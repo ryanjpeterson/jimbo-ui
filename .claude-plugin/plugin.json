@@ -1,7 +1,7 @@
 {
   "name": "jimbo-ui",
-  "version": "3.1.0",
-  "description": "jimbo.ui, Ryan's shared brand and UI system: theme engine with up to four colours, everyday, flag and holiday templates, Tailwind tokens, UI kit, app shell and patterns, with workflows to start apps on it, update them, and release changes.",
+  "version": "0.6.0",
+  "description": "jimbo.ui, Ryan's shared brand and UI system: theme engine with two to four colours and their shades, everyday, flag and holiday templates, glass and a circle motif, Tailwind tokens, UI kit, app shell and patterns, with workflows to start apps on it, update them, and release changes.",
   "author": {
     "name": "Ryan Peterson"
   },

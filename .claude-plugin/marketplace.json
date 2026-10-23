@@ -8,7 +8,7 @@
     {
       "name": "jimbo-ui",
       "source": "./",
-      "version": "3.1.0",
+      "version": "0.6.0",
       "description": "Ryan's shared brand and UI system, with workflows to start apps on it, update them, and release changes."
     }
   ]

@@ -48,12 +48,15 @@ export function initials(name: string): string {
 export type Tone = "accent" | "yellow" | "purple" | "red" | "muted";
 
 export const TONES: Record<Tone, { text: string; chip: string; border: string; tint: string; dot: string }> = {
-  accent: { text: "text-accent",      chip: "bg-accent-950 text-accent border-accent-700",      border: "border-accent-700", tint: "bg-accent-950", dot: "bg-accent" },
-  yellow: { text: "text-yellow-400",  chip: "bg-yellow-950 text-yellow-400 border-yellow-700", border: "border-yellow-600", tint: "bg-yellow-950", dot: "bg-yellow-400" },
-  purple: { text: "text-purple-400",  chip: "bg-purple-950 text-purple-400 border-purple-800", border: "border-purple-700", tint: "bg-purple-950", dot: "bg-purple-400" },
-  red:    { text: "text-red-400",     chip: "bg-red-950 text-red-400 border-red-800",          border: "border-red-700",    tint: "bg-red-950",    dot: "bg-red-400" },
-  muted:  { text: "text-text-subtle", chip: "bg-surface-2 text-text-subtle border-border",      border: "border-border",     tint: "bg-surface-2",  dot: "bg-text-subtle" },
+  accent: { text: "text-accent",      chip: "bg-accent-950 text-accent border-accent-700",      border: "border-accent-700", tint: "bg-accent-950", dot: "bg-accent shadow-accent/70" },
+  yellow: { text: "text-yellow-400",  chip: "bg-yellow-950 text-yellow-400 border-yellow-700", border: "border-yellow-600", tint: "bg-yellow-950", dot: "bg-yellow-400 shadow-yellow-400/70" },
+  purple: { text: "text-purple-400",  chip: "bg-purple-950 text-purple-400 border-purple-800", border: "border-purple-700", tint: "bg-purple-950", dot: "bg-purple-400 shadow-purple-400/70" },
+  red:    { text: "text-red-400",     chip: "bg-red-950 text-red-400 border-red-800",          border: "border-red-700",    tint: "bg-red-950",    dot: "bg-red-400 shadow-red-400/70" },
+  muted:  { text: "text-text-subtle", chip: "bg-surface-2 text-text-subtle border-border",      border: "border-border",     tint: "bg-surface-2",  dot: "bg-text-subtle shadow-text-subtle/40" },
 };
+
+/** A status dot as a small lit sphere with a halo in its colour (add a tone's `dot`). */
+export const STATUS_DOT = "h-3 w-3 shrink-0 rounded-full shadow-[0_0_10px_1px] bg-[radial-gradient(circle_at_35%_30%,rgba(255,255,255,0.6),transparent_62%)]";
 
 /** A status as a labelled chip — for detail pages and headers. */
 export function Badge({ tone, children, className }: { tone: Tone; children: ReactNode; className?: string }) {
@@ -82,6 +85,26 @@ export function Chevron({ dir = "right", className }: { dir?: "left" | "right" |
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Theme dots — the circle motif
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * The theme's colours as small overlapping lit circles (accent, highlight,
+ * support) — jimbo.ui's motif. Use here and there: before a page eyebrow, in
+ * empty states, beside a brand moment. Decorative; follows the live theme.
+ */
+export function ThemeDots({ size = 10, className }: { size?: number; className?: string }) {
+  return (
+    <span aria-hidden="true" className={cn("inline-flex shrink-0 items-center", className)}>
+      {(["orb-accent", "orb-highlight", "orb-support"] as const).map((orb, i) => (
+        <span key={orb} className={cn(orb, "ring-2 ring-bg")}
+          style={{ width: size, height: size, marginLeft: i ? -size * 0.3 : 0, zIndex: 3 - i }} />
+      ))}
+    </span>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Page scaffolding
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -94,7 +117,7 @@ export function PageHeader({ eyebrow, title, count, actions, className }: {
 }) {
   return (
     <header className={cn("mb-5 sm:mb-6", className)}>
-      {eyebrow && <p className="eyebrow mb-1 text-support">{eyebrow}</p>}
+      {eyebrow && <p className="eyebrow mb-1.5 flex items-center gap-2 text-support"><ThemeDots size={9} />{eyebrow}</p>}
       <div className="flex items-end justify-between gap-3">
         <h1 className="h-page min-w-0">
           {title}
@@ -157,7 +180,11 @@ export function Banner({ backdrop, glow = "accent", back, badge, children }: {
         <img src={backdrop} alt="" aria-hidden="true"
           className="absolute inset-0 -z-20 h-full w-full scale-150 object-cover blur-2xl saturate-150" />
       ) : (
-        <div className={cn("absolute inset-0 -z-20 bg-gradient-to-br to-bg", glowCls)} />
+        <div className={cn("absolute inset-0 -z-20 bg-gradient-to-br via-support-950/60 to-bg", glowCls)}>
+          {/* No image: two soft orbs give the frost something to blur. */}
+          <span className="orb-highlight absolute -right-10 -top-12 h-44 w-44 opacity-30 blur-2xl" />
+          <span className="orb-support absolute -bottom-16 left-1/4 h-40 w-40 opacity-25 blur-2xl" />
+        </div>
       )}
       {/* Light overall dim, fading into the page at the bottom so there's no hard edge. */}
       <div className="absolute inset-0 -z-10 bg-black/35" />
@@ -305,17 +332,26 @@ export function List({ children, className }: { children: ReactNode; className?:
 
 /** Sticky-style group label between rows (month headers etc.). */
 export function ListGroupLabel({ children }: { children: ReactNode }) {
-  return <div className="bg-surface-2/60 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-text-muted">{children}</div>;
+  return (
+    <div className="flex items-center gap-2 bg-gradient-to-r from-support-900/50 via-support-950/40 to-transparent px-4 py-2 text-xs font-semibold uppercase tracking-wider text-support">
+      <span aria-hidden="true" className="orb-support h-2 w-2" />
+      {children}
+    </div>
+  );
 }
 
-/** Ticket-style date block: OCT / 14 / Sat. */
+/**
+ * A tear-off calendar ticket: the month on a solid, lit highlight band, the day
+ * big below it, then the year or weekday. Opaque colour on purpose — a thin
+ * wash of the highlight would go grey on a background of the opposite hue.
+ */
 export function DateBlock({ date, showYear = false, approximate = false }: { date: string; showYear?: boolean; approximate?: boolean }) {
   const p = dateParts(date);
   return (
-    <div className="flex w-12 shrink-0 flex-col items-center leading-none sm:w-14">
-      <span className="text-[11px] font-bold tracking-wider text-highlight">{p.month}</span>
-      <span className="font-display text-[26px] leading-[1.1] text-text-base sm:text-[28px]">{approximate ? "~" : p.day}</span>
-      <span className="text-[11px] font-medium text-text-subtle">{showYear ? p.year : p.weekday}</span>
+    <div className="flex w-[52px] shrink-0 flex-col items-center overflow-hidden rounded-xl border border-border bg-surface-2 leading-none shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06),0_6px_14px_-8px_rgba(0,0,0,0.6)] sm:w-14">
+      <span className="lit-highlight w-full py-[3px] text-center text-[10px] font-bold tracking-wider">{p.month}</span>
+      <span className="pt-1 font-display text-[24px] leading-[1.05] text-text-base sm:text-[26px]">{approximate ? "~" : p.day}</span>
+      <span className="pb-1.5 text-[10.5px] font-medium text-text-subtle">{showYear ? p.year : p.weekday}</span>
     </div>
   );
 }
@@ -343,7 +379,7 @@ export function EventRow({ to, date, title, subtitle, meta, imageUrl, status, sh
         className={cn(rowBase, "w-full text-left", selected && "bg-accent/10")}>
         <span className={cn(
           "flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 transition-colors",
-          selected ? "border-accent bg-accent text-on-accent" : "border-border",
+          selected ? "lit-accent border-accent" : "border-border",
         )}>
           {selected && (
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7" /></svg>
@@ -372,7 +408,7 @@ export function EventRow({ to, date, title, subtitle, meta, imageUrl, status, sh
         {meta && <p className="mt-0.5 truncate text-xs text-text-subtle">{meta}</p>}
       </div>
       {/* Status as a quiet dot — the label is in the tooltip and on the detail page */}
-      {status && <span title={status.label} aria-label={status.label} className={cn("h-2.5 w-2.5 shrink-0 rounded-full", TONES[status.tone].dot)} />}
+      {status && <span title={status.label} aria-label={status.label} className={cn(STATUS_DOT, TONES[status.tone].dot)} />}
       <Chevron className="text-text-subtle group-hover:text-accent" />
     </Link>
   );
@@ -393,7 +429,7 @@ export function EntityRow({ to, name, imageUrl, sub, meta, round = false }: {
         {imageUrl ? (
           <img src={imageUrl} alt="" loading="lazy" className="h-full w-full object-cover" />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-support-900 font-display text-base text-support">{initials(name)}</div>
+          <div className="lit-support flex h-full w-full items-center justify-center font-display text-base">{initials(name)}</div>
         )}
       </div>
       <div className="min-w-0 flex-1">
@@ -448,6 +484,14 @@ export function MediaCard({ to, name, imageUrl, sub, meta, aspect = "video", con
 }
 
 /** Tappable summary card: eyebrow, title, sub line, chevron. */
+const ORB = { accent: "orb-accent", highlight: "orb-highlight", support: "orb-support" } as const;
+/** A soft pool of the colour in a card's top-right corner, over the card's own gradient. */
+const GLOW = {
+  accent: "bg-[radial-gradient(circle_at_100%_0%,rgb(var(--c-accent)/0.2),transparent_55%),linear-gradient(rgb(var(--c-surface)/0.9),rgb(var(--c-bg-deep)/0.9))]",
+  highlight: "bg-[radial-gradient(circle_at_100%_0%,rgb(var(--c-highlight)/0.2),transparent_55%),linear-gradient(rgb(var(--c-surface)/0.9),rgb(var(--c-bg-deep)/0.9))]",
+  support: "bg-[radial-gradient(circle_at_100%_0%,rgb(var(--c-support)/0.2),transparent_55%),linear-gradient(rgb(var(--c-surface)/0.9),rgb(var(--c-bg-deep)/0.9))]",
+} as const;
+
 export function LinkCard({ to, eyebrow, title, sub, accent = false }: {
   to?: string;
   eyebrow: ReactNode;
@@ -466,7 +510,7 @@ export function LinkCard({ to, eyebrow, title, sub, accent = false }: {
       {to && <Chevron className="text-text-subtle group-hover:text-accent" />}
     </>
   );
-  const cls = cn("group card flex min-h-[84px] items-center gap-3 p-4 sm:p-5", accent && "border-accent/50 bg-accent-950/20");
+  const cls = cn("group card flex min-h-[84px] items-center gap-3 p-4 sm:p-5", accent && cn("border-accent/50", GLOW.accent));
   return to
     ? <Link to={to} className={cn(cls, "transition-colors hover:border-accent/60")}>{body}</Link>
     : <div className={cls}>{body}</div>;
@@ -484,8 +528,11 @@ export function StatTile({ label, value, sub, accent = "muted" }: {
 }) {
   const col = { accent: "text-accent", highlight: "text-highlight", support: "text-support", muted: "text-text-base" }[accent];
   return (
-    <div className="card p-4 sm:p-5">
-      <p className="eyebrow mb-1">{label}</p>
+    <div className={cn("card relative overflow-hidden p-4 sm:p-5", accent !== "muted" && GLOW[accent])}>
+      <p className="eyebrow mb-1 flex items-center gap-1.5">
+        {accent !== "muted" && <span aria-hidden="true" className={cn(ORB[accent], "h-2.5 w-2.5")} />}
+        {label}
+      </p>
       <p className={cn("font-display text-[32px] leading-none sm:text-4xl", col)}>
         {typeof value === "number" ? value.toLocaleString() : value}
       </p>
@@ -587,7 +634,7 @@ export function Tabs<T extends string>({ value, onChange, options }: {
   options: { value: T; label: string }[];
 }) {
   return (
-    <div role="tablist" className="grid rounded-full border border-border bg-surface p-1 sm:inline-grid sm:min-w-[320px]"
+    <div role="tablist" className="glass grid rounded-full p-1 sm:inline-grid sm:min-w-[320px]"
       // Four or more tabs size to their labels (equal widths would clip the longest).
       style={{ gridTemplateColumns: options.length > 3 ? `repeat(${options.length}, auto)` : `repeat(${options.length}, minmax(0, 1fr))` }}>
       {options.map((o) => {
@@ -598,7 +645,7 @@ export function Tabs<T extends string>({ value, onChange, options }: {
               "h-10 truncate rounded-full font-semibold transition-colors sm:h-9 sm:px-4 sm:text-sm",
               // Four or more tabs: tighter on phones so every label fits.
               options.length > 3 ? "px-2.5 text-sm" : "px-4 text-[15px]",
-              active ? "bg-accent text-on-accent" : "text-text-muted hover:text-text-base",
+              active ? "lit-accent shadow-[inset_0_1px_0_0_rgba(255,255,255,0.25)]" : "text-text-muted hover:text-text-base",
             )}>
             {o.label}
           </button>
@@ -622,7 +669,7 @@ export function PillTabs<T extends string>({ value, onChange, options }: {
           <button key={o.value} onClick={() => onChange(o.value)}
             className={cn(
               "h-10 rounded-full border px-4 text-sm font-semibold transition-colors",
-              active ? (o.activeClass ?? "border-accent bg-accent text-on-accent") : "border-border text-text-muted hover:border-text-subtle hover:text-text-base",
+              active ? (o.activeClass ?? "lit-accent border-accent") : "border-border text-text-muted hover:border-text-subtle hover:text-text-base",
             )}>
             {o.label}
           </button>
@@ -642,7 +689,7 @@ export function Pager({ page, totalPages, total, pageSize, onPage }: {
   if (totalPages <= 1) return null;
   const from = (page - 1) * pageSize + 1;
   const to = Math.min(page * pageSize, total);
-  const btn = "inline-flex h-12 flex-1 items-center justify-center gap-1 rounded-xl border border-border text-[15px] font-semibold transition-colors hover:border-accent disabled:opacity-30 disabled:hover:border-border sm:h-11 sm:flex-none sm:px-5";
+  const btn = "glass inline-flex h-12 flex-1 items-center justify-center gap-1 rounded-xl text-[15px] font-semibold transition-colors hover:border-accent disabled:opacity-30 disabled:hover:border-white/10 sm:h-11 sm:flex-none sm:px-5";
   return (
     <nav className="mt-6 flex items-center gap-3" aria-label="Pagination">
       <button className={btn} disabled={page <= 1} onClick={() => onPage(page - 1)}>
@@ -680,14 +727,14 @@ export function Sheet({ title, subtitle, onClose, children, wide = false }: {
   // Portalled to <body>, so a parent's spacing (space-y margins) or transform can't shift the backdrop.
   return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 backdrop-blur-sm sm:items-center sm:p-6"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-sm sm:items-center sm:p-6"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div
         role="dialog"
         aria-modal="true"
         className={cn(
-          "flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-t-3xl border border-border bg-bg shadow-2xl shadow-black/60",
+          "flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-t-3xl border border-white/10 bg-bg/80 shadow-2xl shadow-black/60 backdrop-blur-2xl backdrop-saturate-150",
           "sm:max-h-[88dvh] sm:rounded-3xl",
           wide ? "sm:max-w-xl" : "sm:max-w-lg",
         )}
@@ -752,6 +799,7 @@ export function EmptyState({ title, body, action, tone = "muted" }: {
 }) {
   return (
     <div className="card px-6 py-14 text-center">
+      <ThemeDots size={tone === "error" ? 18 : 22} className="mb-4" />
       <p className={cn("text-lg font-semibold", tone === "error" ? "text-highlight" : "text-text-base")}>{title}</p>
       {body && <p className="mx-auto mt-1 max-w-sm text-sm text-text-muted">{body}</p>}
       {action && <div className="mt-5 flex justify-center">{action}</div>}
@@ -772,14 +820,14 @@ export function ViewSwitch({ options, current, floating = false }: {
 }) {
   return (
     <div className={cn(
-      "flex rounded-full border p-0.5",
-      floating ? "border-white/10 bg-bg/85 shadow-xl backdrop-blur-md" : "border-border bg-surface",
+      "flex rounded-full p-0.5",
+      floating ? "border border-white/10 bg-bg/70 shadow-xl backdrop-blur-xl backdrop-saturate-150" : "glass",
     )}>
       {options.map((o) => (
         <Link key={o.to} to={o.to} replace aria-current={o.to === current ? "page" : undefined}
           className={cn(
             "flex h-9 items-center rounded-full px-4 text-sm font-semibold transition-colors",
-            o.to === current ? "bg-accent text-on-accent" : "text-text-muted hover:text-text-base",
+            o.to === current ? "lit-accent" : "text-text-muted hover:text-text-base",
           )}>
           {o.label}
         </Link>

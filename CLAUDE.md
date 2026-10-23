@@ -36,8 +36,11 @@ It must print nothing. Add an app's words to it when a new app adopts jimbo.ui.
 | `skills/jimbo-ui/` | `SKILL.md` (core rules + workflows), `guide.md` (the full guide) | |
 | `.claude-plugin/` | `plugin.json` and `marketplace.json` | Versions must match |
 
-Brand decisions so far: up to four source colours (accent, highlight,
-background, optional support); templates in Everyday, Flags and Holidays sets;
+Brand decisions so far: two to four source colours (accent and background
+always; highlight and support set or inferred), each with lighter and darker
+shades; depth over flat fills (lit gradients, frosted glass over colour orbs);
+circles of the theme colours as a motif; templates in Everyday, Flags and
+Holidays sets; no brand colour white or grey;
 no logo — the brand is the app's name as header text (`HeaderTitle`), with a
 dot in the accent; the favicon is the only graphic.
 
@@ -61,7 +64,10 @@ Follow "change and release the guidelines" in `skills/jimbo-ui/SKILL.md`. In sho
 1. Update `skills/jimbo-ui/guide.md` (and its "Change log of this guide") and
    `SKILL.md` if a rule or workflow changed.
 2. Add a `CHANGELOG.md` entry with Changed / Added / Removed and **Apps must**.
-   Semver: patch = fixes, minor = additions, major = apps must change their own code.
+   jimbo.ui is WIP, so 0.x: minor = apps must change their own code, patch =
+   fixes and small additions; 1.0.0 only when Ryan calls it stable. Record
+   work under "Unreleased" as you go; don't number or tag anything until
+   Ryan asks for a release.
 3. Bump `version` in both `.claude-plugin` files and the "This is jimbo.ui"
    line in `SKILL.md`. Start the changelog entry with a one-line summary (the
    session-start check shows it to apps).

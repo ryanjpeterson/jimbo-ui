@@ -1,15 +1,20 @@
 ---
 name: jimbo-ui
-description: Ryan's shared brand and UI system, jimbo.ui (repo and plugin jimbo-ui), for his web apps — theme engine with up to four colours, everyday, flag and holiday templates, Tailwind tokens, UI kit, floating tab-dock app shell and interaction patterns. Use when building, styling or reviewing UI in an app that has a jimbo-ui.json, when starting a new app "in my style" / "like my other apps" / "with jimbo-ui", when asked to update an app to the latest jimbo-ui or brand guidelines, whether there are new brand guidelines, or to preview what an update would change, when checking contrast across themes, or when changing and releasing the jimbo-ui guidelines themselves.
+description: Ryan's shared brand and UI system, jimbo.ui (repo and plugin jimbo-ui), for his web apps — theme engine with two to four colours and their shades, everyday, flag and holiday templates, glass and circle-motif look, Tailwind tokens, UI kit, floating tab-dock app shell and interaction patterns. Use when building, styling or reviewing UI in an app that has a jimbo-ui.json, when starting a new app "in my style" / "like my other apps" / "with jimbo-ui", when asked to update an app to the latest jimbo-ui or brand guidelines, whether there are new brand guidelines, or to preview what an update would change, when checking contrast across themes, or when changing and releasing the jimbo-ui guidelines themselves.
 ---
 
 # jimbo.ui
 
-**This is jimbo.ui 3.1.0.** (Kept in step with the plugin version and the
-newest `CHANGELOG.md` entry; `scripts/versions.mjs` checks.)
+**This is jimbo.ui 0.6.0.** (Kept in step with the plugin version and the
+newest numbered `CHANGELOG.md` entry; `scripts/versions.mjs` checks.)
+jimbo.ui is a work in progress, so it's on 0.x: work collects under
+"Unreleased" in the changelog and is numbered only when Ryan asks for a
+release. Old tags 1.0.0–3.1.0 are now 0.1.0–0.5.0; an app still on an old
+number is on the matching 0.x release (1.0.0 → 0.1.0, 1.1.0 → 0.2.0,
+2.0.0 → 0.3.0, 3.0.0 → 0.4.0, 3.1.0 → 0.5.0).
 
 jimbo.ui is a shared look and behaviour for Ryan's apps: phone-first, app-like, dark by
-default, themeable from up to four colours. The full rules are in
+default, themeable from two to four colours. The full rules are in
 [guide.md](guide.md); read the sections a task needs before writing UI.
 
 The source of truth is the GitHub repo **ryanjpeterson/jimbo-ui** (private).
@@ -20,8 +25,8 @@ in each and what apps must do.
 
 When this skill is used in an app (it has a `jimbo-ui.json`), compare that
 file's `version` with this skill's version (above). If the app is behind, say
-so in one line before anything else — "jimbo.ui 3.1.0 is out; this app is on
-3.0.0" — with the one-line summary of each newer `CHANGELOG.md` entry, and
+so in one line before anything else — "jimbo.ui 0.6.0 is out; this app is on
+0.5.0" — with the one-line summary of each newer `CHANGELOG.md` entry, and
 offer the preview or update workflow. Don't update unless asked. If the app is
 *ahead*, the installed plugin is stale: suggest
 `claude plugin marketplace update jimbo-ui` then
@@ -40,17 +45,23 @@ this check, then the preview workflow if they want detail.
 - Colours come from tokens only: `bg-bg`, `bg-surface`, `bg-surface-2`,
   `border-border`, `text-text-base/muted/subtle`, `*-accent`, `*-highlight`,
   `*-support`, `text-on-accent`, `text-on-highlight`, `text-on-support`,
-  `accent-950/900/700`, `highlight-950/900/800`, `support-950/900/700` (older apps may use the legacy `accent-lime`,
+  each brand colour's shades (`-lighter`, `-light`, `-dark`, `-darker`),
+  lit fill (`from-*-top to-*-bottom`) and washes (`-950/900/800/700`) (older apps may use the legacy `accent-lime`,
   `accent-pink`, `lime-*`, `rose-*` names — same tokens). Never raw hex or Tailwind palette
   colours on brand surfaces; never `text-white` on an accent/highlight fill.
 - No logo: the brand is the app's name as header text (`HeaderTitle`, display
   face, text colour, a dot in the accent — "jimbo.ui").
-- Up to four source colours: **accent** (primary: buttons, active states, the
-  dot in the name), **highlight** (secondary: dates, pins, badges, errors),
-  **support** (third: page eyebrows, avatars, third place, glows — optional,
-  derived when a theme leaves it out), **background** (everything else
-  derives from it). Light backgrounds flip text dark automatically. Spread
-  the colours: a page should show more than the accent.
+- Two to four source colours: **accent** (primary: buttons, active states,
+  the dot in the name) and **background** (everything else derives from it)
+  always; **highlight** (secondary: dates, pins, badges, errors) and
+  **support** (third: page eyebrows, avatars, third place, glows) set or
+  inferred. Light backgrounds flip text dark automatically. Spread the
+  colours: a page shows more than the accent, and no brand colour is white or
+  grey.
+- Depth, not flat fills: lit fills (`.lit-*`, `.btn-primary`), shades for
+  glows and shadows, frosted `.glass` over the page's colour orbs.
+- The circle motif, here and there: `ThemeDots`, `.orb-*`, lit-circle
+  avatars, colour circles on theme tiles. Small and few.
 - Templates come in three sets: **Everyday** (dark, mid, light), **Flags**
   and **Holidays** (guide section 4).
 - Phone first at 375 px; floating frosted tab dock (≤ 5 tabs); things pinned
@@ -75,7 +86,7 @@ release without touching that working copy, export it:
 - `reference/` — generic implementations (kit, shell, header text, Brand and
   Style guide pages), adapted and extended per app
 - `scripts/tokens.mjs` — prints an app's `tokens.css` for its colours
-  (accent, highlight, background, optional support)
+  (accent, highlight or `-`, background, optional support)
 - `scripts/contrast.mjs` — contrast and colour-separation report for every
   template (`--check` fails on a miss)
 - `scripts/versions.mjs` — checks every stated version agrees
@@ -158,7 +169,7 @@ update", or before updating if the user wants to look first.
    `tokens.css` from `BRAND.defaultTheme`.
 6. Typecheck and build; check the Style guide page at phone width.
 7. Set `version` in `jimbo-ui.json`, add an entry to the app's own changelog
-   ("Updated to jimbo-ui 1.2.0: …"), and commit. Push only if the user asks.
+   ("Updated to jimbo-ui 0.6.0: …"), and commit. Push only if the user asks.
 
 ## Workflow: change and release the guidelines
 
@@ -177,10 +188,12 @@ To release one:
    templates changed, run `node scripts/contrast.mjs --check` — every template
    must pass. If the shell or kit changed, keep `showcase/src/Shell.tsx` and
    the demo pages in step.
-3. Add a `CHANGELOG.md` entry for the new version with **Changed / Added /
-   Removed** and an **Apps must** list (or "Nothing — copy the foundation
-   files"). Semver: patch for fixes, minor for additions, major when apps must
-   change their own code.
+3. While working, record changes under **Unreleased** in `CHANGELOG.md`
+   (Changed / Added / Removed and **Apps must**, or "Nothing — copy the
+   foundation files") and don't bump anything. Only when Ryan asks for a
+   release: turn Unreleased into the new version's entry and leave an empty
+   Unreleased above it. Versions (jimbo.ui is a work in progress, so 0.x): minor (0.6 → 0.7) when
+   apps must change their own code, patch for fixes and small additions.
 4. Bump `version` in `.claude-plugin/plugin.json`,
    `.claude-plugin/marketplace.json` and the "This is jimbo.ui" line at the
    top of this file; `node scripts/versions.mjs` must pass. Start the

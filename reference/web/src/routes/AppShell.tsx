@@ -39,7 +39,7 @@ export function AppShell({ tabs, actions, onRefresh, children }: {
   return (
     <div className="min-h-full overflow-x-clip">
       {/* Top padding clears the status bar / notch in standalone mode. */}
-      <header className="sticky top-0 z-40 border-b border-border bg-bg/90 pt-[env(safe-area-inset-top)] backdrop-blur-xl">
+      <header className="sticky top-0 z-40 border-b border-white/10 bg-bg/70 pt-[env(safe-area-inset-top)] backdrop-blur-2xl backdrop-saturate-150">
         <div className="mx-auto flex h-14 max-w-5xl items-center justify-between gap-4 px-4 sm:h-16 sm:px-6">
           <div className="flex h-full items-center gap-8">
             <Link to="/" aria-label="Home"><HeaderTitle /></Link>
@@ -91,7 +91,7 @@ export function AppShell({ tabs, actions, onRefresh, children }: {
                 }}
                 className={cn(
                   "relative flex h-14 flex-col items-center justify-center gap-0.5 rounded-[22px] transition-[background-color,color,transform] duration-200 active:scale-[0.92]",
-                  active ? "bg-accent/15 text-accent" : "text-text-muted active:bg-white/5",
+                  active ? "bg-gradient-to-b from-accent/25 to-accent/10 text-accent shadow-[inset_0_1px_0_0_rgb(var(--c-accent)/0.35)]" : "text-text-muted active:bg-white/5",
                 )}>
                 <DockIcon active={active}>{t.icon}</DockIcon>
                 <span className={cn("text-[10.5px] tracking-wide", active ? "font-bold" : "font-semibold")}>{t.label}</span>
@@ -126,7 +126,7 @@ export function TopBarButton({ label, onClick, primary = false, children }: {
     <button onClick={onClick} aria-label={label} title={label}
       className={cn(
         "flex h-10 w-10 items-center justify-center rounded-full transition-[color,border-color,transform] active:scale-95",
-        primary ? "bg-accent text-on-accent hover:brightness-110" : "border border-border text-text-muted hover:border-accent hover:text-text-base",
+        primary ? "lit-accent shadow-[inset_0_1px_0_0_rgba(255,255,255,0.28),0_6px_16px_-8px_rgb(var(--c-accent-dark)/0.9)]" : "glass text-text-muted hover:border-accent hover:text-text-base",
       )}>
       {children}
     </button>

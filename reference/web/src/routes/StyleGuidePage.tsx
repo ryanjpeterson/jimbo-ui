@@ -14,9 +14,9 @@ import { HeaderTitle } from "@/components/HeaderTitle";
 import { ColorPicker } from "@/components/ColorPicker";
 import {
   Badge, DateBlock, EmptyState, EntityRow, EventRow, LinkCard, List, ListGroupLabel, Loading, MediaCard, PageHeader, Pager,
-  PillTabs, RankedList, SearchField, Section, SelectField, Sheet, StatGrid, StatTile, Tabs, ViewSwitch, type Tone,
+  PillTabs, RankedList, SearchField, Section, SelectField, Sheet, StatGrid, StatTile, Tabs, ThemeDots, ViewSwitch, type Tone,
 } from "@/components/ui/kit";
-import { fullTheme, THEME_KEYS, themeHex } from "@/lib/theme";
+import { THEME_KEYS, themeHex } from "@/lib/theme";
 import { useBrand } from "@/lib/useBrand";
 
 const TOKENS: { name: string; use: string }[] = [
@@ -30,16 +30,22 @@ const TOKENS: { name: string; use: string }[] = [
   { name: "text-subtle", use: "Labels, hints" },
   { name: "accent", use: "Primary actions, active state" },
   { name: "accent-hover", use: "Accent on hover" },
+  { name: "accent-light", use: "Lighter shade (depth, glows)" },
+  { name: "accent-dark", use: "Darker shade (depth, shadows)" },
   { name: "on-accent", use: "Text on accent fills" },
   { name: "accent-950", use: "Accent wash (done chip)" },
   { name: "accent-700", use: "Accent outline" },
   { name: "highlight", use: "Dates, badges, alerts" },
   { name: "on-highlight", use: "Text on highlight fills" },
+  { name: "highlight-dark", use: "Darker highlight" },
   { name: "highlight-950", use: "Highlight wash (warnings)" },
   { name: "support", use: "Page labels, avatars, third place" },
   { name: "on-support", use: "Text on support fills" },
   { name: "support-900", use: "Support wash (avatars)" },
 ];
+
+const ORB = { accent: "orb-accent", highlight: "orb-highlight", support: "orb-support" } as const;
+const LIT = { accent: "lit-accent", highlight: "lit-highlight", support: "lit-support" } as const;
 
 const TONE_EXAMPLES: { tone: Tone; label: string }[] = [
   { tone: "accent", label: "Done" },
@@ -62,7 +68,7 @@ function Block({ title, note, children }: { title: string; note?: string; childr
 }
 
 export function StyleGuidePage() {
-  const theme = fullTheme(useBrand().theme);
+  const { theme: own, colors: theme } = useBrand();
   const hex = themeHex(theme);
   const [tab, setTab] = useState<"one" | "two">("one");
   const [pill, setPill] = useState<"a" | "b" | "c">("a");
@@ -78,22 +84,52 @@ export function StyleGuidePage() {
       <PageHeader eyebrow="Admin · reference" title="Style guide" />
       <p className="meta -mt-6 max-w-xl">The shared building blocks, live in the current theme. The rules are in the jimbo-ui guide.</p>
 
-      <Block title="Brand" note="The app's name as header text (a dot takes the accent) and the four source colours.">
+      <Block title="Brand" note="The app's name as header text (a dot takes the accent) and its colours as circles — two to four; a dashed ring means inferred.">
         <div className="card flex flex-wrap items-center gap-6 p-5">
           <HeaderTitle size="lg" />
           <div className="flex flex-wrap gap-3">
             {THEME_KEYS.map((k) => (
               <div key={k} className="text-center">
-                <div className="h-14 w-14 rounded-2xl border border-border" style={{ background: theme[k] }} />
-                <p className="mt-1 text-xs font-semibold capitalize">{k}</p>
-                <p className="font-mono text-[11px] text-text-subtle">{theme[k]}</p>
+                <div className={`mx-auto h-14 w-14 rounded-full ${k === "background" ? "border border-border" : ORB[k]} ${own[k] ? "" : "outline-dashed outline-2 outline-offset-2 outline-text-subtle"}`}
+                  style={k === "background" ? { background: theme[k] } : undefined} />
+                <p className="mt-1.5 text-xs font-semibold capitalize">{k}</p>
+                <p className="font-mono text-[11px] text-text-subtle">{own[k] ? theme[k] : "inferred"}</p>
               </div>
             ))}
           </div>
         </div>
       </Block>
 
-      <Block title="Colour tokens" note="Derived from the four colours. Use these classes, never raw hex (bg-surface, text-text-muted, bg-accent/15 …).">
+      <Block title="Shades and depth" note="Each brand colour comes lighter and darker, as a lit fill (top → bottom) and as washes. Use them for depth, never as new colours.">
+        <div className="card space-y-4 p-5">
+          {(["accent", "highlight", "support"] as const).map((k) => (
+            <div key={k} className="flex items-center gap-3">
+              <p className="w-20 shrink-0 text-xs font-semibold capitalize">{k}</p>
+              <div className="flex items-center">
+                {["lighter", "light", "", "dark", "darker"].map((v) => (
+                  <span key={v} className="-ml-1.5 h-8 w-8 rounded-full ring-2 ring-surface first:ml-0"
+                    style={{ background: `rgb(var(--c-${k}${v ? `-${v}` : ""}))` }} title={`${k}${v ? `-${v}` : ""}`} />
+                ))}
+              </div>
+              <span className={`${LIT[k]} ml-auto whitespace-nowrap rounded-full px-3 py-1 text-xs font-bold shadow-[inset_0_1px_0_0_rgba(255,255,255,0.25)]`}>Lit fill</span>
+            </div>
+          ))}
+        </div>
+      </Block>
+
+      <Block title="Glass and orbs" note="Frosted .glass over the page's colour orbs; .orb-* circles and ThemeDots are the motif — use them here and there, not everywhere.">
+        <div className="relative overflow-hidden rounded-2xl p-5">
+          <span className="orb-accent absolute -left-6 -top-8 h-32 w-32" />
+          <span className="orb-highlight absolute right-6 top-6 h-20 w-20" />
+          <span className="orb-support absolute -bottom-10 left-1/3 h-28 w-28" />
+          <div className="card-glass relative flex items-center gap-3 p-4">
+            <ThemeDots size={14} />
+            <p className="text-sm font-semibold">.card-glass over orbs</p>
+          </div>
+        </div>
+      </Block>
+
+      <Block title="Colour tokens" note="Derived from the brand colours. Use these classes, never raw hex (bg-surface, text-text-muted, bg-accent/15 …).">
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {TOKENS.map((t) => (
             <div key={t.name} className="flex items-center gap-3 rounded-xl border border-border bg-surface p-2.5">

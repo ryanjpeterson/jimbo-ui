@@ -9,10 +9,13 @@
   html, body, #root { height: 100%; }
   body {
     background-color: rgb(var(--c-bg));
+    /* Three soft orbs of the brand colours behind everything: depth for the
+       frosted bars and sheets to blur, and the circle motif at page scale. */
     background-image:
-      radial-gradient(ellipse at top, rgb(var(--c-accent) / 0.06), transparent 60%),
-      radial-gradient(ellipse at bottom left, rgb(var(--c-support) / 0.05), transparent 55%),
-      radial-gradient(ellipse at bottom right, rgb(var(--c-highlight) / 0.04), transparent 55%);
+      radial-gradient(circle at 10% 4%, rgb(var(--c-accent) / 0.2), transparent 36%),
+      radial-gradient(circle at 98% 36%, rgb(var(--c-highlight) / 0.16), transparent 32%),
+      radial-gradient(circle at 14% 98%, rgb(var(--c-support) / 0.16), transparent 38%),
+      linear-gradient(rgb(var(--c-bg-deep) / 0), rgb(var(--c-bg-deep)));
     background-attachment: fixed;
     /* iOS safe area support. Top/bottom insets are handled by the header and
        the mobile bottom nav — padding body vertically on top of height: 100%
@@ -53,10 +56,33 @@
    ───────────────────────────────────────────────────────────────────────── */
 @layer components {
   /* The one card surface every section, list and tile sits on. */
+  /* Slightly translucent, so the page's colour orbs tint cards as they pass
+     behind, and lit by the brand colours: a breath of accent from the top left
+     and of support from the bottom right, so no card is a flat slab of one hue. */
   .card {
-    @apply rounded-2xl border border-border bg-gradient-to-b from-surface to-bg-deep
-      shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05),0_12px_32px_-16px_rgba(0,0,0,0.7)];
+    @apply rounded-2xl border border-border
+      shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06),0_12px_32px_-16px_rgba(0,0,0,0.7)];
+    background-image:
+      radial-gradient(circle at 0% 0%, rgb(var(--c-accent) / 0.09), transparent 55%),
+      radial-gradient(circle at 100% 100%, rgb(var(--c-support) / 0.09), transparent 55%),
+      linear-gradient(rgb(var(--c-surface) / 0.9), rgb(var(--c-bg-deep) / 0.9));
   }
+  /* Frosted glass: translucent surface that blurs what's behind it (bars, sheets,
+     tiles over a banner or the page orbs). Needs something colourful behind to show. */
+  .glass {
+    @apply border border-white/10 bg-surface/65 backdrop-blur-xl backdrop-saturate-150
+      shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1),0_16px_40px_-20px_rgba(0,0,0,0.65)];
+  }
+  /* A card in glass: same shape as .card, frosted instead of solid. */
+  .card-glass {
+    @apply glass rounded-2xl;
+  }
+  /* Orbs: a brand colour as a lit sphere (light at the top left, dark at the
+     bottom right) — the circle motif. Size and place them with utilities. */
+  .orb-accent    { background: radial-gradient(circle at 32% 28%, rgb(var(--c-accent-lighter)), rgb(var(--c-accent)) 48%, rgb(var(--c-accent-darker))); }
+  .orb-highlight { background: radial-gradient(circle at 32% 28%, rgb(var(--c-highlight-lighter)), rgb(var(--c-highlight)) 48%, rgb(var(--c-highlight-darker))); }
+  .orb-support   { background: radial-gradient(circle at 32% 28%, rgb(var(--c-support-lighter)), rgb(var(--c-support)) 48%, rgb(var(--c-support-darker))); }
+  .orb-accent, .orb-highlight, .orb-support { @apply rounded-full; }
   .eyebrow {
     @apply text-[11px] font-semibold uppercase tracking-[0.12em] text-text-subtle;
   }
@@ -89,11 +115,15 @@
   .btn-sm {
     @apply h-9 px-3.5 text-sm sm:h-8;
   }
+  /* Lit from above: a two-stop accent fill, a bright inner top edge and a
+     glow in the accent's dark shade. The fill never lowers text contrast. */
   .btn-primary {
-    @apply bg-accent text-on-accent hover:bg-accent-hover;
+    @apply bg-accent bg-gradient-to-b from-accent-top to-accent-bottom text-on-accent
+      shadow-[inset_0_1px_0_0_rgba(255,255,255,0.28),0_8px_20px_-10px_rgb(var(--c-accent-dark)/0.9)]
+      hover:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.28),0_10px_26px_-8px_rgb(var(--c-accent)/0.7)];
   }
   .btn-secondary {
-    @apply border border-border bg-surface-2 text-text-base hover:border-text-subtle;
+    @apply border border-border bg-surface-2 text-text-base shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] hover:border-text-subtle;
   }
   .btn-ghost {
     @apply text-text-muted hover:bg-surface-2 hover:text-text-base;
@@ -106,6 +136,10 @@
     @apply inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-2 px-3 py-1.5 text-sm font-medium
       text-text-muted;
   }
+  /* A lit fill for small solid shapes (count badges, avatars, active pills). */
+  .lit-accent    { @apply bg-accent bg-gradient-to-b from-accent-top to-accent-bottom text-on-accent; }
+  .lit-highlight { @apply bg-highlight bg-gradient-to-b from-highlight-top to-highlight-bottom text-on-highlight; }
+  .lit-support   { @apply bg-support bg-gradient-to-b from-support-top to-support-bottom text-on-support; }
   /* Inline text action ("Edit", "Remove", "+ Add"). */
   .link-action {
     @apply text-sm font-semibold text-text-muted transition-colors hover:text-accent;

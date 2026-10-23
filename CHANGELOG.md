@@ -1,11 +1,87 @@
 # Changelog
 
-Every release of jimbo-ui, newest first. Versions follow semver: patch for
-fixes, minor for additions, major when apps must change their own code. Each
-entry ends with **Apps must** — the steps the update workflow carries out in
-each app beyond copying the foundation files.
+Every release of jimbo-ui, newest first. Each entry ends with **Apps must** —
+the steps the update workflow carries out in each app beyond copying the
+foundation files.
 
-## 3.1.0 — 2026-10-23
+**jimbo.ui is a work in progress, so it's on 0.x.** While it is: a release
+that asks apps to change their own code bumps the minor (0.6.0 → 0.7.0);
+fixes and small additions bump the patch (0.6.0 → 0.6.1). 1.0.0 is for when
+Ryan calls it stable. Changes collect under **Unreleased** at the top and only
+get a number when Ryan asks for a release.
+
+Releases before 2026-10-23's renumbering were tagged 1.0.0–3.1.0; they are
+now 0.1.0–0.5.0 (1.0.0 → 0.1.0, 1.1.0 → 0.2.0, 2.0.0 → 0.3.0, 3.0.0 → 0.4.0,
+3.1.0 → 0.5.0). An app whose `jimbo-ui.json` still says an old number is on
+the matching 0.x release.
+
+## Unreleased
+
+Nothing yet.
+
+## 0.6.0 — 2026-10-23
+
+Depth, glass and the circle motif; two colours are enough.
+
+### Added
+- **Shades for every brand colour** (accent, highlight, support):
+  `-lighter`, `-light`, `-dark`, `-darker`, a lit fill `-top` → `-bottom`
+  (only ever moves away from the on-colour, so button text never gets harder
+  to read) and washes `-950/900/800/700` for all three.
+- **Two-colour themes:** highlight is optional; `deriveHighlight` infers it
+  from the accent, and support from both. `fullTheme`, `ownColours`,
+  `OPTIONAL_KEYS`.
+- **Look:** `.glass`, `.card-glass`, `.orb-accent/highlight/support`,
+  `.lit-accent/highlight/support`; lit `.btn-primary` with a glow; three
+  colour orbs behind the page; cards at 90% so the orbs tint them.
+- **Circle motif:** `ThemeDots` (kit) before page eyebrows and in empty
+  states; orbs by stat labels; lit-circle avatars; colour circles on theme
+  tiles (inferred ones dashed); the starter favicon is three circles
+  (recoloured from all three brand colours).
+- **Templates:** Canada (Flags) and Two-tone (Everyday, two colours).
+- Style guide: Shades and depth, Glass and orbs blocks; colours as circles.
+- `scripts/tokens.mjs` takes `-` for an inferred highlight or support.
+
+### Changed
+- **`Theme.highlight` is optional** (breaking for code that reads it from a
+  `Theme`: use `fullTheme(theme).highlight` or `useBrand().colors`).
+- `useBrand()` returns `colors` (all four, inferred filled in) beside `theme`
+  (as set); `withDefaults` keeps a saved theme's missing colours missing.
+- Brand page: *Infer it* / *Inferred* switch for highlight and support; saves
+  only the colours that are set.
+- Kit: frosted `Tabs`, `ViewSwitch`, `Sheet`, `Pager` and top bar; lit
+  active tabs, pills, select ticks and top-bar main button; `StatTile` and
+  accent `LinkCard` glows; `Banner` without an image gets colour orbs.
+- **Lists aren't flat:** `DateBlock` is a calendar ticket with the month on a
+  lit highlight band; row status dots are lit spheres with a glow
+  (`STATUS_DOT`; `TONES[*].dot` now carries a shadow colour);
+  `ListGroupLabel` is support text with an orb on a support wash.
+- `.card` is lit by the brand colours: a soft accent glow top left and
+  support glow bottom right over its gradient.
+- Washes: `highlight-700` and `accent-800`/`support-800` added; `accent-hover`
+  is now 20% (was 22%).
+- Sweden (amber highlight, sky support), USA (sky highlight, white support)
+  and Hanukkah (silver-blue highlight): no white highlights.
+
+### Apps must
+- Copy the foundation files (`theme.ts`, `themes.ts`, `globals.css`,
+  `tailwind.config.js`).
+- Regenerate `src/styles/tokens.css` (`scripts/tokens.mjs`): many new tokens.
+- Where app code reads `.highlight` (or `.support`) from a `Theme`, read it
+  from `fullTheme(theme)` or `useBrand().colors` instead; the typecheck finds
+  them.
+- Apps with a theme server: accept a missing `highlight` (as for `support`)
+  and store only what's sent.
+- Apps that track the reference: port `useBrand`, the Brand page, Style guide,
+  kit (`ThemeDots`, `DateBlock`, `ListGroupLabel`, `EventRow`, `TONES`,
+  `STATUS_DOT`, `StatTile`, `Tabs`, `Sheet`, `Pager`, `EntityRow`,
+  `EmptyState`, `Banner`, `LinkCard`, `ViewSwitch`, `PillTabs`) and
+  `AppShell` changes. App rows built on their own date blocks or dots:
+  follow the ticket and glowing-dot pattern (guide sections 2 and 9).
+- Optional: replace `public/favicon.svg` with the starter's circles (keep its
+  four marker colours) so the favicon follows all the brand colours.
+
+## 0.5.0 — 2026-10-23
 
 Up to four colours, flag and holiday templates, and apps hear about new releases.
 
@@ -46,7 +122,7 @@ Up to four colours, flag and holiday templates, and apps hear about new releases
 - Apps with a theme server: accept and return an optional `support`
   (`#RRGGBB`) alongside the other three.
 
-## 3.0.0 — 2026-10-23
+## 0.4.0 — 2026-10-23
 
 Branded **jimbo.ui** (the repo and plugin keep the name `jimbo-ui`).
 
@@ -71,7 +147,7 @@ Branded **jimbo.ui** (the repo and plugin keep the name `jimbo-ui`).
   remove `logo` from `brand.config.ts`. Apps that keep their own logo can
   skip this.
 
-## 2.0.0 — 2026-10-23
+## 0.3.0 — 2026-10-23
 
 jimbo-ui is now fully generic: no app's code, names, artwork or sample content.
 
@@ -114,7 +190,7 @@ jimbo-ui is now fully generic: no app's code, names, artwork or sample content.
   on `EventRow`, `ViewSwitch`, `accent`/`highlight` prop values) and add
   `logo` to `brand.config.ts` if using the reference `Wordmark`.
 
-## 1.1.0 — 2026-10-23
+## 0.2.0 — 2026-10-23
 
 ### Changed
 - **Stronger contrast on every theme.** Cards, fields, borders and secondary
@@ -155,7 +231,7 @@ jimbo-ui is now fully generic: no app's code, names, artwork or sample content.
 - If the app passes `mapStyles()` to Google Maps, nothing changes; if it typed
   anything as `google.maps.MapTypeStyle[]` from it, use `MapStyle[]`.
 
-## 1.0.0 — 2026-10-23
+## 0.1.0 — 2026-10-23
 
 First release.
 
