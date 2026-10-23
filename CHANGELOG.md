@@ -17,7 +17,26 @@ the matching 0.x release.
 
 ## Unreleased
 
-Nothing yet.
+Clearer separation between items.
+
+### Changed
+- **Stronger lines and layers.** `CONTRAST_TARGETS`: borders step to 1.8:1
+  against cards (was 1.55), cards to 1.2:1 against the page (was 1.16),
+  fields and chips to 1.15:1 against cards (was 1.14). The contrast report
+  now requires border ≥ 1.75 and card ≥ 1.19; every template passes.
+- Rows are a little taller (`py-3.5`, at least 76 px).
+
+### Added
+- `.divide-etched`: a full-strength line with a faint light line under it
+  between stacked items; it also reaches rows grouped in wrappers under a
+  label. `List`, `RankedList` and `Loading` use it.
+
+### Apps must
+- Copy the foundation files (`theme.ts`, `globals.css`).
+- Regenerate `src/styles/tokens.css` (`scripts/tokens.mjs`): the derivation changed.
+- Apps that track the reference kit: `divide-y divide-border` → `divide-etched`
+  in `List`, `RankedList` and `Loading`, and the row padding change. App lists
+  of their own: use `divide-etched` too.
 
 ## 0.6.0 — 2026-10-23
 

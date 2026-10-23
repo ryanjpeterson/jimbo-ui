@@ -7,7 +7,7 @@
  *   node scripts/contrast.mjs --check  exit 1 if any template misses a target
  *
  * Targets (WCAG ratios; text ones checked on cards, the surface most text sits on):
- *   text 7 · muted 4.5 · subtle (labels) 3.5 · border vs card 1.5 · card vs page 1.15
+ *   text 7 · muted 4.5 · subtle (labels) 3.5 · border vs card 1.75 · card vs page 1.19
  *   accent and highlight vs page 3 · support vs card 4.5 · text on the accent 4.5
  *   apart: accent, highlight and support at least 20 apart from each other (CIE ΔE),
  *   so a theme reads as more than one colour
@@ -26,7 +26,7 @@ try {
   writeFileSync(join(dir, "run.ts"), `
 import { contrast, hexToRgb, themeHex } from "./theme";
 import { TEMPLATE_SETS } from "./themes";
-const T = { text: 7, muted: 4.5, subtle: 3.5, border: 1.5, card: 1.15, accent: 3, highlight: 3, support: 4.5, button: 4.5, apart: 20 };
+const T = { text: 7, muted: 4.5, subtle: 3.5, border: 1.75, card: 1.19, accent: 3, highlight: 3, support: 4.5, button: 4.5, apart: 20 };
 /** CIE76 ΔE between two hex colours (sRGB → Lab, D65). */
 function deltaE(a: string, b: string): number {
   const lab = (hex: string) => {

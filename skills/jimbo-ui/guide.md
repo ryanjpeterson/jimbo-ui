@@ -248,10 +248,10 @@ clear cards and labels as a near-black one.
 | Token (`--c-…`) | Tailwind | Formula | Use |
 | --- | --- | --- | --- |
 | `bg` | `bg-bg` | background | Page |
-| `surface` | `bg-surface` | mix(bg, away, *card*) where *card* = stepTo vs bg, **1.16:1** (at least 0.05 dark / 0.04 light) | Cards, sheets, the dock |
+| `surface` | `bg-surface` | mix(bg, away, *card*) where *card* = stepTo vs bg, **1.2:1** (at least 0.05 dark / 0.04 light) | Cards, sheets, the dock |
 | `bg-deep` | `bg-bg-deep` | mix(bg, away, *card* × 0.35) | End of the card gradient |
-| `surface-2` | `bg-surface-2` | stepTo vs surface, **1.14:1** | Fields, chips, hover rows |
-| `border` | `border-border` | stepTo vs surface, **1.55:1** | Lines, outlines, card edges |
+| `surface-2` | `bg-surface-2` | stepTo vs surface, **1.15:1** | Fields, chips, hover rows |
+| `border` | `border-border` | stepTo vs surface, **1.8:1** | Lines, outlines, card edges, row dividers |
 | `text` | `text-text-base` | text | Body text, header text |
 | `text-muted` | `text-text-muted` | mix(text, bg, fadeTo **5:1** on surface, at most 0.4) | Secondary lines |
 | `text-subtle` | `text-text-subtle` | mix(text, bg, fadeTo **3.8:1** on surface, at most 0.6) | Labels, hints, counts |
@@ -311,7 +311,7 @@ inferred ones, which are built to pass):
 
 Every template must also pass `node scripts/contrast.mjs --check`, measured
 on cards: body text ≥ 7:1, muted ≥ 4.5:1, labels ≥ 3.5:1, card border
-≥ 1.5:1, card against page ≥ 1.15:1 — and the three above, plus
+≥ 1.75:1, card against page ≥ 1.19:1 — and the three above, plus
 **colours apart**: accent, highlight and support at least 20 apart from each
 other (CIE76 ΔE), so no template reads as one colour. Mid-grey backgrounds limit body text
 most: keep them dark enough (luminance under about 0.07) for 7:1.
@@ -475,7 +475,7 @@ everything else, **JetBrains Mono** 400/600 for codes and hex values.
   `gap-3` in grids, `p-4 sm:p-5` inside cards; grids are 2 columns on phones,
   3 from `sm:`.
 - **No horizontal scroll strips.** Wrap, use a select on phones, or a sheet.
-- **Touch targets ≥ 44 px** (`h-11`/`h-12` on phones), rows ≥ 64 px.
+- **Touch targets ≥ 44 px** (`h-11`/`h-12` on phones), rows ≥ 76 px (`py-3.5`), each divided from the next by an etched line.
 
 ### Layers (z-index)
 
@@ -495,6 +495,7 @@ everything else, **JetBrains Mono** 400/600 for codes and hex values.
 | `.card` | 18 px radius, `border-border` (full strength), gradient `surface → bg-deep` top to bottom at 90% (the page orbs tint it), under a 9% accent glow from the top left and a 9% support glow from the bottom right; inner top highlight `inset 0 1px 0 rgba(255,255,255,.06)`, soft drop `0 12px 32px -16px rgba(0,0,0,.7)` |
 | `.glass` / `.card-glass` | Frosted: `bg-surface/65`, `backdrop-blur-xl backdrop-saturate-150`, `border-white/10`, inner top highlight `rgba(255,255,255,.1)`, soft drop. For tabs, the secondary top-bar buttons and anything over a banner or orbs; it needs colour behind it to show |
 | `.orb-accent/highlight/support` | A brand colour as a lit sphere: `radial-gradient(circle at 32% 28%, c-lighter, c 48%, c-darker)`, fully round. Size it with utilities. The circle motif |
+| `.divide-etched` | Lines between stacked items, on the parent like `divide-y`: a full-strength `border` line with a faint light line under it (`inset 0 1px 0 rgba(255,255,255,.05)`). It also reaches one level down, so rows grouped in wrappers (a month's label and rows) are divided too. Lists, ranked lists |
 | `.lit-accent/highlight/support` | The lit fill: `from-c-top to-c-bottom` with `on-c` text. Active tabs and pills, avatars, count badges |
 | `.field` | 14 px radius, `bg-surface-2`, `border-border`, 15 px text, `px-4`; focus = accent border + 2 px accent ring at 20% |
 | `.btn` | Fully round, 44 px tall on phones (40 px desktop), `px-5`, 15 px semibold; `.btn-sm` 36 px (32 px desktop); `lg` 48 px |
@@ -663,3 +664,7 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   highlights. Colour from opaque shapes, not thin washes: date tickets with a
   lit month band, glowing status dots, support group labels, cards lit by the
   accent and support.
+- **Unreleased** — Clearer separation: borders step to 1.8:1 against cards
+  (was 1.55:1) and cards to 1.2:1 against the page (was 1.16:1); rows are
+  divided by etched lines (`.divide-etched`), including rows grouped under a
+  label, and are a little taller (76 px).

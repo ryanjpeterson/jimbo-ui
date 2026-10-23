@@ -149,7 +149,7 @@ export function DetailDemo() {
         <p className="meta">A detail page opens with a hero: back, status, title, actions.</p>
       </Hero>
       <Section title="Agenda" count={3}>
-        <ol className="divide-y divide-border">
+        <ol className="divide-etched">
           {["Welcome", "The main session", "Wrap-up"].map((part, i) => (
             <li key={part} className="flex items-center gap-3 px-4 py-3 text-[15px]">
               <span className="w-5 text-right font-display text-text-subtle">{i + 1}</span>{part}

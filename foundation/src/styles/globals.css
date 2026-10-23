@@ -136,6 +136,16 @@
     @apply inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-2 px-3 py-1.5 text-sm font-medium
       text-text-muted;
   }
+  /* Etched dividers between stacked items (rows in a list): a full-strength
+     border with a faint light line under it, so each row reads as its own
+     strip in dark and light themes alike. Use on the parent, like divide-y;
+     it also reaches one level down, so rows grouped in wrappers (a month's
+     label and rows in a <div>) get lines between them too. */
+  .divide-etched > :not(:first-child),
+  .divide-etched > div > :not(:first-child) {
+    border-top: 1px solid rgb(var(--c-border));
+    box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.05);
+  }
   /* A lit fill for small solid shapes (count badges, avatars, active pills). */
   .lit-accent    { @apply bg-accent bg-gradient-to-b from-accent-top to-accent-bottom text-on-accent; }
   .lit-highlight { @apply bg-highlight bg-gradient-to-b from-highlight-top to-highlight-bottom text-on-highlight; }

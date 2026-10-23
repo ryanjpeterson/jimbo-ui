@@ -86,7 +86,7 @@ export const isHex = (v: string): boolean => /^#[0-9a-f]{6}$/i.test(v);
  * Contrast targets (WCAG ratios) the derived colours are stepped to meet on
  * every background, measured on cards — the surface most text sits on.
  */
-export const CONTRAST_TARGETS = { card: 1.16, card2: 1.14, border: 1.55, muted: 5, subtle: 3.8 } as const;
+export const CONTRAST_TARGETS = { card: 1.2, card2: 1.15, border: 1.8, muted: 5, subtle: 3.8 } as const;
 
 /** Smallest t in [min, max] where mix(from, to, t) reaches `target` contrast with `against` (it grows with t). */
 function stepTo(from: RGB, to: RGB, against: RGB, target: number, min: number, max: number): number {

@@ -327,7 +327,7 @@ export function Section({ title, count, action, children, flush = false, classNa
 
 /** Divided list inside a card — pair with EventRow / EntityRow. */
 export function List({ children, className }: { children: ReactNode; className?: string }) {
-  return <div className={cn("card divide-y divide-border overflow-hidden", className)}>{children}</div>;
+  return <div className={cn("card divide-etched overflow-hidden", className)}>{children}</div>;
 }
 
 /** Sticky-style group label between rows (month headers etc.). */
@@ -356,7 +356,7 @@ export function DateBlock({ date, showYear = false, approximate = false }: { dat
   );
 }
 
-const rowBase = "group flex items-center gap-3 px-4 py-3 min-h-[72px] transition-colors hover:bg-surface-2/70 active:bg-surface-2 sm:gap-4";
+const rowBase = "group flex items-center gap-3 px-4 py-3.5 min-h-[76px] transition-colors hover:bg-surface-2/70 active:bg-surface-2 sm:gap-4";
 
 /** A dated item as a row: date block, optional thumb, title, sub lines, status dot, chevron. */
 export function EventRow({ to, date, title, subtitle, meta, imageUrl, status, showYear = true, approximate, selected, onSelect }: {
@@ -561,7 +561,7 @@ export function RankedList({ items, unit = "item" }: { items: RankedItem[]; unit
   return (
     <div className="grid sm:grid-cols-2 sm:divide-x sm:divide-border">
       {[items.slice(0, Math.ceil(items.length / 2)), items.slice(Math.ceil(items.length / 2))].map((col, ci) => (
-        <div key={ci} className={cn("divide-y divide-border", ci === 1 && "border-t border-border sm:border-t-0")}>
+        <div key={ci} className={cn("divide-etched", ci === 1 && "border-t border-border sm:border-t-0")}>
           {col.map((item, i) => {
             const rank = ci * Math.ceil(items.length / 2) + i + 1;
             return (
@@ -776,7 +776,7 @@ export function Loading({ label = "Loading…" }: { label?: string }) {
         <div className="h-24 rounded-2xl bg-surface" />
         <div className="h-24 rounded-2xl bg-surface" />
       </div>
-      <div className="card divide-y divide-border overflow-hidden">
+      <div className="card divide-etched overflow-hidden">
         {[0, 1, 2, 3, 4].map((i) => (
           <div key={i} className="flex items-center gap-3 px-4 py-3">
             <div className="h-12 w-12 shrink-0 rounded-xl bg-surface-2" />
