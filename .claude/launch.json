@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "jimbo-ui-showcase",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "showcase", "run", "dev"],
+      "port": 4455
+    }
+  ]
+}
