@@ -79,7 +79,7 @@ export function AppShell({ tabs, actions, onRefresh, children }: {
       {/* Phones: a floating, frosted dock above the home indicator; content fades out behind it. */}
       <div aria-hidden className="pointer-events-none fixed inset-x-0 bottom-0 z-30 h-[calc(6rem+env(safe-area-inset-bottom))] bg-gradient-to-t from-bg via-bg/70 to-transparent sm:hidden" />
       <nav aria-label="Main" className="pointer-events-none fixed inset-x-0 bottom-0 z-40 select-none px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:hidden">
-        <div className="pointer-events-auto mx-auto grid max-w-md gap-1 rounded-[20px] border border-border bg-surface/95 p-1.5 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06),0_10px_40px_-8px_rgba(0,0,0,0.75)] ring-1 ring-black/30 backdrop-blur-md"
+        <div className="pointer-events-auto mx-auto grid max-w-md gap-1 rounded-[20px] border border-border bg-surface/95 p-1.5 shadow-[0_10px_40px_-8px_rgba(0,0,0,0.75)] ring-1 ring-black/30 backdrop-blur-md"
           style={{ gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))` }}>
           {tabs.map((t) => {
             const active = inTab(t);
@@ -91,7 +91,7 @@ export function AppShell({ tabs, actions, onRefresh, children }: {
                 }}
                 className={cn(
                   "relative flex h-14 flex-col items-center justify-center gap-0.5 rounded-[14px] transition-[background-color,color,transform] duration-200 active:scale-[0.92]",
-                  active ? "bg-gradient-to-b from-accent/25 to-accent/10 text-accent shadow-[inset_0_1px_0_0_rgb(var(--c-accent)/0.35)]" : "text-text-muted active:bg-white/5",
+                  active ? "bg-accent/15 text-accent shadow-[inset_0_0_0_1px_rgb(var(--c-accent)/0.3)]" : "text-text-muted active:bg-white/5",
                 )}>
                 <DockIcon active={active}>{t.icon}</DockIcon>
                 <span className={cn("text-[10.5px] tracking-wide", active ? "font-bold" : "font-semibold")}>{t.label}</span>
@@ -126,7 +126,7 @@ export function TopBarButton({ label, onClick, primary = false, children }: {
     <button onClick={onClick} aria-label={label} title={label}
       className={cn(
         "flex h-10 w-10 items-center justify-center rounded-full transition-[color,border-color,transform] active:scale-95",
-        primary ? "lit-accent shadow-[inset_0_1px_0_0_rgba(255,255,255,0.28),0_6px_16px_-8px_rgb(var(--c-accent-dark)/0.9)]" : "glass text-text-muted hover:border-accent hover:text-text-base",
+        primary ? "lit-accent hover:bg-accent-hover" : "glass text-text-muted hover:border-accent hover:text-text-base",
       )}>
       {children}
     </button>

@@ -66,7 +66,7 @@ function ThemeCard({ name, vibe, theme: input, selected, onPick }: { name: strin
           </div>
         </div>
         <div className="flex gap-1.5">
-          <span className="rounded-md px-2.5 py-1 text-[9px] font-bold shadow-[inset_0_1px_0_0_rgba(255,255,255,0.28)]" style={{ background: `linear-gradient(${c["accent-top"]}, ${c["accent-bottom"]})`, color: c["on-accent"] }}>Save</span>
+          <span className="rounded-md px-2.5 py-1 text-[9px] font-bold" style={{ background: c.accent, boxShadow: `inset 0 0 0 1px ${c["accent-darker"]}8c`, color: c["on-accent"] }}>Save</span>
           <span className="rounded-md px-2.5 py-1 text-[9px] font-bold" style={{ background: c["surface-2"], color: c.text }}>Cancel</span>
         </div>
       </div>

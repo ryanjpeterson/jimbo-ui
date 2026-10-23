@@ -100,7 +100,7 @@ export function StyleGuidePage() {
         </div>
       </Block>
 
-      <Block title="Shades and depth" note="Each brand colour comes lighter and darker, as a lit fill (top → bottom) and as washes. Use them for depth, never as new colours.">
+      <Block title="Shades and depth" note="Each brand colour comes lighter and darker, as a solid fill with a slight outline, and as washes. Use them for depth, never as new colours.">
         <div className="card space-y-4 p-5">
           {(["accent", "highlight", "support"] as const).map((k) => (
             <div key={k} className="flex items-center gap-3">
@@ -111,7 +111,7 @@ export function StyleGuidePage() {
                     style={{ background: `rgb(var(--c-${k}${v ? `-${v}` : ""}))` }} title={`${k}${v ? `-${v}` : ""}`} />
                 ))}
               </div>
-              <span className={`${LIT[k]} ml-auto whitespace-nowrap rounded-full px-3 py-1 text-xs font-bold shadow-[inset_0_1px_0_0_rgba(255,255,255,0.25)]`}>Lit fill</span>
+              <span className={`${LIT[k]} ml-auto whitespace-nowrap rounded-control px-3 py-1 text-xs font-bold`}>Solid fill</span>
             </div>
           ))}
         </div>

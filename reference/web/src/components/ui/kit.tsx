@@ -645,7 +645,7 @@ export function Tabs<T extends string>({ value, onChange, options }: {
               "h-10 truncate rounded-lg font-semibold transition-colors sm:h-9 sm:px-4 sm:text-sm",
               // Four or more tabs: tighter on phones so every label fits.
               options.length > 3 ? "px-2.5 text-sm" : "px-4 text-[15px]",
-              active ? "lit-accent shadow-[inset_0_1px_0_0_rgba(255,255,255,0.25)]" : "text-text-muted hover:text-text-base",
+              active ? "lit-accent" : "text-text-muted hover:text-text-base",
             )}>
             {o.label}
           </button>

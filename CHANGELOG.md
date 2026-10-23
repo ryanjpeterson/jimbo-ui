@@ -20,6 +20,11 @@ the matching 0.x release.
 Clearer separation, a calmer surface (less glass, less round, flat swatches) and type styles.
 
 ### Changed
+- **Flat fills everywhere.** `.btn-primary` and `.lit-*` (active tabs and
+  pills, select ticks, date bands, the top bar's add button) are flat with a
+  slight outline in the colour's darker shade — no gradient, top highlight
+  or glow; `.btn-secondary`, `.glass` and the dock lose their top highlight;
+  the active dock tab is a flat `accent/15` with an outline.
 - **Flat swatches.** Colour circles are flat with a slight outline in their
   own darker shade — no sphere shading or glow: `.orb-*`, `EntityRow`
   avatars (now `orb-support` with `on-support` text), status dots

@@ -13,8 +13,8 @@ implementations of everything below are in the repo's `reference/` folder.
   and support set or inferred), each with lighter and darker shades, picked
   from Everyday, Flags or Holidays templates or fine-tuned on each app's
   **Brand & theme** admin page.
-- **Look:** depth, not flat fills — lit gradients, solid surfaces with a
-  light frost, softly rounded corners (not pills), soft colour orbs, and
+- **Look:** flat colour with a slight outline on coloured shapes, depth from
+  layers — solid surfaces with a light frost, softly rounded corners (not pills), soft colour orbs, and
   circles of the theme's colours as a recurring motif.
 - **Type:** sans (Archivo and Inter), mono (JetBrains Mono) or serif
   (Fraunces and Source Serif 4), chosen separately for headings and body.
@@ -175,11 +175,13 @@ for what to tap, the highlight for dates and alerts, the support for labels
 and people. Don't make the highlight or support white or grey — that's the
 text colour, and the page goes flat.
 
-**Depth, not flat fills.** Each brand colour comes with lighter and darker
-shades (section 3). Solid shapes get a **lit fill** — lighter at the top,
-darker at the bottom, with a bright inner top edge — and primary buttons a
-soft glow in the accent's dark shade. Floating things are **lightly
-frosted**: mostly solid, a soft blur, a crisp border and a lit top line — never
+**Depth from layers, flat colour.** Each brand colour comes with lighter and darker
+shades (section 3). Coloured shapes — buttons, active tabs and pills, date
+bands, avatars, swatches, dots — are **flat with a slight outline**: the
+colour, plus a 1 px inner line of its darker shade. No gloss, gradients or
+glows on them. Depth comes from layers (cards, borders, shadows under
+floating things), not shading. Floating things are **lightly
+frosted**: mostly solid, a soft blur and a crisp border — never
 see-through glass. Corners are **softly rounded, not pills**: circles are
 kept for the motif (avatars, dots, orbs, round icon buttons). Cards carry a breath of the accent (top left)
 and support (bottom right).
@@ -271,7 +273,7 @@ family of tokens:
 | `on-`*c* | `text-on-c` | on(c) | Text/icons on fills of it |
 | *c*`-lighter` / `-light` | `*-c-lighter`, `*-c-light` | mix(c, white, 0.50 / 0.22) | Highlights on spheres, glows, light ends |
 | *c*`-dark` / `-darker` | `*-c-dark`, `*-c-darker` | mix(c, black, 0.22 / 0.50) | Shadows, glows under buttons, dark ends |
-| *c*`-top` → *c*`-bottom` | `from-c-top to-c-bottom` | dark on-text: mix(c, white, 0.30) → c; white on-text: c → mix(c, black, 0.28) | The lit fill (`.lit-c`, `.btn-primary`). It only moves away from the on-colour, so text on it never gets harder to read |
+| *c*`-top` → *c*`-bottom` | `from-c-top to-c-bottom` | dark on-text: mix(c, white, 0.30) → c; white on-text: c → mix(c, black, 0.28) | A two-stop version of the colour, if an app needs one; the kit no longer uses it (fills are flat) |
 | *c*`-950/900/800/700` | `*-c-950…700` | mix(bg, c, 0.10 / 0.28 / 0.40 / 0.50) | Washes: done chip, warnings, banner glows |
 
 **Legacy class names:** apps from before 0.3 may use `accent-lime`,
@@ -481,7 +483,7 @@ mean the headings and body styles.
   6.5 rem + the bottom safe area on phones so nothing hides under the dock.
 - **Tab dock (phones):** floats 12 px above the bottom safe area, `max-w-md`,
   a 5-column grid in a 20 px-radius slab: `bg-surface/95`, `border-border`,
-  `ring-1 ring-black/30`, `backdrop-blur-md`, a lit top line, deep
+  `ring-1 ring-black/30`, `backdrop-blur-md`, deep
   shadow. Each tab is 56 px tall with a 14 px-radius active tab, icon above a
   10.5 px label; active = accent pill, filled icon, bold label. Presses scale
   to 0.92. Tapping the active tab scrolls to the top. A gradient fade from
@@ -514,19 +516,19 @@ mean the headings and body styles.
 | Thing | Recipe |
 | --- | --- |
 | `.card` | 14 px radius, `border-border` (full strength), gradient `surface → bg-deep` top to bottom at 97%, under a 9% accent glow from the top left and a 9% support glow from the bottom right; inner top highlight `inset 0 1px 0 rgba(255,255,255,.06)`, soft drop `0 12px 32px -16px rgba(0,0,0,.7)` |
-| `.glass` / `.card-glass` | Lightly frosted: `bg-surface/90`, `backdrop-blur-md`, `border-border`, inner top highlight `rgba(255,255,255,.08)`, soft drop. For tabs, the secondary top-bar buttons, the pager and anything over a banner |
+| `.glass` / `.card-glass` | Lightly frosted: `bg-surface/90`, `backdrop-blur-md`, `border-border`, soft drop. For tabs, the secondary top-bar buttons, the pager and anything over a banner |
 | `.orb-accent/highlight/support` | A brand colour as a **flat circle with a slight outline**: the colour, plus `inset 0 0 0 1px` of its darker shade at 55%. Fully round; size it with utilities. The circle motif — swatches, avatars, stat dots, `ThemeDots`. No gloss or sphere shading on swatches |
 | `.divide-etched` | Lines between stacked items, on the parent like `divide-y`: a full-strength `border` line with a faint light line under it (`inset 0 1px 0 rgba(255,255,255,.05)`). It also reaches one level down, so rows grouped in wrappers (a month's label and rows) are divided too. Lists, ranked lists |
-| `.lit-accent/highlight/support` | The lit fill: `from-c-top to-c-bottom` with `on-c` text. Active tabs and pills, avatars, count badges |
+| `.lit-accent/highlight/support` | A solid brand fill: flat colour, `inset 0 0 0 1px` of its darker shade at 55%, `on-c` text. Active tabs and pills, select ticks, the date band, count badges (the name is from when they were shaded) |
 | `.field` | 11 px radius, `bg-surface-2`, `border-border`, 15 px text, `px-4`; focus = accent border + 2 px accent ring at 20% |
 | `.btn` | 10 px radius (`rounded-control`), 44 px tall on phones (40 px desktop), `px-5`, 15 px semibold; `.btn-sm` 36 px (32 px desktop); `lg` 48 px |
-| `.btn-primary` | Lit accent fill (`accent-top → accent-bottom`), on-accent text, inner top highlight `rgba(255,255,255,.28)`, glow `0 8px 20px -10px accent-dark/90%` that grows on hover |
-| `.btn-secondary` | `bg-surface-2`, border, inner top highlight, border lightens on hover |
+| `.btn-primary` | Flat accent fill with a slight outline (`inset 0 0 0 1px accent-darker/55%`), on-accent text, `accent-hover` on hover |
+| `.btn-secondary` | `bg-surface-2`, border, border lightens on hover |
 | `.btn-ghost` | Muted text, `surface-2` on hover |
 | `.btn-danger` | Muted text, red wash and highlight text on hover |
 | `.chip` | 8 px radius, `bg-surface-2`, border, 14 px medium, muted |
 | Top bar | `bg-bg/90`, `backdrop-blur-md`, `border-border` |
-| Floating bars and the dock | `bg-surface/95`, `backdrop-blur-md`, `border-border`, lit top line, deep shadow; the dock is a 20 px-radius slab and its active tab a 14 px-radius accent gradient (25% → 10%) with an accent top edge |
+| Floating bars and the dock | `bg-surface/95`, `backdrop-blur-md`, `border-border`, deep shadow; the dock is a 20 px-radius slab and its active tab a 14 px-radius `accent/15` fill with a 1 px `accent/30` outline |
 | Sheet | Solid `bg-bg`, `border-border`. Rendered into `<body>` through a portal (so a parent's spacing or transform can't shift it); bottom sheet on phones (top corners 18 px, grab handle 40×6 px, max 92 dvh), centred dialog on desktop (18 px radius, `max-w-lg` / `max-w-xl`) |
 | Radii scale | 4 (`sm`) · 6 (`md`: badges) · 8 (`lg`: chips, tabs) · 10 (`control`: buttons, pills) · 11 (`xl`: fields) · 14 (`2xl`: cards) · 18 (`3xl`: sheets) · 20 (dock) · full only for circles (avatars, dots, orbs, round icon buttons) |
 
@@ -549,7 +551,7 @@ mean the headings and body styles.
 | `List` + `ListGroupLabel` | A card of rows, optionally grouped (by month); group labels are support text with a support orb, on a support wash fading right |
 | `EventRow` | A dated item. `DateBlock` on the left, a `status` dot (`{ tone, label }`); `selected`/`onSelect` for select mode |
 | `EntityRow` | A named thing with an avatar (a person, a place) |
-| `DateBlock` | A tear-off calendar ticket (52 px wide, 12 px radius, `surface-2`): the month on a lit highlight band, the day big below, then the year or weekday |
+| `DateBlock` | A tear-off calendar ticket (52 px wide, 12 px radius, `surface-2`): the month on a solid highlight band, the day big below, then the year or weekday |
 | `MediaCard` | Image-led grid card (`aspect="portrait"` for posters) |
 | `LinkCard` | A card that navigates (eyebrow / title / sub); `accent` for the one to notice |
 | `StatTile` / `StatGrid` | Headline numbers (`accent="accent"` / `"highlight"` / `"support"`: the number in that colour, a small orb by the label and a soft pool of it in the corner) |
@@ -567,7 +569,7 @@ mean the headings and body styles.
 | `ViewSwitch` | Two or three views of one page as links (List ⇄ Map) |
 | `HeaderTitle` (`components/HeaderTitle.tsx`) | The app's name as header text — the brand; `sm`/`md`/`lg` (22/30/44 px) |
 | `ColorPicker` (`components/ColorPicker.tsx`) | Inline colour picker: saturation/brightness field, hue slider (28–36 px thumbs, drag anywhere), one row of 8 quick swatches, hex box with a preview chip. Never the native `<input type=color>` — it opens a different dialog on every platform |
-| `ThemeCard` (`routes/BrandPage.tsx`) | A theme shown as a miniature of the app (header text, a lit support avatar, a support eyebrow, a date-row card, a lit primary and a secondary button), then a row of circles — every colour it uses, inferred ones with a dashed ring — then name and vibe |
+| `ThemeCard` (`routes/BrandPage.tsx`) | A theme shown as a miniature of the app (header text, a support avatar, a support eyebrow, a date-row card, a primary and a secondary button — all flat), then a row of circles — every colour it uses, inferred ones with a dashed ring — then name and vibe |
 | `Button` (`ui/button.tsx`) | `primary` (one per view), `secondary`, `ghost`, `danger`; `sm`/`md`/`lg` |
 
 CSS classes for plain elements: `.card`, `.field`, `.btn …`, `.chip`,
@@ -685,9 +687,9 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   highlights. Colour from opaque shapes, not thin washes: date tickets with a
   lit month band, glowing status dots, support group labels, cards lit by the
   accent and support.
-- **Unreleased** — Flat swatches: colour circles (orbs, avatars, status
-  dots, theme-tile and editor swatches) are flat with a slight outline, no
-  sphere shading or glow. Less glassy and less round: mostly solid frosted surfaces
+- **Unreleased** — Flat fills: every coloured shape (buttons, active tabs
+  and pills, date bands, orbs, avatars, status dots, swatches) is flat with a
+  slight outline — no gloss, gradients or glows. Less glassy and less round: mostly solid frosted surfaces
   and a smaller radius scale (cards 14, buttons 10, chips 8; circles kept for
   the motif). Type styles: sans, mono or serif for headings and body.
   Clearer separation: borders step to 1.8:1 against cards

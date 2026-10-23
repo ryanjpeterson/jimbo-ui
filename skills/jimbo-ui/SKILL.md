@@ -46,7 +46,7 @@ this check, then the preview workflow if they want detail.
   `border-border`, `text-text-base/muted/subtle`, `*-accent`, `*-highlight`,
   `*-support`, `text-on-accent`, `text-on-highlight`, `text-on-support`,
   each brand colour's shades (`-lighter`, `-light`, `-dark`, `-darker`),
-  lit fill (`from-*-top to-*-bottom`) and washes (`-950/900/800/700`) (older apps may use the legacy `accent-lime`,
+  solid fill (`.lit-*`) and washes (`-950/900/800/700`) (older apps may use the legacy `accent-lime`,
   `accent-pink`, `lime-*`, `rose-*` names — same tokens). Never raw hex or Tailwind palette
   colours on brand surfaces; never `text-white` on an accent/highlight fill.
 - No logo: the brand is the app's name as header text (`HeaderTitle`, display
@@ -58,8 +58,8 @@ this check, then the preview workflow if they want detail.
   inferred. Light backgrounds flip text dark automatically. Spread the
   colours: a page shows more than the accent, and no brand colour is white or
   grey.
-- Depth, not flat fills: lit fills (`.lit-*`, `.btn-primary`), shades for
-  glows and shadows, lightly frosted `.glass` (mostly solid, never
+- Coloured shapes are flat with a slight outline (`.lit-*`, `.btn-primary`,
+  `.orb-*`) — no gloss or glows; depth comes from layers, borders and shadows, lightly frosted `.glass` (mostly solid, never
   see-through). Softly rounded corners, not pills (`rounded-control` for
   buttons and pills); full circles only for the motif.
 - Type: the theme picks sans, mono or serif for headings and for body

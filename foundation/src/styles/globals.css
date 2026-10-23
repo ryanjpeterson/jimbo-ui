@@ -72,11 +72,11 @@
       radial-gradient(circle at 100% 100%, rgb(var(--c-support) / 0.09), transparent 55%),
       linear-gradient(rgb(var(--c-surface) / 0.97), rgb(var(--c-bg-deep) / 0.97));
   }
-  /* Lightly frosted: mostly solid surface with a soft blur, a crisp edge and a
-     lit top line — depth without the see-through look. */
+  /* Lightly frosted: mostly solid surface with a soft blur and a crisp edge —
+     depth without the see-through look. */
   .glass {
     @apply border border-border bg-surface/90 backdrop-blur-md
-      shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08),0_12px_30px_-18px_rgba(0,0,0,0.6)];
+      shadow-[0_12px_30px_-18px_rgba(0,0,0,0.6)];
   }
   /* A card in glass: same shape as .card, frosted instead of solid. */
   .card-glass {
@@ -120,15 +120,12 @@
   .btn-sm {
     @apply h-9 px-3.5 text-sm sm:h-8;
   }
-  /* Lit from above: a two-stop accent fill, a bright inner top edge and a
-     glow in the accent's dark shade. The fill never lowers text contrast. */
+  /* Flat accent fill with a slight outline in the accent's darker shade. */
   .btn-primary {
-    @apply bg-accent bg-gradient-to-b from-accent-top to-accent-bottom text-on-accent
-      shadow-[inset_0_1px_0_0_rgba(255,255,255,0.28),0_8px_20px_-10px_rgb(var(--c-accent-dark)/0.9)]
-      hover:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.28),0_10px_26px_-8px_rgb(var(--c-accent)/0.7)];
+    @apply bg-accent text-on-accent shadow-[inset_0_0_0_1px_rgb(var(--c-accent-darker)/0.55)] hover:bg-accent-hover;
   }
   .btn-secondary {
-    @apply border border-border bg-surface-2 text-text-base shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] hover:border-text-subtle;
+    @apply border border-border bg-surface-2 text-text-base hover:border-text-subtle;
   }
   .btn-ghost {
     @apply text-text-muted hover:bg-surface-2 hover:text-text-base;
@@ -151,10 +148,12 @@
     border-top: 1px solid rgb(var(--c-border));
     box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.05);
   }
-  /* A lit fill for small solid shapes (count badges, avatars, active pills). */
-  .lit-accent    { @apply bg-accent bg-gradient-to-b from-accent-top to-accent-bottom text-on-accent; }
-  .lit-highlight { @apply bg-highlight bg-gradient-to-b from-highlight-top to-highlight-bottom text-on-highlight; }
-  .lit-support   { @apply bg-support bg-gradient-to-b from-support-top to-support-bottom text-on-support; }
+  /* A solid brand fill for small shapes (active tabs and pills, count badges,
+     date bands): flat colour with a slight outline in its darker shade, and
+     its on- colour for text. (Named "lit" before they went flat; kept.) */
+  .lit-accent    { @apply bg-accent text-on-accent shadow-[inset_0_0_0_1px_rgb(var(--c-accent-darker)/0.55)]; }
+  .lit-highlight { @apply bg-highlight text-on-highlight shadow-[inset_0_0_0_1px_rgb(var(--c-highlight-darker)/0.55)]; }
+  .lit-support   { @apply bg-support text-on-support shadow-[inset_0_0_0_1px_rgb(var(--c-support-darker)/0.55)]; }
   /* Inline text action ("Edit", "Remove", "+ Add"). */
   .link-action {
     @apply text-sm font-semibold text-text-muted transition-colors hover:text-accent;
