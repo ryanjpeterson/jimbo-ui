@@ -5,6 +5,47 @@ fixes, minor for additions, major when apps must change their own code. Each
 entry ends with **Apps must** — the steps the update workflow carries out in
 each app beyond copying the foundation files.
 
+## 1.1.0 — 2026-10-23
+
+### Changed
+- **Stronger contrast on every theme.** Cards, fields, borders and secondary
+  text no longer use fixed percentages: the engine steps each one just far
+  enough to meet a contrast target on that background (cards 1.16:1 against
+  the page, borders 1.55:1 against cards, muted text 5:1, labels 3.8:1). Mid
+  and light themes gain the most — on Denim, cards went from 1.11:1 to
+  1.16:1, borders from 1.30:1 to 1.55:1 and labels from 2.8:1 to 3.8:1.
+  Body text is a touch brighter (`#FAF8F4` dark, `#111113` light).
+- **Card borders at full strength** (`.card` uses `border-border`, not `/60`).
+- **Concrete** template background deepened `#55585E` → `#45484D` so body
+  text reaches 7:1.
+- **Sheets render into `<body>` through a portal** (reference kit), so a
+  parent's `space-y` margin can no longer push the backdrop down and leave a
+  strip of the page uncovered at the top.
+
+### Fixed
+- `theme.ts` no longer needs Google Maps' type definitions: `mapStyles()`
+  returns its own `MapStyle[]` (same shape), so apps without Maps typecheck.
+
+### Added
+- **Showcase** (`showcase/`): a demo app built only from the release's code —
+  Home, List (search, filters, select mode) and Detail demo pages, the real
+  Style guide and Brand pages, the shell and dock — published as a private
+  page each release.
+- **Preview an update**: a skill workflow that reports what updating an app
+  would change (versions, look, foundation diffs, local edits at risk, apps-must
+  steps, reference changes, default colours) without touching anything.
+- `scripts/contrast.mjs`: contrast report for every template; `--check` fails
+  the release if any template misses a target.
+
+### Apps must
+- Copy the foundation files (`theme.ts`, `themes.ts`, `globals.css`).
+- Regenerate `src/styles/tokens.css` from `BRAND.defaultTheme`
+  (`scripts/tokens.mjs`) — the derivation changed.
+- Port the `Sheet` portal change into the app's kit (`createPortal(…,
+  document.body)` around the backdrop).
+- If the app passes `mapStyles()` to Google Maps, nothing changes; if it typed
+  anything as `google.maps.MapTypeStyle[]` from it, use `MapStyle[]`.
+
 ## 1.0.0 — 2026-10-23
 
 First release, split out of Tinnitus A Go Go.

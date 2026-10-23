@@ -44,6 +44,14 @@ The stack is React + TypeScript + Vite + Tailwind CSS 3 (with `clsx` and
 - `public/favicon.svg` — keep `#0B0B0C` for its background and `#A8FF3E` for
   its mark so `applyFavicon` can recolour it.
 
+**Showcase:** `showcase/` is a small app built only from a release's code
+(reference, then foundation and starter, then stand-ins for the server parts
+in `showcase/overrides/`). It runs the real Brand page, Style guide and kit,
+plus Home, List and Detail demo pages, with the theme saved in the browser.
+`npm --prefix showcase run dev` runs it locally; each release publishes it as
+a private page (URL in the README) — the way to see what an app would get
+without having one.
+
 **Reference (adapt to the app):** the UI kit (`kit.tsx`), app shell
 (`AppShell.tsx`), Brand page, Style guide page, `Wordmark.tsx`, `useBrand.ts`,
 share images, upload ring, photo carousel, `index.html` (pre-paint script,
@@ -144,19 +152,29 @@ modifiers work on every token (`bg-accent-lime/15`, `border-border/60`).
 `mix(a, b, t)` = a → b by t (0 = a, 1 = b), per RGB channel.
 `light` = WCAG luminance of the background > 0.4.
 `away` = black on a light background, white on a dark one.
-`text` = `#141416` on light, `#F4F1EB` on dark.
+`text` = `#111113` on light, `#FAF8F4` on dark.
 `on(c)` = `#141416` if luminance(c) > 0.35, else `#FFFFFF`.
+
+Surfaces, borders and secondary text aren't fixed percentages: the engine
+steps each one just far enough to meet a **contrast target** on that
+background (`CONTRAST_TARGETS` in `theme.ts`), so a mid-blue page gets as
+clear cards and labels as a near-black one.
+
+- `stepTo(…, target)` = the smallest t where mix(bg, away, t) reaches the
+  target contrast against a reference colour.
+- `fadeTo(…, target)` = the largest t where mix(text, bg, t) still keeps the
+  target contrast on cards.
 
 | Token (`--c-…`) | Tailwind | Formula | Use |
 | --- | --- | --- | --- |
 | `bg` | `bg-bg` | background | Page |
-| `bg-deep` | `bg-bg-deep` | mix(bg, away, 0.017) | End of the card gradient |
-| `surface` | `bg-surface` | mix(bg, away, light ? 0.04 : 0.034) | Cards, sheets, the dock |
-| `surface-2` | `bg-surface-2` | mix(bg, away, light ? 0.075 : 0.072) | Fields, chips, hover rows |
-| `border` | `border-border` | mix(bg, away, light ? 0.14 : 0.119) | Lines, outlines |
+| `surface` | `bg-surface` | mix(bg, away, *card*) where *card* = stepTo vs bg, **1.16:1** (at least 0.05 dark / 0.04 light) | Cards, sheets, the dock |
+| `bg-deep` | `bg-bg-deep` | mix(bg, away, *card* × 0.35) | End of the card gradient |
+| `surface-2` | `bg-surface-2` | stepTo vs surface, **1.14:1** | Fields, chips, hover rows |
+| `border` | `border-border` | stepTo vs surface, **1.55:1** | Lines, outlines, card edges |
 | `text` | `text-text-base` | text | Body text, logo outline |
-| `text-muted` | `text-text-muted` | mix(text, bg, 0.38) | Secondary lines |
-| `text-subtle` | `text-text-subtle` | mix(text, bg, 0.58) | Labels, hints, counts |
+| `text-muted` | `text-text-muted` | mix(text, bg, fadeTo **5:1** on surface, at most 0.4) | Secondary lines |
+| `text-subtle` | `text-text-subtle` | mix(text, bg, fadeTo **3.8:1** on surface, at most 0.6) | Labels, hints, counts |
 | `accent` | `*-accent-lime` | accent | See section 2 |
 | `accent-hover` | `*-accent-lime-hover` | mix(accent, light ? black : white, 0.22) | Hover |
 | `on-accent` | `text-on-accent` | on(accent) | Text/icons on accent fills |
@@ -176,7 +194,9 @@ modifiers work on every token (`bg-accent-lime/15`, `border-border/60`).
 - **Browser chrome:** `<meta name="theme-color">` = background;
   `color-scheme` = light or dark to match.
 - **Text selection:** accent fill, on-accent text.
-- **Maps:** `mapStyles(theme)` tints the map from bg → accent; pins are round,
+- **Maps:** `mapStyles(theme)` returns plain style rules (`MapStyle[]`, the
+  shape Google Maps' `styles` option takes, no Maps types needed) tinting the
+  map from bg → accent; pins are round,
   highlight-filled with a lighter ring (`markerIcon`).
 - **Favicon:** `applyFavicon` swaps the template's `#0B0B0C` → background and
   `#A8FF3E` → accent.
@@ -193,10 +213,17 @@ modifiers work on every token (`bg-accent-lime/15`, `border-border/60`).
 - Light backgrounds: surfaces step *darker*, text flips to near-black. Photo
   viewers, banners over flyers and map pins stay dark/vivid on purpose.
 
-### Readability (checked live on the Brand page; WCAG)
+### Readability (WCAG)
+
+Checked live on the Brand page for the colours an admin picks:
 - Body text ≥ 4.5:1 on the background.
 - Accent and highlight ≥ 3:1 on the background.
 - Text on an accent button ≥ 4.5:1.
+
+Every template must also pass `node scripts/contrast.mjs --check`, measured
+on cards: body text ≥ 7:1, muted ≥ 4.5:1, labels ≥ 3.5:1, card border
+≥ 1.5:1, card against page ≥ 1.15:1. Mid-grey backgrounds limit body text
+most: keep them dark enough (luminance under about 0.07) for 7:1.
 
 ---
 
@@ -229,7 +256,7 @@ extra "Yours" card at the front.
 | Forest | Gold + clay | `#E9C46A` | `#F4A261` | `#1F3A2E` |
 | Burgundy | Rosé + butter | `#F7B2BD` | `#FFD166` | `#4A1C2B` |
 | Dusk | Peach + mint | `#FFB4A2` | `#9DE0AD` | `#3D3B6B` |
-| Concrete | Grey + lemon | `#FFE066` | `#FF8FA3` | `#55585E` |
+| Concrete | Grey + lemon | `#FFE066` | `#FF8FA3` | `#45484D` |
 | Fog | Navy + red | `#1E3A8A` | `#B91C1C` | `#C8CDD4` |
 | Sage | Pine + wine | `#1F3D2B` | `#8B1E3F` | `#B7C9B0` |
 | Clay | Plum + teal | `#3B1F5C` | `#0F4C5C` | `#D9B8A0` |
@@ -323,7 +350,7 @@ everything else, **JetBrains Mono** 400/600 for codes and hex values.
 
 | Thing | Recipe |
 | --- | --- |
-| `.card` | 18 px radius, `border-border/60`, gradient `surface → bg-deep` top to bottom, inner top highlight `inset 0 1px 0 rgba(255,255,255,.05)`, soft drop `0 12px 32px -16px rgba(0,0,0,.7)` |
+| `.card` | 18 px radius, `border-border` (full strength), gradient `surface → bg-deep` top to bottom, inner top highlight `inset 0 1px 0 rgba(255,255,255,.05)`, soft drop `0 12px 32px -16px rgba(0,0,0,.7)` |
 | `.field` | 14 px radius, `bg-surface-2`, `border-border`, 15 px text, `px-4`; focus = accent border + 2 px accent ring at 20% |
 | `.btn` | Fully round, 44 px tall on phones (40 px desktop), `px-5`, 15 px semibold; `.btn-sm` 36 px (32 px desktop); `lg` 48 px |
 | `.btn-primary` | Accent fill, on-accent text, accent-hover on hover |
@@ -332,7 +359,7 @@ everything else, **JetBrains Mono** 400/600 for codes and hex values.
 | `.btn-danger` | Muted text, red wash and highlight text on hover |
 | `.chip` | Fully round, `bg-surface-2`, border, 14 px medium, muted |
 | Floating bars and the dock | `bg-surface/75–95`, `backdrop-blur-xl/2xl`, `border-white/10` or `border-border`, `shadow-2xl shadow-black/50` |
-| Sheet | Bottom sheet on phones (top corners 24 px, grab handle 40×6 px, max 92 dvh), centred dialog on desktop (24 px radius, `max-w-lg` / `max-w-xl`) |
+| Sheet | Rendered into `<body>` through a portal (so a parent's spacing or transform can't shift it); bottom sheet on phones (top corners 24 px, grab handle 40×6 px, max 92 dvh), centred dialog on desktop (24 px radius, `max-w-lg` / `max-w-xl`) |
 | Radii scale | 6 · 8 · 10 · 14 (`xl`) · 18 (`2xl`) · 22/28 (dock) · full (buttons, pills, badges, avatars) |
 
 **Motion:** quick and physical, never decorative.
@@ -456,3 +483,8 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
 - **1.0.0 (2026-10-23)** — jimbo-ui split out of Tinnitus A Go Go: three-colour
   theme engine, 25 templates, kit, shell, patterns; foundation / starter /
   reference files; `jimbo-ui.json`; the skill and its update workflow.
+- **1.1.0 (2026-10-23)** — Contrast targets: surfaces, borders and secondary
+  text step to meet ratios on every background instead of fixed percentages;
+  card borders at full strength; Concrete deepened to `#45484D`;
+  `scripts/contrast.mjs`. The showcase. Sheets render through a portal.
+  `mapStyles` no longer needs Google Maps types.

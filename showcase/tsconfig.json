@@ -1,0 +1,47 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "jsx": "react-jsx",
+    "strict": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "resolveJsonModule": true,
+    "noUncheckedIndexedAccess": true,
+    "types": [
+      "vite/client"
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        ".jimbo/*"
+      ],
+      "@tagg/shared": [
+        ".jimbo/shared.ts"
+      ]
+    }
+  },
+  "include": [
+    "src",
+    ".jimbo/lib/theme.ts",
+    ".jimbo/lib/themes.ts",
+    ".jimbo/lib/useBrand.ts",
+    ".jimbo/lib/api.ts",
+    ".jimbo/lib/cn.ts",
+    ".jimbo/lib/gestures.ts",
+    ".jimbo/lib/shareCard.ts",
+    ".jimbo/components/ui",
+    ".jimbo/components/ColorPicker.tsx",
+    ".jimbo/components/Wordmark.tsx",
+    ".jimbo/routes/BrandPage.tsx",
+    ".jimbo/routes/StyleGuidePage.tsx",
+    ".jimbo/shared.ts"
+  ]
+}

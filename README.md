@@ -8,6 +8,11 @@ of [Tinnitus A Go Go](https://github.com/ryanjpeterson/tinnitus-a-go-go).
 It is also a **Claude Code plugin**: the `jimbo-ui` skill teaches Claude the
 rules and how to start, update and release.
 
+**See it:** the [showcase](https://claude.ai/artifact/F4KAFYCkxZGZB7zKdaWjWC)
+(private page) is a working demo built from the latest release's code — every
+theme, component and pattern an app gets. Run it locally with
+`npm --prefix showcase install && npm --prefix showcase run dev` (port 4455).
+
 ## What's here
 
 | Path | What |
@@ -17,7 +22,9 @@ rules and how to start, update and release.
 | `foundation/` | Code copied verbatim into apps (never edited there) |
 | `starter/` | Code copied once into a new app, then app-owned |
 | `reference/` | Tinnitus's implementations, adapted per app |
+| `showcase/` | Demo app built only from a release's code ([published](https://claude.ai/artifact/F4KAFYCkxZGZB7zKdaWjWC)) |
 | `scripts/tokens.mjs` | Prints an app's `tokens.css` for its three colours |
+| `scripts/contrast.mjs` | Contrast report for every template (`--check` for releases) |
 | `scripts/build-zip.sh` | Builds `dist/jimbo-ui-skill.zip` for claude.ai |
 | `CHANGELOG.md` | Every version and what apps must do |
 
@@ -45,8 +52,9 @@ Settings → Capabilities → Skills.
    `git push --follow-tags`, and rebuild the claude.ai zip.
 3. **Pick it up:** `claude plugin marketplace update jimbo-ui` and
    `claude plugin update jimbo-ui@jimbo-ui`.
-4. **Update each app:** in the app, ask Claude to "update to the latest
-   jimbo-ui". It reads the app's `jimbo-ui.json`, applies every changelog
+4. **Preview, then update each app:** in the app, ask Claude "what would the
+   latest jimbo-ui change here?" for a report that touches nothing. Then ask
+   "update to the latest jimbo-ui": it reads the app's `jimbo-ui.json`, applies every changelog
    entry since that version, copies the foundation, ports reference changes,
    typechecks and commits.
 

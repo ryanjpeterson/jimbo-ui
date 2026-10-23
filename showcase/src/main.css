@@ -1,0 +1,6 @@
+@import "../.jimbo/styles/globals.css";
+
+/* What an app's index.html puts on <body>; the published page has no body tag of its own. */
+@layer base {
+  body { @apply bg-bg font-body text-text-base antialiased; }
+}
