@@ -17,9 +17,17 @@ the matching 0.x release.
 
 ## Unreleased
 
-Clearer separation between items.
+Clearer separation, a calmer surface (less glass, less round) and type styles.
 
 ### Changed
+- **Less glassy.** `.glass` is mostly solid (`bg-surface/90`, `blur-md`,
+  `border-border`); the top bar, dock, view switch and sheets are solid or
+  near-solid; cards are 97% opaque.
+- **Less round, not flat.** Radius scale: cards 14 px (was 18), fields 11
+  (14), sheets 18 (24), dock 20 (28), active dock tab 14 (22). Buttons and
+  pill tabs use the new `rounded-control` (10 px) instead of full pills;
+  chips 8, tabs 8, badges 6. Circles stay round (avatars, dots, orbs, round
+  icon buttons). Lit fills and shadows stay.
 - **Stronger lines and layers.** `CONTRAST_TARGETS`: borders step to 1.8:1
   against cards (was 1.55), cards to 1.2:1 against the page (was 1.16),
   fields and chips to 1.15:1 against cards (was 1.14). The contrast report
@@ -27,13 +35,28 @@ Clearer separation between items.
 - Rows are a little taller (`py-3.5`, at least 76 px).
 
 ### Added
+- **Type styles:** `Theme.fonts: { headings, body }`, each `sans` (Archivo /
+  Inter, the default), `mono` (JetBrains Mono) or `serif` (Fraunces / Source
+  Serif 4). `FONT_STYLES`, `FONT_KEYS`, `loadFonts`; set as `--font-display`
+  and `--font-body`, which Tailwind's `font-display` / `font-body` now read.
+  Brand page gains a *Type* section; templates keep the chosen fonts.
+  `scripts/tokens.mjs --headings= --body=`. `SavedTheme` type for API data.
 - `.divide-etched`: a full-strength line with a faint light line under it
   between stacked items; it also reaches rows grouped in wrappers under a
   label. `List`, `RankedList` and `Loading` use it.
 
 ### Apps must
-- Copy the foundation files (`theme.ts`, `globals.css`).
+- Copy the foundation files (`theme.ts`, `globals.css`, `tailwind.config.js`).
 - Regenerate `src/styles/tokens.css` (`scripts/tokens.mjs`): the derivation changed.
+- App code with `rounded-full` on buttons, tabs or pills: use
+  `rounded-control` (circles keep `rounded-full`). Translucent `bg-*/70`-ish
+  bars of the app's own: make them `/90`–`/95` with `backdrop-blur-md`.
+- Apps with a theme server: accept and return an optional `fonts`
+  (`{ headings?, body? }`, each `sans` / `mono` / `serif`); `useBrand`'s
+  `withDefaults` takes a `SavedTheme`.
+- Apps that track the reference: port the Brand page *Type* section, the
+  kit's radius and glass changes (`Badge`, `Tabs`, `PillTabs`, `ViewSwitch`,
+  `Sheet`) and `AppShell` (top bar, dock).
 - Apps that track the reference kit: `divide-y divide-border` → `divide-etched`
   in `List`, `RankedList` and `Loading`, and the row padding change. App lists
   of their own: use `divide-etched` too.

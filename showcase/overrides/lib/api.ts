@@ -3,7 +3,7 @@
  * favicon upload on its server; the showcase keeps them in this browser instead, so
  * the real Brand page works unchanged.
  */
-import type { Theme } from "./theme";
+import type { SavedTheme, Theme } from "./theme";
 
 type Saved = { theme?: Theme; favicon?: string };
 const KEY = "jimbo-showcase.saved";
@@ -22,7 +22,7 @@ const asDataUrl = (file: File) => new Promise<string>((resolve, reject) => {
 });
 
 export const api = {
-  async getTheme(): Promise<{ theme: Partial<Record<keyof Theme, string | null>>; faviconUrl: string | null }> {
+  async getTheme(): Promise<{ theme: SavedTheme; faviconUrl: string | null }> {
     const s = read();
     return { theme: s.theme ?? {}, faviconUrl: s.favicon ?? null };
   },

@@ -59,7 +59,11 @@ this check, then the preview workflow if they want detail.
   colours: a page shows more than the accent, and no brand colour is white or
   grey.
 - Depth, not flat fills: lit fills (`.lit-*`, `.btn-primary`), shades for
-  glows and shadows, frosted `.glass` over the page's colour orbs.
+  glows and shadows, lightly frosted `.glass` (mostly solid, never
+  see-through). Softly rounded corners, not pills (`rounded-control` for
+  buttons and pills); full circles only for the motif.
+- Type: the theme picks sans, mono or serif for headings and for body
+  (`Theme.fonts`); use `font-display` / `font-body`, never a named family.
 - The circle motif, here and there: `ThemeDots`, `.orb-*`, lit-circle
   avatars, colour circles on theme tiles. Small and few.
 - Templates come in three sets: **Everyday** (dark, mid, light), **Flags**

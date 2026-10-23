@@ -54,18 +54,24 @@ export default {
         danger: "#FF5252",
       },
       fontFamily: {
-        // Heavy grotesque for headings — set to weight 800 in globals.css.
-        display: ["Archivo", "ui-sans-serif", "system-ui", "sans-serif"],
+        // Headings and body follow the theme's type styles (sans, mono or serif),
+        // set by src/lib/theme.ts as --font-display / --font-body; defaults in globals.css.
+        // Headings are weight 800 (globals.css).
+        display: ["var(--font-display)"],
         script: ["'Caveat Brush'", "cursive"],
-        body: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+        body: ["var(--font-body)"],
         mono: ["'JetBrains Mono'", "ui-monospace", "SFMono-Regular", "monospace"],
       },
+      // Softly rounded, not pills: cards 14, fields 11, controls 10, chips 8.
+      // Circles (avatars, dots, orbs) stay rounded-full — they're the motif.
       borderRadius: {
-        "2xl": "18px",
-        xl: "14px",
-        lg: "10px",
-        md: "8px",
-        sm: "6px",
+        "3xl": "18px",
+        "2xl": "14px",
+        xl: "11px",
+        control: "10px",
+        lg: "8px",
+        md: "6px",
+        sm: "4px",
       },
     },
   },

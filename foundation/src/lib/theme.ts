@@ -14,6 +14,9 @@
  * badges (`-top` → `-bottom`, lit from above, never lower contrast with its
  * `on-` text) and washes mixed into the page (`-950` … `-700`).
  *
+ * A theme can also pick a type style for headings and for body text — sans
+ * (the default), mono or serif — set as `--font-display` / `--font-body`.
+ *
  * Tokens are CSS variables holding "R G B" channels, so Tailwind classes keep
  * their opacity modifiers (`bg-accent/15`). The defaults live in
  * globals.css too, so the app looks right before any script runs; index.html
@@ -25,6 +28,9 @@
 
 import { BRAND } from "./brand.config";
 
+/** A type style: the family used for headings or for body text. */
+export type FontStyle = "sans" | "mono" | "serif";
+
 export interface Theme {
   accent: string;
   background: string;
@@ -32,6 +38,47 @@ export interface Theme {
   highlight?: string;
   /** Optional: inferred from the other colours when left out (`deriveSupport`). */
   support?: string;
+  /** Optional type styles; both default to sans. */
+  fonts?: { headings?: FontStyle; body?: FontStyle };
+}
+
+/** A theme as a server or cache returns it: anything may be missing or null. */
+export type SavedTheme = { [K in "accent" | "background" | "highlight" | "support"]?: string | null } & { fonts?: Theme["fonts"] | null };
+
+/**
+ * The type styles. `display` is the headings family, `body` the text family;
+ * `google` is the Google Fonts query that loads them (sans is in index.html).
+ */
+export const FONT_STYLES: Record<FontStyle, { label: string; display: string; body: string; google: string | null }> = {
+  sans: {
+    label: "Sans",
+    display: "'Archivo', ui-sans-serif, system-ui, sans-serif",
+    body: "'Inter', ui-sans-serif, system-ui, sans-serif",
+    google: null,
+  },
+  mono: {
+    label: "Mono",
+    display: "'JetBrains Mono', ui-monospace, SFMono-Regular, monospace",
+    body: "'JetBrains Mono', ui-monospace, SFMono-Regular, monospace",
+    google: "family=JetBrains+Mono:wght@400;500;600;700;800",
+  },
+  serif: {
+    label: "Serif",
+    display: "'Fraunces', ui-serif, Georgia, serif",
+    body: "'Source Serif 4', ui-serif, Georgia, serif",
+    google: "family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800;9..144,900&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700",
+  },
+};
+export const FONT_KEYS = ["sans", "mono", "serif"] as const;
+
+/** Load the web fonts for these styles (once each), by adding a Google Fonts stylesheet. */
+export function loadFonts(styles: FontStyle[]): void {
+  for (const s of new Set(styles)) {
+    const q = FONT_STYLES[s]?.google;
+    if (!q || document.getElementById(`font-${s}`)) continue;
+    const link = Object.assign(document.createElement("link"), { id: `font-${s}`, rel: "stylesheet", href: `https://fonts.googleapis.com/css2?${q}&display=swap` });
+    document.head.appendChild(link);
+  }
 }
 
 /** A theme with all four colours filled in (missing ones inferred). */
@@ -166,12 +213,23 @@ export function deriveSupport(theme: Theme): string {
 /** The theme with every colour filled in: missing highlight and support are inferred. */
 export function fullTheme(theme: Theme): FullTheme {
   const highlight = theme.highlight || deriveHighlight(theme);
-  return { accent: theme.accent, background: theme.background, highlight, support: theme.support || deriveSupport({ ...theme, highlight }) };
+  return {
+    accent: theme.accent, background: theme.background, highlight,
+    support: theme.support || deriveSupport({ ...theme, highlight }),
+    fonts: { headings: theme.fonts?.headings ?? "sans", body: theme.fonts?.body ?? "sans" },
+  };
 }
 
-/** Just the colours a theme sets (drops empty optional ones) — what to save. */
+/** Just what a theme sets (drops empty optional colours and default fonts) — what to save. */
 export function ownColours(theme: Theme): Theme {
-  return { accent: theme.accent, background: theme.background, ...(theme.highlight ? { highlight: theme.highlight } : {}), ...(theme.support ? { support: theme.support } : {}) };
+  const headings = theme.fonts?.headings && theme.fonts.headings !== "sans" ? theme.fonts.headings : undefined;
+  const body = theme.fonts?.body && theme.fonts.body !== "sans" ? theme.fonts.body : undefined;
+  return {
+    accent: theme.accent, background: theme.background,
+    ...(theme.highlight ? { highlight: theme.highlight } : {}),
+    ...(theme.support ? { support: theme.support } : {}),
+    ...(headings || body ? { fonts: { ...(headings ? { headings } : {}), ...(body ? { body } : {}) } } : {}),
+  };
 }
 
 /** Every derived colour, as RGB, keyed by CSS variable name (without the --c- prefix). */
@@ -265,8 +323,12 @@ export function applyTheme(theme: Theme): void {
   const vars: Record<string, string> = {};
   for (const [name, [r, g, b]] of Object.entries(deriveColors(theme))) {
     vars[`--c-${name}`] = `${Math.round(r)} ${Math.round(g)} ${Math.round(b)}`;
-    root.style.setProperty(`--c-${name}`, vars[`--c-${name}`]!);
   }
+  const { headings, body } = fullTheme(theme).fonts;
+  vars["--font-display"] = FONT_STYLES[headings!].display;
+  vars["--font-body"] = FONT_STYLES[body!].body;
+  for (const [k, v] of Object.entries(vars)) root.style.setProperty(k, v);
+  loadFonts([headings!, body!]);
   const scheme = luminance(theme.background) > 0.4 ? "light" : "dark";
   root.style.colorScheme = scheme;
   document.querySelector('meta[name="theme-color"]')?.setAttribute("content", theme.background);

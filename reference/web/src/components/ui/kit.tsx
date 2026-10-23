@@ -61,7 +61,7 @@ export const STATUS_DOT = "h-3 w-3 shrink-0 rounded-full shadow-[0_0_10px_1px] b
 /** A status as a labelled chip — for detail pages and headers. */
 export function Badge({ tone, children, className }: { tone: Tone; children: ReactNode; className?: string }) {
   return (
-    <span className={cn("inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-semibold", TONES[tone].chip, className)}>
+    <span className={cn("inline-flex items-center rounded-md border px-2 py-0.5 text-[11px] font-semibold", TONES[tone].chip, className)}>
       {children}
     </span>
   );
@@ -634,7 +634,7 @@ export function Tabs<T extends string>({ value, onChange, options }: {
   options: { value: T; label: string }[];
 }) {
   return (
-    <div role="tablist" className="glass grid rounded-full p-1 sm:inline-grid sm:min-w-[320px]"
+    <div role="tablist" className="glass grid rounded-xl p-1 sm:inline-grid sm:min-w-[320px]"
       // Four or more tabs size to their labels (equal widths would clip the longest).
       style={{ gridTemplateColumns: options.length > 3 ? `repeat(${options.length}, auto)` : `repeat(${options.length}, minmax(0, 1fr))` }}>
       {options.map((o) => {
@@ -642,7 +642,7 @@ export function Tabs<T extends string>({ value, onChange, options }: {
         return (
           <button key={o.value} role="tab" aria-selected={active} onClick={() => onChange(o.value)}
             className={cn(
-              "h-10 truncate rounded-full font-semibold transition-colors sm:h-9 sm:px-4 sm:text-sm",
+              "h-10 truncate rounded-lg font-semibold transition-colors sm:h-9 sm:px-4 sm:text-sm",
               // Four or more tabs: tighter on phones so every label fits.
               options.length > 3 ? "px-2.5 text-sm" : "px-4 text-[15px]",
               active ? "lit-accent shadow-[inset_0_1px_0_0_rgba(255,255,255,0.25)]" : "text-text-muted hover:text-text-base",
@@ -668,7 +668,7 @@ export function PillTabs<T extends string>({ value, onChange, options }: {
         return (
           <button key={o.value} onClick={() => onChange(o.value)}
             className={cn(
-              "h-10 rounded-full border px-4 text-sm font-semibold transition-colors",
+              "h-10 rounded-control border px-4 text-sm font-semibold transition-colors",
               active ? (o.activeClass ?? "lit-accent border-accent") : "border-border text-text-muted hover:border-text-subtle hover:text-text-base",
             )}>
             {o.label}
@@ -734,7 +734,7 @@ export function Sheet({ title, subtitle, onClose, children, wide = false }: {
         role="dialog"
         aria-modal="true"
         className={cn(
-          "flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-t-3xl border border-white/10 bg-bg/80 shadow-2xl shadow-black/60 backdrop-blur-2xl backdrop-saturate-150",
+          "flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-t-3xl border border-border bg-bg shadow-2xl shadow-black/60",
           "sm:max-h-[88dvh] sm:rounded-3xl",
           wide ? "sm:max-w-xl" : "sm:max-w-lg",
         )}
@@ -820,13 +820,13 @@ export function ViewSwitch({ options, current, floating = false }: {
 }) {
   return (
     <div className={cn(
-      "flex rounded-full p-0.5",
-      floating ? "border border-white/10 bg-bg/70 shadow-xl backdrop-blur-xl backdrop-saturate-150" : "glass",
+      "flex rounded-xl p-0.5",
+      floating ? "border border-border bg-bg/90 shadow-xl backdrop-blur-md" : "glass",
     )}>
       {options.map((o) => (
         <Link key={o.to} to={o.to} replace aria-current={o.to === current ? "page" : undefined}
           className={cn(
-            "flex h-9 items-center rounded-full px-4 text-sm font-semibold transition-colors",
+            "flex h-9 items-center rounded-lg px-4 text-sm font-semibold transition-colors",
             o.to === current ? "lit-accent" : "text-text-muted hover:text-text-base",
           )}>
           {o.label}

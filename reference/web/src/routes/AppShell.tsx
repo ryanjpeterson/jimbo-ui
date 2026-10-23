@@ -39,7 +39,7 @@ export function AppShell({ tabs, actions, onRefresh, children }: {
   return (
     <div className="min-h-full overflow-x-clip">
       {/* Top padding clears the status bar / notch in standalone mode. */}
-      <header className="sticky top-0 z-40 border-b border-white/10 bg-bg/70 pt-[env(safe-area-inset-top)] backdrop-blur-2xl backdrop-saturate-150">
+      <header className="sticky top-0 z-40 border-b border-border bg-bg/90 pt-[env(safe-area-inset-top)] backdrop-blur-md">
         <div className="mx-auto flex h-14 max-w-5xl items-center justify-between gap-4 px-4 sm:h-16 sm:px-6">
           <div className="flex h-full items-center gap-8">
             <Link to="/" aria-label="Home"><HeaderTitle /></Link>
@@ -79,7 +79,7 @@ export function AppShell({ tabs, actions, onRefresh, children }: {
       {/* Phones: a floating, frosted dock above the home indicator; content fades out behind it. */}
       <div aria-hidden className="pointer-events-none fixed inset-x-0 bottom-0 z-30 h-[calc(6rem+env(safe-area-inset-bottom))] bg-gradient-to-t from-bg via-bg/70 to-transparent sm:hidden" />
       <nav aria-label="Main" className="pointer-events-none fixed inset-x-0 bottom-0 z-40 select-none px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:hidden">
-        <div className="pointer-events-auto mx-auto grid max-w-md gap-1 rounded-[28px] border border-white/10 bg-surface/75 p-1.5 shadow-[0_10px_40px_-8px_rgba(0,0,0,0.75)] ring-1 ring-black/40 backdrop-blur-2xl backdrop-saturate-150"
+        <div className="pointer-events-auto mx-auto grid max-w-md gap-1 rounded-[20px] border border-border bg-surface/95 p-1.5 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06),0_10px_40px_-8px_rgba(0,0,0,0.75)] ring-1 ring-black/30 backdrop-blur-md"
           style={{ gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))` }}>
           {tabs.map((t) => {
             const active = inTab(t);
@@ -90,7 +90,7 @@ export function AppShell({ tabs, actions, onRefresh, children }: {
                   if (location.pathname === t.to) { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }
                 }}
                 className={cn(
-                  "relative flex h-14 flex-col items-center justify-center gap-0.5 rounded-[22px] transition-[background-color,color,transform] duration-200 active:scale-[0.92]",
+                  "relative flex h-14 flex-col items-center justify-center gap-0.5 rounded-[14px] transition-[background-color,color,transform] duration-200 active:scale-[0.92]",
                   active ? "bg-gradient-to-b from-accent/25 to-accent/10 text-accent shadow-[inset_0_1px_0_0_rgb(var(--c-accent)/0.35)]" : "text-text-muted active:bg-white/5",
                 )}>
                 <DockIcon active={active}>{t.icon}</DockIcon>

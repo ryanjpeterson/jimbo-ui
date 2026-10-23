@@ -4,7 +4,8 @@
  * Pick a look from the Everyday (dark, mid, light), Flags and Holidays templates (each card is
  * a miniature of the app in that theme, with its colours as circles), then fine-tune the
  * colours with the inline picker. Accent and background are always set; highlight and
- * support can be left to the engine, which infers them from the others.
+ * support can be left to the engine, which infers them from the others. Type: a sans, mono or
+ * serif style for headings and for body text.
  * Everything previews live across the app; the save bar appears when there's
  * something unsaved, and leaving the page without saving puts the saved
  * theme back. The favicon can be replaced with an upload.
@@ -14,7 +15,7 @@ import { Fragment, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
-import { applyTheme, contrast, fullTheme, ownColours, themeHex, type FullTheme, type Theme } from "@/lib/theme";
+import { applyTheme, contrast, FONT_KEYS, FONT_STYLES, fullTheme, loadFonts, ownColours, themeHex, type FontStyle, type Theme, THEME_KEYS } from "@/lib/theme";
 import { sameTheme, TEMPLATE_SETS } from "@/lib/themes";
 import { BRAND } from "@/lib/brand.config";
 import { useBrand } from "@/lib/useBrand";
@@ -65,8 +66,8 @@ function ThemeCard({ name, vibe, theme: input, selected, onPick }: { name: strin
           </div>
         </div>
         <div className="flex gap-1.5">
-          <span className="rounded-full px-2.5 py-1 text-[9px] font-bold shadow-[inset_0_1px_0_0_rgba(255,255,255,0.28)]" style={{ background: `linear-gradient(${c["accent-top"]}, ${c["accent-bottom"]})`, color: c["on-accent"] }}>Save</span>
-          <span className="rounded-full px-2.5 py-1 text-[9px] font-bold" style={{ background: c["surface-2"], color: c.text }}>Cancel</span>
+          <span className="rounded-md px-2.5 py-1 text-[9px] font-bold shadow-[inset_0_1px_0_0_rgba(255,255,255,0.28)]" style={{ background: `linear-gradient(${c["accent-top"]}, ${c["accent-bottom"]})`, color: c["on-accent"] }}>Save</span>
+          <span className="rounded-md px-2.5 py-1 text-[9px] font-bold" style={{ background: c["surface-2"], color: c.text }}>Cancel</span>
         </div>
       </div>
       <div className="space-y-1.5 border-t border-border bg-surface px-3 py-2">
@@ -93,7 +94,9 @@ function ThemeCard({ name, vibe, theme: input, selected, onPick }: { name: strin
 // Page
 // ─────────────────────────────────────────────────────────────────────────────
 
-const FIELDS: { key: keyof FullTheme; label: string; short?: string; hint: string; swatches: string[] }[] = [
+type ColourKey = (typeof THEME_KEYS)[number];
+
+const FIELDS: { key: ColourKey; label: string; short?: string; hint: string; swatches: string[] }[] = [
   { key: "accent", label: "Accent", hint: "Buttons, active tabs, “done” states, big numbers, the dot in the name",
     swatches: ["#A8FF3E", "#2EF2FF", "#F5FF2E", "#FF8A3D", "#B48CFF", "#3DFFC5", "#F2F2F2", "#1F7A4D"] },
   { key: "highlight", label: "Highlight", hint: "Dates, badges, map pins, warnings. Leave it out and it's inferred from the accent.",
@@ -110,7 +113,7 @@ export function BrandPage() {
   // The colours as set: highlight and support may be missing (inferred). `shown` fills them in.
   const [draft, setDraft] = useState<Theme>(ownColours(brand.theme));
   const shown = fullTheme(draft);
-  const [editing, setEditing] = useState<keyof FullTheme>("accent");
+  const [editing, setEditing] = useState<ColourKey>("accent");
   const [set, setSet] = useState(() => TEMPLATE_SETS.find((s) => s.groups.some((g) => g.templates.some((x) => same(x.theme, brand.theme))))?.label ?? TEMPLATE_SETS[0]!.label);
   const [saving, setSaving] = useState(false);
   const [note, setNote] = useState<string | null>(null);
@@ -118,6 +121,10 @@ export function BrandPage() {
 
   // Live preview while editing; leaving the page puts the saved theme back.
   useEffect(() => { applyTheme(draft); }, [draft]);
+  // The type pickers show each style in its own face.
+  useEffect(() => { loadFonts([...FONT_KEYS]); }, []);
+  const setFont = (part: "headings" | "body", style: FontStyle) =>
+    setDraft((d) => ownColours({ ...d, fonts: { ...d.fonts, [part]: style } }));
   const saved = useRef(brand.theme);
   saved.current = brand.theme;
   useEffect(() => () => applyTheme(saved.current), []);
@@ -167,7 +174,7 @@ export function BrandPage() {
             {g.label !== set && <p className="eyebrow px-0.5">{g.label}</p>}
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
               {g.templates.map((tpl) => (
-                <ThemeCard key={tpl.name} {...tpl} selected={same(draft, tpl.theme)} onPick={() => setDraft(ownColours(tpl.theme))} />
+                <ThemeCard key={tpl.name} {...tpl} selected={same(draft, tpl.theme)} onPick={() => setDraft(ownColours({ ...tpl.theme, fonts: draft.fonts }))} />
               ))}
             </div>
           </div>
@@ -216,6 +223,34 @@ export function BrandPage() {
               {warnings.map((w) => <p key={w}>! {w}</p>)}
             </div>
           )}
+        </div>
+      </section>
+
+      {/* 3. Type */}
+      <section className="space-y-3">
+        <div className="px-0.5">
+          <h2 className="h-section">Type</h2>
+          <p className="meta mt-1">Pick a style for headings and one for body text. Mix them — a serif heading over sans text, or mono all the way.</p>
+        </div>
+        <div className="card space-y-5 p-4 sm:p-5">
+          {(["headings", "body"] as const).map((part) => (
+            <div key={part} className="space-y-2">
+              <p className="label">{part === "headings" ? "Headings" : "Body text"}</p>
+              <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label={part === "headings" ? "Headings" : "Body text"}>
+                {FONT_KEYS.map((style) => {
+                  const active = shown.fonts[part] === style;
+                  const family = part === "headings" ? FONT_STYLES[style].display : FONT_STYLES[style].body;
+                  return (
+                    <button key={style} type="button" role="radio" aria-checked={active} onClick={() => setFont(part, style)}
+                      className={`flex flex-col items-center gap-1 rounded-xl border p-3 transition-colors ${active ? "border-accent bg-accent-950" : "border-border bg-surface-2 hover:border-text-subtle"}`}>
+                      <span className={part === "headings" ? "text-[28px] font-extrabold leading-none" : "text-[22px] leading-none"} style={{ fontFamily: family }}>Aa</span>
+                      <span className={`text-xs font-semibold ${active ? "text-accent" : "text-text-muted"}`}>{FONT_STYLES[style].label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 

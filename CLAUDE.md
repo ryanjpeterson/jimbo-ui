@@ -38,7 +38,9 @@ It must print nothing. Add an app's words to it when a new app adopts jimbo.ui.
 
 Brand decisions so far: two to four source colours (accent and background
 always; highlight and support set or inferred), each with lighter and darker
-shades; depth over flat fills (lit gradients, frosted glass over colour orbs);
+shades; depth over flat fills (lit gradients, lightly frosted solid surfaces,
+soft colour orbs); softly rounded corners, not pills; sans, mono or serif type
+for headings and body;
 circles of the theme colours as a motif; templates in Everyday, Flags and
 Holidays sets; no brand colour white or grey;
 no logo — the brand is the app's name as header text (`HeaderTitle`), with a

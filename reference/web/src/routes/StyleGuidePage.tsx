@@ -16,7 +16,7 @@ import {
   Badge, DateBlock, EmptyState, EntityRow, EventRow, LinkCard, List, ListGroupLabel, Loading, MediaCard, PageHeader, Pager,
   PillTabs, RankedList, SearchField, Section, SelectField, Sheet, StatGrid, StatTile, Tabs, ThemeDots, ViewSwitch, type Tone,
 } from "@/components/ui/kit";
-import { THEME_KEYS, themeHex } from "@/lib/theme";
+import { FONT_STYLES, THEME_KEYS, themeHex } from "@/lib/theme";
 import { useBrand } from "@/lib/useBrand";
 
 const TOKENS: { name: string; use: string }[] = [
@@ -143,7 +143,7 @@ export function StyleGuidePage() {
         </div>
       </Block>
 
-      <Block title="Type" note="Archivo 800 for headings, Inter for everything else; tabular figures throughout.">
+      <Block title="Type" note={`Headings in ${FONT_STYLES[theme.fonts.headings!].label.toLowerCase()}, body in ${FONT_STYLES[theme.fonts.body!].label.toLowerCase()} — the theme picks sans, mono or serif for each. Tabular figures throughout.`}>
         <div className="card space-y-3 p-5">
           <p className="eyebrow">.eyebrow — label above a title</p>
           <p className="h-page">.h-page — Page title</p>

@@ -7,11 +7,11 @@
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "./api";
-import { applyFavicon, applyTheme, DEFAULT_THEME, fullTheme, THEME_STORAGE_KEY, type FullTheme, type Theme } from "./theme";
+import { applyFavicon, applyTheme, DEFAULT_THEME, fullTheme, ownColours, THEME_STORAGE_KEY, type FullTheme, type SavedTheme, type Theme } from "./theme";
 import { BRAND } from "./brand.config";
 
 // The app's API client provides getTheme(): { theme: { accent, highlight,
-// background, support } (null = default), faviconUrl } — see the guide.
+// background, support, fonts } (null = default), faviconUrl } — see the guide.
 // Highlight and support may be missing (left to inference, or saved before 0.5).
 const BRAND_CACHE_KEY = `${BRAND.storagePrefix}.brand`;
 
@@ -41,14 +41,15 @@ function cached(): Brand | undefined {
  * theme keeps its own optional colours: a missing highlight or support stays
  * missing, so the engine infers it to suit the saved accent and background.
  */
-export function withDefaults(t: Partial<Record<keyof Theme, string | null>>): Theme {
-  if (!t.accent && !t.background) return DEFAULT_THEME;
-  return {
+export function withDefaults(t: SavedTheme): Theme {
+  if (!t.accent && !t.background) return t.fonts ? ownColours({ ...DEFAULT_THEME, fonts: t.fonts }) : DEFAULT_THEME;
+  return ownColours({
     accent: t.accent || DEFAULT_THEME.accent,
     background: t.background || DEFAULT_THEME.background,
     ...(t.highlight ? { highlight: t.highlight } : {}),
     ...(t.support ? { support: t.support } : {}),
-  };
+    ...(t.fonts ? { fonts: t.fonts } : {}),
+  });
 }
 
 export function useBrand(): Brand {

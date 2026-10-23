@@ -13,8 +13,11 @@ implementations of everything below are in the repo's `reference/` folder.
   and support set or inferred), each with lighter and darker shades, picked
   from Everyday, Flags or Holidays templates or fine-tuned on each app's
   **Brand & theme** admin page.
-- **Look:** depth, not flat fills — lit gradients, frosted glass over soft
-  colour orbs, and circles of the theme's colours as a recurring motif.
+- **Look:** depth, not flat fills — lit gradients, solid surfaces with a
+  light frost, softly rounded corners (not pills), soft colour orbs, and
+  circles of the theme's colours as a recurring motif.
+- **Type:** sans (Archivo and Inter), mono (JetBrains Mono) or serif
+  (Fraunces and Source Serif 4), chosen separately for headings and body.
 
 **Contents:** 1 How apps use jimbo-ui · 2 Brand · 3 Theme engine · 4 Theme
 templates · 5 Typography · 6 Layout and shell · 7 Surfaces, depth and motion ·
@@ -143,7 +146,7 @@ component and pattern rules (sections 8–9).
 
 ### Header text (no logo)
 - The brand is the app's **name as header text** (`HeaderTitle`), not a logo:
-  `BRAND.name` set in the display face (Archivo 800, tracking −0.02em) in the
+  `BRAND.name` set in the display face (the headings style, weight 800, tracking −0.02em) in the
   text colour. A **dot** in the name takes the **accent** — `jimbo.ui` —
   which is the brand's one flourish.
 - Sizes: 22 px in the top bar (`sm`), 30 px (`md`), 44 px (`lg`) for brand
@@ -175,8 +178,10 @@ text colour, and the page goes flat.
 **Depth, not flat fills.** Each brand colour comes with lighter and darker
 shades (section 3). Solid shapes get a **lit fill** — lighter at the top,
 darker at the bottom, with a bright inner top edge — and primary buttons a
-soft glow in the accent's dark shade. Floating things are **frosted glass**
-over the page's colour orbs. Cards carry a breath of the accent (top left)
+soft glow in the accent's dark shade. Floating things are **lightly
+frosted**: mostly solid, a soft blur, a crisp border and a lit top line — never
+see-through glass. Corners are **softly rounded, not pills**: circles are
+kept for the motif (avatars, dots, orbs, round icon buttons). Cards carry a breath of the accent (top left)
 and support (bottom right).
 
 **Colour comes from opaque shapes, not thin washes.** A faint wash of a
@@ -425,8 +430,24 @@ a bright red gets white button text below 4.5:1, so use a deeper red (about
 
 ## 5. Typography
 
-Fonts (Google Fonts): **Archivo** 500–900 for display, **Inter** 400–700 for
-everything else, **JetBrains Mono** 400/600 for codes and hex values.
+**Type styles.** A theme picks one style for headings and one for body text
+(`Theme.fonts: { headings, body }`, both default `sans`; `FONT_STYLES` in
+`theme.ts`). They're set as `--font-display` and `--font-body`, which
+Tailwind's `font-display` and `font-body` read, so every page follows.
+
+| Style | Headings | Body | Feel |
+| --- | --- | --- | --- |
+| `sans` (default) | **Archivo** 800 | **Inter** 400–700 | Bold and clean |
+| `mono` | **JetBrains Mono** 800 | **JetBrains Mono** 400–700 | Technical, terminal |
+| `serif` | **Fraunces** 800 | **Source Serif 4** 400–700 | Editorial, warm |
+
+Mixing works: serif headings over sans body is the most common pairing; mono
+throughout suits tools. Sans loads from `index.html`; `applyTheme` loads the
+others from Google Fonts when picked (`loadFonts`). An app whose default uses
+mono or serif adds those families to `index.html` and passes `--headings=` /
+`--body=` to `scripts/tokens.mjs`. **JetBrains Mono** 400/600 is also always
+used for codes and hex values (`font-mono`). Below, "Archivo" and "Inter"
+mean the headings and body styles.
 
 | Class | Size | Font | Use |
 | --- | --- | --- | --- |
@@ -459,9 +480,9 @@ everything else, **JetBrains Mono** 400/600 for codes and hex values.
 - **Content:** `max-w-5xl`, `px-4` (`sm:px-6`), `pt-6`; bottom padding of
   6.5 rem + the bottom safe area on phones so nothing hides under the dock.
 - **Tab dock (phones):** floats 12 px above the bottom safe area, `max-w-md`,
-  a 5-column grid in a 28 px-radius pill: `bg-surface/75`, `border-white/10`,
-  `ring-1 ring-black/40`, `backdrop-blur-2xl backdrop-saturate-150`, deep
-  shadow. Each tab is 56 px tall with a 22 px-radius active pill, icon above a
+  a 5-column grid in a 20 px-radius slab: `bg-surface/95`, `border-border`,
+  `ring-1 ring-black/30`, `backdrop-blur-md`, a lit top line, deep
+  shadow. Each tab is 56 px tall with a 14 px-radius active tab, icon above a
   10.5 px label; active = accent pill, filled icon, bold label. Presses scale
   to 0.92. Tapping the active tab scrolls to the top. A gradient fade from
   `bg` sits behind it so content dissolves under the dock.
@@ -492,22 +513,22 @@ everything else, **JetBrains Mono** 400/600 for codes and hex values.
 
 | Thing | Recipe |
 | --- | --- |
-| `.card` | 18 px radius, `border-border` (full strength), gradient `surface → bg-deep` top to bottom at 90% (the page orbs tint it), under a 9% accent glow from the top left and a 9% support glow from the bottom right; inner top highlight `inset 0 1px 0 rgba(255,255,255,.06)`, soft drop `0 12px 32px -16px rgba(0,0,0,.7)` |
-| `.glass` / `.card-glass` | Frosted: `bg-surface/65`, `backdrop-blur-xl backdrop-saturate-150`, `border-white/10`, inner top highlight `rgba(255,255,255,.1)`, soft drop. For tabs, the secondary top-bar buttons and anything over a banner or orbs; it needs colour behind it to show |
+| `.card` | 14 px radius, `border-border` (full strength), gradient `surface → bg-deep` top to bottom at 97%, under a 9% accent glow from the top left and a 9% support glow from the bottom right; inner top highlight `inset 0 1px 0 rgba(255,255,255,.06)`, soft drop `0 12px 32px -16px rgba(0,0,0,.7)` |
+| `.glass` / `.card-glass` | Lightly frosted: `bg-surface/90`, `backdrop-blur-md`, `border-border`, inner top highlight `rgba(255,255,255,.08)`, soft drop. For tabs, the secondary top-bar buttons, the pager and anything over a banner |
 | `.orb-accent/highlight/support` | A brand colour as a lit sphere: `radial-gradient(circle at 32% 28%, c-lighter, c 48%, c-darker)`, fully round. Size it with utilities. The circle motif |
 | `.divide-etched` | Lines between stacked items, on the parent like `divide-y`: a full-strength `border` line with a faint light line under it (`inset 0 1px 0 rgba(255,255,255,.05)`). It also reaches one level down, so rows grouped in wrappers (a month's label and rows) are divided too. Lists, ranked lists |
 | `.lit-accent/highlight/support` | The lit fill: `from-c-top to-c-bottom` with `on-c` text. Active tabs and pills, avatars, count badges |
-| `.field` | 14 px radius, `bg-surface-2`, `border-border`, 15 px text, `px-4`; focus = accent border + 2 px accent ring at 20% |
-| `.btn` | Fully round, 44 px tall on phones (40 px desktop), `px-5`, 15 px semibold; `.btn-sm` 36 px (32 px desktop); `lg` 48 px |
+| `.field` | 11 px radius, `bg-surface-2`, `border-border`, 15 px text, `px-4`; focus = accent border + 2 px accent ring at 20% |
+| `.btn` | 10 px radius (`rounded-control`), 44 px tall on phones (40 px desktop), `px-5`, 15 px semibold; `.btn-sm` 36 px (32 px desktop); `lg` 48 px |
 | `.btn-primary` | Lit accent fill (`accent-top → accent-bottom`), on-accent text, inner top highlight `rgba(255,255,255,.28)`, glow `0 8px 20px -10px accent-dark/90%` that grows on hover |
 | `.btn-secondary` | `bg-surface-2`, border, inner top highlight, border lightens on hover |
 | `.btn-ghost` | Muted text, `surface-2` on hover |
 | `.btn-danger` | Muted text, red wash and highlight text on hover |
-| `.chip` | Fully round, `bg-surface-2`, border, 14 px medium, muted |
-| Top bar | `bg-bg/70`, `backdrop-blur-2xl backdrop-saturate-150`, `border-white/10` |
-| Floating bars and the dock | `bg-surface/75–95`, `backdrop-blur-xl/2xl`, `border-white/10` or `border-border`, `shadow-2xl shadow-black/50`; the active dock tab is an accent gradient (25% → 10%) with an accent top edge |
-| Sheet | Frosted (`bg-bg/80`, `backdrop-blur-2xl`, `border-white/10`). Rendered into `<body>` through a portal (so a parent's spacing or transform can't shift it); bottom sheet on phones (top corners 24 px, grab handle 40×6 px, max 92 dvh), centred dialog on desktop (24 px radius, `max-w-lg` / `max-w-xl`) |
-| Radii scale | 6 · 8 · 10 · 14 (`xl`) · 18 (`2xl`) · 22/28 (dock) · full (buttons, pills, badges, avatars) |
+| `.chip` | 8 px radius, `bg-surface-2`, border, 14 px medium, muted |
+| Top bar | `bg-bg/90`, `backdrop-blur-md`, `border-border` |
+| Floating bars and the dock | `bg-surface/95`, `backdrop-blur-md`, `border-border`, lit top line, deep shadow; the dock is a 20 px-radius slab and its active tab a 14 px-radius accent gradient (25% → 10%) with an accent top edge |
+| Sheet | Solid `bg-bg`, `border-border`. Rendered into `<body>` through a portal (so a parent's spacing or transform can't shift it); bottom sheet on phones (top corners 18 px, grab handle 40×6 px, max 92 dvh), centred dialog on desktop (18 px radius, `max-w-lg` / `max-w-xl`) |
+| Radii scale | 4 (`sm`) · 6 (`md`: badges) · 8 (`lg`: chips, tabs) · 10 (`control`: buttons, pills) · 11 (`xl`: fields) · 14 (`2xl`: cards) · 18 (`3xl`: sheets) · 20 (dock) · full only for circles (avatars, dots, orbs, round icon buttons) |
 
 **Motion:** quick and physical, never decorative.
 - Presses: `active:scale-95` on buttons, `0.92` on dock tabs, `0.97` on cards.
@@ -664,7 +685,10 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   highlights. Colour from opaque shapes, not thin washes: date tickets with a
   lit month band, glowing status dots, support group labels, cards lit by the
   accent and support.
-- **Unreleased** — Clearer separation: borders step to 1.8:1 against cards
+- **Unreleased** — Less glassy and less round: mostly solid frosted surfaces
+  and a smaller radius scale (cards 14, buttons 10, chips 8; circles kept for
+  the motif). Type styles: sans, mono or serif for headings and body.
+  Clearer separation: borders step to 1.8:1 against cards
   (was 1.55:1) and cards to 1.2:1 against the page (was 1.16:1); rows are
   divided by etched lines (`.divide-etched`), including rows grouped under a
   label, and are a little taller (76 px).
