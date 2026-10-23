@@ -83,7 +83,16 @@ Clearer separation, a calmer surface (less glass, less round, flat swatches), ty
   between stacked items; it also reaches rows grouped in wrappers under a
   label. `List`, `RankedList` and `Loading` use it.
 
+### Fixed
+- **A changed theme showed up late.** `useBrand` treated the cached theme as
+  fresh for 5 minutes on every load, so a new look (or one changed on another
+  device) could take that long to appear. The cached copy still paints at
+  once but is marked old (`initialDataUpdatedAt: 0`), so the server's theme is
+  fetched straight away.
+
 ### Apps must
+- Apps with a theme server: add `initialDataUpdatedAt: 0` to `useBrand`'s
+  query (beside `initialData: cached`), or port the reference `useBrand`.
 - Copy the foundation files (`theme.ts`, `globals.css`, `tailwind.config.js`).
 - Regenerate `src/styles/tokens.css` (`scripts/tokens.mjs`): the derivation changed.
 - App code with `rounded-full` on buttons, tabs or pills: use

@@ -61,6 +61,9 @@ export function useBrand(): Brand {
       return { theme, colors: fullTheme(theme), faviconUrl: r.faviconUrl };
     },
     initialData: cached,
+    // The cached copy paints at once but counts as old, so the server's theme is
+    // fetched straight away — otherwise a changed theme shows up to 5 min late.
+    initialDataUpdatedAt: 0,
     staleTime: 5 * 60_000,
   });
   return q.data ?? { theme: DEFAULT_THEME, colors: fullTheme(DEFAULT_THEME), faviconUrl: null };

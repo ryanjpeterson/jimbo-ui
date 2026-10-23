@@ -332,6 +332,9 @@ family of tokens:
   `brand.config.ts`.
 - A small inline script in `index.html` applies the cached variables **before
   first paint**, so there is never a flash of the default colours.
+- `useBrand` starts from its cached copy (`<prefix>.brand`) but treats it as
+  old, so it asks the server for the current theme on every load — a theme
+  changed elsewhere appears as soon as the app opens, not minutes later.
 - Light backgrounds: surfaces step *darker*, text flips to near-black. Photo
   viewers, banners over images and map pins stay dark/vivid on purpose.
 
