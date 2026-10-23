@@ -17,9 +17,29 @@ the matching 0.x release.
 
 ## Unreleased
 
-Clearer separation, a calmer surface (less glass, less round, flat swatches) and type styles.
+Clearer separation, a calmer surface (less glass, less round, flat swatches), type styles, and themes for teams and places.
+
+### Added
+- **169 new templates from real colours:** every NHL, NBA, MLB and NFL team;
+  Toronto, Ottawa and Chicago teams in other leagues (MLS, CFL, WNBA, PWHL,
+  NWSL, CPL, NLL, AHL, OHL); 17 more countries; Canada's 13 provinces and
+  territories. 218 templates in all, every one passing the checks.
+- **Categories:** Everyday, Holidays, Countries (Americas, Europe, Asia and
+  Pacific, Africa), Provinces, Sports (sub-tabs: NHL, NBA, MLB, NFL, Toronto,
+  Ottawa, Chicago — city tabs gather every team from that city).
+  `TemplateSet.tabs` shows a category's groups as sub-tabs; `ALL_TEMPLATES`
+  lists every template once.
+- **Search** on the Brand page across name, vibe, category and tab, ignoring
+  accents.
+- `scripts/template-from-colours.mjs`: real colours in, checked templates
+  out — light themes for brands with white, monochrome for black-and-silver.
 
 ### Changed
+- "Flags" is now **Countries**, grouped by region.
+- The Brand page picks categories with wrapping `PillTabs` (sub-tabs in a
+  panel below) instead of `Tabs`, so five or more never scroll sideways.
+- `scripts/contrast.mjs` checks each template once (city tabs repeat
+  league teams).
 - **Every app has the admin theming pages.** The skill and guide now
   require a Brand & theme page and a Style guide in every app, nearly
   identical to the reference and adapted only to the app (access, who may
@@ -76,7 +96,8 @@ Clearer separation, a calmer surface (less glass, less round, flat swatches) and
   every theming feature (guide section 1, "Admin theming pages"); add them if
   missing, adapted to the app. Apps without a server: save the theme in the
   browser rather than having no Brand page.
-- Apps that track the reference: port the Brand page *Type* section, the
+- Apps that track the reference: port the Brand page's categories, sub-tabs
+  and search (`TemplateGrid`), and the *Type* section, the
   kit's radius and glass changes (`Badge`, `Tabs`, `PillTabs`, `ViewSwitch`,
   `Sheet`) and `AppShell` (top bar, dock).
 - Apps that track the reference kit: `divide-y divide-border` → `divide-etched`

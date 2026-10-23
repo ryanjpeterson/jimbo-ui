@@ -66,8 +66,11 @@ this check, then the preview workflow if they want detail.
   (`Theme.fonts`); use `font-display` / `font-body`, never a named family.
 - The circle motif, here and there: `ThemeDots`, `.orb-*` (flat circles with a slight outline),
   avatars, colour circles on theme tiles. Small and few.
-- Templates come in three sets: **Everyday** (dark, mid, light), **Flags**
-  and **Holidays** (guide section 4).
+- Templates come in five categories: **Everyday** (dark, mid, light),
+  **Holidays**, **Countries** (by region), **Provinces** and **Sports** (every
+  NHL, NBA, MLB and NFL team, plus Toronto, Ottawa and Chicago tabs), with a
+  search box (guide section 4). New team, country or place themes come from
+  their real colours via `scripts/template-from-colours.mjs`.
 - Phone first at 375 px; floating frosted tab dock (≤ 5 tabs); things pinned
   to the bottom sit above it; touch targets ≥ 44 px; no horizontal scroll
   strips; nothing hover-only.
@@ -79,8 +82,9 @@ this check, then the preview workflow if they want detail.
 - **Every app has the admin theming pages built in:** a **Brand & theme**
   page (`/admin/brand`) and a **Style guide** (`/admin/style`), from
   `reference/web/src/routes/BrandPage.tsx` and `StyleGuidePage.tsx`. Keep the
-  Brand page nearly identical — the template sets (Everyday, Flags,
-  Holidays) with colour-circle tiles, *Make it yours* (four colours with the
+  Brand page nearly identical — the template categories (Everyday,
+  Holidays, Countries, Provinces, Sports with league and city tabs) and
+  search, with colour-circle tiles, *Make it yours* (four colours with the
   *Infer it* switches and readability warnings), *Type* (headings and body:
   sans, mono or serif), favicon, live preview and the save bar. Adapt it only
   to fit the app: how admins reach it (an admin tab, a settings link, behind
@@ -108,6 +112,8 @@ release without touching that working copy, export it:
 - `scripts/contrast.mjs` — contrast and colour-separation report for every
   template (`--check` fails on a miss)
 - `scripts/versions.mjs` — checks every stated version agrees
+- `scripts/template-from-colours.mjs` — turns real colours (a team's, a
+  flag's) into templates that pass the checks
 - `hooks/check-version.mjs` — the session-start version check for apps
 - `showcase/` — a demo app built only from the release's code; published as a
   private page (URL in the README) so anyone can see what an app gets

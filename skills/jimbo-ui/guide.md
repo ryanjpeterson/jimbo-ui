@@ -11,7 +11,8 @@ implementations of everything below are in the repo's `reference/` folder.
   renders every shared component in that app's current theme.
 - **Theme:** two to four colours (accent and background always; highlight
   and support set or inferred), each with lighter and darker shades, picked
-  from Everyday, Flags or Holidays templates or fine-tuned on each app's
+  from Everyday, Holidays, Countries, Provinces or Sports templates (or a
+  search across them) or fine-tuned on each app's
   **Brand & theme** admin page.
 - **Look:** flat colour with a slight outline on coloured shapes, depth from
   layers — solid surfaces with a light frost, softly rounded corners (not pills), soft colour orbs, and
@@ -86,8 +87,9 @@ that).
 
 Every app built on jimbo.ui has, behind its admin access:
 
-- **Brand & theme** (`/admin/brand`): *Pick a look* (Everyday, Flags and
-  Holidays tabs; tiles are miniatures of the app with the theme's colours as
+- **Brand & theme** (`/admin/brand`): *Pick a look* (Everyday, Holidays,
+  Countries, Provinces and Sports categories with league and city tabs, and
+  a search box; tiles are miniatures of the app with the theme's colours as
   circles), *Make it yours* (the four colours as round tabs, the inline
   picker, *Infer it* switches for highlight and support, readability
   warnings), *Type* (headings and body: sans, mono or serif), *Favicon*, a
@@ -353,71 +355,43 @@ most: keep them dark enough (luminance under about 0.07) for 7:1.
 
 ## 4. Theme templates
 
-The Brand page offers these (`foundation/src/lib/themes.ts`) in three sets —
-**Everyday** (Dark / Mid / Light), **Flags** and **Holidays** — chosen with
-`Tabs`, each template drawn as a miniature of the app. Every one passes the
-readability checks. An app whose default isn't one of them gets it as an
-extra "Yours" card at the front of Everyday. `TEMPLATE_SETS` has the sets;
-`TEMPLATE_GROUPS` is every group in one list; `sameTheme` compares two themes.
+The Brand page offers these (`foundation/src/lib/themes.ts`) in five
+categories, chosen with wrapping pills, plus a search box across all of them
+(name, vibe, category and tab; accents ignored, so "quebec" finds Québec):
 
-**Dark**
+| Category | What's in it | Shown as |
+| --- | --- | --- |
+| **Everyday** | Dark, Mid and Light originals | Stacked groups |
+| **Holidays** | Through the year, Lunar new year to New year's eve | One group |
+| **Countries** | Flags by region: Americas, Europe, Asia and Pacific, Africa | Stacked groups |
+| **Provinces** | Canada's 13 provinces and territories | One group |
+| **Sports** | NHL, NBA, MLB, NFL (every team), then **Toronto**, **Ottawa** and **Chicago** (every team from the city, across leagues — MLS, CFL, WNBA, PWHL, NWSL, CPL, NLL, AHL, OHL too) | Sub-tabs (`tabs: true`), one at a time |
 
-| Name | Vibe | Accent | Highlight | Support | Background |
-| --- | --- | --- | --- | --- | --- |
-| Volt (default) | Lime, hot pink, sky | `#A8FF3E` | `#FF3D6E` | `#2EC5FF` | `#141416` |
-| Neon night | Cyan, magenta, lemon | `#2EF2FF` | `#FF2ED1` | `#FFE53D` | `#0A0A12` |
-| Acid | Yellow, orange, violet | `#F5FF2E` | `#FF5A1F` | `#B98CFF` | `#0D0D0B` |
-| Sunset strip | Orange, pink, teal | `#FF8A3D` | `#FF3D7F` | `#3DDCC8` | `#1A0F1F` |
-| Deep sea | Teal, coral, periwinkle | `#3DFFC5` | `#FF7A59` | `#9BB0FF` | `#071A1F` |
-| Ultraviolet | Purple, pink, mint | `#B48CFF` | `#FF5FA2` | `#5CF2B8` | `#120F1C` |
-| Ember | Gold, fire, ice | `#FFB23D` | `#FF3D3D` | `#7FD4FF` | `#17110D` |
-| Blackout | White, red, blue | `#F2F2F2` | `#FF3D3D` | `#4D94FF` | `#000000` |
-| Two-tone | Periwinkle; the rest inferred | `#9DB2FF` | inferred | inferred | `#101418` |
+Each template is drawn as a miniature of the app with its colours as
+circles. Every one passes the readability checks. An app whose default isn't
+one of them gets it as an extra "Yours" card at the front of Everyday.
+`TEMPLATE_SETS` has the categories; `TEMPLATE_GROUPS` every group in one
+list (city tabs repeat league teams); `ALL_TEMPLATES` every template once;
+`sameTheme` compares two themes.
 
-**Mid**
+**Team, country and province themes** are made from their real colours with
+`scripts/template-from-colours.mjs` (a list of `{ name, vibe, colours }` in,
+`t(…)` lines out): the page is a deepened version of the darkest colour (or
+near-white when white is one of the colours, so Japan, the Maple Leafs and
+Québec are light), the accent is the first colour made readable, the
+highlight and support the next clearly different ones; a two-colour brand
+gets a tint or shade of its colour, a black-and-silver one a monochrome theme
+with a steel-blue support. They're inspired by the colours only — no names
+on screen beyond the tile label, no logos or artwork. Team vibes start with
+the city ("Toronto · blue and white"), which is how the city tabs are built.
+To add teams or places: write their colours, run the script, paste the lines,
+run `node scripts/contrast.mjs --check`.
 
-| Name | Vibe | Accent | Highlight | Support | Background |
-| --- | --- | --- | --- | --- | --- |
-| Slate | Frost, sand, heather | `#88C0D0` | `#EBCB8B` | `#D3AECB` | `#2E3440` |
-| Denim | Yellow, coral, aqua | `#FFD23F` | `#EE6C4D` | `#8EE6DC` | `#23395B` |
-| Forest | Gold, clay, sky | `#E9C46A` | `#F4A261` | `#AEDBF5` | `#1F3A2E` |
-| Burgundy | Rosé, butter, mint | `#F7B2BD` | `#FFD166` | `#A6EBCF` | `#4A1C2B` |
-| Dusk | Peach, mint, butter | `#FFB4A2` | `#9DE0AD` | `#FFE38A` | `#3D3B6B` |
-| Concrete | Lemon, pink, sky | `#FFE066` | `#FF8FA3` | `#9AD8FF` | `#45484D` |
-| Fog | Navy, red, pine | `#1E3A8A` | `#B91C1C` | `#14532D` | `#C8CDD4` |
-| Sage | Pine, wine, navy | `#1F3D2B` | `#8B1E3F` | `#1E2F6B` | `#B7C9B0` |
-| Clay | Plum, teal, rust | `#3B1F5C` | `#0F4C5C` | `#6B260B` | `#D9B8A0` |
+The Everyday and Holiday templates, hand-picked:
 
-**Light**
 
-| Name | Vibe | Accent | Highlight | Support | Background |
-| --- | --- | --- | --- | --- | --- |
-| Daylight | Green, pink, violet | `#1F7A4D` | `#D6336C` | `#5B3FD1` | `#F6F4EF` |
-| Gig poster | Red, blue, green | `#D7261E` | `#1E4FD7` | `#0F6B4F` | `#F3EAD6` |
-| Newsprint | Black, red, blue | `#111111` | `#E11D48` | `#1D4ED8` | `#FFFFFF` |
-| Mint | Teal, rust, purple | `#0F766E` | `#C2410C` | `#6D28D9` | `#E6F4EE` |
-| Blush | Raspberry, violet, teal | `#BE185D` | `#6D28D9` | `#0B5E57` | `#FCE8EE` |
-| Sky | Cobalt, pink, green | `#1D4ED8` | `#DB2777` | `#116632` | `#E8F0FB` |
-| Lemonade | Violet, red, teal | `#7C3AED` | `#DC2626` | `#0B5C73` | `#FFF7CC` |
-| Peach | Rust, teal, plum | `#C2410C` | `#0E7490` | `#86198F` | `#FFE8D6` |
 
-**Flags**
-
-| Name | Vibe | Accent | Highlight | Support | Background |
-| --- | --- | --- | --- | --- | --- |
-| Canada | Red, white and pine | `#D52B1E` | `#8E1B14` | `#1F5E3A` | `#FFFFFF` |
-| USA | Red, white and blue | `#E0283F` | `#7DB4FF` | `#F2F2F2` | `#0B1B3D` |
-| Italy | Green, white and red | `#007A3D` | `#CD212A` | `#1F4E8C` | `#FAFAF5` |
-| Germany | Black, red and gold | `#FFCE00` | `#FF4B3E` | `#F2F2F2` | `#0E0E0E` |
-| Ireland | Green, white and orange | `#3DDC84` | `#FF9F43` | `#F5F5F0` | `#0C2418` |
-| Sweden | Yellow and amber on blue | `#FECC02` | `#FF9F1C` | `#A8DCFF` | `#004B87` |
-| Jamaica | Black, gold and green | `#FED100` | `#2BB24C` | `#FF7A45` | `#0A0A0A` |
-| Brazil | Green, yellow and blue | `#FFDF00` | `#9DBBFF` | `#FFFFFF` | `#004D26` |
-| Mexico | Green, white and red | `#006847` | `#CE1126` | `#7A4A12` | `#FFFFFF` |
-| India | Saffron, white and green | `#FF9933` | `#46C35A` | `#F2F2F2` | `#0A0F3D` |
-| South Africa | Green, gold, red and blue | `#1FC77A` | `#FFB612` | `#6E9BFF` | `#0B0B0B` |
-
-**Through the year**
+**Holidays** (through the year)
 
 | Name | Vibe | Accent | Highlight | Support | Background |
 | --- | --- | --- | --- | --- | --- |
@@ -434,12 +408,6 @@ extra "Yours" card at the front of Everyday. `TEMPLATE_SETS` has the sets;
 | Christmas morning | Red and green on snow | `#C8102E` | `#146B3A` | `#6F5000` | `#FFF9F5` |
 | New year's eve | Champagne, fuchsia and ice | `#F2C14E` | `#FF3DA5` | `#5BC0FF` | `#0A0A0F` |
 
-**Yours**
-
-| Name | Vibe | Accent | Highlight | Support | Background |
-| --- | --- | --- | --- | --- | --- |
-
-Flags are named for the country; holidays run through the year in order.
 "Inferred" means the template leaves that colour to the engine (Two-tone shows
 a two-colour theme). Each theme tile shows its colours as circles under the
 miniature, inferred ones with a dashed ring.
@@ -608,7 +576,7 @@ Style guide page, and list it here.
 
 ## 9. Patterns
 
-- **Theme editor:** templates first, in Everyday / Flags / Holidays tabs (tap
+- **Theme editor:** templates first, in categories with a search box (tap
   to try; the whole app changes live), then *Make it yours* — tap which
   colour to change (round swatch tabs; inferred ones dashed), drag in the
   picker. Highlight and support have an *Infer it* / *Inferred* switch:
@@ -713,7 +681,11 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   highlights. Colour from opaque shapes, not thin washes: date tickets with a
   lit month band, glowing status dots, support group labels, cards lit by the
   accent and support.
-- **Unreleased** — Every app has the admin theming pages (Brand & theme
+- **Unreleased** — Templates in five categories (Everyday, Holidays,
+  Countries, Provinces, Sports) with search; 169 new themes from real
+  colours (every NHL, NBA, MLB and NFL team, Toronto, Ottawa and Chicago
+  teams in other leagues, more countries, the provinces and territories) via
+  `scripts/template-from-colours.mjs`. Every app has the admin theming pages (Brand & theme
   and Style guide) built in, nearly identical to the reference and adapted
   to the app; an app without a server saves the theme in the browser. Flat fills: every coloured shape (buttons, active tabs
   and pills, date bands, orbs, avatars, status dots, swatches) is flat with a

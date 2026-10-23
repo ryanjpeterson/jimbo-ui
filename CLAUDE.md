@@ -41,8 +41,9 @@ always; highlight and support set or inferred), each with lighter and darker
 shades; coloured shapes flat with a slight outline (no gloss or glows), depth
 from layers (lightly frosted solid surfaces, borders, soft colour orbs); softly rounded corners, not pills; sans, mono or serif type
 for headings and body;
-circles of the theme colours as a motif; templates in Everyday, Flags and
-Holidays sets; no brand colour white or grey;
+circles of the theme colours as a motif; templates in Everyday, Holidays, Countries,
+Provinces and Sports categories (team themes from real colours, via
+`scripts/template-from-colours.mjs`); no brand colour white or grey;
 no logo — the brand is the app's name as header text (`HeaderTitle`), with a
 dot in the accent; the favicon is the only graphic.
 

@@ -41,10 +41,15 @@ function deltaE(a: string, b: string): number {
 const check = process.argv.includes("--check");
 let fails = 0;
 const cols = ["text", "muted", "subtle", "border", "card", "accent", "highlight", "support", "button", "apart"] as const;
-console.log("template".padEnd(19) + cols.map((c) => c.slice(0, 6).padEnd(7)).join(""));
+console.log("template".padEnd(26) + cols.map((c) => c.slice(0, 6).padEnd(7)).join(""));
+const seen = new Set<string>();
 for (const s of TEMPLATE_SETS) for (const g of s.groups) {
+  // City tabs repeat league teams; check each template once.
+  const fresh = g.templates.filter((t) => !seen.has(t.name + "|" + t.vibe));
+  if (!fresh.length) continue;
   console.log("— " + s.label + (g.label !== s.label ? " · " + g.label : ""));
-  for (const t of g.templates) {
+  for (const t of fresh) {
+    seen.add(t.name + "|" + t.vibe);
     const c = themeHex(t.theme);
     const r: Record<(typeof cols)[number], number> = {
       text: contrast(c.text!, c.surface!), muted: contrast(c["text-muted"]!, c.surface!), subtle: contrast(c["text-subtle"]!, c.surface!),
@@ -55,7 +60,7 @@ for (const s of TEMPLATE_SETS) for (const g of s.groups) {
     };
     const bad = cols.filter((k) => r[k] < T[k]);
     fails += bad.length ? 1 : 0;
-    console.log(t.name.padEnd(19) + cols.map((k) => (k === "apart" ? r[k].toFixed(0) : r[k].toFixed(2)).padEnd(7)).join("") + (bad.length ? " low: " + bad.join(", ") : ""));
+    console.log(t.name.slice(0, 25).padEnd(26) + cols.map((k) => (k === "apart" ? r[k].toFixed(0) : r[k].toFixed(2)).padEnd(7)).join("") + (bad.length ? " low: " + bad.join(", ") : ""));
   }
 }
 if (check && fails) { console.error(fails + " template(s) below target"); process.exit(1); }

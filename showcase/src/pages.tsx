@@ -10,7 +10,7 @@ import {
   SearchField, Section, Sheet, StatGrid, StatTile, type RowStatus,
 } from "@/components/ui/kit";
 import { Button } from "@/components/ui/button";
-import { TEMPLATE_GROUPS } from "@/lib/themes";
+import { ALL_TEMPLATES } from "@/lib/themes";
 
 // Example statuses, mapped onto the kit's tones.
 const DONE: RowStatus = { tone: "accent", label: "Done" };
@@ -35,7 +35,7 @@ const monthOf = (iso: string) =>
   new Date(`${iso}T00:00:00Z`).toLocaleDateString("en-US", { month: "long", year: "numeric", timeZone: "UTC" });
 
 export function HomeDemo() {
-  const templates = TEMPLATE_GROUPS.reduce((n, g) => n + g.templates.length, 0);
+  const templates = ALL_TEMPLATES.length;
   const next = ITEMS[0]!;
   return (
     <div className="space-y-8">
@@ -49,7 +49,7 @@ export function HomeDemo() {
         <StatTile label="Events done" value={128} accent="accent" />
         <StatTile label="People" value={342} accent="support" />
         <StatTile label="Places" value={27} />
-        <StatTile label="Templates" value={templates} accent="highlight" sub="Everyday, flags and holidays" />
+        <StatTile label="Templates" value={templates} accent="highlight" sub="Everyday, holidays, places and teams" />
       </StatGrid>
 
       <LinkCard to="/admin/brand" eyebrow="Theme" title="Try a different look" sub="Templates, a colour picker and the save bar" accent />
