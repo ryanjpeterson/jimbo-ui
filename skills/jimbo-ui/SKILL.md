@@ -76,6 +76,20 @@ this check, then the preview workflow if they want detail.
 - Use the kit (`.card`, `.btn`, `.field`, `.chip`, `.eyebrow`, `.meta`,
   `PageHeader`, `List`, `Section`…) before inventing anything. A new shared
   component goes in the kit, the app's Style guide page, and the guide.
+- **Every app has the admin theming pages built in:** a **Brand & theme**
+  page (`/admin/brand`) and a **Style guide** (`/admin/style`), from
+  `reference/web/src/routes/BrandPage.tsx` and `StyleGuidePage.tsx`. Keep the
+  Brand page nearly identical — the template sets (Everyday, Flags,
+  Holidays) with colour-circle tiles, *Make it yours* (four colours with the
+  *Infer it* switches and readability warnings), *Type* (headings and body:
+  sans, mono or serif), favicon, live preview and the save bar. Adapt it only
+  to fit the app: how admins reach it (an admin tab, a settings link, behind
+  sign-in), who may save (the app's admin role), where it saves (the app's
+  server; with no server, the browser — like
+  `showcase/overrides/lib/api.ts`), and its copy and examples (the Style
+  guide adds the app's own components). Drop a part only when the app truly
+  can't support it (e.g. favicon upload with nowhere to store it) and say so
+  in the app's `docs/brand.md`; never drop templates, colour editing or type.
 
 ## Where the files are
 
@@ -113,13 +127,16 @@ explains all of this.
    prefix), then regenerate `src/styles/tokens.css` with `scripts/tokens.mjs`.
 4. Adapt from `reference/`: `index.html` (pre-paint script with the app's
    prefix, fonts, PWA tags), the app shell and its tabs, the kit (drop
-   map the app's statuses onto the kit's tones and add its domain components), `BRAND.name` as the header text, Brand and Style guide pages,
-   and the API theme route if the app has a server (otherwise use
-   `BRAND.defaultTheme` only).
+   map the app's statuses onto the kit's tones and add its domain components), `BRAND.name` as the header text,
+   and the admin **Brand & theme** and **Style guide** pages with every
+   theming feature (see the core rule above), wired to the app's theme API
+   if it has a server, or saved in the browser if it doesn't.
 5. Write `jimbo-ui.json` with the version and the reference map, and a short
    `docs/brand.md` in the app noting its identity choices and pointing here.
 6. Typecheck, run it, and look at the Style guide page in a dark and a light
-   template at phone width.
+   template at phone width. On the Brand page, try a template from each set,
+   a two-colour theme (highlight and support inferred), each type style and
+   a save, and check the choice survives a reload.
 
 ## Workflow: preview what an update would do (changes nothing)
 
@@ -145,6 +162,10 @@ update", or before updating if the user wants to look first.
    - **Apps must steps:** each one, and which of the app's files it touches
      (use the `reference` map and a search of the app for affected classes or
      names).
+   - **Admin theming pages:** whether the app's Brand & theme and Style guide
+     pages have every feature the new reference has (template sets, colour
+     circles, infer switches, type styles, favicon, save bar) and what's
+     missing — or whether the app has no such pages yet.
    - **Reference changes:** a summary of `git diff <old> <new> -- reference/`,
      and whether the app's mapped files still look like the old reference
      (easy port) or have diverged (hand work).
@@ -171,8 +192,12 @@ update", or before updating if the user wants to look first.
    (and any other app code the change applies to, e.g. a renamed class).
 5. If the changelog says the theme engine's derivation changed, regenerate
    `tokens.css` from `BRAND.defaultTheme`.
-6. Typecheck and build; check the Style guide page at phone width.
-7. Set `version` in `jimbo-ui.json`, add an entry to the app's own changelog
+6. Make sure the app's admin Brand & theme and Style guide pages have every
+   theming feature the current reference has (core rule above); add the
+   pages if the app doesn't have them yet, and port anything missing, adapted
+   to the app.
+7. Typecheck and build; check the Style guide and Brand pages at phone width.
+8. Set `version` in `jimbo-ui.json`, add an entry to the app's own changelog
    ("Updated to jimbo-ui 0.6.0: …"), and commit. Push only if the user asks.
 
 ## Workflow: change and release the guidelines

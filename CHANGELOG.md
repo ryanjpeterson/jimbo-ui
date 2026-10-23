@@ -20,6 +20,13 @@ the matching 0.x release.
 Clearer separation, a calmer surface (less glass, less round, flat swatches) and type styles.
 
 ### Changed
+- **Every app has the admin theming pages.** The skill and guide now
+  require a Brand & theme page and a Style guide in every app, nearly
+  identical to the reference and adapted only to the app (access, who may
+  save, where it saves, copy, its own components). An app without a server
+  keeps the page and saves the theme in the browser (like the showcase's
+  `api.ts`) instead of dropping it. The start, preview and update workflows
+  check for every theming feature. The theme API carries `fonts`.
 - **Flat fills everywhere.** `.btn-primary` and `.lit-*` (active tabs and
   pills, select ticks, date bands, the top bar's add button) are flat with a
   slight outline in the colour's darker shade — no gradient, top highlight
@@ -65,6 +72,10 @@ Clearer separation, a calmer surface (less glass, less round, flat swatches) and
 - Apps with a theme server: accept and return an optional `fonts`
   (`{ headings?, body? }`, each `sans` / `mono` / `serif`); `useBrand`'s
   `withDefaults` takes a `SavedTheme`.
+- **Every app:** have the admin Brand & theme and Style guide pages with
+  every theming feature (guide section 1, "Admin theming pages"); add them if
+  missing, adapted to the app. Apps without a server: save the theme in the
+  browser rather than having no Brand page.
 - Apps that track the reference: port the Brand page *Type* section, the
   kit's radius and glass changes (`Badge`, `Tabs`, `PillTabs`, `ViewSwitch`,
   `Sheet`) and `AppShell` (top bar, dock).

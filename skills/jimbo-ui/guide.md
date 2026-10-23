@@ -68,16 +68,42 @@ guide page, `HeaderTitle.tsx` (the app's name as header text), `useBrand.ts`, an
 
 **Server side (optional):** an app that lets admins change the theme stores
 the colours and any uploaded favicon, and serves them:
-`GET /public/theme` → `{ theme: { accent, highlight, background, support }
-(null = default; `highlight` and `support` may be missing — inferred),
-faviconUrl }`; admin-only `PUT /admin/theme` (accent and background as
-`#RRGGBB`, plus optional `highlight` and `support` — store what's sent, and
-leave missing ones missing so they stay inferred), `DELETE /admin/theme` (back to defaults), and
+`GET /public/theme` → `{ theme: { accent, highlight, background, support,
+fonts } (null = default; `highlight`, `support` and `fonts` may be missing —
+inferred or sans), faviconUrl }`; admin-only `PUT /admin/theme` (accent and
+background as `#RRGGBB`, plus optional `highlight`, `support` and `fonts:
+{ headings?, body? }` — store what's sent, and leave missing ones missing so
+they stay inferred), `DELETE /admin/theme` (back to defaults), and
 `POST`/`DELETE /admin/theme/favicon` (SVG, PNG, WebP or
 JPEG ≤ 1 MB; refuse SVGs with scripts, event handlers or foreign objects).
 The app's API client exposes these as `getTheme`, `setTheme`, `resetTheme`,
-`uploadBrandAsset`, `removeBrandAsset`. An app without a server uses
-`BRAND.defaultTheme` only and drops the Brand page's save.
+`uploadBrandAsset`, `removeBrandAsset`. An app without a server keeps the
+Brand page and saves the theme in the browser instead, with the same five
+functions over localStorage (`showcase/overrides/lib/api.ts` is exactly
+that).
+
+### Admin theming pages (every app)
+
+Every app built on jimbo.ui has, behind its admin access:
+
+- **Brand & theme** (`/admin/brand`): *Pick a look* (Everyday, Flags and
+  Holidays tabs; tiles are miniatures of the app with the theme's colours as
+  circles), *Make it yours* (the four colours as round tabs, the inline
+  picker, *Infer it* switches for highlight and support, readability
+  warnings), *Type* (headings and body: sans, mono or serif), *Favicon*, a
+  link to the Style guide, live preview across the app and a floating save
+  bar (*Undo* / *Save*; leaving restores the saved theme).
+- **Style guide** (`/admin/style`): every shared component in the current
+  theme, plus the app's own.
+
+Build them from the reference pages and keep the Brand page **nearly
+identical** from app to app, so a person who's themed one app can theme
+any. Adapt only what the app needs: how admins reach the pages, who may
+save, where it saves (server or browser), copy and examples, and the app's
+own components on the Style guide. Leave out a part only when the app
+can't support it (no storage for a favicon upload, say), and note it in the
+app's `docs/brand.md`. Templates, colour editing and type are never left
+out.
 
 ### `jimbo-ui.json` (in each app's repo root)
 
@@ -687,7 +713,9 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   highlights. Colour from opaque shapes, not thin washes: date tickets with a
   lit month band, glowing status dots, support group labels, cards lit by the
   accent and support.
-- **Unreleased** — Flat fills: every coloured shape (buttons, active tabs
+- **Unreleased** — Every app has the admin theming pages (Brand & theme
+  and Style guide) built in, nearly identical to the reference and adapted
+  to the app; an app without a server saves the theme in the browser. Flat fills: every coloured shape (buttons, active tabs
   and pills, date bands, orbs, avatars, status dots, swatches) is flat with a
   slight outline — no gloss, gradients or glows. Less glassy and less round: mostly solid frosted surfaces
   and a smaller radius scale (cards 14, buttons 10, chips 8; circles kept for
