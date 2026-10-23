@@ -2,7 +2,8 @@
 import type { Theme } from "./theme";
 
 export const BRAND = {
-  name: "Tinnitus",
+  name: "jimbo-ui",
+  logo: { word: "JIMBO", line: "ui showcase" },
   defaultTheme: { accent: "#A8FF3E", highlight: "#FF3D6E", background: "#141416" } satisfies Theme,
   storagePrefix: "jimbo-showcase",
 };

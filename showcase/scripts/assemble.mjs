@@ -1,6 +1,6 @@
 /**
  * Lay the release's code out the way an app would have it, in .jimbo/:
- * reference (Tinnitus's code) first, then foundation and starter on top, then
+ * reference (the generic kit, shell and pages) first, then foundation and starter on top, then
  * the showcase's stand-ins (overrides/) for the parts that need a server.
  * The showcase imports everything from there through the `@/` alias.
  */

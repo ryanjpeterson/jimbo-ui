@@ -1,6 +1,6 @@
 ---
 name: jimbo-ui
-description: Ryan's shared brand and UI system (jimbo-ui) for his web apps — theme engine with three colours, templates, Tailwind tokens, UI kit, floating tab-dock app shell and interaction patterns, first built for Tinnitus A Go Go. Use when building, styling or reviewing UI in an app that has a jimbo-ui.json, when starting a new app "in my style" / "like Tinnitus" / "with jimbo-ui", when asked to update an app to the latest jimbo-ui or brand guidelines or to preview what an update would change, when checking contrast across themes, or when changing and releasing the jimbo-ui guidelines themselves.
+description: Ryan's shared brand and UI system (jimbo-ui) for his web apps — theme engine with three colours, templates, Tailwind tokens, UI kit, floating tab-dock app shell and interaction patterns. Use when building, styling or reviewing UI in an app that has a jimbo-ui.json, when starting a new app "in my style" / "like my other apps" / "with jimbo-ui", when asked to update an app to the latest jimbo-ui or brand guidelines or to preview what an update would change, when checking contrast across themes, or when changing and releasing the jimbo-ui guidelines themselves.
 ---
 
 # jimbo-ui
@@ -16,9 +16,10 @@ in each and what apps must do.
 ## Core rules (always)
 
 - Colours come from tokens only: `bg-bg`, `bg-surface`, `bg-surface-2`,
-  `border-border`, `text-text-base/muted/subtle`, `*-accent-lime` (accent),
-  `*-accent-pink` (highlight), `text-on-accent`, `text-on-highlight`,
-  `lime-950/900/700`, `rose-950/900/800`. Never raw hex or Tailwind palette
+  `border-border`, `text-text-base/muted/subtle`, `*-accent`, `*-highlight`,
+  `text-on-accent`, `text-on-highlight`, `accent-950/900/700`,
+  `highlight-950/900/800` (older apps may use the legacy `accent-lime`,
+  `accent-pink`, `lime-*`, `rose-*` names — same tokens). Never raw hex or Tailwind palette
   colours on brand surfaces; never `text-white` on an accent/highlight fill.
 - Three source colours: **accent** (primary: logo main word, primary buttons,
   active states), **highlight** (secondary: logo second line, dates, pins,
@@ -43,7 +44,8 @@ release without touching that working copy, export it:
 
 - `foundation/` — copied verbatim into apps (never edited in an app)
 - `starter/` — copied once into a new app, then app-owned
-- `reference/` — Tinnitus's implementations, adapted per app
+- `reference/` — generic implementations (kit, shell, wordmark, Brand and
+  Style guide pages), adapted and extended per app
 - `scripts/tokens.mjs` — prints an app's `tokens.css` for its three colours
 - `scripts/contrast.mjs` — contrast report for every template (`--check` fails on a miss)
 - `showcase/` — a demo app built only from the release's code; published as a
@@ -64,8 +66,7 @@ explains all of this.
    prefix), then regenerate `src/styles/tokens.css` with `scripts/tokens.mjs`.
 4. Adapt from `reference/`: `index.html` (pre-paint script with the app's
    prefix, fonts, PWA tags), the app shell and its tabs, the kit (drop
-   Tinnitus-only parts like attendance statuses or rename them for the app's
-   domain), `Wordmark` with the app's lettering, Brand and Style guide pages,
+   map the app's statuses onto the kit's tones and add its domain components), `Wordmark` with the app's lettering, Brand and Style guide pages,
    and the API theme route if the app has a server (otherwise use
    `BRAND.defaultTheme` only).
 5. Write `jimbo-ui.json` with the version and the reference map, and a short
@@ -129,10 +130,16 @@ update", or before updating if the user wants to look first.
 
 ## Workflow: change and release the guidelines
 
-Changes usually start in an app (often Tinnitus). To release one:
+Changes often start in an app. **jimbo-ui stays generic:** never copy an
+app's code, names, artwork, sample content or domain terms into it — bring
+back only the generic pattern, rewritten with neutral names and examples.
+To release one:
 
 1. In `~/Development/jimbo-ui` (pull first): copy the changed foundation files
-   back from the app and update the matching `reference/` files.
+   back from the app (they hold no app values — those live in the app's
+   `brand.config.ts` and `tokens.css`) and update the matching generic
+   `reference/` files by hand. Search the repo for the app's name and domain
+   words before committing.
 2. Update `skills/jimbo-ui/guide.md` (the relevant section and its change log)
    and this file if a core rule or workflow changed. If the theme engine or
    templates changed, run `node scripts/contrast.mjs --check` — every template

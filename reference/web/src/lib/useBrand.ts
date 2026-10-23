@@ -8,8 +8,11 @@ import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "./api";
 import { applyFavicon, applyTheme, DEFAULT_THEME, THEME_STORAGE_KEY, type Theme } from "./theme";
+import { BRAND } from "./brand.config";
 
-const BRAND_CACHE_KEY = "tagg.brand";
+// The app's API client provides getTheme(): { theme: { accent, highlight,
+// background } (null = default), logoUrl, faviconUrl } — see the guide.
+const BRAND_CACHE_KEY = `${BRAND.storagePrefix}.brand`;
 
 export interface Brand { theme: Theme; logoUrl: string | null; faviconUrl: string | null }
 

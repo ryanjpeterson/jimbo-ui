@@ -14,6 +14,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { applyTheme, contrast, themeHex, type Theme } from "@/lib/theme";
 import { TEMPLATE_GROUPS } from "@/lib/themes";
+import { BRAND } from "@/lib/brand.config";
 import { useBrand } from "@/lib/useBrand";
 import { Button } from "@/components/ui/button";
 import { Wordmark } from "@/components/Wordmark";
@@ -37,11 +38,11 @@ function ThemeCard({ name, vibe, theme, selected, onPick }: { name: string; vibe
       <div className="space-y-2.5 p-3" style={{ background: theme.background, color: c.text }}>
         <div className="flex items-center justify-between">
           <span className="font-display text-[15px] leading-none" style={{ color: theme.accent }}>
-            TINNITUS<span className="block text-[10px]" style={{ color: theme.highlight }}>a-go-go</span>
+            {BRAND.logo.word}<span className="block text-[10px]" style={{ color: theme.highlight }}>{BRAND.logo.line}</span>
           </span>
           <span className="h-5 w-5 rounded-full" style={{ background: theme.accent }} />
         </div>
-        <p className="text-[9px] font-bold uppercase tracking-widest" style={{ color: theme.highlight }}>On this day</p>
+        <p className="text-[9px] font-bold uppercase tracking-widest" style={{ color: theme.highlight }}>Coming up</p>
         <div className="rounded-lg p-2" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
           <div className="flex items-center gap-2">
             <span className="w-6 text-center leading-none">
@@ -64,7 +65,7 @@ function ThemeCard({ name, vibe, theme, selected, onPick }: { name: string; vibe
           <span className="block truncate text-sm font-semibold">{name}</span>
           <span className="block truncate text-[11px] text-text-subtle">{vibe}</span>
         </span>
-        {selected && <span className="shrink-0 text-xs font-bold text-accent-lime">✓</span>}
+        {selected && <span className="shrink-0 text-xs font-bold text-accent">✓</span>}
       </div>
     </button>
   );
@@ -75,9 +76,9 @@ function ThemeCard({ name, vibe, theme, selected, onPick }: { name: string; vibe
 // ─────────────────────────────────────────────────────────────────────────────
 
 const FIELDS: { key: keyof Theme; label: string; hint: string; swatches: string[] }[] = [
-  { key: "accent", label: "Accent", hint: "The logo’s TINNITUS, buttons, active tabs, “attended”, big numbers",
+  { key: "accent", label: "Accent", hint: "The logo’s main word, buttons, active tabs, “done” states, big numbers",
     swatches: ["#A8FF3E", "#2EF2FF", "#F5FF2E", "#FF8A3D", "#B48CFF", "#3DFFC5", "#F2F2F2", "#1F7A4D"] },
-  { key: "highlight", label: "Highlight", hint: "The logo’s a-go-go, dates, “on this day”, map pins, warnings",
+  { key: "highlight", label: "Highlight", hint: "The logo’s second line, dates, badges, map pins, warnings",
     swatches: ["#FF3D6E", "#FF2ED1", "#FF5A1F", "#FF3D3D", "#FF7A59", "#FF5FA2", "#1E4FD7", "#FFC23D"] },
   { key: "background", label: "Background", hint: "The page — cards, borders and text follow it",
     swatches: ["#141416", "#000000", "#0A0A12", "#1A0F1F", "#071A1F", "#17110D", "#F6F4EF", "#F3EAD6"] },
@@ -172,7 +173,7 @@ export function BrandPage() {
             onChange={(hexValue) => setDraft((d) => ({ ...d, [editing]: hexValue }))}
           />
           {warnings.length > 0 && (
-            <div className="rounded-xl bg-rose-950 px-3 py-2 text-sm text-accent-pink">
+            <div className="rounded-xl bg-highlight-950 px-3 py-2 text-sm text-highlight">
               {warnings.map((w) => <p key={w}>! {w}</p>)}
             </div>
           )}
@@ -181,7 +182,7 @@ export function BrandPage() {
 
       <BrandAssets logoUrl={brand.logoUrl} faviconUrl={brand.faviconUrl} onChange={refresh} />
 
-      <Link to="/admin/style" className="card flex items-center justify-between gap-3 p-4 hover:border-accent-lime">
+      <Link to="/admin/style" className="card flex items-center justify-between gap-3 p-4 hover:border-accent">
         <span>
           <span className="eyebrow block">Reference</span>
           <span className="mt-0.5 block text-[15px] font-semibold">Style guide — every component in these colours</span>
@@ -257,7 +258,7 @@ function BrandAssets({ logoUrl, faviconUrl, onChange }: { logoUrl: string | null
           logoUrl ? <img src={logoUrl} alt="" className="max-h-full max-w-full object-contain" /> : <Wordmark size="sm" />)}
         {row("favicon", "Favicon", "Built-in — recoloured from the theme", faviconUrl,
           <img src={faviconUrl ?? (document.querySelector<HTMLLinkElement>('link[rel="icon"]')?.href ?? "/favicon.svg")} alt="" className="h-10 w-10" />)}
-        {error && <p className="text-sm text-accent-pink">{error}</p>}
+        {error && <p className="text-sm text-highlight">{error}</p>}
       </div>
     </section>
   );

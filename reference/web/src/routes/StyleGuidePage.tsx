@@ -1,9 +1,11 @@
 /**
  * Style guide — /admin/style
  *
- * Every shared building block, rendered with the real components in the
- * current theme. The written rules live in jimbo-ui's guide (see docs/brand.md); this
- * page is the living picture of them, so it changes whenever the kit does.
+ * Every shared building block, rendered with the real code in the current
+ * theme. The written rules live in the jimbo-ui guide; this page is the living
+ * picture of them, so it changes whenever the kit does.
+ *
+ * jimbo-ui reference: an app adds its own domain components here too.
  */
 
 import { useState } from "react";
@@ -11,8 +13,8 @@ import { Button } from "@/components/ui/button";
 import { Wordmark } from "@/components/Wordmark";
 import { ColorPicker } from "@/components/ColorPicker";
 import {
-  DateBlock, EmptyState, EntityRow, EventRow, LinkCard, List, ListGroupLabel, Loading, MediaCard, PageHeader, Pager,
-  PillTabs, RankedList, SearchField, Section, SelectField, Sheet, StatGrid, StatTile, StatusBadge, Tabs, VenueViewSwitch,
+  Badge, DateBlock, EmptyState, EntityRow, EventRow, LinkCard, List, ListGroupLabel, Loading, MediaCard, PageHeader, Pager,
+  PillTabs, RankedList, SearchField, Section, SelectField, Sheet, StatGrid, StatTile, Tabs, ViewSwitch, type Tone,
 } from "@/components/ui/kit";
 import { themeHex } from "@/lib/theme";
 import { useBrand } from "@/lib/useBrand";
@@ -29,11 +31,19 @@ const TOKENS: { name: string; use: string }[] = [
   { name: "accent", use: "Primary actions, active state" },
   { name: "accent-hover", use: "Accent on hover" },
   { name: "on-accent", use: "Text on accent fills" },
-  { name: "accent-950", use: "Accent wash (attended chip)" },
+  { name: "accent-950", use: "Accent wash (done chip)" },
   { name: "accent-700", use: "Accent outline" },
-  { name: "highlight", use: "Dates, alerts, pins" },
+  { name: "highlight", use: "Dates, badges, alerts" },
   { name: "on-highlight", use: "Text on highlight fills" },
   { name: "highlight-950", use: "Highlight wash (warnings)" },
+];
+
+const TONE_EXAMPLES: { tone: Tone; label: string }[] = [
+  { tone: "accent", label: "Done" },
+  { tone: "yellow", label: "Going" },
+  { tone: "purple", label: "Maybe" },
+  { tone: "red", label: "Missed" },
+  { tone: "muted", label: "Cancelled" },
 ];
 
 function Block({ title, note, children }: { title: string; note?: string; children: React.ReactNode }) {
@@ -63,11 +73,9 @@ export function StyleGuidePage() {
   return (
     <div className="space-y-10">
       <PageHeader eyebrow="Admin · reference" title="Style guide" />
-      <p className="meta -mt-6 max-w-xl">
-        The shared building blocks, live in the current theme. The rules: the jimbo-ui guide (<code className="font-mono text-text-base">docs/brand.md</code> says where).
-      </p>
+      <p className="meta -mt-6 max-w-xl">The shared building blocks, live in the current theme. The rules are in the jimbo-ui guide.</p>
 
-      <Block title="Brand" note="Logo (accent + highlight unless replaced) and the three source colours.">
+      <Block title="Brand" note="The wordmark (accent over highlight, unless a logo is uploaded) and the three source colours.">
         <div className="card flex flex-wrap items-center gap-6 p-5">
           <Wordmark size="lg" />
           <div className="flex flex-wrap gap-3">
@@ -82,7 +90,7 @@ export function StyleGuidePage() {
         </div>
       </Block>
 
-      <Block title="Colour tokens" note="Derived from the four colours. Use these classes, never raw hex (bg-surface, text-text-muted, bg-accent-lime/15 …).">
+      <Block title="Colour tokens" note="Derived from the three colours. Use these classes, never raw hex (bg-surface, text-text-muted, bg-accent/15 …).">
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {TOKENS.map((t) => (
             <div key={t.name} className="flex items-center gap-3 rounded-xl border border-border bg-surface p-2.5">
@@ -103,7 +111,7 @@ export function StyleGuidePage() {
           <p className="h-section">.h-section — Section title</p>
           <p className="text-[15px]">Body — 15px Inter. Plain sentences, sentence case.</p>
           <p className="meta">.meta — secondary line, 14px muted</p>
-          <p className="font-display text-5xl text-accent-lime">171</p>
+          <p className="font-display text-5xl text-accent">128</p>
         </div>
       </Block>
 
@@ -127,7 +135,7 @@ export function StyleGuidePage() {
             options={[{ value: "newest", label: "Newest first" }, { value: "oldest", label: "Oldest first" }]} />
           <Tabs value={tab} onChange={setTab} options={[{ value: "one", label: "Tabs" }, { value: "two", label: "Segmented" }]} />
           <PillTabs value={pill} onChange={setPill} options={[{ value: "a", label: "PillTabs" }, { value: "b", label: "Filter" }, { value: "c", label: "Chips" }]} />
-          <VenueViewSwitch view="list" />
+          <ViewSwitch current="/admin/style" options={[{ to: "/admin/style", label: "List" }, { to: "/admin/style?view=map", label: "Map" }]} />
         </div>
       </Block>
 
@@ -137,31 +145,31 @@ export function StyleGuidePage() {
         </div>
       </Block>
 
-      <Block title="Status" note="One colour per attendance status, used everywhere a status appears.">
+      <Block title="Tones" note="Fixed colours for states that carry meaning; the done state uses the accent. Apps map their own statuses onto them.">
         <div className="card flex flex-wrap gap-2 p-5">
-          {(["attended", "attending", "interested", "missed", "cancelled"] as const).map((s) => <StatusBadge key={s} status={s} />)}
+          {TONE_EXAMPLES.map((t) => <Badge key={t.tone} tone={t.tone}>{t.label}</Badge>)}
         </div>
       </Block>
 
       <Block title="Numbers">
         <StatGrid>
-          <StatTile label="StatTile · lime" value={171} accent="lime" />
-          <StatTile label="StatTile · pink" value={51} accent="pink" />
+          <StatTile label="StatTile · accent" value={128} accent="accent" />
+          <StatTile label="StatTile · highlight" value={42} accent="highlight" />
           <StatTile label="StatTile · muted" value={17} sub="with a sub line" />
-          <StatTile label="Years active" value={17} />
+          <StatTile label="Years" value={6} />
         </StatGrid>
       </Block>
 
       <Block title="Lists and cards" note="Lists sit in one card; rows are at least 64px tall for thumbs.">
         <List>
           <ListGroupLabel>ListGroupLabel</ListGroupLabel>
-          <EventRow to="/admin/style" date="2008-03-22" title="EventRow — Foo Fighters / Against Me!" subtitle="Air Canada Centre" status="attended" />
+          <EventRow to="/admin/style" date="2026-03-22" title="EventRow — a dated item" subtitle="Second line" status={{ tone: "accent", label: "Done" }} />
           <EventRow to="/admin/style" date="2026-07-12" title="EventRow in select mode" subtitle="Tap to tick" selected={picked} onSelect={() => setPicked((p) => !p)} />
-          <EntityRow to="/admin/style" name="EntityRow — an artist or venue" sub="4 shows" round />
+          <EntityRow to="/admin/style" name="EntityRow — a person or place" sub="4 items" round />
         </List>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          <MediaCard to="/admin/style" name="MediaCard" sub="Image card" meta="3 shows" />
-          <MediaCard to="/admin/style" name="Portrait" sub="For flyers" aspect="portrait" />
+          <MediaCard to="/admin/style" name="MediaCard" sub="Image card" meta="3 items" />
+          <MediaCard to="/admin/style" name="Portrait" sub="For posters" aspect="portrait" />
         </div>
         <LinkCard to="/admin/style" eyebrow="LinkCard" title="A card that goes somewhere" sub="Eyebrow, title, sub line" accent />
         <Section title="Section" count={3}>
@@ -169,14 +177,14 @@ export function StyleGuidePage() {
         </Section>
         <Section title="RankedList" flush>
           <RankedList items={[
-            { id: "1", name: "Foo Fighters", sub: "2008–2018", count: 5, href: "/admin/style" },
-            { id: "2", name: "Rush", count: 3, href: "/admin/style" },
-            { id: "3", name: "The Cure", count: 3, href: "/admin/style" },
+            { id: "1", name: "Main hall", sub: "2021–2026", count: 12, href: "/admin/style" },
+            { id: "2", name: "Studio B", count: 7, href: "/admin/style" },
+            { id: "3", name: "Rooftop", count: 3, href: "/admin/style" },
           ]} />
         </Section>
         <div className="card flex items-center gap-4 p-4">
           <DateBlock date="2026-10-23" showYear />
-          <p className="meta">DateBlock — the ticket-style date on every show row.</p>
+          <p className="meta">DateBlock — the ticket-style date on every dated row.</p>
         </div>
       </Block>
 

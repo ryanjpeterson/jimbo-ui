@@ -11,7 +11,6 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      "@tagg/shared": path.resolve(__dirname, ".jimbo/shared.ts"),
       "@": path.resolve(__dirname, ".jimbo"),
     },
   },

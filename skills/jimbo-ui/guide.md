@@ -2,8 +2,8 @@
 
 How apps built on **jimbo-ui** look, read and behave, written as a recipe:
 with this guide you can build an app that looks and feels like the others,
-with its own colours and logo, whether or not you copy the code. It grew out
-of Tinnitus A Go Go, which is the reference app; its code is in `reference/`.
+with its own colours and logo, whether or not you copy the code. Generic
+implementations of everything below are in the repo's `reference/` folder.
 
 - **The rules:** this guide. It's versioned with the jimbo-ui repo; see
   `CHANGELOG.md` for what changed in each version and what apps must do.
@@ -29,7 +29,7 @@ The stack is React + TypeScript + Vite + Tailwind CSS 3 (with `clsx` and
 | --- | --- | --- | --- |
 | **Foundation** | `foundation/` | Same path in the app | Copied over verbatim on every update. **Never edit in an app** — change jimbo-ui instead. Each file says so in its header |
 | **Starter** | `starter/` | Same path in the app | Copied once when an app starts, then owned by the app |
-| **Reference** | `reference/` | The app's own equivalents | Tinnitus's implementations. Apps adapt them; on update, changes are ported by hand (the changelog says which) |
+| **Reference** | `reference/` | The app's own equivalents | Generic implementations. Apps adapt and extend them with their own domain pieces; on update, changes are ported by hand (the changelog says which) |
 
 **Foundation:** `src/lib/theme.ts` (theme engine), `src/lib/themes.ts`
 (templates), `src/lib/cn.ts`, `src/lib/gestures.ts`,
@@ -52,10 +52,21 @@ plus Home, List and Detail demo pages, with the theme saved in the browser.
 a private page (URL in the README) — the way to see what an app would get
 without having one.
 
-**Reference (adapt to the app):** the UI kit (`kit.tsx`), app shell
-(`AppShell.tsx`), Brand page, Style guide page, `Wordmark.tsx`, `useBrand.ts`,
-share images, upload ring, photo carousel, `index.html` (pre-paint script,
-fonts, PWA tags), and the API's theme route and `site_copy` table.
+**Reference (adapt to the app):** the UI kit (`kit.tsx`), the app shell
+(`AppShell.tsx`: pass tabs, top-bar actions and routes), Brand page, Style
+guide page, `Wordmark.tsx` (typeset from `BRAND.logo`), `useBrand.ts`, and
+`index.html` (pre-paint script, fonts, PWA tags).
+
+**Server side (optional):** an app that lets admins change the theme stores
+the three colours and any uploaded logo/favicon, and serves them:
+`GET /public/theme` → `{ theme: { accent, highlight, background } (null =
+default), logoUrl, faviconUrl }`; admin-only `PUT /admin/theme` (three
+`#RRGGBB` values), `DELETE /admin/theme` (back to defaults), and
+`POST`/`DELETE /admin/theme/:asset` for `logo` / `favicon` (SVG, PNG, WebP or
+JPEG ≤ 1 MB; refuse SVGs with scripts, event handlers or foreign objects).
+The app's API client exposes these as `getTheme`, `setTheme`, `resetTheme`,
+`uploadBrandAsset`, `removeBrandAsset`. An app without a server uses
+`BRAND.defaultTheme` only and drops the Brand page's save.
 
 ### `jimbo-ui.json` (in each app's repo root)
 
@@ -92,21 +103,21 @@ component and pattern rules (sections 8–9).
 
 ### Voice
 - Plain, short, a little wry. Say what something is and what happens next
-  ("Take this show out of Bluesfest 2025? It goes back to being its own show.").
+  ("Remove this event from the group? It stays in your list on its own.").
 - **Sentence case** everywhere — titles, buttons, tabs. No Title Case, no ALL
   CAPS (except `.eyebrow` labels, which are styled caps).
-- Buttons are verbs: *Save*, *Add to festival…* (an ellipsis means a sheet or
+- Buttons are verbs: *Save*, *Add to group…* (an ellipsis means a sheet or
   choice follows).
-- Name things the way the user does ("show", "set", "festival", "venue"),
-  never internal names ("event series", "concert_id").
+- Name things the way the user does, never by internal names (a person
+  manages *events*, not *event_series rows*).
 - Empty states and confirmations say what survives or what to do next.
 
 ### Logo
 - A two-line wordmark: the **main word** in the **accent** (primary) colour
   with an outline in the text colour (white on dark themes, near-black on
   light), and a **second line** in the **highlight** (secondary) colour.
-  (Tinnitus: **TINNITUS** over **a-go-go**.) Each app draws its own lettering;
-  the colour rules are shared.
+  The built-in one is typeset in the display face from `BRAND.logo`; an app
+  can swap in its own drawn lettering and keep the colour rules.
 - It follows the theme everywhere it appears: top bar, sign-in, Brand page
   miniatures, favicon (the mark in the accent on the background colour).
 - An uploaded logo (SVG/PNG/WebP/JPEG ≤ 1 MB) replaces the wordmark; an
@@ -116,23 +127,23 @@ component and pattern rules (sections 8–9).
 
 ### Colour — the three source colours
 
-| Colour | Default (Tinnitus) | Used for |
+| Colour | Default (Volt) | Used for |
 | --- | --- | --- |
-| **Accent** (primary) | `#A8FF3E` | Logo main word, primary buttons, active tab/pill, focus rings, links on hover, "attended", text selection, numbers that matter, the favicon mark |
-| **Highlight** (secondary) | `#FF3D6E` | Logo second line, dates (month on date blocks), "on this day", map pins, count badges, warnings and errors, destructive hover |
+| **Accent** (primary) | `#A8FF3E` | Logo main word, primary buttons, active tab/pill, focus rings, links on hover, "done" states, text selection, numbers that matter, the favicon mark |
+| **Highlight** (secondary) | `#FF3D6E` | Logo second line, dates (month on date blocks), map pins, count badges, warnings and errors, destructive hover |
 | **Background** | `#141416` | The page. Surfaces, borders and every text colour are derived from it |
 
-Status colours are **fixed**, not themed, because they carry meaning.
-Tinnitus's attendance statuses are the model; an app with other statuses
-follows the same pattern (one fixed colour each, the accent for the "done" one):
+Status colours are **fixed tones**, not themed, because they carry meaning
+(`Tone` and `TONES` in the kit). An app maps its own statuses onto them, with
+the accent for the "done" one:
 
-| Status | Colour (Tailwind) | Chip |
+| Tone | Example status | Chip |
 | --- | --- | --- |
-| Attended | the accent | `bg-lime-950 text-accent-lime border-lime-700` |
-| Attending | yellow-400 | `bg-yellow-950 text-yellow-400 border-yellow-700` |
-| Interested | purple-400 | `bg-purple-950 text-purple-400 border-purple-800` |
-| Missed | red-400 | `bg-red-950 text-red-400 border-red-800` |
-| Cancelled | text-subtle | `bg-surface-2 text-text-subtle border-border` |
+| `accent` | Done | `bg-accent-950 text-accent border-accent-700` |
+| `yellow` | Going / in progress | `bg-yellow-950 text-yellow-400 border-yellow-700` |
+| `purple` | Maybe / saved | `bg-purple-950 text-purple-400 border-purple-800` |
+| `red` | Missed / failed | `bg-red-950 text-red-400 border-red-800` |
+| `muted` | Cancelled / archived | `bg-surface-2 text-text-subtle border-border` |
 
 The offline banner is fixed yellow (`bg-yellow-950/95 text-yellow-200`).
 
@@ -143,7 +154,7 @@ The offline banner is fixed yellow (`bg-yellow-950/95 text-yellow-200`).
 Three colours in, every token out (`deriveColors()` in `src/lib/theme.ts`).
 Tokens are CSS variables holding `R G B` channels (`--c-surface: 28 28 30`),
 and Tailwind colours are `rgb(var(--c-name) / <alpha-value>)`, so opacity
-modifiers work on every token (`bg-accent-lime/15`, `border-border/60`).
+modifiers work on every token (`bg-accent/15`, `border-border/60`).
 
 **Never write a hex value in a component.** Use the token classes.
 
@@ -175,17 +186,18 @@ clear cards and labels as a near-black one.
 | `text` | `text-text-base` | text | Body text, logo outline |
 | `text-muted` | `text-text-muted` | mix(text, bg, fadeTo **5:1** on surface, at most 0.4) | Secondary lines |
 | `text-subtle` | `text-text-subtle` | mix(text, bg, fadeTo **3.8:1** on surface, at most 0.6) | Labels, hints, counts |
-| `accent` | `*-accent-lime` | accent | See section 2 |
-| `accent-hover` | `*-accent-lime-hover` | mix(accent, light ? black : white, 0.22) | Hover |
+| `accent` | `*-accent` | accent | See section 2 |
+| `accent-hover` | `*-accent-hover` | mix(accent, light ? black : white, 0.22) | Hover |
 | `on-accent` | `text-on-accent` | on(accent) | Text/icons on accent fills |
-| `accent-950/900/700` | `*-lime-950/900/700` | mix(bg, accent, 0.10 / 0.28 / 0.50) | Accent washes: attended chip, banner glow |
-| `highlight` | `*-accent-pink` | highlight | See section 2 |
-| `highlight-hover` | `*-accent-pink-hover` | mix(highlight, light ? black : white, 0.20) | Hover |
+| `accent-950/900/700` | `*-accent-950/900/700` | mix(bg, accent, 0.10 / 0.28 / 0.50) | Accent washes: done chip, banner glow |
+| `highlight` | `*-highlight` | highlight | See section 2 |
+| `highlight-hover` | `*-highlight-hover` | mix(highlight, light ? black : white, 0.20) | Hover |
 | `on-highlight` | `text-on-highlight` | on(highlight) | Text on highlight fills (count badges) |
-| `highlight-950/900/800` | `*-rose-950/900/800` | mix(bg, highlight, 0.10 / 0.28 / 0.40) | Warning washes |
+| `highlight-950/900/800` | `*-highlight-950/900/800` | mix(bg, highlight, 0.10 / 0.28 / 0.40) | Warning washes |
 
-(The `lime` / `pink` class names are historical — they mean *accent* /
-*highlight* whatever colours the theme sets.)
+**Legacy class names:** apps from before 2.0 may use `accent-lime`,
+`accent-pink`, `lime-950/900/700` and `rose-950/900/800`; they still work
+(same tokens). New code uses `accent`, `highlight` and their `-950…` washes.
 
 ### Where else the theme goes
 - **Page background:** `bg` plus two soft glows — accent at 6% from the top,
@@ -211,7 +223,7 @@ clear cards and labels as a near-black one.
 - A small inline script in `index.html` applies the cached variables **before
   first paint**, so there is never a flash of the default colours.
 - Light backgrounds: surfaces step *darker*, text flips to near-black. Photo
-  viewers, banners over flyers and map pins stay dark/vivid on purpose.
+  viewers, banners over images and map pins stay dark/vivid on purpose.
 
 ### Readability (WCAG)
 
@@ -238,7 +250,7 @@ extra "Yours" card at the front.
 
 | Name | Vibe | Accent | Highlight | Background |
 | --- | --- | --- | --- | --- |
-| Tinnitus | Lime + hot pink — the original | `#A8FF3E` | `#FF3D6E` | `#141416` |
+| Volt (default) | Lime + hot pink | `#A8FF3E` | `#FF3D6E` | `#141416` |
 | Neon night | Cyan + magenta | `#2EF2FF` | `#FF2ED1` | `#0A0A12` |
 | Acid | Loud yellow | `#F5FF2E` | `#FF5A1F` | `#0D0D0B` |
 | Sunset strip | Orange on plum | `#FF8A3D` | `#FF3D7F` | `#1A0F1F` |
@@ -294,7 +306,7 @@ everything else, **JetBrains Mono** 400/600 for codes and hex values.
 | `.meta` | 14 px | Inter, text-muted | Second lines, helper text |
 | `.label` | 14 px semibold | Inter, text-muted | Form label above a field |
 | `.eyebrow` | 11 px caps, tracking 0.12em | Inter semibold, text-subtle | Label above a title, group labels |
-| `font-display` + size | any | Archivo 800 | Big numbers, the year in Year in review |
+| `font-display` + size | any | Archivo 800 | Big numbers |
 | small UI | 10.5–12 px | Inter semibold/bold | Dock labels, badges, chips |
 
 - The `→` in a size means phone → ≥ 640 px.
@@ -379,10 +391,10 @@ everything else, **JetBrains Mono** 400/600 for codes and hex values.
 | `Hero` / `Banner` | Detail page header over a blurred image |
 | `Section` | A titled card holding one block of content |
 | `List` + `ListGroupLabel` | A card of rows, optionally grouped (by month) |
-| `EventRow` | A dated thing (show). `DateBlock` on the left; `selected`/`onSelect` for select mode |
-| `EntityRow` | A named thing with an avatar (artist, venue) |
+| `EventRow` | A dated item. `DateBlock` on the left, a `status` dot (`{ tone, label }`); `selected`/`onSelect` for select mode |
+| `EntityRow` | A named thing with an avatar (a person, a place) |
 | `DateBlock` | Ticket-style date: highlight month over a big display-font day |
-| `MediaCard` | Image-led grid card (venues, festivals, flyers: `aspect="portrait"`) |
+| `MediaCard` | Image-led grid card (`aspect="portrait"` for posters) |
 | `LinkCard` | A card that navigates (eyebrow / title / sub); `accent` for the one to notice |
 | `StatTile` / `StatGrid` | Headline numbers (`accent="lime"` / `"pink"` for emphasis) |
 | `RankedList` | Top-N lists with counts |
@@ -391,12 +403,11 @@ everything else, **JetBrains Mono** 400/600 for codes and hex values.
 | `PillTabs` | Filters on desktop |
 | `Pager` | Paging long lists |
 | `Sheet` | **The** modal: bottom sheet on phones, dialog on desktop |
-| `ImageViewer`, `PhotoCarousel` | Full-screen images / photos (swipe, swipe down to close) |
-| `StatusBadge` / `STATUS` | Attendance status, same colours everywhere |
+| `ImageViewer` | Full-screen image (tap or Escape to close) |
+| `Badge` / `Tone` / `TONES` | A status as a chip, in one of the fixed tones |
 | `EmptyState` | No data — say what's missing and offer the next step |
 | `Loading` | Skeleton shaped like a page (never a bare spinner) |
-| `ShareButton` | Story-sized share image |
-| `VenueViewSwitch` | List ⇄ map switch |
+| `ViewSwitch` | Two or three views of one page as links (List ⇄ Map) |
 | `Wordmark` (`components/Wordmark.tsx`) | The logo, `sm`/`md`/`lg`/`xl` (40/60/88/120 px tall) |
 | `ColorPicker` (`components/ColorPicker.tsx`) | Inline colour picker: saturation/brightness field, hue slider (28–36 px thumbs, drag anywhere), one row of 8 quick swatches, hex box with a preview chip. Never the native `<input type=color>` — it opens a different dialog on every platform |
 | `ThemeCard` (`routes/BrandPage.tsx`) | A theme shown as a miniature of the app: logo, eyebrow, a date-row card, a primary and a secondary button, then name and vibe |
@@ -423,13 +434,14 @@ Style guide page, and list it here.
 - **Select mode:** a *Select* button turns rows into toggles (`EventRow
   onSelect`); a floating action bar above the dock shows the count and action.
 - **Sheets for choices**, not new pages, when the user comes straight back
-  (pickers, add-shows, search).
+  (pickers, add flows, search).
 - **Confirm before destructive or surprising actions**, in plain words; say
-  what survives ("Its shows stay as ordinary shows").
-- **Background work** shows in the corner ring (uploads): never block the
+  what survives ("Its events stay in your list").
+- **Background work** (uploads, syncing) shows as a small progress ring in a
+  corner: never block the
   screen; allow pause/cancel; warn before closing with work pending.
 - **Gestures:** pull to refresh at the top of a page; horizontal swipe between
-  siblings (festival days); swipe down to close full-screen media. Mark
+  siblings (days of a multi-day event); swipe down to close full-screen media. Mark
   carousels/maps `data-no-swipe`.
 - **Lists:** newest first for the past, soonest first for the future; group by
   month; status as a quiet dot in rows, a badge on detail pages.
@@ -453,8 +465,8 @@ Style guide page, and list it here.
 
 - Readability targets in section 3 (the Brand page warns when they're missed;
   every template passes).
-- Focus is visible (`focus:ring-2 ring-accent-lime/20` on fields,
-  `focus-visible:ring-accent-lime/50` on buttons).
+- Focus is visible (`focus:ring-2 ring-accent/20` on fields,
+  `focus-visible:ring-accent/50` on buttons).
 - Every interactive element is a real `button`/`a`; toggles use
   `aria-pressed`/`role="switch"`; tabs use `role="tab"`/`aria-selected`;
   the picker's field and hue bar are `role="slider"`.
@@ -480,7 +492,7 @@ Style guide page, and list it here.
 
 Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
 
-- **1.0.0 (2026-10-23)** — jimbo-ui split out of Tinnitus A Go Go: three-colour
+- **1.0.0 (2026-10-23)** — First release: three-colour
   theme engine, 25 templates, kit, shell, patterns; foundation / starter /
   reference files; `jimbo-ui.json`; the skill and its update workflow.
 - **1.1.0 (2026-10-23)** — Contrast targets: surfaces, borders and secondary
@@ -488,3 +500,8 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   card borders at full strength; Concrete deepened to `#45484D`;
   `scripts/contrast.mjs`. The showcase. Sheets render through a portal.
   `mapStyles` no longer needs Google Maps types.
+- **2.0.0 (2026-10-23)** — Fully generic: neutral kit (`Badge`/`Tone`
+  instead of app statuses, `ViewSwitch`), `AppShell` takes tabs and actions,
+  typeset `Wordmark` from `BRAND.logo`, neutral favicon and showcase content,
+  generic colour class names (`accent`, `highlight`) with the old ones kept as
+  legacy aliases, server contract described instead of shipped.

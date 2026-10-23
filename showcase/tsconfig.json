@@ -22,26 +22,11 @@
     "paths": {
       "@/*": [
         ".jimbo/*"
-      ],
-      "@tagg/shared": [
-        ".jimbo/shared.ts"
       ]
     }
   },
   "include": [
     "src",
-    ".jimbo/lib/theme.ts",
-    ".jimbo/lib/themes.ts",
-    ".jimbo/lib/useBrand.ts",
-    ".jimbo/lib/api.ts",
-    ".jimbo/lib/cn.ts",
-    ".jimbo/lib/gestures.ts",
-    ".jimbo/lib/shareCard.ts",
-    ".jimbo/components/ui",
-    ".jimbo/components/ColorPicker.tsx",
-    ".jimbo/components/Wordmark.tsx",
-    ".jimbo/routes/BrandPage.tsx",
-    ".jimbo/routes/StyleGuidePage.tsx",
-    ".jimbo/shared.ts"
+    ".jimbo"
   ]
 }

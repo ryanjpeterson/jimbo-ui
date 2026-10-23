@@ -1,39 +1,71 @@
 /**
- * App UI kit — the shared building blocks every page is assembled from.
+ * The UI kit — the shared building blocks every page is assembled from.
  *
  * Mobile first: full-width rows with 44px+ tap targets, nothing that scrolls
  * sideways, and type that steps up a size on phones rather than down.
- * Look: ticket-app style — bold heading font, image heroes with a dark
- * gradient, date blocks on show rows, chevrons on anything that navigates.
+ * Look: bold heading font, image heroes with a dark gradient, ticket-style
+ * date blocks on dated rows, chevrons on anything that navigates.
+ *
+ * jimbo-ui reference: copy into an app and extend it with the app's own
+ * domain pieces (statuses, rows, switches) built from the same tokens.
  */
 
 import { useEffect, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
-import type { AttendanceStatus } from "@tagg/shared";
 import { cn } from "@/lib/cn";
-import { dateParts, initials } from "@/lib/format";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Attendance status — one palette for every page
+// Small helpers
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const STATUS: Record<AttendanceStatus, { label: string; text: string; chip: string; border: string; tint: string; dot: string }> = {
-  attended:   { label: "Attended",   text: "text-accent-lime", chip: "bg-lime-950 text-accent-lime border-lime-700",    border: "border-lime-700",   tint: "bg-lime-950" , dot: "bg-accent-lime" },
-  attending:  { label: "Attending",  text: "text-yellow-400",  chip: "bg-yellow-950 text-yellow-400 border-yellow-700", border: "border-yellow-600", tint: "bg-yellow-950" , dot: "bg-yellow-400" },
-  interested: { label: "Interested", text: "text-purple-400",  chip: "bg-purple-950 text-purple-400 border-purple-800", border: "border-purple-700", tint: "bg-purple-950" , dot: "bg-purple-400" },
-  missed:     { label: "Missed",     text: "text-red-400",     chip: "bg-red-950 text-red-400 border-red-800",          border: "border-red-700",    tint: "bg-red-950" , dot: "bg-red-400" },
-  cancelled:  { label: "Cancelled",  text: "text-text-subtle", chip: "bg-surface-2 text-text-subtle border-border",      border: "border-border",     tint: "bg-surface-2" , dot: "bg-text-subtle" },
+/** "2026-10-14" → { month: "OCT", day: "14", year: "2026", weekday: "Wed" } (UTC, so dates don't shift). */
+export function dateParts(iso: string): { month: string; day: string; year: string; weekday: string } {
+  const date = /^\d{4}-\d{2}-\d{2}/.test(iso) ? new Date(`${iso.slice(0, 10)}T00:00:00Z`) : null;
+  if (!date || Number.isNaN(date.getTime())) return { month: "", day: "?", year: iso.slice(0, 4), weekday: "" };
+  return {
+    month: date.toLocaleDateString("en-US", { month: "short", timeZone: "UTC" }).toUpperCase(),
+    day: String(date.getUTCDate()),
+    year: String(date.getUTCFullYear()),
+    weekday: date.toLocaleDateString("en-US", { weekday: "short", timeZone: "UTC" }),
+  };
+}
+
+/** Up to two initials for an avatar placeholder: "Main Hall" → "MH". */
+export function initials(name: string): string {
+  return name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]?.toUpperCase() ?? "").join("");
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Tones — fixed colours for states that carry meaning (statuses, badges)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Status colours are fixed, not themed, because they carry meaning. The
+ * "done" state uses the accent. An app maps its own statuses onto these
+ * (e.g. done / going / maybe / missed / cancelled).
+ */
+export type Tone = "accent" | "yellow" | "purple" | "red" | "muted";
+
+export const TONES: Record<Tone, { text: string; chip: string; border: string; tint: string; dot: string }> = {
+  accent: { text: "text-accent",      chip: "bg-accent-950 text-accent border-accent-700",      border: "border-accent-700", tint: "bg-accent-950", dot: "bg-accent" },
+  yellow: { text: "text-yellow-400",  chip: "bg-yellow-950 text-yellow-400 border-yellow-700", border: "border-yellow-600", tint: "bg-yellow-950", dot: "bg-yellow-400" },
+  purple: { text: "text-purple-400",  chip: "bg-purple-950 text-purple-400 border-purple-800", border: "border-purple-700", tint: "bg-purple-950", dot: "bg-purple-400" },
+  red:    { text: "text-red-400",     chip: "bg-red-950 text-red-400 border-red-800",          border: "border-red-700",    tint: "bg-red-950",    dot: "bg-red-400" },
+  muted:  { text: "text-text-subtle", chip: "bg-surface-2 text-text-subtle border-border",      border: "border-border",     tint: "bg-surface-2",  dot: "bg-text-subtle" },
 };
 
-export function StatusBadge({ status, className }: { status: AttendanceStatus; className?: string }) {
-  const s = STATUS[status] ?? STATUS.cancelled;
+/** A status as a labelled chip — for detail pages and headers. */
+export function Badge({ tone, children, className }: { tone: Tone; children: ReactNode; className?: string }) {
   return (
-    <span className={cn("inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-semibold", s.chip, className)}>
-      {s.label}
+    <span className={cn("inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-semibold", TONES[tone].chip, className)}>
+      {children}
     </span>
   );
 }
+
+/** A status on a row: a tone plus the words a screen reader and tooltip use. */
+export type RowStatus = { tone: Tone; label: string };
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Icons
@@ -98,20 +130,19 @@ export function BackButton({ to, label, overlay = false }: { to: string; label: 
 /**
  * Full-width banner at the top of a page: the backdrop runs edge to edge of
  * the screen with no frame, while its content lines up with the page column.
- * Used by the show, artist, venue and festival pages (via Hero) and Year in review.
  */
-export function Banner({ backdrop, glow = "lime", back, badge, children }: {
+export function Banner({ backdrop, glow = "accent", back, badge, children }: {
   /** Image blurred to fill the banner; falls back to a soft accent gradient. */
   backdrop?: string | null;
-  glow?: "lime" | "pink" | "yellow" | "purple";
+  glow?: "accent" | "highlight" | "yellow" | "purple";
   back?: { to: string; label: string };
   /** Top-right of the banner, opposite the back button (e.g. a status flag). */
   badge?: ReactNode;
   children: ReactNode;
 }) {
   const glowCls = {
-    lime: "from-lime-900/70",
-    pink: "from-rose-900/70",
+    accent: "from-accent-900/70",
+    highlight: "from-highlight-900/70",
     yellow: "from-yellow-900/70",
     purple: "from-purple-900/70",
   }[glow];
@@ -175,7 +206,7 @@ export function ImageViewer({ src, alt, onClose }: { src: string; alt: string; o
  * Banner for detail pages: thumbnail (tap for full size), eyebrow, big title,
  * meta lines and pill actions over the blurred image.
  */
-export function Hero({ imageUrl, imageAlt, eyebrow, title, children, actions, back, badge, accent = "lime", square = false }: {
+export function Hero({ imageUrl, imageAlt, eyebrow, title, children, actions, back, badge, accent = "accent", square = false }: {
   imageUrl?: string | null;
   imageAlt?: string;
   eyebrow?: ReactNode;
@@ -183,15 +214,15 @@ export function Hero({ imageUrl, imageAlt, eyebrow, title, children, actions, ba
   children?: ReactNode;
   actions?: ReactNode;
   back?: { to: string; label: string };
-  /** Shown top-right, e.g. the attendance status. */
+  /** Shown top-right, e.g. a status Badge. */
   badge?: ReactNode;
-  accent?: "lime" | "pink" | "yellow" | "purple";
-  /** Square thumbnail (artists/venues) instead of a portrait one (flyers). */
+  accent?: "accent" | "highlight" | "yellow" | "purple";
+  /** Square thumbnail (people, places) instead of a portrait one (posters). */
   square?: boolean;
 }) {
   const glow = {
-    lime: "from-lime-900/70",
-    pink: "from-rose-900/70",
+    accent: "from-accent-900/70",
+    highlight: "from-highlight-900/70",
     yellow: "from-yellow-900/70",
     purple: "from-purple-900/70",
   }[accent];
@@ -280,7 +311,7 @@ export function DateBlock({ date, showYear = false, approximate = false }: { dat
   const p = dateParts(date);
   return (
     <div className="flex w-12 shrink-0 flex-col items-center leading-none sm:w-14">
-      <span className="text-[11px] font-bold tracking-wider text-accent-pink">{p.month}</span>
+      <span className="text-[11px] font-bold tracking-wider text-highlight">{p.month}</span>
       <span className="font-display text-[26px] leading-[1.1] text-text-base sm:text-[28px]">{approximate ? "~" : p.day}</span>
       <span className="text-[11px] font-medium text-text-subtle">{showYear ? p.year : p.weekday}</span>
     </div>
@@ -289,7 +320,7 @@ export function DateBlock({ date, showYear = false, approximate = false }: { dat
 
 const rowBase = "group flex items-center gap-3 px-4 py-3 min-h-[72px] transition-colors hover:bg-surface-2/70 active:bg-surface-2 sm:gap-4";
 
-/** A show as a row: date block, optional flyer thumb, title, sub lines, status, chevron. */
+/** A dated item as a row: date block, optional thumb, title, sub lines, status dot, chevron. */
 export function EventRow({ to, date, title, subtitle, meta, imageUrl, status, showYear = true, approximate, selected, onSelect }: {
   to: string;
   date: string;
@@ -297,20 +328,20 @@ export function EventRow({ to, date, title, subtitle, meta, imageUrl, status, sh
   subtitle?: ReactNode;
   meta?: ReactNode;
   imageUrl?: string | null;
-  status?: AttendanceStatus | null;
+  status?: RowStatus | null;
   showYear?: boolean;
   approximate?: boolean;
-  /** Selection mode: the row toggles instead of opening the show. */
+  /** Selection mode: the row toggles instead of opening the item. */
   selected?: boolean;
   onSelect?: () => void;
 }) {
   if (onSelect) {
     return (
       <button type="button" onClick={onSelect} aria-pressed={!!selected}
-        className={cn(rowBase, "w-full text-left", selected && "bg-accent-lime/10")}>
+        className={cn(rowBase, "w-full text-left", selected && "bg-accent/10")}>
         <span className={cn(
           "flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 transition-colors",
-          selected ? "border-accent-lime bg-accent-lime text-on-accent" : "border-border",
+          selected ? "border-accent bg-accent text-on-accent" : "border-border",
         )}>
           {selected && (
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7" /></svg>
@@ -334,18 +365,18 @@ export function EventRow({ to, date, title, subtitle, meta, imageUrl, status, sh
         </div>
       )}
       <div className="min-w-0 flex-1">
-        <p className="line-clamp-2 text-[15px] font-semibold leading-snug text-text-base group-hover:text-accent-lime sm:text-base">{title}</p>
+        <p className="line-clamp-2 text-[15px] font-semibold leading-snug text-text-base group-hover:text-accent sm:text-base">{title}</p>
         {subtitle && <p className="mt-0.5 truncate text-sm text-text-muted">{subtitle}</p>}
         {meta && <p className="mt-0.5 truncate text-xs text-text-subtle">{meta}</p>}
       </div>
-      {/* Status as a quiet dot — the label is in the tooltip and on the show page */}
-      {status && <span title={STATUS[status]?.label} aria-label={STATUS[status]?.label} className={cn("h-2.5 w-2.5 shrink-0 rounded-full", STATUS[status]?.dot)} />}
-      <Chevron className="text-text-subtle group-hover:text-accent-lime" />
+      {/* Status as a quiet dot — the label is in the tooltip and on the detail page */}
+      {status && <span title={status.label} aria-label={status.label} className={cn("h-2.5 w-2.5 shrink-0 rounded-full", TONES[status.tone].dot)} />}
+      <Chevron className="text-text-subtle group-hover:text-accent" />
     </Link>
   );
 }
 
-/** An artist / venue / festival as a row with an avatar. */
+/** A named thing (person, place, group) as a row with an avatar. */
 export function EntityRow({ to, name, imageUrl, sub, meta, round = false }: {
   to: string;
   name: string;
@@ -364,16 +395,16 @@ export function EntityRow({ to, name, imageUrl, sub, meta, round = false }: {
         )}
       </div>
       <div className="min-w-0 flex-1">
-        <p className="truncate text-[15px] font-semibold text-text-base group-hover:text-accent-lime sm:text-base">{name}</p>
+        <p className="truncate text-[15px] font-semibold text-text-base group-hover:text-accent sm:text-base">{name}</p>
         {sub && <p className="mt-0.5 truncate text-sm text-text-muted">{sub}</p>}
       </div>
       {meta && <span className="shrink-0 text-sm font-medium text-text-subtle">{meta}</span>}
-      <Chevron className="text-text-subtle group-hover:text-accent-lime" />
+      <Chevron className="text-text-subtle group-hover:text-accent" />
     </Link>
   );
 }
 
-/** Image-led card for grids (venues, festivals). */
+/** Image-led card for grids. */
 export function MediaCard({ to, name, imageUrl, sub, meta, aspect = "video", contain = false, badge }: {
   to: string;
   name: string;
@@ -381,13 +412,13 @@ export function MediaCard({ to, name, imageUrl, sub, meta, aspect = "video", con
   sub?: ReactNode;
   meta?: ReactNode;
   aspect?: "video" | "square" | "portrait";
-  /** Fit the whole image (flyers) over a blurred copy instead of cropping. */
+  /** Fit the whole image (posters) over a blurred copy instead of cropping. */
   contain?: boolean;
   badge?: ReactNode;
 }) {
   const aspectCls = aspect === "square" ? "aspect-square" : aspect === "portrait" ? "aspect-[3/4]" : "aspect-video";
   return (
-    <Link to={to} className="group card flex flex-col overflow-hidden transition-colors hover:border-accent-lime/60">
+    <Link to={to} className="group card flex flex-col overflow-hidden transition-colors hover:border-accent/60">
       <div className={cn("relative overflow-hidden bg-surface-2", aspectCls)}>
         {imageUrl ? (
           contain ? (
@@ -406,7 +437,7 @@ export function MediaCard({ to, name, imageUrl, sub, meta, aspect = "video", con
         {badge && <div className="absolute left-2 top-2">{badge}</div>}
       </div>
       <div className="flex flex-1 flex-col gap-0.5 p-3">
-        <p className="line-clamp-2 text-[15px] font-semibold leading-snug text-text-base group-hover:text-accent-lime">{name}</p>
+        <p className="line-clamp-2 text-[15px] font-semibold leading-snug text-text-base group-hover:text-accent">{name}</p>
         {sub && <p className="truncate text-sm text-text-muted">{sub}</p>}
         {meta && <p className="mt-auto truncate pt-1 text-xs font-medium text-text-subtle">{meta}</p>}
       </div>
@@ -420,22 +451,22 @@ export function LinkCard({ to, eyebrow, title, sub, accent = false }: {
   eyebrow: ReactNode;
   title: ReactNode;
   sub?: ReactNode;
-  /** Lime border — for the one card on a page that should stand out. */
+  /** Accent border — for the one card on a page that should stand out. */
   accent?: boolean;
 }) {
   const body = (
     <>
       <div className="min-w-0 flex-1">
         <p className="eyebrow mb-1">{eyebrow}</p>
-        <p className="truncate text-base font-semibold text-text-base group-hover:text-accent-lime sm:text-lg">{title}</p>
+        <p className="truncate text-base font-semibold text-text-base group-hover:text-accent sm:text-lg">{title}</p>
         {sub && <p className="mt-0.5 truncate text-sm text-text-muted">{sub}</p>}
       </div>
-      {to && <Chevron className="text-text-subtle group-hover:text-accent-lime" />}
+      {to && <Chevron className="text-text-subtle group-hover:text-accent" />}
     </>
   );
-  const cls = cn("group card flex min-h-[84px] items-center gap-3 p-4 sm:p-5", accent && "border-accent-lime/50 bg-lime-950/20");
+  const cls = cn("group card flex min-h-[84px] items-center gap-3 p-4 sm:p-5", accent && "border-accent/50 bg-accent-950/20");
   return to
-    ? <Link to={to} className={cn(cls, "transition-colors hover:border-accent-lime/60")}>{body}</Link>
+    ? <Link to={to} className={cn(cls, "transition-colors hover:border-accent/60")}>{body}</Link>
     : <div className={cls}>{body}</div>;
 }
 
@@ -447,9 +478,9 @@ export function StatTile({ label, value, sub, accent = "muted" }: {
   label: string;
   value: string | number;
   sub?: ReactNode;
-  accent?: "lime" | "pink" | "muted";
+  accent?: "accent" | "highlight" | "muted";
 }) {
-  const col = accent === "lime" ? "text-accent-lime" : accent === "pink" ? "text-accent-pink" : "text-text-base";
+  const col = accent === "accent" ? "text-accent" : accent === "highlight" ? "text-highlight" : "text-text-base";
   return (
     <div className="card p-4 sm:p-5">
       <p className="eyebrow mb-1">{label}</p>
@@ -473,11 +504,11 @@ export type RankedItem = {
   href: string;
 };
 
-/** Leaderboard rows: rank, name, sub line, show count. Two columns from sm up. */
-export function RankedList({ items, unit = "show" }: { items: RankedItem[]; unit?: string }) {
+/** Leaderboard rows: rank, name, sub line, count. Two columns from sm up. */
+export function RankedList({ items, unit = "item" }: { items: RankedItem[]; unit?: string }) {
   if (items.length === 0) return <p className="p-4 text-sm text-text-subtle">Nothing here yet.</p>;
   const rankColor = (rank: number) =>
-    rank === 1 ? "text-accent-lime" : rank === 2 ? "text-accent-cyan" : rank === 3 ? "text-accent-pink" : "text-text-subtle";
+    rank === 1 ? "text-accent" : rank === 2 ? "text-highlight" : rank === 3 ? "text-text-base" : "text-text-subtle";
   return (
     <div className="grid sm:grid-cols-2 sm:divide-x sm:divide-border">
       {[items.slice(0, Math.ceil(items.length / 2)), items.slice(Math.ceil(items.length / 2))].map((col, ci) => (
@@ -488,7 +519,7 @@ export function RankedList({ items, unit = "show" }: { items: RankedItem[]; unit
               <Link key={item.id} to={item.href} className={rowBase}>
                 <span className={cn("w-7 shrink-0 text-right font-display text-xl", rankColor(rank))}>{rank}</span>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-[15px] font-semibold text-text-base group-hover:text-accent-lime">{item.name}</p>
+                  <p className="truncate text-[15px] font-semibold text-text-base group-hover:text-accent">{item.name}</p>
                   {item.sub && <p className="truncate text-sm text-text-subtle">{item.sub}</p>}
                 </div>
                 <span className="shrink-0 text-sm font-semibold text-text-muted">
@@ -547,7 +578,7 @@ export function SelectField<T extends string>({ value, onChange, options, label,
   );
 }
 
-/** Two or three equal-width tabs (Upcoming / Past). Full width on phones. */
+/** Two to four tabs for views of one thing (Upcoming / Past). Full width on phones. */
 export function Tabs<T extends string>({ value, onChange, options }: {
   value: T;
   onChange: (v: T) => void;
@@ -565,7 +596,7 @@ export function Tabs<T extends string>({ value, onChange, options }: {
               "h-10 truncate rounded-full font-semibold transition-colors sm:h-9 sm:px-4 sm:text-sm",
               // Four or more tabs: tighter on phones so every label fits.
               options.length > 3 ? "px-2.5 text-sm" : "px-4 text-[15px]",
-              active ? "bg-accent-lime text-on-accent" : "text-text-muted hover:text-text-base",
+              active ? "bg-accent text-on-accent" : "text-text-muted hover:text-text-base",
             )}>
             {o.label}
           </button>
@@ -589,7 +620,7 @@ export function PillTabs<T extends string>({ value, onChange, options }: {
           <button key={o.value} onClick={() => onChange(o.value)}
             className={cn(
               "h-10 rounded-full border px-4 text-sm font-semibold transition-colors",
-              active ? (o.activeClass ?? "border-accent-lime bg-accent-lime text-on-accent") : "border-border text-text-muted hover:border-text-subtle hover:text-text-base",
+              active ? (o.activeClass ?? "border-accent bg-accent text-on-accent") : "border-border text-text-muted hover:border-text-subtle hover:text-text-base",
             )}>
             {o.label}
           </button>
@@ -609,7 +640,7 @@ export function Pager({ page, totalPages, total, pageSize, onPage }: {
   if (totalPages <= 1) return null;
   const from = (page - 1) * pageSize + 1;
   const to = Math.min(page * pageSize, total);
-  const btn = "inline-flex h-12 flex-1 items-center justify-center gap-1 rounded-xl border border-border text-[15px] font-semibold transition-colors hover:border-accent-lime disabled:opacity-30 disabled:hover:border-border sm:h-11 sm:flex-none sm:px-5";
+  const btn = "inline-flex h-12 flex-1 items-center justify-center gap-1 rounded-xl border border-border text-[15px] font-semibold transition-colors hover:border-accent disabled:opacity-30 disabled:hover:border-border sm:h-11 sm:flex-none sm:px-5";
   return (
     <nav className="mt-6 flex items-center gap-3" aria-label="Pagination">
       <button className={btn} disabled={page <= 1} onClick={() => onPage(page - 1)}>
@@ -719,7 +750,7 @@ export function EmptyState({ title, body, action, tone = "muted" }: {
 }) {
   return (
     <div className="card px-6 py-14 text-center">
-      <p className={cn("text-lg font-semibold", tone === "error" ? "text-accent-pink" : "text-text-base")}>{title}</p>
+      <p className={cn("text-lg font-semibold", tone === "error" ? "text-highlight" : "text-text-base")}>{title}</p>
       {body && <p className="mx-auto mt-1 max-w-sm text-sm text-text-muted">{body}</p>}
       {action && <div className="mt-5 flex justify-center">{action}</div>}
     </div>
@@ -727,54 +758,30 @@ export function EmptyState({ title, body, action, tone = "muted" }: {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Venues List | Map switch — the Venues tab has two views
+// View switch — two or three views of one page as links (List | Map)
 // ─────────────────────────────────────────────────────────────────────────────
 
-export function VenueViewSwitch({ view, floating = false }: { view: "list" | "map"; floating?: boolean }) {
-  const item = (to: string, label: string, active: boolean) => (
-    <Link to={to} replace aria-current={active ? "page" : undefined}
-      className={cn(
-        "flex h-9 items-center rounded-full px-4 text-sm font-semibold transition-colors",
-        active ? "bg-accent-lime text-on-accent" : "text-text-muted hover:text-text-base",
-      )}>
-      {label}
-    </Link>
-  );
+export function ViewSwitch({ options, current, floating = false }: {
+  options: { to: string; label: string }[];
+  /** The `to` of the view showing now. */
+  current: string;
+  /** Frosted, for sitting over a map or image. */
+  floating?: boolean;
+}) {
   return (
     <div className={cn(
       "flex rounded-full border p-0.5",
       floating ? "border-white/10 bg-bg/85 shadow-xl backdrop-blur-md" : "border-border bg-surface",
     )}>
-      {item("/venues", "List", view === "list")}
-      {item("/map", "Map", view === "map")}
+      {options.map((o) => (
+        <Link key={o.to} to={o.to} replace aria-current={o.to === current ? "page" : undefined}
+          className={cn(
+            "flex h-9 items-center rounded-full px-4 text-sm font-semibold transition-colors",
+            o.to === current ? "bg-accent text-on-accent" : "text-text-muted hover:text-text-base",
+          )}>
+          {o.label}
+        </Link>
+      ))}
     </div>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Share — makes a story-sized image and opens the share sheet
-// ─────────────────────────────────────────────────────────────────────────────
-
-export function ShareButton({ card, className }: { card: () => import("@/lib/shareCard").ShareCard; className?: string }) {
-  const [busy, setBusy] = useState(false);
-  return (
-    <button
-      disabled={busy}
-      onClick={async () => {
-        setBusy(true);
-        try {
-          const { shareCard } = await import("@/lib/shareCard");
-          await shareCard(card());
-        } finally {
-          setBusy(false);
-        }
-      }}
-      className={cn("inline-flex h-10 items-center gap-2 rounded-full border border-border bg-surface-2 px-4 text-sm font-semibold transition-colors hover:border-accent-lime disabled:opacity-60", className)}
-    >
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <path d="M12 3v12M7 8l5-5 5 5" /><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7" />
-      </svg>
-      {busy ? "Making image…" : "Share"}
-    </button>
   );
 }
