@@ -17,9 +17,15 @@ the matching 0.x release.
 
 ## Unreleased
 
-Clearer separation, a calmer surface (less glass, less round) and type styles.
+Clearer separation, a calmer surface (less glass, less round, flat swatches) and type styles.
 
 ### Changed
+- **Flat swatches.** Colour circles are flat with a slight outline in their
+  own darker shade — no sphere shading or glow: `.orb-*`, `EntityRow`
+  avatars (now `orb-support` with `on-support` text), status dots
+  (`STATUS_DOT` is a 10 px flat dot with a faint dark ring; `TONES[*].dot`
+  is just the fill again), and the Brand page's theme-tile and editor
+  swatches.
 - **Less glassy.** `.glass` is mostly solid (`bg-surface/90`, `blur-md`,
   `border-border`); the top bar, dock, view switch and sheets are solid or
   near-solid; cards are 97% opaque.

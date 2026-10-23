@@ -64,7 +64,7 @@ this check, then the preview workflow if they want detail.
   buttons and pills); full circles only for the motif.
 - Type: the theme picks sans, mono or serif for headings and for body
   (`Theme.fonts`); use `font-display` / `font-body`, never a named family.
-- The circle motif, here and there: `ThemeDots`, `.orb-*`, lit-circle
+- The circle motif, here and there: `ThemeDots`, `.orb-*` (flat circles with a slight outline),
   avatars, colour circles on theme tiles. Small and few.
 - Templates come in three sets: **Everyday** (dark, mid, light), **Flags**
   and **Holidays** (guide section 4).

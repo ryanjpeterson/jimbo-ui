@@ -188,12 +188,12 @@ and support (bottom right).
 colour over a background of the opposite hue goes grey (amber over blue,
 pink over green) — that's what makes a theme look flat. Put brand colour on
 solid, lit things instead: the date ticket's month band, lit avatars and
-pills, glowing status dots, orbs, coloured text. Washes are for tinting the
+pills, status dots, flat colour circles, coloured text. Washes are for tinting the
 same hue family (done chips, warnings), not for adding colour.
 
 **The circle motif.** The theme's colours as circles turn up here and there:
 `ThemeDots` before a page eyebrow and in empty states, a small orb beside a
-stat's label, lit-circle avatars, colour circles on theme tiles, three soft
+stat's label, avatar circles, colour circles on theme tiles, three soft
 orbs behind the page, and the favicon. Keep them small and few — a motif, not
 wallpaper.
 
@@ -515,7 +515,7 @@ mean the headings and body styles.
 | --- | --- |
 | `.card` | 14 px radius, `border-border` (full strength), gradient `surface → bg-deep` top to bottom at 97%, under a 9% accent glow from the top left and a 9% support glow from the bottom right; inner top highlight `inset 0 1px 0 rgba(255,255,255,.06)`, soft drop `0 12px 32px -16px rgba(0,0,0,.7)` |
 | `.glass` / `.card-glass` | Lightly frosted: `bg-surface/90`, `backdrop-blur-md`, `border-border`, inner top highlight `rgba(255,255,255,.08)`, soft drop. For tabs, the secondary top-bar buttons, the pager and anything over a banner |
-| `.orb-accent/highlight/support` | A brand colour as a lit sphere: `radial-gradient(circle at 32% 28%, c-lighter, c 48%, c-darker)`, fully round. Size it with utilities. The circle motif |
+| `.orb-accent/highlight/support` | A brand colour as a **flat circle with a slight outline**: the colour, plus `inset 0 0 0 1px` of its darker shade at 55%. Fully round; size it with utilities. The circle motif — swatches, avatars, stat dots, `ThemeDots`. No gloss or sphere shading on swatches |
 | `.divide-etched` | Lines between stacked items, on the parent like `divide-y`: a full-strength `border` line with a faint light line under it (`inset 0 1px 0 rgba(255,255,255,.05)`). It also reaches one level down, so rows grouped in wrappers (a month's label and rows) are divided too. Lists, ranked lists |
 | `.lit-accent/highlight/support` | The lit fill: `from-c-top to-c-bottom` with `on-c` text. Active tabs and pills, avatars, count badges |
 | `.field` | 11 px radius, `bg-surface-2`, `border-border`, 15 px text, `px-4`; focus = accent border + 2 px accent ring at 20% |
@@ -603,8 +603,8 @@ Style guide page, and list it here.
   siblings (days of a multi-day event); swipe down to close full-screen media. Mark
   carousels/maps `data-no-swipe`.
 - **Lists:** newest first for the past, soonest first for the future; group by
-  month; status as a small glowing dot in rows (`STATUS_DOT` + the tone's
-  `dot`: a lit sphere with a halo in its colour), a badge on detail pages.
+  month; status as a small flat dot in rows (`STATUS_DOT` + the tone's
+  `dot`: a 10 px circle with a slight dark outline), a badge on detail pages.
 - **Counts on tabs:** a small highlight badge with on-highlight text.
 - **Errors:** inline, near what failed, in the highlight colour; keep the
   user's input.
@@ -685,7 +685,9 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   highlights. Colour from opaque shapes, not thin washes: date tickets with a
   lit month band, glowing status dots, support group labels, cards lit by the
   accent and support.
-- **Unreleased** — Less glassy and less round: mostly solid frosted surfaces
+- **Unreleased** — Flat swatches: colour circles (orbs, avatars, status
+  dots, theme-tile and editor swatches) are flat with a slight outline, no
+  sphere shading or glow. Less glassy and less round: mostly solid frosted surfaces
   and a smaller radius scale (cards 14, buttons 10, chips 8; circles kept for
   the motif). Type styles: sans, mono or serif for headings and body.
   Clearer separation: borders step to 1.8:1 against cards

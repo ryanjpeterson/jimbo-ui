@@ -48,15 +48,15 @@ export function initials(name: string): string {
 export type Tone = "accent" | "yellow" | "purple" | "red" | "muted";
 
 export const TONES: Record<Tone, { text: string; chip: string; border: string; tint: string; dot: string }> = {
-  accent: { text: "text-accent",      chip: "bg-accent-950 text-accent border-accent-700",      border: "border-accent-700", tint: "bg-accent-950", dot: "bg-accent shadow-accent/70" },
-  yellow: { text: "text-yellow-400",  chip: "bg-yellow-950 text-yellow-400 border-yellow-700", border: "border-yellow-600", tint: "bg-yellow-950", dot: "bg-yellow-400 shadow-yellow-400/70" },
-  purple: { text: "text-purple-400",  chip: "bg-purple-950 text-purple-400 border-purple-800", border: "border-purple-700", tint: "bg-purple-950", dot: "bg-purple-400 shadow-purple-400/70" },
-  red:    { text: "text-red-400",     chip: "bg-red-950 text-red-400 border-red-800",          border: "border-red-700",    tint: "bg-red-950",    dot: "bg-red-400 shadow-red-400/70" },
-  muted:  { text: "text-text-subtle", chip: "bg-surface-2 text-text-subtle border-border",      border: "border-border",     tint: "bg-surface-2",  dot: "bg-text-subtle shadow-text-subtle/40" },
+  accent: { text: "text-accent",      chip: "bg-accent-950 text-accent border-accent-700",      border: "border-accent-700", tint: "bg-accent-950", dot: "bg-accent" },
+  yellow: { text: "text-yellow-400",  chip: "bg-yellow-950 text-yellow-400 border-yellow-700", border: "border-yellow-600", tint: "bg-yellow-950", dot: "bg-yellow-400" },
+  purple: { text: "text-purple-400",  chip: "bg-purple-950 text-purple-400 border-purple-800", border: "border-purple-700", tint: "bg-purple-950", dot: "bg-purple-400" },
+  red:    { text: "text-red-400",     chip: "bg-red-950 text-red-400 border-red-800",          border: "border-red-700",    tint: "bg-red-950",    dot: "bg-red-400" },
+  muted:  { text: "text-text-subtle", chip: "bg-surface-2 text-text-subtle border-border",      border: "border-border",     tint: "bg-surface-2",  dot: "bg-text-subtle" },
 };
 
-/** A status dot as a small lit sphere with a halo in its colour (add a tone's `dot`). */
-export const STATUS_DOT = "h-3 w-3 shrink-0 rounded-full shadow-[0_0_10px_1px] bg-[radial-gradient(circle_at_35%_30%,rgba(255,255,255,0.6),transparent_62%)]";
+/** A status dot: a small flat circle with a slight outline (add a tone's `dot`). */
+export const STATUS_DOT = "h-2.5 w-2.5 shrink-0 rounded-full ring-1 ring-inset ring-black/25";
 
 /** A status as a labelled chip — for detail pages and headers. */
 export function Badge({ tone, children, className }: { tone: Tone; children: ReactNode; className?: string }) {
@@ -429,7 +429,7 @@ export function EntityRow({ to, name, imageUrl, sub, meta, round = false }: {
         {imageUrl ? (
           <img src={imageUrl} alt="" loading="lazy" className="h-full w-full object-cover" />
         ) : (
-          <div className="lit-support flex h-full w-full items-center justify-center font-display text-base">{initials(name)}</div>
+          <div className="orb-support flex h-full w-full items-center justify-center font-display text-base text-on-support">{initials(name)}</div>
         )}
       </div>
       <div className="min-w-0 flex-1">

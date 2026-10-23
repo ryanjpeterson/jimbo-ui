@@ -82,11 +82,11 @@
   .card-glass {
     @apply glass rounded-2xl;
   }
-  /* Orbs: a brand colour as a lit sphere (light at the top left, dark at the
-     bottom right) — the circle motif. Size and place them with utilities. */
-  .orb-accent    { background: radial-gradient(circle at 32% 28%, rgb(var(--c-accent-lighter)), rgb(var(--c-accent)) 48%, rgb(var(--c-accent-darker))); }
-  .orb-highlight { background: radial-gradient(circle at 32% 28%, rgb(var(--c-highlight-lighter)), rgb(var(--c-highlight)) 48%, rgb(var(--c-highlight-darker))); }
-  .orb-support   { background: radial-gradient(circle at 32% 28%, rgb(var(--c-support-lighter)), rgb(var(--c-support)) 48%, rgb(var(--c-support-darker))); }
+  /* Orbs: a brand colour as a flat circle with a slight outline in its own
+     darker shade — the circle motif. Size and place them with utilities. */
+  .orb-accent    { background: rgb(var(--c-accent));    box-shadow: inset 0 0 0 1px rgb(var(--c-accent-darker) / 0.55); }
+  .orb-highlight { background: rgb(var(--c-highlight)); box-shadow: inset 0 0 0 1px rgb(var(--c-highlight-darker) / 0.55); }
+  .orb-support   { background: rgb(var(--c-support));   box-shadow: inset 0 0 0 1px rgb(var(--c-support-darker) / 0.55); }
   .orb-accent, .orb-highlight, .orb-support { @apply rounded-full; }
   .eyebrow {
     @apply text-[11px] font-semibold uppercase tracking-[0.12em] text-text-subtle;
