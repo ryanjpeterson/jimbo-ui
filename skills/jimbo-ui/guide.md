@@ -9,8 +9,9 @@ implementations of everything below are in the repo's `reference/` folder.
   `CHANGELOG.md` for what changed in each version and what apps must do.
 - **The living picture:** each app's **Style guide** page (`/admin/style`)
   renders every shared component in that app's current theme.
-- **Theme:** three colours (accent, highlight, background), picked from
-  templates or fine-tuned on each app's **Brand & theme** admin page.
+- **Theme:** up to four colours (accent, highlight, support, background),
+  picked from Everyday, Flags or Holidays templates or fine-tuned on each
+  app's **Brand & theme** admin page.
 
 **Contents:** 1 How apps use jimbo-ui · 2 Brand · 3 Theme engine · 4 Theme
 templates · 5 Typography · 6 Layout and shell · 7 Surfaces, depth and motion ·
@@ -40,7 +41,7 @@ The stack is React + TypeScript + Vite + Tailwind CSS 3 (with `clsx` and
 - `src/lib/brand.config.ts` — the app's name, default theme and localStorage
   prefix. The only theme values that differ between apps.
 - `src/styles/tokens.css` — the default tokens; generate it with
-  `node scripts/tokens.mjs <accent> <highlight> <background>`.
+  `node scripts/tokens.mjs <accent> <highlight> <background> [support]`.
 - `public/favicon.svg` — keep `#0B0B0C` for its background and `#A8FF3E` for
   its mark so `applyFavicon` can recolour it.
 
@@ -58,10 +59,11 @@ guide page, `HeaderTitle.tsx` (the app's name as header text), `useBrand.ts`, an
 `index.html` (pre-paint script, fonts, PWA tags).
 
 **Server side (optional):** an app that lets admins change the theme stores
-the three colours and any uploaded favicon, and serves them:
-`GET /public/theme` → `{ theme: { accent, highlight, background } (null =
-default), faviconUrl }`; admin-only `PUT /admin/theme` (three
-`#RRGGBB` values), `DELETE /admin/theme` (back to defaults), and
+the colours and any uploaded favicon, and serves them:
+`GET /public/theme` → `{ theme: { accent, highlight, background, support }
+(null = default; `support` may be missing on themes saved before 3.1),
+faviconUrl }`; admin-only `PUT /admin/theme` (accent, highlight and
+background as `#RRGGBB`, plus an optional `support`), `DELETE /admin/theme` (back to defaults), and
 `POST`/`DELETE /admin/theme/favicon` (SVG, PNG, WebP or
 JPEG ≤ 1 MB; refuse SVGs with scripts, event handlers or foreign objects).
 The app's API client exposes these as `getTheme`, `setTheme`, `resetTheme`,
@@ -81,9 +83,25 @@ The app's API client exposes these as `getTheme`, `setTheme`, `resetTheme`,
 }
 ```
 
-`version` is the jimbo-ui version the app is on. Foundation and starter files
+`version` is the jimbo-ui version the app is on. At the start of every
+Claude Code session in the app, the jimbo-ui plugin compares it with the
+installed release and says when there are newer guidelines to bring in (see
+"Versions" below). Foundation and starter files
 live at `webRoot` + their path. `reference` maps each reference file to the
 app's equivalent, if it has one.
+
+### Versions
+
+jimbo.ui follows semver: patch for fixes, minor for additions, major when
+apps must change their own code. The version is stated in the plugin
+manifests, the skill (`This is jimbo.ui X`) and the newest `CHANGELOG.md`
+entry, which always agree (`scripts/versions.mjs`). An app is behind when its
+`jimbo-ui.json` version is lower than the installed plugin's: the plugin's
+session-start check (`hooks/check-version.mjs`) and the skill both say so,
+list what's new, and offer a preview or the update. A new release reaches a
+machine when the plugin is refreshed
+(`claude plugin marketplace update jimbo-ui`, then
+`claude plugin update jimbo-ui@jimbo-ui`).
 
 ### Identity each app sets
 App name (`index.html` title, `apple-mobile-web-app-title`, the PWA manifest),
@@ -93,7 +111,7 @@ label).
 
 ### Building it without this code
 Everything below is specified in values, so another stack can reproduce it:
-the three colours and the derivation formulas (section 3), type scale
+the four colours and the derivation formulas (section 3), type scale
 (section 5), shell sizes (section 6), surface recipes (section 7), and the
 component and pattern rules (sections 8–9).
 
@@ -124,13 +142,20 @@ component and pattern rules (sections 8–9).
   background colour, recoloured with the theme; an uploaded favicon (SVG, PNG,
   WebP or JPEG ≤ 1 MB) replaces it and can be reset to the built-in one.
 
-### Colour — the three source colours
+### Colour — up to four source colours
 
 | Colour | Default (Volt) | Used for |
 | --- | --- | --- |
 | **Accent** (primary) | `#A8FF3E` | The dot in the header text, primary buttons, active tab/pill, focus rings, links on hover, "done" states, text selection, numbers that matter, the favicon mark |
-| **Highlight** (secondary) | `#FF3D6E` | Dates (month on date blocks), map pins, count badges, warnings and errors, destructive hover |
+| **Highlight** (secondary) | `#FF3D6E` | Dates (month on date blocks), map pins, count badges, warnings and errors, destructive hover, second place |
+| **Support** (third, optional) | `#2EC5FF` | Page eyebrows (`PageHeader`), avatar initials (`EntityRow`), third place in ranked lists, a stat or banner glow that isn't the main one, the page's bottom-left glow |
 | **Background** | `#141416` | The page. Surfaces, borders and every text colour are derived from it |
+
+**Spread the colours.** A page should show more than the accent: the accent
+for what to tap, the highlight for dates and alerts, the support for labels
+and people. A theme that leaves support out gets one derived (the hue
+furthest from the accent and highlight, made readable on the page), so older
+themes and apps still work.
 
 Status colours are **fixed tones**, not themed, because they carry meaning
 (`Tone` and `TONES` in the kit). An app maps its own statuses onto them, with
@@ -150,7 +175,7 @@ The offline banner is fixed yellow (`bg-yellow-950/95 text-yellow-200`).
 
 ## 3. Theme engine
 
-Three colours in, every token out (`deriveColors()` in `src/lib/theme.ts`).
+Up to four colours in, every token out (`deriveColors()` in `src/lib/theme.ts`).
 Tokens are CSS variables holding `R G B` channels (`--c-surface: 28 28 30`),
 and Tailwind colours are `rgb(var(--c-name) / <alpha-value>)`, so opacity
 modifiers work on every token (`bg-accent/15`, `border-border/60`).
@@ -164,6 +189,10 @@ modifiers work on every token (`bg-accent/15`, `border-border/60`).
 `away` = black on a light background, white on a dark one.
 `text` = `#111113` on light, `#FAF8F4` on dark.
 `on(c)` = `#141416` if luminance(c) > 0.35, else `#FFFFFF`.
+`support` = the theme's support, or `deriveSupport(theme)`: the hue (in 5°
+steps) furthest from both the accent's and the highlight's (ignoring greys),
+saturation the average of theirs (at least 0.55), lightness starting at the
+accent's and stepping away from the page until it reaches 4.5:1.
 
 Surfaces, borders and secondary text aren't fixed percentages: the engine
 steps each one just far enough to meet a **contrast target** on that
@@ -193,15 +222,19 @@ clear cards and labels as a near-black one.
 | `highlight-hover` | `*-highlight-hover` | mix(highlight, light ? black : white, 0.20) | Hover |
 | `on-highlight` | `text-on-highlight` | on(highlight) | Text on highlight fills (count badges) |
 | `highlight-950/900/800` | `*-highlight-950/900/800` | mix(bg, highlight, 0.10 / 0.28 / 0.40) | Warning washes |
+| `support` | `*-support` | support | See section 2 |
+| `support-hover` | `*-support-hover` | mix(support, light ? black : white, 0.20) | Hover |
+| `on-support` | `text-on-support` | on(support) | Text on support fills |
+| `support-950/900/700` | `*-support-950/900/700` | mix(bg, support, 0.10 / 0.28 / 0.50) | Support washes: avatar fill, banner glow |
 
 **Legacy class names:** apps from before 2.0 may use `accent-lime`,
 `accent-pink`, `lime-950/900/700` and `rose-950/900/800`; they still work
 (same tokens). New code uses `accent`, `highlight` and their `-950…` washes.
 
 ### Where else the theme goes
-- **Page background:** `bg` plus two soft glows — accent at 6% from the top,
-  highlight at 4% from the bottom (`radial-gradient(ellipse at top/bottom …)`,
-  fixed).
+- **Page background:** `bg` plus three soft glows — accent at 6% from the
+  top, support at 5% from the bottom left, highlight at 4% from the bottom
+  right (`radial-gradient(ellipse at …)`, fixed).
 - **Browser chrome:** `<meta name="theme-color">` = background;
   `color-scheme` = light or dark to match.
 - **Text selection:** accent fill, on-accent text.
@@ -229,66 +262,114 @@ clear cards and labels as a near-black one.
 Checked live on the Brand page for the colours an admin picks:
 - Body text ≥ 4.5:1 on the background.
 - Accent and highlight ≥ 3:1 on the background.
+- Support ≥ 4.5:1 on cards (it's used for small text).
 - Text on an accent button ≥ 4.5:1.
 
 Every template must also pass `node scripts/contrast.mjs --check`, measured
 on cards: body text ≥ 7:1, muted ≥ 4.5:1, labels ≥ 3.5:1, card border
-≥ 1.5:1, card against page ≥ 1.15:1. Mid-grey backgrounds limit body text
+≥ 1.5:1, card against page ≥ 1.15:1 — and the three above, plus
+**colours apart**: accent, highlight and support at least 20 apart from each
+other (CIE76 ΔE), so no template reads as one colour. Mid-grey backgrounds limit body text
 most: keep them dark enough (luminance under about 0.07) for 7:1.
 
 ---
 
 ## 4. Theme templates
 
-The Brand page offers these (`foundation/src/lib/themes.ts`), grouped Dark /
-Mid / Light, each drawn as a miniature of the app. Every one passes the
+The Brand page offers these (`foundation/src/lib/themes.ts`) in three sets —
+**Everyday** (Dark / Mid / Light), **Flags** and **Holidays** — chosen with
+`Tabs`, each template drawn as a miniature of the app. Every one passes the
 readability checks. An app whose default isn't one of them gets it as an
-extra "Yours" card at the front.
+extra "Yours" card at the front of Everyday. `TEMPLATE_SETS` has the sets;
+`TEMPLATE_GROUPS` is every group in one list; `sameTheme` compares two themes.
 
 **Dark**
 
-| Name | Vibe | Accent | Highlight | Background |
-| --- | --- | --- | --- | --- |
-| Volt (default) | Lime + hot pink | `#A8FF3E` | `#FF3D6E` | `#141416` |
-| Neon night | Cyan + magenta | `#2EF2FF` | `#FF2ED1` | `#0A0A12` |
-| Acid | Loud yellow | `#F5FF2E` | `#FF5A1F` | `#0D0D0B` |
-| Sunset strip | Orange on plum | `#FF8A3D` | `#FF3D7F` | `#1A0F1F` |
-| Deep sea | Teal + coral | `#3DFFC5` | `#FF7A59` | `#071A1F` |
-| Ultraviolet | Purple haze | `#B48CFF` | `#FF5FA2` | `#120F1C` |
-| Ember | Gold + fire | `#FFB23D` | `#FF3D3D` | `#17110D` |
-| Blackout | Monochrome | `#F2F2F2` | `#FF3D3D` | `#000000` |
+| Name | Vibe | Accent | Highlight | Support | Background |
+| --- | --- | --- | --- | --- | --- |
+| Volt (default) | Lime, hot pink, sky | `#A8FF3E` | `#FF3D6E` | `#2EC5FF` | `#141416` |
+| Neon night | Cyan, magenta, lemon | `#2EF2FF` | `#FF2ED1` | `#FFE53D` | `#0A0A12` |
+| Acid | Yellow, orange, violet | `#F5FF2E` | `#FF5A1F` | `#B98CFF` | `#0D0D0B` |
+| Sunset strip | Orange, pink, teal | `#FF8A3D` | `#FF3D7F` | `#3DDCC8` | `#1A0F1F` |
+| Deep sea | Teal, coral, periwinkle | `#3DFFC5` | `#FF7A59` | `#9BB0FF` | `#071A1F` |
+| Ultraviolet | Purple, pink, mint | `#B48CFF` | `#FF5FA2` | `#5CF2B8` | `#120F1C` |
+| Ember | Gold, fire, ice | `#FFB23D` | `#FF3D3D` | `#7FD4FF` | `#17110D` |
+| Blackout | White, red, blue | `#F2F2F2` | `#FF3D3D` | `#4D94FF` | `#000000` |
 
-**Mid** (coloured darks and mid-light greys/earths)
+**Mid**
 
-| Name | Vibe | Accent | Highlight | Background |
-| --- | --- | --- | --- | --- |
-| Slate | Frost + sand | `#88C0D0` | `#EBCB8B` | `#2E3440` |
-| Denim | Yellow on blue | `#FFD23F` | `#EE6C4D` | `#23395B` |
-| Forest | Gold + clay | `#E9C46A` | `#F4A261` | `#1F3A2E` |
-| Burgundy | Rosé + butter | `#F7B2BD` | `#FFD166` | `#4A1C2B` |
-| Dusk | Peach + mint | `#FFB4A2` | `#9DE0AD` | `#3D3B6B` |
-| Concrete | Grey + lemon | `#FFE066` | `#FF8FA3` | `#45484D` |
-| Fog | Navy + red | `#1E3A8A` | `#B91C1C` | `#C8CDD4` |
-| Sage | Pine + wine | `#1F3D2B` | `#8B1E3F` | `#B7C9B0` |
-| Clay | Plum + teal | `#3B1F5C` | `#0F4C5C` | `#D9B8A0` |
+| Name | Vibe | Accent | Highlight | Support | Background |
+| --- | --- | --- | --- | --- | --- |
+| Slate | Frost, sand, heather | `#88C0D0` | `#EBCB8B` | `#D3AECB` | `#2E3440` |
+| Denim | Yellow, coral, aqua | `#FFD23F` | `#EE6C4D` | `#8EE6DC` | `#23395B` |
+| Forest | Gold, clay, sky | `#E9C46A` | `#F4A261` | `#AEDBF5` | `#1F3A2E` |
+| Burgundy | Rosé, butter, mint | `#F7B2BD` | `#FFD166` | `#A6EBCF` | `#4A1C2B` |
+| Dusk | Peach, mint, butter | `#FFB4A2` | `#9DE0AD` | `#FFE38A` | `#3D3B6B` |
+| Concrete | Lemon, pink, sky | `#FFE066` | `#FF8FA3` | `#9AD8FF` | `#45484D` |
+| Fog | Navy, red, pine | `#1E3A8A` | `#B91C1C` | `#14532D` | `#C8CDD4` |
+| Sage | Pine, wine, navy | `#1F3D2B` | `#8B1E3F` | `#1E2F6B` | `#B7C9B0` |
+| Clay | Plum, teal, rust | `#3B1F5C` | `#0F4C5C` | `#6B260B` | `#D9B8A0` |
 
 **Light**
 
-| Name | Vibe | Accent | Highlight | Background |
-| --- | --- | --- | --- | --- |
-| Daylight | Green + pink | `#1F7A4D` | `#D6336C` | `#F6F4EF` |
-| Gig poster | Cream + red | `#D7261E` | `#1E4FD7` | `#F3EAD6` |
-| Newsprint | Black + red | `#111111` | `#E11D48` | `#FFFFFF` |
-| Mint | Teal + rust | `#0F766E` | `#C2410C` | `#E6F4EE` |
-| Blush | Raspberry + violet | `#BE185D` | `#6D28D9` | `#FCE8EE` |
-| Sky | Cobalt + pink | `#1D4ED8` | `#DB2777` | `#E8F0FB` |
-| Lemonade | Violet + red | `#7C3AED` | `#DC2626` | `#FFF7CC` |
-| Peach | Rust + teal | `#C2410C` | `#0E7490` | `#FFE8D6` |
+| Name | Vibe | Accent | Highlight | Support | Background |
+| --- | --- | --- | --- | --- | --- |
+| Daylight | Green, pink, violet | `#1F7A4D` | `#D6336C` | `#5B3FD1` | `#F6F4EF` |
+| Gig poster | Red, blue, green | `#D7261E` | `#1E4FD7` | `#0F6B4F` | `#F3EAD6` |
+| Newsprint | Black, red, blue | `#111111` | `#E11D48` | `#1D4ED8` | `#FFFFFF` |
+| Mint | Teal, rust, purple | `#0F766E` | `#C2410C` | `#6D28D9` | `#E6F4EE` |
+| Blush | Raspberry, violet, teal | `#BE185D` | `#6D28D9` | `#0B5E57` | `#FCE8EE` |
+| Sky | Cobalt, pink, green | `#1D4ED8` | `#DB2777` | `#116632` | `#E8F0FB` |
+| Lemonade | Violet, red, teal | `#7C3AED` | `#DC2626` | `#0B5C73` | `#FFF7CC` |
+| Peach | Rust, teal, plum | `#C2410C` | `#0E7490` | `#86198F` | `#FFE8D6` |
+
+**Flags**
+
+| Name | Vibe | Accent | Highlight | Support | Background |
+| --- | --- | --- | --- | --- | --- |
+| USA | Red, white and blue | `#E0283F` | `#F2F2F2` | `#6FA8FF` | `#0B1B3D` |
+| Italy | Green, white and red | `#007A3D` | `#CD212A` | `#1F4E8C` | `#FAFAF5` |
+| Germany | Black, red and gold | `#FFCE00` | `#FF4B3E` | `#F2F2F2` | `#0E0E0E` |
+| Ireland | Green, white and orange | `#3DDC84` | `#FF9F43` | `#F5F5F0` | `#0C2418` |
+| Sweden | Blue and yellow | `#FECC02` | `#FFFFFF` | `#8FD0FF` | `#004B87` |
+| Jamaica | Black, gold and green | `#FED100` | `#2BB24C` | `#FF7A45` | `#0A0A0A` |
+| Brazil | Green, yellow and blue | `#FFDF00` | `#9DBBFF` | `#FFFFFF` | `#004D26` |
+| Mexico | Green, white and red | `#006847` | `#CE1126` | `#7A4A12` | `#FFFFFF` |
+| India | Saffron, white and green | `#FF9933` | `#46C35A` | `#F2F2F2` | `#0A0F3D` |
+| South Africa | Green, gold, red and blue | `#1FC77A` | `#FFB612` | `#6E9BFF` | `#0B0B0B` |
+
+**Through the year**
+
+| Name | Vibe | Accent | Highlight | Support | Background |
+| --- | --- | --- | --- | --- | --- |
+| Lunar new year | Gold and jade on red | `#FFD24A` | `#FF9A7A` | `#5FE0B4` | `#5A0A0A` |
+| Valentine's | Red, pink and purple | `#C9184A` | `#D63384` | `#6A23B0` | `#FFF0F3` |
+| St Patrick's | Shamrock, gold and sky | `#4ADE80` | `#FFD54A` | `#8CC4FF` | `#0B2016` |
+| Easter | Violet, pink and green | `#6D28D9` | `#BE185D` | `#0F6630` | `#F4EEFF` |
+| Pride | Yellow, red and blue | `#FFD93D` | `#FF4D6D` | `#4DA3FF` | `#121212` |
+| Halloween | Pumpkin, purple and slime | `#FF7A1A` | `#B266FF` | `#8CFF4F` | `#120D17` |
+| Diwali | Marigold, magenta and teal | `#FFB020` | `#FF3DA5` | `#2DD4BF` | `#1A0B2E` |
+| Harvest | Pumpkin, mustard and sage | `#FF9A3C` | `#E8C04A` | `#A7CC94` | `#1E140C` |
+| Hanukkah | Blue, silver and gold | `#5AA9FF` | `#DDE3EA` | `#FFC94D` | `#0A1838` |
+| Christmas | Red, gold and green | `#DC1F2A` | `#FFC94D` | `#3FBF6F` | `#0B1A12` |
+| Christmas morning | Red and green on snow | `#C8102E` | `#146B3A` | `#6F5000` | `#FFF9F5` |
+| New year's eve | Champagne, fuchsia and ice | `#F2C14E` | `#FF3DA5` | `#5BC0FF` | `#0A0A0F` |
+
+**Yours**
+
+| Name | Vibe | Accent | Highlight | Support | Background |
+| --- | --- | --- | --- | --- | --- |
+
+Flags are named for the country; holidays run through the year in order.
 
 **Writing a new template:** on dark and mid-dark backgrounds use bright,
-saturated accents; on light and mid-light ones use deep accents (luminance
-roughly under 0.2). Accent and highlight should differ in hue, since they
-sit side by side on every page. Check all three readability ratios.
+saturated colours; on light and mid-light ones use deep ones (luminance
+roughly under 0.2). Accent, highlight and support should differ in hue, since
+they sit side by side on every page. Give it a support colour — leaving it out
+works, but a chosen one looks better. Red accents on dark pages are tricky:
+a bright red gets white button text below 4.5:1, so use a deeper red (about
+`#DC1F2A`) or make the red the highlight. Run `node scripts/contrast.mjs
+--check`.
 
 ---
 
@@ -395,7 +476,7 @@ everything else, **JetBrains Mono** 400/600 for codes and hex values.
 | `DateBlock` | Ticket-style date: highlight month over a big display-font day |
 | `MediaCard` | Image-led grid card (`aspect="portrait"` for posters) |
 | `LinkCard` | A card that navigates (eyebrow / title / sub); `accent` for the one to notice |
-| `StatTile` / `StatGrid` | Headline numbers (`accent="lime"` / `"pink"` for emphasis) |
+| `StatTile` / `StatGrid` | Headline numbers (`accent="accent"` / `"highlight"` / `"support"` for emphasis) |
 | `RankedList` | Top-N lists with counts |
 | `SearchField`, `SelectField` | Search and single-choice filters (select on phones) |
 | `Tabs` | 2–4 mutually exclusive views (segmented) |
@@ -409,7 +490,7 @@ everything else, **JetBrains Mono** 400/600 for codes and hex values.
 | `ViewSwitch` | Two or three views of one page as links (List ⇄ Map) |
 | `HeaderTitle` (`components/HeaderTitle.tsx`) | The app's name as header text — the brand; `sm`/`md`/`lg` (22/30/44 px) |
 | `ColorPicker` (`components/ColorPicker.tsx`) | Inline colour picker: saturation/brightness field, hue slider (28–36 px thumbs, drag anywhere), one row of 8 quick swatches, hex box with a preview chip. Never the native `<input type=color>` — it opens a different dialog on every platform |
-| `ThemeCard` (`routes/BrandPage.tsx`) | A theme shown as a miniature of the app: header text, eyebrow, a date-row card, a primary and a secondary button, then name and vibe |
+| `ThemeCard` (`routes/BrandPage.tsx`) | A theme shown as a miniature of the app: header text, a support avatar, a support eyebrow, a date-row card, a primary and a secondary button, then name and vibe |
 | `Button` (`ui/button.tsx`) | `primary` (one per view), `secondary`, `ghost`, `danger`; `sm`/`md`/`lg` |
 
 CSS classes for plain elements: `.card`, `.field`, `.btn …`, `.chip`,
@@ -422,8 +503,9 @@ Style guide page, and list it here.
 
 ## 9. Patterns
 
-- **Theme editor:** templates first (tap to try; the whole app changes live),
-  then *Make it yours* — tap which colour to change (round swatch tabs), drag
+- **Theme editor:** templates first, in Everyday / Flags / Holidays tabs (tap
+  to try; the whole app changes live), then *Make it yours* — tap which of
+  the four colours to change (round swatch tabs), drag
   in the picker. Readability warnings appear inline. Nothing is saved until
   *Save*; leaving the page restores the saved theme.
 - **Unsaved changes:** a floating save bar above the dock (*Undo* / *Save*)
@@ -507,3 +589,10 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
 - **3.0.0 (2026-10-23)** — Branded **jimbo.ui**. No logo: the brand is the
   app's name as header text (`HeaderTitle`, a dot in the accent); logo uploads
   removed, favicon kept.
+- **3.1.0 (2026-10-23)** — Up to four colours: an optional **support**
+  colour (derived when missing) with its own tokens, used for page eyebrows,
+  avatars, third place and a page glow. 22 new templates in **Flags** and
+  **Holidays** sets beside **Everyday**; every Everyday template gains a
+  support colour. Contrast check adds button text, support and colour
+  separation. Versions: the skill states its version and the plugin checks
+  each app's `jimbo-ui.json` at session start.

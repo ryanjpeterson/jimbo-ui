@@ -94,7 +94,7 @@ export function PageHeader({ eyebrow, title, count, actions, className }: {
 }) {
   return (
     <header className={cn("mb-5 sm:mb-6", className)}>
-      {eyebrow && <p className="eyebrow mb-1">{eyebrow}</p>}
+      {eyebrow && <p className="eyebrow mb-1 text-support">{eyebrow}</p>}
       <div className="flex items-end justify-between gap-3">
         <h1 className="h-page min-w-0">
           {title}
@@ -134,7 +134,7 @@ export function BackButton({ to, label, overlay = false }: { to: string; label: 
 export function Banner({ backdrop, glow = "accent", back, badge, children }: {
   /** Image blurred to fill the banner; falls back to a soft accent gradient. */
   backdrop?: string | null;
-  glow?: "accent" | "highlight" | "yellow" | "purple";
+  glow?: "accent" | "highlight" | "support" | "yellow" | "purple";
   back?: { to: string; label: string };
   /** Top-right of the banner, opposite the back button (e.g. a status flag). */
   badge?: ReactNode;
@@ -143,6 +143,7 @@ export function Banner({ backdrop, glow = "accent", back, badge, children }: {
   const glowCls = {
     accent: "from-accent-900/70",
     highlight: "from-highlight-900/70",
+    support: "from-support-900/70",
     yellow: "from-yellow-900/70",
     purple: "from-purple-900/70",
   }[glow];
@@ -216,13 +217,14 @@ export function Hero({ imageUrl, imageAlt, eyebrow, title, children, actions, ba
   back?: { to: string; label: string };
   /** Shown top-right, e.g. a status Badge. */
   badge?: ReactNode;
-  accent?: "accent" | "highlight" | "yellow" | "purple";
+  accent?: "accent" | "highlight" | "support" | "yellow" | "purple";
   /** Square thumbnail (people, places) instead of a portrait one (posters). */
   square?: boolean;
 }) {
   const glow = {
     accent: "from-accent-900/70",
     highlight: "from-highlight-900/70",
+    support: "from-support-900/70",
     yellow: "from-yellow-900/70",
     purple: "from-purple-900/70",
   }[accent];
@@ -391,7 +393,7 @@ export function EntityRow({ to, name, imageUrl, sub, meta, round = false }: {
         {imageUrl ? (
           <img src={imageUrl} alt="" loading="lazy" className="h-full w-full object-cover" />
         ) : (
-          <div className="flex h-full w-full items-center justify-center font-display text-base text-text-subtle">{initials(name)}</div>
+          <div className="flex h-full w-full items-center justify-center bg-support-900 font-display text-base text-support">{initials(name)}</div>
         )}
       </div>
       <div className="min-w-0 flex-1">
@@ -478,9 +480,9 @@ export function StatTile({ label, value, sub, accent = "muted" }: {
   label: string;
   value: string | number;
   sub?: ReactNode;
-  accent?: "accent" | "highlight" | "muted";
+  accent?: "accent" | "highlight" | "support" | "muted";
 }) {
-  const col = accent === "accent" ? "text-accent" : accent === "highlight" ? "text-highlight" : "text-text-base";
+  const col = { accent: "text-accent", highlight: "text-highlight", support: "text-support", muted: "text-text-base" }[accent];
   return (
     <div className="card p-4 sm:p-5">
       <p className="eyebrow mb-1">{label}</p>
@@ -508,7 +510,7 @@ export type RankedItem = {
 export function RankedList({ items, unit = "item" }: { items: RankedItem[]; unit?: string }) {
   if (items.length === 0) return <p className="p-4 text-sm text-text-subtle">Nothing here yet.</p>;
   const rankColor = (rank: number) =>
-    rank === 1 ? "text-accent" : rank === 2 ? "text-highlight" : rank === 3 ? "text-text-base" : "text-text-subtle";
+    rank === 1 ? "text-accent" : rank === 2 ? "text-highlight" : rank === 3 ? "text-support" : "text-text-subtle";
   return (
     <div className="grid sm:grid-cols-2 sm:divide-x sm:divide-border">
       {[items.slice(0, Math.ceil(items.length / 2)), items.slice(Math.ceil(items.length / 2))].map((col, ci) => (

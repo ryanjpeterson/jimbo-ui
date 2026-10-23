@@ -11,7 +11,8 @@ import { applyFavicon, applyTheme, DEFAULT_THEME, THEME_STORAGE_KEY, type Theme 
 import { BRAND } from "./brand.config";
 
 // The app's API client provides getTheme(): { theme: { accent, highlight,
-// background } (null = default), faviconUrl } — see the guide.
+// background, support } (null = default), faviconUrl } — see the guide.
+// Themes saved before jimbo.ui 3.1 have no support; the engine derives one.
 const BRAND_CACHE_KEY = `${BRAND.storagePrefix}.brand`;
 
 export interface Brand { theme: Theme; faviconUrl: string | null }
@@ -28,12 +29,15 @@ function cached(): Brand | undefined {
   }
 }
 
-/** Server values over the defaults (unset colours fall back). */
+/** Server values over the defaults (unset colours fall back; a saved theme without support gets a derived one). */
 export function withDefaults(t: Partial<Record<keyof Theme, string | null>>): Theme {
+  if (!t.accent && !t.highlight && !t.background) return DEFAULT_THEME;
+  const support = t.support || undefined;
   return {
     accent: t.accent || DEFAULT_THEME.accent,
     highlight: t.highlight || DEFAULT_THEME.highlight,
     background: t.background || DEFAULT_THEME.background,
+    ...(support ? { support } : {}),
   };
 }
 

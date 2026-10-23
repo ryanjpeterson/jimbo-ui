@@ -1,31 +1,58 @@
 ---
 name: jimbo-ui
-description: Ryan's shared brand and UI system, jimbo.ui (repo and plugin jimbo-ui), for his web apps — theme engine with three colours, templates, Tailwind tokens, UI kit, floating tab-dock app shell and interaction patterns. Use when building, styling or reviewing UI in an app that has a jimbo-ui.json, when starting a new app "in my style" / "like my other apps" / "with jimbo-ui", when asked to update an app to the latest jimbo-ui or brand guidelines or to preview what an update would change, when checking contrast across themes, or when changing and releasing the jimbo-ui guidelines themselves.
+description: Ryan's shared brand and UI system, jimbo.ui (repo and plugin jimbo-ui), for his web apps — theme engine with up to four colours, everyday, flag and holiday templates, Tailwind tokens, UI kit, floating tab-dock app shell and interaction patterns. Use when building, styling or reviewing UI in an app that has a jimbo-ui.json, when starting a new app "in my style" / "like my other apps" / "with jimbo-ui", when asked to update an app to the latest jimbo-ui or brand guidelines, whether there are new brand guidelines, or to preview what an update would change, when checking contrast across themes, or when changing and releasing the jimbo-ui guidelines themselves.
 ---
 
 # jimbo.ui
 
+**This is jimbo.ui 3.1.0.** (Kept in step with the plugin version and the
+newest `CHANGELOG.md` entry; `scripts/versions.mjs` checks.)
+
 jimbo.ui is a shared look and behaviour for Ryan's apps: phone-first, app-like, dark by
-default, themeable from three colours. The full rules are in
+default, themeable from up to four colours. The full rules are in
 [guide.md](guide.md); read the sections a task needs before writing UI.
 
 The source of truth is the GitHub repo **ryanjpeterson/jimbo-ui** (private).
 Releases are git tags `jimbo-ui--v<version>`; `CHANGELOG.md` says what changed
 in each and what apps must do.
 
+## Check the app's version first (always)
+
+When this skill is used in an app (it has a `jimbo-ui.json`), compare that
+file's `version` with this skill's version (above). If the app is behind, say
+so in one line before anything else — "jimbo.ui 3.1.0 is out; this app is on
+3.0.0" — with the one-line summary of each newer `CHANGELOG.md` entry, and
+offer the preview or update workflow. Don't update unless asked. If the app is
+*ahead*, the installed plugin is stale: suggest
+`claude plugin marketplace update jimbo-ui` then
+`claude plugin update jimbo-ui@jimbo-ui`.
+
+The plugin also does this at the start of every session in an app
+(`hooks/check-version.mjs`, a SessionStart hook), so the user hears about a
+new release without asking. On claude.ai there's no hook: do it from this
+section, using the `CHANGELOG.md` bundled with the skill.
+
+"Are there new brand guidelines?" / "is this app on the latest jimbo-ui?" →
+this check, then the preview workflow if they want detail.
+
 ## Core rules (always)
 
 - Colours come from tokens only: `bg-bg`, `bg-surface`, `bg-surface-2`,
   `border-border`, `text-text-base/muted/subtle`, `*-accent`, `*-highlight`,
-  `text-on-accent`, `text-on-highlight`, `accent-950/900/700`,
-  `highlight-950/900/800` (older apps may use the legacy `accent-lime`,
+  `*-support`, `text-on-accent`, `text-on-highlight`, `text-on-support`,
+  `accent-950/900/700`, `highlight-950/900/800`, `support-950/900/700` (older apps may use the legacy `accent-lime`,
   `accent-pink`, `lime-*`, `rose-*` names — same tokens). Never raw hex or Tailwind palette
   colours on brand surfaces; never `text-white` on an accent/highlight fill.
 - No logo: the brand is the app's name as header text (`HeaderTitle`, display
   face, text colour, a dot in the accent — "jimbo.ui").
-- Three source colours: **accent** (primary: buttons, active states, the dot
-  in the name), **highlight** (secondary: dates, pins, badges, errors), **background** (everything else derives from it). Light
-  backgrounds flip text dark automatically.
+- Up to four source colours: **accent** (primary: buttons, active states, the
+  dot in the name), **highlight** (secondary: dates, pins, badges, errors),
+  **support** (third: page eyebrows, avatars, third place, glows — optional,
+  derived when a theme leaves it out), **background** (everything else
+  derives from it). Light backgrounds flip text dark automatically. Spread
+  the colours: a page should show more than the accent.
+- Templates come in three sets: **Everyday** (dark, mid, light), **Flags**
+  and **Holidays** (guide section 4).
 - Phone first at 375 px; floating frosted tab dock (≤ 5 tabs); things pinned
   to the bottom sit above it; touch targets ≥ 44 px; no horizontal scroll
   strips; nothing hover-only.
@@ -47,8 +74,12 @@ release without touching that working copy, export it:
 - `starter/` — copied once into a new app, then app-owned
 - `reference/` — generic implementations (kit, shell, header text, Brand and
   Style guide pages), adapted and extended per app
-- `scripts/tokens.mjs` — prints an app's `tokens.css` for its three colours
-- `scripts/contrast.mjs` — contrast report for every template (`--check` fails on a miss)
+- `scripts/tokens.mjs` — prints an app's `tokens.css` for its colours
+  (accent, highlight, background, optional support)
+- `scripts/contrast.mjs` — contrast and colour-separation report for every
+  template (`--check` fails on a miss)
+- `scripts/versions.mjs` — checks every stated version agrees
+- `hooks/check-version.mjs` — the session-start version check for apps
 - `showcase/` — a demo app built only from the release's code; published as a
   private page (URL in the README) so anyone can see what an app gets
 - `skills/jimbo-ui/guide.md` — the guide
@@ -80,8 +111,8 @@ explains all of this.
 Use when asked "what would the latest jimbo-ui change here?", "preview the
 update", or before updating if the user wants to look first.
 
-1. Read the app's `jimbo-ui.json`; fetch tags. If it's on the latest version,
-   say so and stop.
+1. Read the app's `jimbo-ui.json`; fetch tags. If it's on the latest version
+   (the newest tag, and at least this skill's version), say so and stop.
 2. Export the app's version and the latest one to temp dirs (never touch the
    app's files or the jimbo-ui working copy).
 3. Report, in plain words, in this order:
@@ -150,8 +181,11 @@ To release one:
    Removed** and an **Apps must** list (or "Nothing — copy the foundation
    files"). Semver: patch for fixes, minor for additions, major when apps must
    change their own code.
-4. Bump `version` in `.claude-plugin/plugin.json` and
-   `.claude-plugin/marketplace.json`.
+4. Bump `version` in `.claude-plugin/plugin.json`,
+   `.claude-plugin/marketplace.json` and the "This is jimbo.ui" line at the
+   top of this file; `node scripts/versions.mjs` must pass. Start the
+   changelog entry with a one-line summary — the session-start check shows it
+   to every app that's behind.
 5. `claude plugin validate .`, commit, `claude plugin tag .` (creates
    `jimbo-ui--v<version>`), and — when the user asks — `git push --follow-tags`.
 6. `scripts/build-zip.sh` makes `dist/jimbo-ui-skill.zip` for claude.ai

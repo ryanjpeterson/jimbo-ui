@@ -16,7 +16,7 @@ import {
   Badge, DateBlock, EmptyState, EntityRow, EventRow, LinkCard, List, ListGroupLabel, Loading, MediaCard, PageHeader, Pager,
   PillTabs, RankedList, SearchField, Section, SelectField, Sheet, StatGrid, StatTile, Tabs, ViewSwitch, type Tone,
 } from "@/components/ui/kit";
-import { themeHex } from "@/lib/theme";
+import { fullTheme, THEME_KEYS, themeHex } from "@/lib/theme";
 import { useBrand } from "@/lib/useBrand";
 
 const TOKENS: { name: string; use: string }[] = [
@@ -36,6 +36,9 @@ const TOKENS: { name: string; use: string }[] = [
   { name: "highlight", use: "Dates, badges, alerts" },
   { name: "on-highlight", use: "Text on highlight fills" },
   { name: "highlight-950", use: "Highlight wash (warnings)" },
+  { name: "support", use: "Page labels, avatars, third place" },
+  { name: "on-support", use: "Text on support fills" },
+  { name: "support-900", use: "Support wash (avatars)" },
 ];
 
 const TONE_EXAMPLES: { tone: Tone; label: string }[] = [
@@ -59,7 +62,7 @@ function Block({ title, note, children }: { title: string; note?: string; childr
 }
 
 export function StyleGuidePage() {
-  const { theme } = useBrand();
+  const theme = fullTheme(useBrand().theme);
   const hex = themeHex(theme);
   const [tab, setTab] = useState<"one" | "two">("one");
   const [pill, setPill] = useState<"a" | "b" | "c">("a");
@@ -75,11 +78,11 @@ export function StyleGuidePage() {
       <PageHeader eyebrow="Admin · reference" title="Style guide" />
       <p className="meta -mt-6 max-w-xl">The shared building blocks, live in the current theme. The rules are in the jimbo-ui guide.</p>
 
-      <Block title="Brand" note="The app's name as header text (a dot takes the accent) and the three source colours.">
+      <Block title="Brand" note="The app's name as header text (a dot takes the accent) and the four source colours.">
         <div className="card flex flex-wrap items-center gap-6 p-5">
           <HeaderTitle size="lg" />
           <div className="flex flex-wrap gap-3">
-            {(["accent", "highlight", "background"] as const).map((k) => (
+            {THEME_KEYS.map((k) => (
               <div key={k} className="text-center">
                 <div className="h-14 w-14 rounded-2xl border border-border" style={{ background: theme[k] }} />
                 <p className="mt-1 text-xs font-semibold capitalize">{k}</p>
@@ -90,7 +93,7 @@ export function StyleGuidePage() {
         </div>
       </Block>
 
-      <Block title="Colour tokens" note="Derived from the three colours. Use these classes, never raw hex (bg-surface, text-text-muted, bg-accent/15 …).">
+      <Block title="Colour tokens" note="Derived from the four colours. Use these classes, never raw hex (bg-surface, text-text-muted, bg-accent/15 …).">
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {TOKENS.map((t) => (
             <div key={t.name} className="flex items-center gap-3 rounded-xl border border-border bg-surface p-2.5">
@@ -155,8 +158,8 @@ export function StyleGuidePage() {
         <StatGrid>
           <StatTile label="StatTile · accent" value={128} accent="accent" />
           <StatTile label="StatTile · highlight" value={42} accent="highlight" />
-          <StatTile label="StatTile · muted" value={17} sub="with a sub line" />
-          <StatTile label="Years" value={6} />
+          <StatTile label="StatTile · support" value={17} accent="support" />
+          <StatTile label="StatTile · muted" value={6} sub="with a sub line" />
         </StatGrid>
       </Block>
 

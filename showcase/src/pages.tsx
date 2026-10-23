@@ -47,9 +47,9 @@ export function HomeDemo() {
 
       <StatGrid>
         <StatTile label="Events done" value={128} accent="accent" />
-        <StatTile label="People" value={342} />
+        <StatTile label="People" value={342} accent="support" />
         <StatTile label="Places" value={27} />
-        <StatTile label="Templates" value={templates} accent="highlight" sub="Dark, mid and light" />
+        <StatTile label="Templates" value={templates} accent="highlight" sub="Everyday, flags and holidays" />
       </StatGrid>
 
       <LinkCard to="/admin/brand" eyebrow="Theme" title="Try a different look" sub="Templates, a colour picker and the save bar" accent />

@@ -31,11 +31,13 @@ It must print nothing. Add an app's words to it when a new app adopts jimbo.ui.
 | `starter/` | `brand.config.ts`, `tokens.css`, `favicon.svg` | Copied once into a new app, then app-owned |
 | `reference/` | Generic kit, `AppShell`, `HeaderTitle`, Brand and Style guide pages, `useBrand`, `index.html` | Apps adapt and extend them |
 | `showcase/` | Demo app assembled from reference → foundation → starter → `showcase/overrides/` | Published as a private page each release |
-| `scripts/` | `tokens.mjs` (an app's `tokens.css`), `contrast.mjs` (template contrast report), `build-zip.sh` (claude.ai upload) | |
+| `scripts/` | `tokens.mjs` (an app's `tokens.css`), `contrast.mjs` (template contrast report), `versions.mjs` (versions agree), `build-zip.sh` (claude.ai upload) | |
+| `hooks/` | `hooks.json` + `check-version.mjs`: tells an app's session when it's behind the installed release | |
 | `skills/jimbo-ui/` | `SKILL.md` (core rules + workflows), `guide.md` (the full guide) | |
 | `.claude-plugin/` | `plugin.json` and `marketplace.json` | Versions must match |
 
-Brand decisions so far: three source colours (accent, highlight, background);
+Brand decisions so far: up to four source colours (accent, highlight,
+background, optional support); templates in Everyday, Flags and Holidays sets;
 no logo — the brand is the app's name as header text (`HeaderTitle`), with a
 dot in the accent; the favicon is the only graphic.
 
@@ -49,6 +51,7 @@ dot in the accent; the favicon is the only graphic.
 - Contrast: `node scripts/contrast.mjs --check` must pass for every template
   after any change to `theme.ts` or `themes.ts`.
 - Plugin manifests: `claude plugin validate --strict .`
+- Versions: `node scripts/versions.mjs` (manifests, SKILL.md, CHANGELOG agree)
 - Check UI at phone width (375 px) in a dark, a mid and a light template.
 
 ## Releasing
@@ -59,7 +62,9 @@ Follow "change and release the guidelines" in `skills/jimbo-ui/SKILL.md`. In sho
    `SKILL.md` if a rule or workflow changed.
 2. Add a `CHANGELOG.md` entry with Changed / Added / Removed and **Apps must**.
    Semver: patch = fixes, minor = additions, major = apps must change their own code.
-3. Bump `version` in both `.claude-plugin` files.
+3. Bump `version` in both `.claude-plugin` files and the "This is jimbo.ui"
+   line in `SKILL.md`. Start the changelog entry with a one-line summary (the
+   session-start check shows it to apps).
 4. Run the checks above, commit, `claude plugin tag .` (creates
    `jimbo-ui--v<version>`).
 5. Push (`git push --follow-tags`) **only when Ryan asks**.

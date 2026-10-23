@@ -5,6 +5,47 @@ fixes, minor for additions, major when apps must change their own code. Each
 entry ends with **Apps must** — the steps the update workflow carries out in
 each app beyond copying the foundation files.
 
+## 3.1.0 — 2026-10-23
+
+Up to four colours, flag and holiday templates, and apps hear about new releases.
+
+### Added
+- **Support colour** — an optional fourth colour (`Theme.support`) for page
+  eyebrows, avatars, third place and the page's bottom-left glow, with tokens
+  `support`, `support-hover`, `on-support` and `support-950/900/700`. Themes
+  without one get it derived (`deriveSupport`, `fullTheme`), so three-colour
+  themes and saved settings keep working. `THEME_KEYS`, `FullTheme`.
+- **Flags** (10) and **Holidays** (12) template sets beside **Everyday**
+  (`TEMPLATE_SETS`; `TEMPLATE_GROUPS` still lists every group; `sameTheme`).
+- **Version check:** the plugin runs `hooks/check-version.mjs` at session
+  start; in an app whose `jimbo-ui.json` is behind the installed release, it
+  says so and lists what's new. The skill states its version and does the
+  same check when used. `scripts/versions.mjs` keeps every stated version in
+  step.
+
+### Changed
+- Every Everyday template has a support colour; vibes name all three.
+- `scripts/contrast.mjs` also checks accent, highlight and support contrast,
+  button text, and that the three colours are clearly apart (ΔE ≥ 20).
+- `scripts/tokens.mjs` takes an optional fourth argument (support).
+- Reference: Brand page has set tabs, four colour tabs and a support warning;
+  `ThemeCard` shows support; `PageHeader` eyebrows, `EntityRow` initials and
+  `RankedList` third place use support; `StatTile`, `Banner` and `Hero` take
+  `"support"`; Style guide shows the four colours and support tokens;
+  `useBrand`'s `withDefaults` keeps a saved support.
+- Starter default theme has a support colour (`#2EC5FF`).
+
+### Apps must
+- Copy the foundation files (`theme.ts`, `themes.ts`, `globals.css`,
+  `tailwind.config.js`).
+- Regenerate `src/styles/tokens.css` (the support tokens are new): add a
+  `support` to `BRAND.defaultTheme` if you want to choose it, then
+  `node scripts/tokens.mjs <accent> <highlight> <background> [support]`.
+- Apps that track the reference: port the Brand page, Style guide,
+  `useBrand` and kit changes above.
+- Apps with a theme server: accept and return an optional `support`
+  (`#RRGGBB`) alongside the other three.
+
 ## 3.0.0 — 2026-10-23
 
 Branded **jimbo.ui** (the repo and plugin keep the name `jimbo-ui`).
