@@ -1,0 +1,7 @@
+{
+  "name": "jimbo-ui",
+  "version": "1.0.0",
+  "description": "Ryan's shared brand and UI system: three-colour theme engine, templates, Tailwind tokens, UI kit, app shell and patterns, with workflows to start apps on it, update them, and release changes.",
+  "author": { "name": "Ryan Peterson" },
+  "repository": "https://github.com/ryanjpeterson/jimbo-ui"
+}

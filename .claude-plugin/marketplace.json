@@ -1,0 +1,15 @@
+{
+  "name": "jimbo-ui",
+  "description": "Ryan's shared brand and UI system for web apps.",
+  "owner": {
+    "name": "Ryan Peterson"
+  },
+  "plugins": [
+    {
+      "name": "jimbo-ui",
+      "source": "./",
+      "version": "1.0.0",
+      "description": "Ryan's shared brand and UI system, with workflows to start apps on it, update them, and release changes."
+    }
+  ]
+}
