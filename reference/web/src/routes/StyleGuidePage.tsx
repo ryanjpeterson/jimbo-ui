@@ -10,7 +10,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Wordmark } from "@/components/Wordmark";
+import { HeaderTitle } from "@/components/HeaderTitle";
 import { ColorPicker } from "@/components/ColorPicker";
 import {
   Badge, DateBlock, EmptyState, EntityRow, EventRow, LinkCard, List, ListGroupLabel, Loading, MediaCard, PageHeader, Pager,
@@ -75,9 +75,9 @@ export function StyleGuidePage() {
       <PageHeader eyebrow="Admin · reference" title="Style guide" />
       <p className="meta -mt-6 max-w-xl">The shared building blocks, live in the current theme. The rules are in the jimbo-ui guide.</p>
 
-      <Block title="Brand" note="The wordmark (accent over highlight, unless a logo is uploaded) and the three source colours.">
+      <Block title="Brand" note="The app's name as header text (a dot takes the accent) and the three source colours.">
         <div className="card flex flex-wrap items-center gap-6 p-5">
-          <Wordmark size="lg" />
+          <HeaderTitle size="lg" />
           <div className="flex flex-wrap gap-3">
             {(["accent", "highlight", "background"] as const).map((k) => (
               <div key={k} className="text-center">

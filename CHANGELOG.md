@@ -5,6 +5,31 @@ fixes, minor for additions, major when apps must change their own code. Each
 entry ends with **Apps must** — the steps the update workflow carries out in
 each app beyond copying the foundation files.
 
+## 3.0.0 — 2026-10-23
+
+Branded **jimbo.ui** (the repo and plugin keep the name `jimbo-ui`).
+
+### Changed
+- **No logo — header text.** The reference `Wordmark` is replaced by
+  `HeaderTitle`: the app's name (`BRAND.name`) in the display face and text
+  colour, with any dot in the accent ("jimbo.ui"). The top bar, Style guide
+  and Brand page miniatures use it.
+- **Starter `brand.config.ts`:** `logo` is gone; `name` is the header text.
+- **Brand page:** the uploads section is favicon-only.
+- **Server contract:** `GET /public/theme` returns `{ theme, faviconUrl }`;
+  only `favicon` uploads (`/admin/theme/favicon`).
+- Showcase branded jimbo.ui.
+
+### Removed
+- `reference/web/src/components/Wordmark.tsx` and logo uploads.
+
+### Apps must
+- Copy the foundation files (comment changes only in `theme.ts`).
+- Apps that track the reference shell or Brand page: use `HeaderTitle` in the
+  top bar instead of a logo, drop the logo upload row and `logoUrl`, and
+  remove `logo` from `brand.config.ts`. Apps that keep their own logo can
+  skip this.
+
 ## 2.0.0 — 2026-10-23
 
 jimbo-ui is now fully generic: no app's code, names, artwork or sample content.

@@ -1,5 +1,5 @@
 /**
- * The brand theme from the server (colours, logo, favicon), applied to the
+ * The brand theme from the server (colours, favicon), applied to the
  * page as it changes. Starts from the copy cached in localStorage so there's
  * no flash of the default colours, and works offline from that copy.
  */
@@ -11,10 +11,10 @@ import { applyFavicon, applyTheme, DEFAULT_THEME, THEME_STORAGE_KEY, type Theme 
 import { BRAND } from "./brand.config";
 
 // The app's API client provides getTheme(): { theme: { accent, highlight,
-// background } (null = default), logoUrl, faviconUrl } — see the guide.
+// background } (null = default), faviconUrl } — see the guide.
 const BRAND_CACHE_KEY = `${BRAND.storagePrefix}.brand`;
 
-export interface Brand { theme: Theme; logoUrl: string | null; faviconUrl: string | null }
+export interface Brand { theme: Theme; faviconUrl: string | null }
 
 function cached(): Brand | undefined {
   try {
@@ -42,12 +42,12 @@ export function useBrand(): Brand {
     queryKey: ["brand"],
     queryFn: async (): Promise<Brand> => {
       const r = await api.getTheme();
-      return { theme: withDefaults(r.theme), logoUrl: r.logoUrl, faviconUrl: r.faviconUrl };
+      return { theme: withDefaults(r.theme), faviconUrl: r.faviconUrl };
     },
     initialData: cached,
     staleTime: 5 * 60_000,
   });
-  return q.data ?? { theme: DEFAULT_THEME, logoUrl: null, faviconUrl: null };
+  return q.data ?? { theme: DEFAULT_THEME, faviconUrl: null };
 }
 
 /** Mount once (App): keeps the page's colours, favicon and cached copy in step with the theme. */

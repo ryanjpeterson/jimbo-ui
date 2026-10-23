@@ -1,8 +1,8 @@
-# jimbo-ui standards
+# jimbo.ui standards
 
-How apps built on **jimbo-ui** look, read and behave, written as a recipe:
+How apps built on **jimbo.ui** look, read and behave, written as a recipe:
 with this guide you can build an app that looks and feels like the others,
-with its own colours and logo, whether or not you copy the code. Generic
+with its own name and colours, whether or not you copy the code. Generic
 implementations of everything below are in the repo's `reference/` folder.
 
 - **The rules:** this guide. It's versioned with the jimbo-ui repo; see
@@ -54,15 +54,15 @@ without having one.
 
 **Reference (adapt to the app):** the UI kit (`kit.tsx`), the app shell
 (`AppShell.tsx`: pass tabs, top-bar actions and routes), Brand page, Style
-guide page, `Wordmark.tsx` (typeset from `BRAND.logo`), `useBrand.ts`, and
+guide page, `HeaderTitle.tsx` (the app's name as header text), `useBrand.ts`, and
 `index.html` (pre-paint script, fonts, PWA tags).
 
 **Server side (optional):** an app that lets admins change the theme stores
-the three colours and any uploaded logo/favicon, and serves them:
+the three colours and any uploaded favicon, and serves them:
 `GET /public/theme` → `{ theme: { accent, highlight, background } (null =
-default), logoUrl, faviconUrl }`; admin-only `PUT /admin/theme` (three
+default), faviconUrl }`; admin-only `PUT /admin/theme` (three
 `#RRGGBB` values), `DELETE /admin/theme` (back to defaults), and
-`POST`/`DELETE /admin/theme/:asset` for `logo` / `favicon` (SVG, PNG, WebP or
+`POST`/`DELETE /admin/theme/favicon` (SVG, PNG, WebP or
 JPEG ≤ 1 MB; refuse SVGs with scripts, event handlers or foreign objects).
 The app's API client exposes these as `getTheme`, `setTheme`, `resetTheme`,
 `uploadBrandAsset`, `removeBrandAsset`. An app without a server uses
@@ -87,7 +87,7 @@ app's equivalent, if it has one.
 
 ### Identity each app sets
 App name (`index.html` title, `apple-mobile-web-app-title`, the PWA manifest),
-`brand.config.ts`, `tokens.css`, the wordmark artwork, `favicon.svg`, app
+`brand.config.ts` (the name is the header text), `tokens.css`, `favicon.svg`, app
 icons and splash screens, and the dock's tabs (five or fewer, icon + one-word
 label).
 
@@ -112,25 +112,24 @@ component and pattern rules (sections 8–9).
   manages *events*, not *event_series rows*).
 - Empty states and confirmations say what survives or what to do next.
 
-### Logo
-- A two-line wordmark: the **main word** in the **accent** (primary) colour
-  with an outline in the text colour (white on dark themes, near-black on
-  light), and a **second line** in the **highlight** (secondary) colour.
-  The built-in one is typeset in the display face from `BRAND.logo`; an app
-  can swap in its own drawn lettering and keep the colour rules.
-- It follows the theme everywhere it appears: top bar, sign-in, Brand page
-  miniatures, favicon (the mark in the accent on the background colour).
-- An uploaded logo (SVG/PNG/WebP/JPEG ≤ 1 MB) replaces the wordmark; an
-  uploaded favicon replaces the recoloured one. Both can be reset to built-in.
-- Minimum height 40 px (`size="sm"`), always on the page background or a card —
-  never on a photo without a dark fade.
+### Header text (no logo)
+- The brand is the app's **name as header text** (`HeaderTitle`), not a logo:
+  `BRAND.name` set in the display face (Archivo 800, tracking −0.02em) in the
+  text colour. A **dot** in the name takes the **accent** — `jimbo.ui` —
+  which is the brand's one flourish.
+- Sizes: 22 px in the top bar (`sm`), 30 px (`md`), 44 px (`lg`) for brand
+  moments like a sign-in screen or the Style guide.
+- It follows the theme everywhere: top bar, sign-in, Brand page miniatures.
+- The **favicon** is the one graphic: a simple mark in the accent on the
+  background colour, recoloured with the theme; an uploaded favicon (SVG, PNG,
+  WebP or JPEG ≤ 1 MB) replaces it and can be reset to the built-in one.
 
 ### Colour — the three source colours
 
 | Colour | Default (Volt) | Used for |
 | --- | --- | --- |
-| **Accent** (primary) | `#A8FF3E` | Logo main word, primary buttons, active tab/pill, focus rings, links on hover, "done" states, text selection, numbers that matter, the favicon mark |
-| **Highlight** (secondary) | `#FF3D6E` | Logo second line, dates (month on date blocks), map pins, count badges, warnings and errors, destructive hover |
+| **Accent** (primary) | `#A8FF3E` | The dot in the header text, primary buttons, active tab/pill, focus rings, links on hover, "done" states, text selection, numbers that matter, the favicon mark |
+| **Highlight** (secondary) | `#FF3D6E` | Dates (month on date blocks), map pins, count badges, warnings and errors, destructive hover |
 | **Background** | `#141416` | The page. Surfaces, borders and every text colour are derived from it |
 
 Status colours are **fixed tones**, not themed, because they carry meaning
@@ -183,7 +182,7 @@ clear cards and labels as a near-black one.
 | `bg-deep` | `bg-bg-deep` | mix(bg, away, *card* × 0.35) | End of the card gradient |
 | `surface-2` | `bg-surface-2` | stepTo vs surface, **1.14:1** | Fields, chips, hover rows |
 | `border` | `border-border` | stepTo vs surface, **1.55:1** | Lines, outlines, card edges |
-| `text` | `text-text-base` | text | Body text, logo outline |
+| `text` | `text-text-base` | text | Body text, header text |
 | `text-muted` | `text-text-muted` | mix(text, bg, fadeTo **5:1** on surface, at most 0.4) | Secondary lines |
 | `text-subtle` | `text-text-subtle` | mix(text, bg, fadeTo **3.8:1** on surface, at most 0.6) | Labels, hints, counts |
 | `accent` | `*-accent` | accent | See section 2 |
@@ -289,7 +288,7 @@ extra "Yours" card at the front.
 **Writing a new template:** on dark and mid-dark backgrounds use bright,
 saturated accents; on light and mid-light ones use deep accents (luminance
 roughly under 0.2). Accent and highlight should differ in hue, since they
-sit side by side in the logo. Check all three readability ratios.
+sit side by side on every page. Check all three readability ratios.
 
 ---
 
@@ -323,7 +322,7 @@ everything else, **JetBrains Mono** 400/600 for codes and hex values.
   bar, no tap highlight, `overscroll-behavior-y: contain` (own pull to
   refresh), smooth scrolling, pinch-zoom allowed.
 - **Top bar:** sticky, 56 px (64 px on desktop) plus the top safe area,
-  `bg-bg/90` frosted (`backdrop-blur-xl`), bottom border. Left: logo (and text
+  `bg-bg/90` frosted (`backdrop-blur-xl`), bottom border. Left: the header text (and text
   tabs on desktop). Right: 40 px round buttons — search (outlined), **+ add**
   (accent fill), account (avatar initial in an accent circle).
 - **Content:** `max-w-5xl`, `px-4` (`sm:px-6`), `pt-6`; bottom padding of
@@ -408,9 +407,9 @@ everything else, **JetBrains Mono** 400/600 for codes and hex values.
 | `EmptyState` | No data — say what's missing and offer the next step |
 | `Loading` | Skeleton shaped like a page (never a bare spinner) |
 | `ViewSwitch` | Two or three views of one page as links (List ⇄ Map) |
-| `Wordmark` (`components/Wordmark.tsx`) | The logo, `sm`/`md`/`lg`/`xl` (40/60/88/120 px tall) |
+| `HeaderTitle` (`components/HeaderTitle.tsx`) | The app's name as header text — the brand; `sm`/`md`/`lg` (22/30/44 px) |
 | `ColorPicker` (`components/ColorPicker.tsx`) | Inline colour picker: saturation/brightness field, hue slider (28–36 px thumbs, drag anywhere), one row of 8 quick swatches, hex box with a preview chip. Never the native `<input type=color>` — it opens a different dialog on every platform |
-| `ThemeCard` (`routes/BrandPage.tsx`) | A theme shown as a miniature of the app: logo, eyebrow, a date-row card, a primary and a secondary button, then name and vibe |
+| `ThemeCard` (`routes/BrandPage.tsx`) | A theme shown as a miniature of the app: header text, eyebrow, a date-row card, a primary and a secondary button, then name and vibe |
 | `Button` (`ui/button.tsx`) | `primary` (one per view), `secondary`, `ghost`, `danger`; `sm`/`md`/`lg` |
 
 CSS classes for plain elements: `.card`, `.field`, `.btn …`, `.chip`,
@@ -505,3 +504,6 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   typeset `Wordmark` from `BRAND.logo`, neutral favicon and showcase content,
   generic colour class names (`accent`, `highlight`) with the old ones kept as
   legacy aliases, server contract described instead of shipped.
+- **3.0.0 (2026-10-23)** — Branded **jimbo.ui**. No logo: the brand is the
+  app's name as header text (`HeaderTitle`, a dot in the accent); logo uploads
+  removed, favicon kept.

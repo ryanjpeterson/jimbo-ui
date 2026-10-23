@@ -5,10 +5,10 @@
  * that theme), then fine-tune any of the three colours with the inline picker.
  * Everything previews live across the app; the save bar appears when there's
  * something unsaved, and leaving the page without saving puts the saved
- * theme back. Logo and favicon can be replaced with uploads.
+ * theme back. The favicon can be replaced with an upload.
  */
 
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
@@ -17,7 +17,6 @@ import { TEMPLATE_GROUPS } from "@/lib/themes";
 import { BRAND } from "@/lib/brand.config";
 import { useBrand } from "@/lib/useBrand";
 import { Button } from "@/components/ui/button";
-import { Wordmark } from "@/components/Wordmark";
 import { ColorPicker } from "@/components/ColorPicker";
 import { PageHeader } from "@/components/ui/kit";
 
@@ -28,7 +27,7 @@ import { PageHeader } from "@/components/ui/kit";
 const KEYS: (keyof Theme)[] = ["accent", "highlight", "background"];
 const same = (a: Theme, b: Theme) => KEYS.every((k) => a[k].toUpperCase() === b[k].toUpperCase());
 
-/** A miniature of the app in a theme: top bar with logo, title, a card, buttons, a date. */
+/** A miniature of the app in a theme: top bar with the app's name, a label, a card, buttons, a date. */
 function ThemeCard({ name, vibe, theme, selected, onPick }: { name: string; vibe: string; theme: Theme; selected: boolean; onPick: () => void }) {
   const c = themeHex(theme);
   return (
@@ -37,8 +36,10 @@ function ThemeCard({ name, vibe, theme, selected, onPick }: { name: string; vibe
       style={selected ? { ["--tw-ring-color" as string]: theme.accent } : undefined}>
       <div className="space-y-2.5 p-3" style={{ background: theme.background, color: c.text }}>
         <div className="flex items-center justify-between">
-          <span className="font-display text-[15px] leading-none" style={{ color: theme.accent }}>
-            {BRAND.logo.word}<span className="block text-[10px]" style={{ color: theme.highlight }}>{BRAND.logo.line}</span>
+          <span className="font-display text-[15px] leading-none tracking-[-0.02em]" style={{ color: c.text }}>
+            {BRAND.name.split(".").map((part, i) => (
+              <Fragment key={i}>{i > 0 && <span style={{ color: theme.accent }}>.</span>}{part}</Fragment>
+            ))}
           </span>
           <span className="h-5 w-5 rounded-full" style={{ background: theme.accent }} />
         </div>
@@ -76,9 +77,9 @@ function ThemeCard({ name, vibe, theme, selected, onPick }: { name: string; vibe
 // ─────────────────────────────────────────────────────────────────────────────
 
 const FIELDS: { key: keyof Theme; label: string; hint: string; swatches: string[] }[] = [
-  { key: "accent", label: "Accent", hint: "The logo’s main word, buttons, active tabs, “done” states, big numbers",
+  { key: "accent", label: "Accent", hint: "Buttons, active tabs, “done” states, big numbers, the dot in the name",
     swatches: ["#A8FF3E", "#2EF2FF", "#F5FF2E", "#FF8A3D", "#B48CFF", "#3DFFC5", "#F2F2F2", "#1F7A4D"] },
-  { key: "highlight", label: "Highlight", hint: "The logo’s second line, dates, badges, map pins, warnings",
+  { key: "highlight", label: "Highlight", hint: "Dates, badges, map pins, warnings",
     swatches: ["#FF3D6E", "#FF2ED1", "#FF5A1F", "#FF3D3D", "#FF7A59", "#FF5FA2", "#1E4FD7", "#FFC23D"] },
   { key: "background", label: "Background", hint: "The page — cards, borders and text follow it",
     swatches: ["#141416", "#000000", "#0A0A12", "#1A0F1F", "#071A1F", "#17110D", "#F6F4EF", "#F3EAD6"] },
@@ -180,7 +181,7 @@ export function BrandPage() {
         </div>
       </section>
 
-      <BrandAssets logoUrl={brand.logoUrl} faviconUrl={brand.faviconUrl} onChange={refresh} />
+      <FaviconUpload faviconUrl={brand.faviconUrl} onChange={refresh} />
 
       <Link to="/admin/style" className="card flex items-center justify-between gap-3 p-4 hover:border-accent">
         <span>
@@ -210,55 +211,47 @@ export function BrandPage() {
   );
 }
 
-/** Upload or remove a custom logo and favicon. */
-function BrandAssets({ logoUrl, faviconUrl, onChange }: { logoUrl: string | null; faviconUrl: string | null; onChange: () => Promise<unknown> }) {
-  const [busy, setBusy] = useState<string | null>(null);
+/** Upload or remove a custom favicon (the built-in one is recoloured from the theme). */
+function FaviconUpload({ faviconUrl, onChange }: { faviconUrl: string | null; onChange: () => Promise<unknown> }) {
+  const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const upload = async (asset: "logo" | "favicon", file: File | undefined) => {
+  const upload = async (file: File | undefined) => {
     if (!file) return;
-    setBusy(asset);
+    setBusy(true);
     setError(null);
-    try { await api.uploadBrandAsset(asset, file); await onChange(); }
+    try { await api.uploadBrandAsset("favicon", file); await onChange(); }
     catch (err) { setError(err instanceof Error ? err.message : "Upload failed."); }
-    finally { setBusy(null); }
+    finally { setBusy(false); }
   };
-  const remove = async (asset: "logo" | "favicon") => {
-    setBusy(asset);
-    try { await api.removeBrandAsset(asset); await onChange(); }
-    finally { setBusy(null); }
+  const remove = async () => {
+    setBusy(true);
+    try { await api.removeBrandAsset("favicon"); await onChange(); }
+    finally { setBusy(false); }
   };
-
-  const row = (asset: "logo" | "favicon", label: string, hint: string, url: string | null, preview: React.ReactNode) => (
-    <div className="flex items-center gap-4">
-      <div className="flex h-16 w-28 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border bg-surface-2 p-2">{preview}</div>
-      <div className="min-w-0 flex-1">
-        <p className="text-[15px] font-semibold">{label}</p>
-        <p className="text-xs text-text-subtle">{url ? "Custom upload" : hint}</p>
-        <div className="mt-2 flex flex-wrap gap-2">
-          <label className={`btn btn-sm btn-secondary cursor-pointer ${busy === asset ? "pointer-events-none opacity-50" : ""}`}>
-            {busy === asset ? "Uploading…" : url ? "Replace" : "Upload"}
-            <input type="file" accept="image/svg+xml,image/png,image/webp,image/jpeg" className="sr-only"
-              onChange={(e) => { void upload(asset, e.target.files?.[0]); e.target.value = ""; }} />
-          </label>
-          {url && <button onClick={() => void remove(asset)} className="btn btn-sm btn-ghost">Use built-in</button>}
-        </div>
-      </div>
-    </div>
-  );
 
   return (
     <section className="space-y-3">
       <div className="px-0.5">
-        <h2 className="h-section">Logo & favicon</h2>
-        <p className="meta mt-1">The built-in ones follow your colours. Upload SVG, PNG or WebP (under 1 MB) to replace either.</p>
+        <h2 className="h-section">Favicon</h2>
+        <p className="meta mt-1">The built-in one follows your colours. Upload an SVG, PNG or WebP under 1 MB to replace it.</p>
       </div>
-      <div className="card space-y-4 p-4 sm:p-5">
-        {row("logo", "Logo", "Built-in — accent + highlight colours", logoUrl,
-          logoUrl ? <img src={logoUrl} alt="" className="max-h-full max-w-full object-contain" /> : <Wordmark size="sm" />)}
-        {row("favicon", "Favicon", "Built-in — recoloured from the theme", faviconUrl,
-          <img src={faviconUrl ?? (document.querySelector<HTMLLinkElement>('link[rel="icon"]')?.href ?? "/favicon.svg")} alt="" className="h-10 w-10" />)}
-        {error && <p className="text-sm text-highlight">{error}</p>}
+      <div className="card flex items-center gap-4 p-4 sm:p-5">
+        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl border border-border bg-surface-2">
+          <img src={faviconUrl ?? (document.querySelector<HTMLLinkElement>('link[rel="icon"]')?.href ?? "/favicon.svg")} alt="" className="h-10 w-10" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="text-xs text-text-subtle">{faviconUrl ? "Custom upload" : "Built-in — recoloured from the theme"}</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            <label className={`btn btn-sm btn-secondary cursor-pointer ${busy ? "pointer-events-none opacity-50" : ""}`}>
+              {busy ? "Uploading…" : faviconUrl ? "Replace" : "Upload"}
+              <input type="file" accept="image/svg+xml,image/png,image/webp,image/jpeg" className="sr-only"
+                onChange={(e) => { void upload(e.target.files?.[0]); e.target.value = ""; }} />
+            </label>
+            {faviconUrl && <button onClick={() => void remove()} className="btn btn-sm btn-ghost">Use built-in</button>}
+          </div>
+          {error && <p className="mt-2 text-sm text-highlight">{error}</p>}
+        </div>
       </div>
     </section>
   );

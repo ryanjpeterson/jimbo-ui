@@ -1,5 +1,5 @@
 /**
- * The app shell: a sticky, frosted top bar (logo, tabs as text links on
+ * The app shell: a sticky, frosted top bar (the app's name, tabs as text links on
  * desktop, round action buttons), the page frame, pull to refresh, and the
  * floating tab dock on phones.
  *
@@ -9,7 +9,7 @@
 
 import type { ReactNode } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
-import { Wordmark } from "@/components/Wordmark";
+import { HeaderTitle } from "@/components/HeaderTitle";
 import { usePullToRefresh } from "@/lib/gestures";
 import { cn } from "@/lib/cn";
 
@@ -42,7 +42,7 @@ export function AppShell({ tabs, actions, onRefresh, children }: {
       <header className="sticky top-0 z-40 border-b border-border bg-bg/90 pt-[env(safe-area-inset-top)] backdrop-blur-xl">
         <div className="mx-auto flex h-14 max-w-5xl items-center justify-between gap-4 px-4 sm:h-16 sm:px-6">
           <div className="flex h-full items-center gap-8">
-            <Link to="/" aria-label="Home"><Wordmark size="sm" /></Link>
+            <Link to="/" aria-label="Home"><HeaderTitle /></Link>
             {/* Desktop: bold links with an accent underline on the active one. */}
             <nav className="hidden h-full items-stretch gap-6 sm:flex">
               {tabs.filter((t) => t.to !== "/").map((t) => (

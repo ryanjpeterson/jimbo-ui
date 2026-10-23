@@ -39,7 +39,7 @@ export function HomeDemo() {
   const next = ITEMS[0]!;
   return (
     <div className="space-y-8">
-      <PageHeader eyebrow={`jimbo-ui ${__JIMBO_VERSION__} · showcase`} title="Overview" />
+      <PageHeader eyebrow={`jimbo.ui ${__JIMBO_VERSION__} · showcase`} title="Overview" />
       <p className="meta -mt-5 max-w-xl">
         Everything here is rendered from this release's own code, the same files an app gets. The
         content is example data. Change the look on the Theme tab and every page follows.

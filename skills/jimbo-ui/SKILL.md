@@ -1,11 +1,11 @@
 ---
 name: jimbo-ui
-description: Ryan's shared brand and UI system (jimbo-ui) for his web apps — theme engine with three colours, templates, Tailwind tokens, UI kit, floating tab-dock app shell and interaction patterns. Use when building, styling or reviewing UI in an app that has a jimbo-ui.json, when starting a new app "in my style" / "like my other apps" / "with jimbo-ui", when asked to update an app to the latest jimbo-ui or brand guidelines or to preview what an update would change, when checking contrast across themes, or when changing and releasing the jimbo-ui guidelines themselves.
+description: Ryan's shared brand and UI system, jimbo.ui (repo and plugin jimbo-ui), for his web apps — theme engine with three colours, templates, Tailwind tokens, UI kit, floating tab-dock app shell and interaction patterns. Use when building, styling or reviewing UI in an app that has a jimbo-ui.json, when starting a new app "in my style" / "like my other apps" / "with jimbo-ui", when asked to update an app to the latest jimbo-ui or brand guidelines or to preview what an update would change, when checking contrast across themes, or when changing and releasing the jimbo-ui guidelines themselves.
 ---
 
-# jimbo-ui
+# jimbo.ui
 
-A shared look and behaviour for Ryan's apps: phone-first, app-like, dark by
+jimbo.ui is a shared look and behaviour for Ryan's apps: phone-first, app-like, dark by
 default, themeable from three colours. The full rules are in
 [guide.md](guide.md); read the sections a task needs before writing UI.
 
@@ -21,9 +21,10 @@ in each and what apps must do.
   `highlight-950/900/800` (older apps may use the legacy `accent-lime`,
   `accent-pink`, `lime-*`, `rose-*` names — same tokens). Never raw hex or Tailwind palette
   colours on brand surfaces; never `text-white` on an accent/highlight fill.
-- Three source colours: **accent** (primary: logo main word, primary buttons,
-  active states), **highlight** (secondary: logo second line, dates, pins,
-  badges, errors), **background** (everything else derives from it). Light
+- No logo: the brand is the app's name as header text (`HeaderTitle`, display
+  face, text colour, a dot in the accent — "jimbo.ui").
+- Three source colours: **accent** (primary: buttons, active states, the dot
+  in the name), **highlight** (secondary: dates, pins, badges, errors), **background** (everything else derives from it). Light
   backgrounds flip text dark automatically.
 - Phone first at 375 px; floating frosted tab dock (≤ 5 tabs); things pinned
   to the bottom sit above it; touch targets ≥ 44 px; no horizontal scroll
@@ -44,7 +45,7 @@ release without touching that working copy, export it:
 
 - `foundation/` — copied verbatim into apps (never edited in an app)
 - `starter/` — copied once into a new app, then app-owned
-- `reference/` — generic implementations (kit, shell, wordmark, Brand and
+- `reference/` — generic implementations (kit, shell, header text, Brand and
   Style guide pages), adapted and extended per app
 - `scripts/tokens.mjs` — prints an app's `tokens.css` for its three colours
 - `scripts/contrast.mjs` — contrast report for every template (`--check` fails on a miss)
@@ -66,7 +67,7 @@ explains all of this.
    prefix), then regenerate `src/styles/tokens.css` with `scripts/tokens.mjs`.
 4. Adapt from `reference/`: `index.html` (pre-paint script with the app's
    prefix, fonts, PWA tags), the app shell and its tabs, the kit (drop
-   map the app's statuses onto the kit's tones and add its domain components), `Wordmark` with the app's lettering, Brand and Style guide pages,
+   map the app's statuses onto the kit's tones and add its domain components), `BRAND.name` as the header text, Brand and Style guide pages,
    and the API theme route if the app has a server (otherwise use
    `BRAND.defaultTheme` only).
 5. Write `jimbo-ui.json` with the version and the reference map, and a short

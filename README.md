@@ -1,6 +1,7 @@
-# jimbo-ui
+# jimbo.ui
 
-Ryan's shared brand and UI system for web apps: a three-colour theme engine
+Ryan's shared brand and UI system for web apps (repo and plugin name:
+`jimbo-ui`): a three-colour theme engine
 with 25 templates, Tailwind tokens, a UI kit, a phone-first app shell with a
 floating tab dock, and the patterns that make the apps feel alike. It's
 generic on purpose: no app's code, names or artwork live here.
@@ -21,7 +22,7 @@ theme, component and pattern an app gets. Run it locally with
 | `skills/jimbo-ui/SKILL.md` | The skill: core rules + workflows |
 | `foundation/` | Code copied verbatim into apps (never edited there) |
 | `starter/` | Code copied once into a new app, then app-owned |
-| `reference/` | Generic kit, shell, wordmark and admin pages, adapted per app |
+| `reference/` | Generic kit, shell, header text and admin pages, adapted per app |
 | `showcase/` | Demo app built only from a release's code ([published](https://claude.ai/artifact/F4KAFYCkxZGZB7zKdaWjWC)) |
 | `scripts/tokens.mjs` | Prints an app's `tokens.css` for its three colours |
 | `scripts/contrast.mjs` | Contrast report for every template (`--check` for releases) |

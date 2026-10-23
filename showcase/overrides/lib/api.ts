@@ -1,11 +1,11 @@
 /**
- * Showcase stand-in for an app's API client. An app saves its theme and logo
- * uploads on its server; the showcase keeps them in this browser instead, so
+ * Showcase stand-in for an app's API client. An app saves its theme and
+ * favicon upload on its server; the showcase keeps them in this browser instead, so
  * the real Brand page works unchanged.
  */
 import type { Theme } from "./theme";
 
-type Saved = { theme?: Theme; logo?: string; favicon?: string };
+type Saved = { theme?: Theme; favicon?: string };
 const KEY = "jimbo-showcase.saved";
 
 function read(): Saved {
@@ -22,9 +22,9 @@ const asDataUrl = (file: File) => new Promise<string>((resolve, reject) => {
 });
 
 export const api = {
-  async getTheme(): Promise<{ theme: Partial<Record<keyof Theme, string | null>>; logoUrl: string | null; faviconUrl: string | null }> {
+  async getTheme(): Promise<{ theme: Partial<Record<keyof Theme, string | null>>; faviconUrl: string | null }> {
     const s = read();
-    return { theme: s.theme ?? {}, logoUrl: s.logo ?? null, faviconUrl: s.favicon ?? null };
+    return { theme: s.theme ?? {}, faviconUrl: s.favicon ?? null };
   },
   async setTheme(theme: Theme): Promise<{ theme: Theme }> {
     write({ ...read(), theme });
@@ -35,12 +35,12 @@ export const api = {
     write(rest);
     return { ok: true };
   },
-  async uploadBrandAsset(asset: "logo" | "favicon", file: File): Promise<{ ok: true }> {
+  async uploadBrandAsset(asset: "favicon", file: File): Promise<{ ok: true }> {
     if (file.size > 1_000_000) throw new Error("That file is over 1 MB. Upload an SVG, PNG or WebP under 1 MB.");
     write({ ...read(), [asset]: await asDataUrl(file) });
     return { ok: true };
   },
-  async removeBrandAsset(asset: "logo" | "favicon"): Promise<{ ok: true }> {
+  async removeBrandAsset(asset: "favicon"): Promise<{ ok: true }> {
     const s = read();
     delete s[asset];
     write(s);

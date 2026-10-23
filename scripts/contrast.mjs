@@ -19,7 +19,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const dir = mkdtempSync(join(tmpdir(), "jimbo-contrast-"));
 try {
   for (const f of ["theme.ts", "themes.ts"]) copyFileSync(join(root, "foundation/src/lib", f), join(dir, f));
-  writeFileSync(join(dir, "brand.config.ts"), `export const BRAND = { name: "Default", logo: { word: "", line: "" }, storagePrefix: "x", defaultTheme: { accent: "#A8FF3E", highlight: "#FF3D6E", background: "#141416" } };\n`);
+  writeFileSync(join(dir, "brand.config.ts"), `export const BRAND = { name: "Default", storagePrefix: "x", defaultTheme: { accent: "#A8FF3E", highlight: "#FF3D6E", background: "#141416" } };\n`);
   writeFileSync(join(dir, "run.ts"), `
 import { contrast, themeHex } from "./theme";
 import { TEMPLATE_GROUPS } from "./themes";
