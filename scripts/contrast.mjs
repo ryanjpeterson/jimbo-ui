@@ -9,8 +9,9 @@
  * Targets (WCAG ratios; text ones checked on cards, the surface most text sits on):
  *   text 7 · muted 4.5 · subtle (labels) 3.5 · border vs card 1.75 · card vs page 1.19
  *   accent and highlight vs page 3 · support vs card 4.5 · text on the accent 4.5
- *   apart: accent, highlight and support at least 20 apart from each other (CIE ΔE),
- *   so a theme reads as more than one colour
+ *   apart: accent and highlight at least 15 apart (CIE ΔE), and no two of accent,
+ *   highlight and support closer than 10 — a tonal theme (shades of one colour)
+ *   passes; identical colours don't
  */
 import { mkdtempSync, copyFileSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -26,7 +27,7 @@ try {
   writeFileSync(join(dir, "run.ts"), `
 import { contrast, hexToRgb, themeHex } from "./theme";
 import { TEMPLATE_SETS } from "./themes";
-const T = { text: 7, muted: 4.5, subtle: 3.5, border: 1.75, card: 1.19, accent: 3, highlight: 3, support: 4.5, button: 4.5, apart: 20 };
+const T = { text: 7, muted: 4.5, subtle: 3.5, border: 1.75, card: 1.19, accent: 3, highlight: 3, support: 4.5, button: 4.5, apart: 10 };
 /** CIE76 ΔE between two hex colours (sRGB → Lab, D65). */
 function deltaE(a: string, b: string): number {
   const lab = (hex: string) => {
@@ -56,7 +57,8 @@ for (const s of TEMPLATE_SETS) for (const g of s.groups) {
       border: contrast(c.border!, c.surface!), card: contrast(c.surface!, c.bg!),
       accent: contrast(c.accent!, c.bg!), highlight: contrast(c.highlight!, c.bg!), support: contrast(c.support!, c.surface!),
       button: contrast(c["on-accent"]!, c.accent!),
-      apart: Math.min(deltaE(c.accent!, c.highlight!), deltaE(c.accent!, c.support!), deltaE(c.highlight!, c.support!)),
+      // Accent and highlight need 15 apart; the other pairs 10 (scaled so the one target, 10, covers both).
+      apart: Math.min(deltaE(c.accent!, c.highlight!) * (10 / 15), deltaE(c.accent!, c.support!), deltaE(c.highlight!, c.support!)),
     };
     const bad = cols.filter((k) => r[k] < T[k]);
     fails += bad.length ? 1 : 0;

@@ -62,8 +62,15 @@ this check, then the preview workflow if they want detail.
   `.orb-*`) — no gloss or glows; depth comes from layers, borders and shadows, lightly frosted `.glass` (mostly solid, never
   see-through). Softly rounded corners, not pills (`rounded-control` for
   buttons and pills); full circles only for the motif.
-- Type: the theme picks sans, mono or serif for headings and for body
-  (`Theme.fonts`); use `font-display` / `font-body`, never a named family.
+- Type: the theme picks a font for headings and one for body (`FONTS`:
+  sans, serif, mono, and decorative for headings only) with weight and
+  spacing (`Theme.fonts`); use `font-display` / `font-body`, never a named
+  family.
+- Colour tuning: `Theme.infer` (contrasting or tonal), `Theme.vibrancy` and
+  `Theme.contrast` — all on the Brand page.
+- Themes made from real things (teams, flags, provinces) use only their own
+  colours and shades of them — never an invented hue; sports teams come in
+  Home and Away (and some Retro).
 - The circle motif, here and there: `ThemeDots`, `.orb-*` (flat circles with a slight outline),
   avatars, colour circles on theme tiles. Small and few.
 - Templates come in five categories: **Everyday** (dark, mid, light),
@@ -86,7 +93,8 @@ this check, then the preview workflow if they want detail.
   Holidays, Countries, Provinces, Sports with league and city tabs) and
   search, with colour-circle tiles, *Make it yours* (four colours with the
   *Infer it* switches and readability warnings), *Type* (headings and body:
-  sans, mono or serif), favicon, live preview and the save bar. Adapt it only
+  fonts with weight and spacing sliders), vibrancy and contrast sliders,
+  favicon, live preview and the save bar. Adapt it only
   to fit the app: how admins reach it (an admin tab, a settings link, behind
   sign-in), who may save (the app's admin role), where it saves (the app's
   server; with no server, the browser — like

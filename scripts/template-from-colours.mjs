@@ -5,24 +5,26 @@
  *
  *   node scripts/template-from-colours.mjs input.json
  *
- * input.json is a list of { "name", "vibe", "colours": ["#RRGGBB", …] } with
- * the most important colour first. It prints one `t(…)` line per entry, ready
- * for foundation/src/lib/themes.ts, and a note for any that miss a target.
+ * input.json is a list of entries, each printed as one `t(…)` line for
+ * foundation/src/lib/themes.ts (with a note if it misses a target):
  *
- * How a theme is made from the colours:
- *   light or dark  light when white is one of the colours ("#FFFFFF") or the
- *               entry says "light": true; otherwise dark
- *   background  dark: the darkest colour, deepened (or a near-black tinted
- *               with the first colour); light: near-white tinted with it
- *   accent      the first vivid colour, kept if it already reads, else
- *               lightened (dark) or deepened (light) until it does
- *   highlight   the next vivid colour that's clearly different, made to read;
- *               else a tint (dark), or a deep shade or mid-tone (light), of it
- *   support     the next clearly different vivid colour, made to read on
- *               cards; else left to the engine to infer
- * Whites, greys and blacks are never the accent, highlight or support — except
- * for a black-and-silver brand with no other colour, which gets a monochrome
- * theme (white or black accent, silver highlight, steel-blue support).
+ *   { "name": "Maple Leafs", "vibe": "Toronto · blue and white",
+ *     "colours": ["#00205B", "#FFFFFF"],      most important first
+ *     "page": "#003DA5",                      optional: the page colour (a flag's field)
+ *     "light": true,                          optional: a white page (else dark)
+ *     "road": true,                           optional: a road-grey page (baseball away)
+ *     "kit": "home" | "away" | "retro" }      optional: shown as Home / Away / Retro
+ *
+ * The rule: only the entry's own colours, and lighter or darker versions of
+ * them that still read as that colour, are used — never a new hue. So:
+ *   page       the given page; or white / road grey; or (dark) the main
+ *              colour — or, if it's too bright, the darkest — deepened just
+ *              enough for body text to read on cards
+ *   accent,    taken in order from the colours, preferring each colour as it
+ *   highlight, is, then nudged lighter or darker (reds and oranges are never
+ *   support    lightened into pink), then — on a dark page — whites tinted
+ *              with the main colour (a blue-and-white team's pale blues)
+ * A role no colour can fill is left to tonal inference (shades of the accent).
  */
 import { mkdtempSync, copyFileSync, writeFileSync, rmSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -45,9 +47,10 @@ try {
   writeFileSync(join(dir, "entries.json"), JSON.stringify(entries));
   writeFileSync(join(dir, "run.ts"), `
 import { readFileSync } from "node:fs";
-import { contrast, hexToRgb, luminance, rgbToHex, themeHex, type Theme } from "./theme";
+import { contrast, deltaE, hexToRgb, luminance, rgbToHex, themeHex, type Theme } from "./theme";
 type RGB = [number, number, number];
-const entries: { name: string; vibe: string; colours: string[]; light?: boolean }[] = JSON.parse(readFileSync(${JSON.stringify(join(dir, "entries.json"))}, "utf8"));
+type Entry = { name: string; vibe: string; colours: string[]; page?: string; light?: boolean; road?: boolean; kit?: string };
+const entries: Entry[] = JSON.parse(readFileSync(${JSON.stringify(join(dir, "entries.json"))}, "utf8"));
 
 function hsl(hex: string): [number, number, number] {
   const [r, g, b] = hexToRgb(hex).map((v) => v / 255) as RGB;
@@ -62,95 +65,83 @@ function fromHsl([h, s, l]: [number, number, number]): string {
   const f = (n: number) => { const k = (n + h / 30) % 12; return 255 * (l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1))); };
   return rgbToHex([f(0), f(8), f(4)]);
 }
-function deltaE(a: string, b: string): number {
-  const lab = (hex: string) => {
-    const [r, g, bl] = hexToRgb(hex).map((v) => { const c = v / 255; return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; }) as RGB;
-    const f = (t: number) => (t > 0.008856 ? Math.cbrt(t) : 7.787 * t + 16 / 116);
-    const [x, y, z] = [(r * 0.4124 + g * 0.3576 + bl * 0.1805) / 0.95047, r * 0.2126 + g * 0.7152 + bl * 0.0722, (r * 0.0193 + g * 0.1192 + bl * 0.9505) / 1.08883].map(f) as RGB;
-    return [116 * y - 16, 500 * (x - y), 200 * (y - z)];
-  };
-  const [p, q] = [lab(a), lab(b)];
-  return Math.hypot(p[0]! - q[0]!, p[1]! - q[1]!, p[2]! - q[2]!);
-}
 const mixHex = (a: string, b: string, t: number) => { const [x, y] = [hexToRgb(a), hexToRgb(b)]; return rgbToHex([0, 1, 2].map((i) => x[i]! + (y[i]! - x[i]!) * t) as RGB); };
-const neutral = (hex: string) => { const [, s, l] = hsl(hex); return s < 0.16 || l > 0.93 || luminance(hex) < 0.012; };
+const isWhite = (c: string) => luminance(c) > 0.8;
+const isNeutral = (c: string) => hsl(c)[1] < 0.16 || isWhite(c) || luminance(c) < 0.012;
+/** Reds, oranges and magentas: lightening them much turns them pink or peach. */
+const warm = (c: string) => { const [h, s] = hsl(c); return s > 0.35 && (h < 28 || h > 320); };
 
-const isLight = (bg: string) => luminance(bg) > 0.4;
-/** Step lightness away from the page (lighter on dark, deeper on light), keeping hue and saturation, until the colour reaches target contrast on bg. */
-function readable(hex: string, bg: string, target: number): string {
-  let [h, s, l] = hsl(hex);
-  const step = isLight(bg) ? -0.012 : 0.012;
-  for (let i = 0; i < 70 && contrast(fromHsl([h, s, l]), bg) < target; i++) l = Math.max(0.03, Math.min(0.97, l + step));
-  return fromHsl([h, s, l]);
-}
-/** An accent that reads on bg (3:1) and takes 4.5:1 button text: kept if it already does, else moved away from the page until it does. */
-function accentFor(hex: string, bg: string): string {
-  const ok = (c: string) => contrast(c, bg) >= 3.1 && (luminance(c) <= 0.35 ? contrast("#FFFFFF", c) >= 4.6 : true);
-  if (ok(hex)) return hex;
-  let [h, s, l] = hsl(hex);
-  if (isLight(bg)) {
-    for (let i = 0; i < 80 && !ok(fromHsl([h, s, l])); i++) l = Math.max(0.05, l - 0.01);
-  } else {
-    for (let i = 0; i < 80 && (luminance(fromHsl([h, s, l])) <= 0.37 || contrast(fromHsl([h, s, l]), bg) < 3.1); i++) l = Math.min(0.97, l + 0.01);
-  }
-  return fromHsl([h, s, l]);
-}
-function backgroundFor(colours: string[]): { bg: string; used: string | null } {
-  const dark = colours.filter((c) => luminance(c) < 0.07).sort((a, b) => luminance(a) - luminance(b));
-  const chromatic = dark.find((c) => hsl(c)[1] >= 0.2 && luminance(c) >= 0.004);
-  if (chromatic) {
-    let [h, s, l] = hsl(chromatic);
-    s = Math.min(s, 0.75);
-    for (let i = 0; i < 40 && luminance(fromHsl([h, s, l])) > 0.013; i++) l -= 0.01;
-    return { bg: fromHsl([h, s, Math.max(l, 0.04)]), used: chromatic };
-  }
-  // Black (or nothing dark): a near-black with a breath of the first vivid colour.
-  const first = colours.find((c) => !neutral(c)) ?? colours[0]!;
-  return { bg: mixHex("#0C0C0E", first, 0.07), used: null };
-}
-
-function build(colours: string[], light: boolean): Theme {
-  const vividAll = colours.filter((c) => !neutral(c));
-  // A black-and-silver (or black-and-white) brand: a monochrome theme.
-  if (!vividAll.length) {
-    // Three greys can't be both clearly apart and readable, so the support is a cool steel blue.
-    if (light) return { accent: "#111111", highlight: "#5F6368", background: "#FAFAFA", support: "#2F5D9A" };
-    const silver = colours.filter((c) => luminance(c) > 0.2).sort((a, b) => luminance(b) - luminance(a))[0];
-    return { accent: "#F2F2F2", highlight: silver ? readable(mixHex(silver, "#8A9096", 0.4), "#0C0C0E", 3.6) : "#9AA0A6", background: "#0C0C0E", support: "#7FB0E8" };
-  }
-  if (light) {
-    const bg = mixHex("#FCFBF9", vividAll[0]!, 0.035);
-    const accent = accentFor(vividAll[0]!, bg);
-    const theme: Theme = { accent, background: bg };
-    const rest = vividAll.slice(1);
-    const hl = rest.map((c) => readable(c, bg, 3.6)).find((c) => deltaE(c, accent) >= 24);
-    if (hl) theme.highlight = hl;
+/** Body text reads on cards (7:1) — the page is dark or light enough. */
+const textOk = (bg: string) => { const c = themeHex({ accent: "#808080", background: bg }); return contrast(c.text!, c.surface!) >= 7.05; };
+function pageFor(e: Entry): string {
+  const vivid = e.colours.find((c) => !isNeutral(c)) ?? e.colours[0]!;
+  let bg = e.page ?? (e.road ? "#DCDFE2" : e.light ? mixHex("#FCFCFB", vivid, 0.025) : "");
+  if (!bg) {
+    // Home: the main colour, deepened (a red team gets a deep red page). If the main
+    // colour is too bright to deepen and keep (gold, silver), the darkest colour instead.
+    // A red or orange main colour stays the accent at its true value instead, on the
+    // team's dark secondary (black, navy) — a deep-red page leaves nothing readable on it but white.
+    const first = e.colours[0]!;
+    const [, s0] = hsl(first);
+    if (!warm(first) && s0 >= 0.2 && luminance(first) < 0.3 && luminance(first) >= 0.004) bg = first;
     else {
-      // No second colour: a deep shade of the first, or (if it's already deep) a mid-tone of it.
-      const shade = readable(mixHex(vividAll[0]!, "#000000", 0.5), bg, 3.6);
-      const mid = readable(mixHex(vividAll[0]!, "#FFFFFF", 0.4), bg, 3.6);
-      const pickHl = [shade, mid].find((c) => deltaE(c, accent) >= 24);
-      if (pickHl) theme.highlight = pickHl;
+      const dark = e.colours.filter((c) => luminance(c) < 0.09 && !warm(c)).sort((a, b) => luminance(a) - luminance(b));
+      const chromatic = dark.find((c) => hsl(c)[1] >= 0.2 && luminance(c) >= 0.004);
+      bg = chromatic ?? dark[0] ?? mixHex("#0C0C0E", vivid, 0.07);
     }
-    const sp = rest.map((c) => readable(c, bg, 5.6)).find((c) => deltaE(c, accent) >= 24 && (!theme.highlight || deltaE(c, theme.highlight) >= 24));
-    if (sp) theme.support = sp;
-    return theme;
   }
-  const { bg, used } = backgroundFor(colours);
-  const vivid = colours.filter((c) => !neutral(c) && c !== used);
-  if (!vivid.length && used) vivid.push(used);
-  if (!vivid.length) vivid.push(colours.find((c) => !neutral(c)) ?? "#8FB2FF");
-  const accent = accentFor(vivid[0]!, bg);
-  const theme: Theme = { accent, background: bg };
-  const rest = vivid.slice(1).concat(used && vivid[0] !== used ? [used] : []);
-  const hl = rest.map((c) => readable(c, bg, 3.6)).find((c) => deltaE(c, accent) >= 24);
+  // Deepen (dark) or lighten (light) only as far as body text needs — and, for a
+  // red or orange team on a dark page, until its red reads as the accent.
+  let [h, s, l] = hsl(bg);
+  const lightPage = luminance(bg) > 0.4;
+  const first = e.colours[0]!;
+  const redReads = (b: string) => lightPage || !warm(first) || e.page || contrast(first, b) >= 3.15;
+  for (let i = 0; i < 80 && (!textOk(fromHsl([h, s, l])) || !redReads(fromHsl([h, s, l]))); i++) l = lightPage ? Math.min(0.99, l + 0.01) : Math.max(0.015, l - 0.01);
+  return fromHsl([h, s, l]);
+}
+
+/** Candidate colours for the roles, cheapest (truest) first: [colour, cost]. */
+function candidates(e: Entry, bg: string): [string, number][] {
+  const light = luminance(bg) > 0.4;
+  const main = e.colours.find((c) => !isNeutral(c)) ?? e.colours[0]!;
+  const out: [string, number][] = [];
+  e.colours.forEach((c, i) => {
+    if (light && isWhite(c)) return;
+    const order = i * 1.5;                        // the team's main colours come before its whites and trims
+    out.push([c, 0 + order]);
+    const [h, s, l] = hsl(c);
+    const away = light ? -1 : 1;                  // lighter on a dark page, deeper on a light one
+    const maxUp = warm(c) ? 0.1 : 0.3;             // never lighten a red into pink
+    // On a light page a very deep colour goes lighter first (Leafs navy → mid blue), not toward black.
+    const deep = light && luminance(c) < 0.05;
+    for (const [d, cost] of [[0.05, 1], [0.1, 2], [0.18, 3], [0.26, 4], [0.34, 5]] as const) {
+      if (away < 0 || d <= maxUp) out.push([fromHsl([h, s, Math.max(0.03, Math.min(0.96, l + away * d))]), cost + (deep ? 0.5 : 0) + order]);
+      if (light && d <= maxUp) out.push([fromHsl([h, s, Math.min(0.96, l + d)]), cost + (deep ? 0 : 0.5) + order]);
+    }
+    // A white on a dark page also comes tinted with the main colour (a blue-and-white
+    // team's pale blues) — or, for a red team, as light greys (never pink).
+    if (!light && isWhite(c)) {
+      if (!warm(main)) for (const [t, cost] of [[0.15, 2], [0.3, 3], [0.45, 4]] as const) out.push([mixHex(c, main, t), cost + order]);
+      for (const [t, cost] of [[0.16, 3], [0.28, 4]] as const) out.push([mixHex(c, "#000000", t), cost + order]);
+    }
+  });
+  // Nothing that looks like the page itself.
+  return out.filter(([c]) => deltaE(c, bg) >= 22).sort((a, b) => a[1] - b[1]);
+}
+
+const readsAsAccent = (c: string, bg: string) =>
+  contrast(c, bg) >= 3.1 && (luminance(c) <= 0.35 ? contrast("#FFFFFF", c) >= 4.6 : true);
+
+function build(e: Entry): Theme {
+  const background = pageFor(e);
+  const pool = candidates(e, background).map(([c]) => c);
+  const accent = pool.find((c) => readsAsAccent(c, background)) ?? e.colours[0]!;
+  const theme: Theme = { accent, background };
+  const hl = pool.find((c) => contrast(c, background) >= 3.3 && deltaE(c, accent) >= 15);
   if (hl) theme.highlight = hl;
-  else {
-    const tint = readable(mixHex(vivid[0]!, "#FFFFFF", 0.62), bg, 3.6);
-    if (deltaE(tint, accent) >= 24) theme.highlight = tint;
-  }
-  const sp = rest.map((c) => readable(c, bg, 5.6)).find((c) => deltaE(c, accent) >= 24 && (!theme.highlight || deltaE(c, theme.highlight) >= 24));
+  const sp = pool.find((c) => contrast(c, background) >= 5.5 && deltaE(c, accent) >= 11 && (!hl || deltaE(c, hl) >= 11));
   if (sp) theme.support = sp;
+  if (!hl || !sp) theme.infer = "tonal";
   return theme;
 }
 
@@ -162,15 +153,18 @@ function problems(theme: Theme): string[] {
   if (contrast(c.highlight!, c.bg!) < 3) out.push("highlight");
   if (contrast(c.support!, c.surface!) < 4.5) out.push("support");
   if (contrast(c["on-accent"]!, c.accent!) < 4.5) out.push("button");
-  if (Math.min(deltaE(c.accent!, c.highlight!), deltaE(c.accent!, c.support!), deltaE(c.highlight!, c.support!)) < 20) out.push("apart");
+  if (deltaE(c.accent!, c.highlight!) < 15 || Math.min(deltaE(c.accent!, c.support!), deltaE(c.highlight!, c.support!)) < 10) out.push("apart");
   return out;
 }
 
 const q = (v?: string) => (v ? JSON.stringify(v) : "null");
 for (const e of entries) {
-  const th = build(e.colours, e.light ?? e.colours.some((c) => c.toUpperCase() === "#FFFFFF"));
+  const th = build(e);
   const bad = problems(th);
-  const args = [JSON.stringify(e.name), JSON.stringify(e.vibe), q(th.accent), q(th.highlight), q(th.background)].concat(th.support ? [q(th.support)] : []);
+  const opts = [e.kit ? \`kit: "\${e.kit}"\` : "", th.infer === "tonal" ? 'infer: "tonal"' : ""].filter(Boolean);
+  const args = [JSON.stringify(e.name), JSON.stringify(e.vibe), q(th.accent), q(th.highlight), q(th.background), q(th.support)];
+  if (opts.length) args.push("{ " + opts.join(", ") + " }");
+  else if (!th.support) args.pop();
   console.log("t(" + args.join(", ") + ")," + (bad.length ? " // LOW: " + bad.join(", ") : ""));
 }
 `);

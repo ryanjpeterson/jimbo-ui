@@ -17,13 +17,35 @@ the matching 0.x release.
 
 ## Unreleased
 
-Clearer separation, a calmer surface (less glass, less round, flat swatches), type styles, and themes for teams and places.
+Clearer separation, a calmer surface (less glass, less round, flat swatches), fonts and sliders, and themes for teams and places.
 
 ### Added
-- **169 new templates from real colours:** every NHL, NBA, MLB and NFL team;
-  Toronto, Ottawa and Chicago teams in other leagues (MLS, CFL, WNBA, PWHL,
-  NWSL, CPL, NLL, AHL, OHL); 17 more countries; Canada's 13 provinces and
-  territories. 218 templates in all, every one passing the checks.
+- **Templates from real colours (314):** every NHL, NBA, MLB and NFL team in
+  a **Home** look (its colour) and an **Away** look (white; baseball road
+  grey); Toronto, Ottawa and Chicago teams in other leagues (MLS, CFL, WNBA,
+  PWHL, NWSL, CPL, NLL, AHL, OHL), also home and away; **Retro** looks for
+  Toronto and Ottawa (St. Pats, Raptors ’95, Blue Jays ’77, Original
+  Senators, Senators ’92, Rough Riders); 17 more countries; Canada's 13
+  provinces and territories on their flags' field colours. They use **only
+  their own colours** and shades of them — no invented hues, no reds turned
+  pink. 363 templates in all, every one passing the checks. `Template.kit`.
+- **Tonal inference:** `Theme.infer: "tonal"` fills a missing highlight or
+  support with lighter or darker versions of the accent (the default,
+  `"contrast"`, picks new hues). The Brand page has a *Contrasting / Tonal*
+  switch. `deltaE` is exported.
+- **Vibrancy and contrast:** `Theme.vibrancy` (0.4–1.5) scales the brand
+  colours' saturation; `Theme.contrast` (0.8–1.6) scales how far cards,
+  fields and borders step from the page. Sliders on the Brand page.
+- **Fonts:** 25 in `FONTS` — sans (Archivo, Inter, Space Grotesk, DM Sans,
+  Manrope, Oswald), serif (Fraunces, Source Serif, Playfair, EB Garamond,
+  Marcellus — the closest free match to Friz Quadrata — DM Serif), mono
+  (JetBrains Mono, IBM Plex Mono, Space Mono, Fira Code) and decorative, for
+  headings only (Old English, Old German, Gothic, Pirate, Rocker, Typewriter,
+  Pixel, Bungee, Neon, Carved caps, Script). `Theme.fonts` takes a font key
+  for headings and body plus `headingsWeight`, `bodyWeight`,
+  `headingsTracking`, `bodyTracking`, set as `--font-display-weight` /
+  `--font-body-weight` / `-tracking`. Weight and letter-spacing sliders
+  (`RangeField`, kit). Old style names (`sans`, `mono`, `serif`) still work.
 - **Categories:** Everyday, Holidays, Countries (Americas, Europe, Asia and
   Pacific, Africa), Provinces, Sports (sub-tabs: NHL, NBA, MLB, NFL, Toronto,
   Ottawa, Chicago — city tabs gather every team from that city).
@@ -31,11 +53,16 @@ Clearer separation, a calmer surface (less glass, less round, flat swatches), ty
   lists every template once.
 - **Search** on the Brand page across name, vibe, category and tab, ignoring
   accents.
-- `scripts/template-from-colours.mjs`: real colours in, checked templates
-  out — light themes for brands with white, monochrome for black-and-silver.
+- `scripts/template-from-colours.mjs`: real colours in (with an optional
+  page colour, light or road-grey page, and kit), checked templates out.
 
 ### Changed
 - "Flags" is now **Countries**, grouped by region.
+- **The separation check allows tonal themes:** accent and highlight at least
+  15 apart (ΔE), and no two of the three closer than 10 (was 20 for all).
+- Sweden, the Maple Leafs and other two-colour brands are shades of their
+  colours rather than borrowing an inferred one; the steel-blue support for
+  black-and-silver teams is gone (greys instead).
 - The Brand page picks categories with wrapping `PillTabs` (sub-tabs in a
   panel below) instead of `Tabs`, so five or more never scroll sideways.
 - `scripts/contrast.mjs` checks each template once (city tabs repeat
@@ -47,6 +74,8 @@ Clearer separation, a calmer surface (less glass, less round, flat swatches), ty
   keeps the page and saves the theme in the browser (like the showcase's
   `api.ts`) instead of dropping it. The start, preview and update workflows
   check for every theming feature. The theme API carries `fonts`.
+- **No dots above page titles.** `PageHeader` eyebrows are plain support
+  text again; `ThemeDots` stays for empty states.
 - **Flat fills everywhere.** `.btn-primary` and `.lit-*` (active tabs and
   pills, select ticks, date bands, the top bar's add button) are flat with a
   slight outline in the colour's darker shade — no gradient, top highlight
@@ -73,12 +102,11 @@ Clearer separation, a calmer surface (less glass, less round, flat swatches), ty
 - Rows are a little taller (`py-3.5`, at least 76 px).
 
 ### Added
-- **Type styles:** `Theme.fonts: { headings, body }`, each `sans` (Archivo /
-  Inter, the default), `mono` (JetBrains Mono) or `serif` (Fraunces / Source
-  Serif 4). `FONT_STYLES`, `FONT_KEYS`, `loadFonts`; set as `--font-display`
+- **Type section:** `Theme.fonts` (see Fonts above), set as `--font-display`
   and `--font-body`, which Tailwind's `font-display` / `font-body` now read.
-  Brand page gains a *Type* section; templates keep the chosen fonts.
-  `scripts/tokens.mjs --headings= --body=`. `SavedTheme` type for API data.
+  `FONTS`, `FONT_GROUPS`, `fontFor`, `loadFonts`. Brand page gains a *Type*
+  section; templates keep the chosen fonts. `scripts/tokens.mjs --headings=
+  --body=` (font keys). `SavedTheme` type for API data.
 - `.divide-etched`: a full-strength line with a faint light line under it
   between stacked items; it also reaches rows grouped in wrappers under a
   label. `List`, `RankedList` and `Loading` use it.
@@ -98,7 +126,9 @@ Clearer separation, a calmer surface (less glass, less round, flat swatches), ty
 - App code with `rounded-full` on buttons, tabs or pills: use
   `rounded-control` (circles keep `rounded-full`). Translucent `bg-*/70`-ish
   bars of the app's own: make them `/90`–`/95` with `backdrop-blur-md`.
-- Apps with a theme server: accept and return an optional `fonts`
+- Apps with a theme server: accept and return optional `infer`, `vibrancy`
+  and `contrast` too, and fonts as keys with weights and tracking (see
+  Fonts); accept and return an optional `fonts`
   (`{ headings?, body? }`, each `sans` / `mono` / `serif`); `useBrand`'s
   `withDefaults` takes a `SavedTheme`.
 - **Every app:** have the admin Brand & theme and Style guide pages with

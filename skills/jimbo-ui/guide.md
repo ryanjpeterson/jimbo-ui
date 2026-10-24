@@ -91,8 +91,11 @@ Every app built on jimbo.ui has, behind its admin access:
   Countries, Provinces and Sports categories with league and city tabs, and
   a search box; tiles are miniatures of the app with the theme's colours as
   circles), *Make it yours* (the four colours as round tabs, the inline
-  picker, *Infer it* switches for highlight and support, readability
-  warnings), *Type* (headings and body: sans, mono or serif), *Favicon*, a
+  picker, *Infer it* switches for highlight and support with *Contrasting* /
+  *Tonal* inference, *Vibrancy* and *Contrast* sliders, readability
+  warnings), *Type* (a font for headings and one for body — sans, serif, mono
+  or, for headings, decorative — each with weight and letter-spacing
+  sliders), *Favicon*, a
   link to the Style guide, live preview across the app and a floating save
   bar (*Undo* / *Save*; leaving restores the saved theme).
 - **Style guide** (`/admin/style`): every shared component in the current
@@ -194,9 +197,16 @@ component and pattern rules (sections 8–9).
 | **Background** | `#141416` | The page. Surfaces, borders and every text colour are derived from it |
 
 **Two is enough.** A theme always sets the accent and background. Leave out
-the highlight and it's inferred from the accent (a split complement); leave
-out the support and it's inferred from the others (the hue furthest from
-both). Four is the most.
+the highlight or support and it's inferred, one of two ways (`Theme.infer`):
+**contrasting** (the default — the highlight is a split complement of the
+accent, the support the hue furthest from both) or **tonal** (lighter and
+darker versions of the accent, for a simple one-colour scheme like blue and
+white). Four is the most, and a theme needn't be four different hues.
+
+**Vibrancy and contrast.** Two sliders tune any theme: `Theme.vibrancy`
+(0.4–1.5) scales the brand colours' saturation (the page's by half as much);
+`Theme.contrast` (0.8–1.6) scales how far cards, fields and borders step from
+the page. The Brand page warns if a setting costs readability.
 
 **Spread the colours.** A page should show more than the accent: the accent
 for what to tap, the highlight for dates and alerts, the support for labels
@@ -222,7 +232,7 @@ pills, status dots, flat colour circles, coloured text. Washes are for tinting t
 same hue family (done chips, warnings), not for adding colour.
 
 **The circle motif.** The theme's colours as circles turn up here and there:
-`ThemeDots` before a page eyebrow and in empty states, a small orb beside a
+`ThemeDots` in empty states (never above page titles), a small orb beside a
 stat's label, avatar circles, colour circles on theme tiles, three soft
 orbs behind the page, and the favicon. Keep them small and few — a motif, not
 wallpaper.
@@ -350,8 +360,9 @@ inferred ones, which are built to pass):
 Every template must also pass `node scripts/contrast.mjs --check`, measured
 on cards: body text ≥ 7:1, muted ≥ 4.5:1, labels ≥ 3.5:1, card border
 ≥ 1.75:1, card against page ≥ 1.19:1 — and the three above, plus
-**colours apart**: accent, highlight and support at least 20 apart from each
-other (CIE76 ΔE), so no template reads as one colour. Mid-grey backgrounds limit body text
+**colours apart**: accent and highlight at least 15 apart (CIE76 ΔE) and no
+two of accent, highlight and support closer than 10 — so a tonal theme
+(shades of one colour) passes, and identical colours don't. Mid-grey backgrounds limit body text
 most: keep them dark enough (luminance under about 0.07) for 7:1.
 
 ---
@@ -367,8 +378,8 @@ categories, chosen with wrapping pills, plus a search box across all of them
 | **Everyday** | Dark, Mid and Light originals | Stacked groups |
 | **Holidays** | Through the year, Lunar new year to New year's eve | One group |
 | **Countries** | Flags by region: Americas, Europe, Asia and Pacific, Africa | Stacked groups |
-| **Provinces** | Canada's 13 provinces and territories | One group |
-| **Sports** | NHL, NBA, MLB, NFL (every team), then **Toronto**, **Ottawa** and **Chicago** (every team from the city, across leagues — MLS, CFL, WNBA, PWHL, NWSL, CPL, NLL, AHL, OHL too) | Sub-tabs (`tabs: true`), one at a time |
+| **Provinces** | Canada's 13 provinces and territories, each on its flag's field colour | One group |
+| **Sports** | NHL, NBA, MLB, NFL (every team, each in **Home** and **Away**, some Toronto and Ottawa teams in **Retro** too), then **Toronto**, **Ottawa** and **Chicago** (every team from the city, across leagues — MLS, CFL, WNBA, PWHL, NWSL, CPL, NLL, AHL, OHL too) | Sub-tabs (`tabs: true`), one at a time, with a Home / Away / Retro switch |
 
 Each template is drawn as a miniature of the app with its colours as
 circles. Every one passes the readability checks. An app whose default isn't
@@ -377,18 +388,35 @@ one of them gets it as an extra "Yours" card at the front of Everyday.
 list (city tabs repeat league teams); `ALL_TEMPLATES` every template once;
 `sameTheme` compares two themes.
 
-**Team, country and province themes** are made from their real colours with
-`scripts/template-from-colours.mjs` (a list of `{ name, vibe, colours }` in,
-`t(…)` lines out): the page is a deepened version of the darkest colour (or
-near-white when white is one of the colours, so Japan, the Maple Leafs and
-Québec are light), the accent is the first colour made readable, the
-highlight and support the next clearly different ones; a two-colour brand
-gets a tint or shade of its colour, a black-and-silver one a monochrome theme
-with a steel-blue support. They're inspired by the colours only — no names
-on screen beyond the tile label, no logos or artwork. Team vibes start with
-the city ("Toronto · blue and white"), which is how the city tabs are built.
-To add teams or places: write their colours, run the script, paste the lines,
-run `node scripts/contrast.mjs --check`.
+**Team, country and province themes** use **only their own colours** —
+and lighter or darker versions of them that still read as that colour —
+never a new hue. They're made with `scripts/template-from-colours.mjs` (a
+list of `{ name, vibe, colours, page?, light?, road?, kit? }` in, `t(…)`
+lines out):
+
+- **The page:** a province's flag field (Québec's blue, Ontario's red
+  ensign); a team's **Home** look is its main colour, deepened just enough
+  for text — except a red or orange team, which keeps its red as the accent
+  at full strength on its dark secondary (black, navy); **Away** is white
+  (baseball: road grey); flags with a white field are light.
+- **Accent, highlight, support:** taken in order from the real colours, each
+  as it is if it reads, else nudged lighter or darker. Reds and oranges are
+  never lightened into pink. On a dark page a white also comes as pale tints
+  of the main colour (a blue-and-white team's pale blues) or, for a red team,
+  light greys. Colours that look like the page are never used.
+- **Simple schemes stay simple:** a blue-and-white team is shades of blue
+  and white; a black-and-silver one is greys. Where nothing real can fill a
+  role, the template uses tonal inference.
+- **Retro:** classic looks for Toronto and Ottawa teams (St. Pats, Raptors
+  ’95, Blue Jays ’77, Original Senators, Senators ’92, Rough Riders).
+
+They borrow colours only — no logos or artwork; the tile label is the only
+name on screen. Team vibes start with the city ("Toronto · blue and white"),
+which builds the city tabs. To add teams or places: list their real colours
+(main first, minor accents too — the Steelers' Steelmark red and blue), run
+the script, paste the lines, run `node scripts/contrast.mjs --check`, and
+look at them. The team colours were compiled from memory; correct any that
+are off.
 
 The Everyday and Holiday templates, hand-picked:
 
@@ -429,24 +457,30 @@ a bright red gets white button text below 4.5:1, so use a deeper red (about
 
 ## 5. Typography
 
-**Type styles.** A theme picks one style for headings and one for body text
-(`Theme.fonts: { headings, body }`, both default `sans`; `FONT_STYLES` in
-`theme.ts`). They're set as `--font-display` and `--font-body`, which
-Tailwind's `font-display` and `font-body` read, so every page follows.
+**Type.** A theme picks a font for headings and one for body text, each
+with a weight and letter spacing (`Theme.fonts: { headings, body,
+headingsWeight, bodyWeight, headingsTracking, bodyTracking }`; defaults
+Archivo 800 at −0.015em and Inter 400 at 0). They're set as `--font-display`,
+`--font-body` and their `-weight` / `-tracking`, which `font-display`,
+`.h-page`, `.h-section` and the body read, so every page follows. The fonts
+(`FONTS` in `theme.ts`, by `group`):
 
-| Style | Headings | Body | Feel |
-| --- | --- | --- | --- |
-| `sans` (default) | **Archivo** 800 | **Inter** 400–700 | Bold and clean |
-| `mono` | **JetBrains Mono** 800 | **JetBrains Mono** 400–700 | Technical, terminal |
-| `serif` | **Fraunces** 800 | **Source Serif 4** 400–700 | Editorial, warm |
+| Group | Fonts |
+| --- | --- |
+| Sans | **Archivo** (default headings), **Inter** (default body), Space Grotesk, DM Sans, Manrope, Oswald |
+| Serif | Fraunces, Source Serif, Playfair, EB Garamond, **Marcellus** (the closest free match to Friz Quadrata), DM Serif (headings only) |
+| Mono | JetBrains Mono, IBM Plex Mono, Space Mono, Fira Code |
+| Decorative (headings only) | Old English, Old German, Gothic (blackletter), Pirate, Rocker, Typewriter, Pixel, Bungee, Neon, Carved caps, Script |
 
-Mixing works: serif headings over sans body is the most common pairing; mono
-throughout suits tools. Sans loads from `index.html`; `applyTheme` loads the
-others from Google Fonts when picked (`loadFonts`). An app whose default uses
-mono or serif adds those families to `index.html` and passes `--headings=` /
-`--body=` to `scripts/tokens.mjs`. **JetBrains Mono** 400/600 is also always
-used for codes and hex values (`font-mono`). Below, "Archivo" and "Inter"
-mean the headings and body styles.
+Decorative faces are for headings only — they're unreadable as body text.
+Archivo, Inter and JetBrains Mono load from `index.html`; `applyTheme` loads
+any other from Google Fonts when picked (`loadFonts`). An app whose default
+uses another font adds it to `index.html` and passes `--headings=` /
+`--body=` (font keys) to `scripts/tokens.mjs`. **JetBrains Mono** is also
+always used for codes and hex values (`font-mono`). Older themes that saved
+a style name (`sans`, `mono`, `serif`) map to Archivo/Inter, JetBrains Mono
+and Fraunces/Source Serif. Below, "Archivo" and "Inter" mean the headings
+and body fonts.
 
 | Class | Size | Font | Use |
 | --- | --- | --- | --- |
@@ -552,7 +586,7 @@ mean the headings and body styles.
 | `MediaCard` | Image-led grid card (`aspect="portrait"` for posters) |
 | `LinkCard` | A card that navigates (eyebrow / title / sub); `accent` for the one to notice |
 | `StatTile` / `StatGrid` | Headline numbers (`accent="accent"` / `"highlight"` / `"support"`: the number in that colour, a small orb by the label and a soft pool of it in the corner) |
-| `ThemeDots` | The circle motif: the theme's three colours as small overlapping orbs. Before page eyebrows and in empty states |
+| `ThemeDots` | The circle motif: the theme's three colours as small overlapping orbs. In empty states and brand moments — not above page titles |
 | `RankedList` | Top-N lists with counts |
 | `SearchField`, `SelectField` | Search and single-choice filters (select on phones) |
 | `Tabs` | 2–4 mutually exclusive views (segmented) |
@@ -684,7 +718,11 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   highlights. Colour from opaque shapes, not thin washes: date tickets with a
   lit month band, glowing status dots, support group labels, cards lit by the
   accent and support.
-- **Unreleased** — Templates in five categories (Everyday, Holidays,
+- **Unreleased** — Themes use only real colours (and their shades); every
+  team has Home and Away looks, some Toronto and Ottawa teams Retro ones;
+  provinces sit on their flag's field. Tonal inference, vibrancy and contrast
+  sliders. 25 fonts (incl. blackletter and Marcellus) with weight and spacing
+  sliders. No dots above page titles. Templates in five categories (Everyday, Holidays,
   Countries, Provinces, Sports) with search; 169 new themes from real
   colours (every NHL, NBA, MLB and NFL team, Toronto, Ottawa and Chicago
   teams in other leagues, more countries, the provinces and territories) via
