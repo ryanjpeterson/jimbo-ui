@@ -29,6 +29,23 @@ Clearer separation, a calmer surface (less glass, less round, flat swatches), fo
   provinces and territories on their flags' field colours. They use **only
   their own colours** and shades of them — no invented hues, no reds turned
   pink. 363 templates in all, every one passing the checks. `Template.kit`.
+- **Backdrops:** `Theme.backdrop` — an abstract pattern (ripples, waves,
+  contours, geometry, light burst, dot grid, arrows, shapes, or none) over a
+  base (solid, gradient, or the glow orbs as before), with strength and size.
+  `backdropCss`, `BACKDROPS`, `BACKDROP_BASES`; set as `--bg-image` /
+  `--bg-size` / `--bg-position` / `--bg-repeat` (pre-paint applies them). A
+  *Backdrop* section on the Brand page with a preview of each pattern.
+  Exports and imports carry the backdrop; templates keep it.
+- **Full width:** `FullBleed` (any section edge to edge, in a tone or
+  flush), `HeroSection` (a full-width opener over a pattern, no photo) and
+  `AppShell width` (`column` · `wide` · `full`). The showcase home opens with
+  a `HeroSection` and has a full-width band.
+- **The component menu (skill and guide):** before building a feature or
+  section, ask which existing component to use, from a menu of options.
+- **App archetypes (skill and guide):** Tracker, Collection, Dashboard,
+  Directory, Planner, Showcase and Tool — each with dock tabs, page width,
+  the components for its main pages and a backdrop. Starting an app asks
+  which fits first.
 - **Share this look (import / export):** the Brand page exports the theme
   being edited as a theme file (`jimbo-ui/theme` JSON), the app's
   `brand.config.ts` `defaultTheme` line or its `tokens.css`, and imports a
@@ -145,7 +162,12 @@ Clearer separation, a calmer surface (less glass, less round, flat swatches), fo
   every theming feature (guide section 1, "Admin theming pages"); add them if
   missing, adapted to the app. Apps without a server: save the theme in the
   browser rather than having no Brand page.
-- Apps that track the reference: port the Brand page's *Share this look*
+- Copy `globals.css` (the page background now reads `--bg-image` and
+  friends). Apps with a theme server: accept and return an optional
+  `backdrop`.
+- Apps that track the reference: port the kit's `FullBleed`, `HeroSection`
+  and `RangeField`, `AppShell`'s `width`, the Brand page's *Backdrop* section
+  and *Share this look*
   section (export and import), categories, sub-tabs
   and search (`TemplateGrid`), and the *Type* section, the
   kit's radius and glass changes (`Badge`, `Tabs`, `PillTabs`, `ViewSwitch`,

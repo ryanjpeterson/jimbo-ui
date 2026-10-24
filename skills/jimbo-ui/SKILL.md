@@ -86,6 +86,20 @@ this check, then the preview workflow if they want detail.
 - Use the kit (`.card`, `.btn`, `.field`, `.chip`, `.eyebrow`, `.meta`,
   `PageHeader`, `List`, `Section`…) before inventing anything. A new shared
   component goes in the kit, the app's Style guide page, and the guide.
+- **Ask before building a feature or section:** "What existing component do
+  you want to use for this feature or section's styling?" — offer 3–4
+  fitting options from the component menu (guide section 9: e.g. for a list,
+  `EventRow` list, `EntityRow` list, `MediaCard` grid, `RankedList`), plus
+  something new, recommending one. Use Claude Code's question tool when
+  available. One question per feature or section; then build with the
+  choice.
+- **New apps start from an archetype** (Tracker, Collection, Dashboard,
+  Directory, Planner, Showcase, Tool — guide section 9): ask which fits
+  before building.
+- Backdrops and width: the theme's backdrop (`Theme.backdrop` — ripples,
+  waves, contours, geometry, light burst, dots, arrows, shapes over a solid,
+  gradient or glow base) is behind every page; full-width sections use
+  `FullBleed` and `HeroSection`, and `AppShell width` sets the page width.
 - **Every app has the admin theming pages built in:** a **Brand & theme**
   page (`/admin/brand`) and a **Style guide** (`/admin/style`), from
   `reference/web/src/routes/BrandPage.tsx` and `StyleGuidePage.tsx`. Keep the
@@ -138,6 +152,11 @@ explains all of this.
 
 ## Workflow: start a new app on jimbo-ui
 
+0. **Ask which archetype fits** (guide section 9: Tracker, Collection,
+   Dashboard, Directory, Planner, Showcase, Tool — or a mix), recommending
+   the closest. It sets the dock tabs, page width, main pages and backdrop.
+   Then, as you build each page, ask which component to use for each feature
+   or section (the component menu).
 1. Export the latest release (highest `jimbo-ui--v*` tag).
 2. Copy `foundation/` and `starter/` into the app's web root. Install
    `clsx` and `tailwind-merge`; Tailwind 3 with PostCSS; the `@/` alias to `src/`.

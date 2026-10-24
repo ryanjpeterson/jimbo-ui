@@ -95,6 +95,13 @@ Follow "change and release the guidelines" in `skills/jimbo-ui/SKILL.md`. In sho
 
 ## Working style
 
+- The pilot app is **Tinnitus A Go Go** (the first app on jimbo.ui, which it
+  was split out of). Try new patterns there first, then bring them back
+  generic. Its name stays out of everything but this file and the changelog.
+- When starting an app, ask which archetype fits; when building UI in an
+  app, ask which existing component to use for each feature or section (the
+  archetypes and component menu, guide section 9) before building.
+
 - Plain, short copy; sentence case; the guide's voice rules apply to docs too.
 - Keep `CHANGELOG.md`, `guide.md`'s change log and `README.md` in step with
   every meaningful change, in the same commit.

@@ -4,9 +4,9 @@
  */
 
 import { useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import {
-  Badge, EmptyState, EventRow, Hero, LinkCard, List, ListGroupLabel, PageHeader, Pager, PillTabs, RankedList,
+  Badge, EmptyState, EventRow, FullBleed, Hero, HeroSection, LinkCard, List, ListGroupLabel, PageHeader, Pager, PillTabs, RankedList,
   SearchField, Section, Sheet, StatGrid, StatTile, type RowStatus,
 } from "@/components/ui/kit";
 import { Button } from "@/components/ui/button";
@@ -39,11 +39,11 @@ export function HomeDemo() {
   const next = ITEMS[0]!;
   return (
     <div className="space-y-8">
-      <PageHeader eyebrow={`jimbo.ui ${__JIMBO_VERSION__} · showcase`} title="Overview" />
-      <p className="meta -mt-5 max-w-xl">
-        Everything here is rendered from this release's own code, the same files an app gets. The
-        content is example data. Change the look on the Theme tab and every page follows — then export it (Share this look) to use in an app.
-      </p>
+      <HeroSection eyebrow={`jimbo.ui ${__JIMBO_VERSION__} · showcase`} title="Overview" pattern="ripples"
+        actions={<Link to="/admin/brand" className="btn btn-primary">Try a different look</Link>}>
+        Everything here is rendered from this release's own code, the same files an app gets. Change the look
+        on the Theme tab and every page follows — then export it (Share this look) to use in an app.
+      </HeroSection>
 
       <StatGrid>
         <StatTile label="Events done" value={128} accent="accent" />
@@ -52,7 +52,15 @@ export function HomeDemo() {
         <StatTile label="Templates" value={templates} accent="highlight" sub="Everyday, holidays, places and teams" />
       </StatGrid>
 
-      <LinkCard to="/admin/brand" eyebrow="Theme" title="Try a different look" sub="Templates, a colour picker and the save bar" accent />
+      <FullBleed tone="accent">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.12em] opacity-80">Full width</p>
+            <p className="font-display text-2xl">A band edge to edge</p>
+          </div>
+          <Link to="/admin/style" className="btn border-2 border-current bg-transparent text-current">See the kit</Link>
+        </div>
+      </FullBleed>
 
       <div className="grid gap-3 sm:grid-cols-2">
         <LinkCard to="/events" eyebrow="List page" title="Search, filters, select mode" sub="Grouped rows, a floating action bar" />

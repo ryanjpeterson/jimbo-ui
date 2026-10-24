@@ -225,6 +225,19 @@ white). Four is the most, and a theme needn't be four different hues.
 `Theme.contrast` (0.8–1.6) scales how far cards, fields and borders step from
 the page. The Brand page warns if a setting costs readability.
 
+**Backdrop.** Behind every page sits an abstract backdrop in the theme's
+colours (`Theme.backdrop`, `backdropCss`): a **pattern** — none, ripples
+(rings from two corners), waves (layered along the bottom), contours
+(topographic lines), geometry (a triangle lattice), light burst (rays from
+the top), dot grid, arrows (chevrons), shapes (scattered circles, triangles,
+squiggles) — over a **base**: solid (the page colour), gradient (a sweep of
+accent and support) or glow (soft colour orbs, the default). **Strength**
+(0–1) and **size** (0.5–2) sliders tune it. Patterns are inline SVG or
+gradients, static (no motion), fixed to the screen, and set as `--bg-image` /
+`--bg-size` / `--bg-position` / `--bg-repeat` so the pre-paint script applies
+them too. Cards stay solid, so text never sits on the pattern; page titles
+and labels do, so keep the strength moderate.
+
 **Spread the colours.** A page should show more than the accent: the accent
 for what to tap, the highlight for dates and alerts, the support for labels
 and people. Don't make the highlight or support white or grey — that's the
@@ -527,7 +540,11 @@ and body fonts.
   `bg-bg/90` frosted (`backdrop-blur-xl`), bottom border. Left: the header text (and text
   tabs on desktop). Right: 40 px round buttons — search (outlined), **+ add**
   (accent fill), account (avatar initial in an accent circle).
-- **Content:** `max-w-5xl`, `px-4` (`sm:px-6`), `pt-6`; bottom padding of
+- **Width:** `AppShell width` — `column` (`max-w-5xl`, the default, for
+  reading), `wide` (`max-w-7xl`: dashboards, galleries) or `full` (the whole
+  screen). Any one section can go edge to edge on its own with `FullBleed`
+  or `HeroSection`, whatever the page width.
+- **Content:** the page width, `px-4` (`sm:px-6`), `pt-6`; bottom padding of
   6.5 rem + the bottom safe area on phones so nothing hides under the dock.
 - **Tab dock (phones):** floats 12 px above the bottom safe area, `max-w-md`,
   a 5-column grid in a 20 px-radius slab: `bg-surface/95`, `border-border`,
@@ -594,7 +611,10 @@ and body fonts.
 | Component | Use it for |
 | --- | --- |
 | `PageHeader` | Every index page's title row |
-| `Hero` / `Banner` | Detail page header over a blurred image |
+| `Hero` / `Banner` | Detail page header over a blurred image (full width) |
+| `HeroSection` | Full-width page opener with no photo: eyebrow, big title, a line, actions, over a backdrop pattern (`pattern`, any of the backdrops) on a gradient; `size="lg"` fills most of the first screen; `align="center"` |
+| `FullBleed` | Any section edge to edge: a band (`tone`: `surface`, or a flat `accent` / `highlight` / `support` with its `on-` text), a strip of media (`flush`), a call to action. Content lines up with the page column unless `flush` |
+| `RangeField` | A labelled slider (weight, spacing, strength…) with its value shown |
 | `Section` | A titled card holding one block of content |
 | `List` + `ListGroupLabel` | A card of rows, optionally grouped (by month); group labels are support text with a support orb, on a support wash fading right |
 | `EventRow` | A dated item. `DateBlock` on the left, a `status` dot (`{ tone, label }`); `selected`/`onSelect` for select mode |
@@ -629,6 +649,51 @@ Style guide page, and list it here.
 ---
 
 ## 9. Patterns
+
+### The component menu — ask before building a section
+
+When building a feature or a section of a page, **ask the user first:
+"What existing component do you want to use for this feature or section's
+styling?"** — with a handful of fitting options from this menu (and
+"something new"). Don't pick silently, and don't invent a new component when
+one here fits.
+
+| For… | Options |
+| --- | --- |
+| **Opening a page** | `PageHeader` (title row) · `HeroSection` (full-width, pattern, no photo) · `Banner` / `Hero` (over a blurred photo) |
+| **A list of things** | `List` + `EventRow` (dated, with date tickets) · `List` + `EntityRow` (people, places, with avatars) · `RankedList` (top-N with counts) · `MediaCard` grid (image-led) · `LinkCard` stack (a few destinations) |
+| **Numbers** | `StatGrid` + `StatTile` (headline numbers, coloured dots) · `RankedList` (counts in a list) · `Section` with big `font-display` numbers |
+| **A block of content** | `Section` (titled card) · plain `.card` · `FullBleed` band (`surface`, or a brand colour) · `Sheet` (when it's a choice or a short flow) |
+| **Calls to action** | primary `Button` · `LinkCard` with `accent` · `FullBleed` band in a brand colour · `HeroSection` actions |
+| **Switching views** | `Tabs` (2–4, segmented) · `PillTabs` (wrapping filters) · `ViewSwitch` (list ⇄ map) · `SelectField` (many options on phones) |
+| **Finding things** | `SearchField` · `PillTabs` filters · `SelectField` sort |
+| **Empty or loading** | `EmptyState` (with `ThemeDots`) · `Loading` skeleton |
+| **Status** | `Badge` (detail pages) · status dot on rows · `DateBlock` ticket |
+| **Settings** | `.field`, `SelectField`, `RangeField`, `Tabs` as a switch, `Section` cards |
+| **Page width** | column (default) · wide · full (`AppShell width`) |
+
+Ask with the options as choices (Claude Code's question tool where it's
+available), one question per feature or section, recommending one. Then
+build with that component and its variants, adapted to the app's content.
+
+### App archetypes — ask before starting an app
+
+A new app starts from an archetype: a ready-made shape (tabs, width, the
+component for each main page, a backdrop) that the component menu then
+fills in. **Ask which one fits** (with the closest recommended), or mix two.
+
+| Archetype | For | Tabs (dock) | Width | Main pages | Backdrop |
+| --- | --- | --- | --- | --- | --- |
+| **Tracker** | Logging things you do, see or collect over time | Home · List · Add · Stats · Me | column | Home: `HeroSection` or `PageHeader`, `StatGrid`, "Coming up" `List` + `EventRow`; List: `SearchField`, `PillTabs`, grouped `List` + `EventRow`, select mode; Detail: `Hero` / `Banner`, `Section`s; Stats: `StatGrid`, `RankedList` | glow or dots |
+| **Collection** | A library of items with pictures (records, books, recipes, gear) | Home · Browse · Add · Lists · Me | wide | Browse: `SearchField`, filters, `MediaCard` grid; Detail: `Hero` with the image; Lists: `LinkCard`s | geometry or none |
+| **Dashboard** | Numbers and status at a glance (finance, health, ops) | Today · Trends · Alerts · Settings | wide | `StatGrid` first, `Section` cards with charts, `RankedList`, `Badge` statuses, `FullBleed` band for the headline | dots or contours |
+| **Directory** | People, places or groups to find and visit | Find · Map · Saved · Me | column | `SearchField`, `List` + `EntityRow` (avatars), `ViewSwitch` list ⇄ map, Detail `Hero` (square) | contours |
+| **Planner** | Plans, events and schedules ahead | Upcoming · Calendar · Add · Me | column | Upcoming: `List` + `EventRow` grouped by month (date tickets); Detail: `Banner`; adding in a `Sheet` | waves or ripples |
+| **Showcase** | A public face: a landing page, a portfolio, an event site | Home · About · Work · Contact | full | `HeroSection` (`lg`), `FullBleed` bands, `MediaCard` grid, `LinkCard` calls to action | burst or shapes |
+| **Tool** | One job done well (a calculator, converter, generator) | — (or ≤ 3) | column | One `Section` with fields, `RangeField`s and `Tabs`; the result in a `card`; history in a `List` | dots or none |
+
+Every archetype keeps the admin pages (Brand & theme, Style guide) and the
+rules above; the archetype only sets the starting shape.
 
 - **Theme editor:** templates first, in categories with a search box (tap
   to try; the whole app changes live), then *Make it yours* — tap which
@@ -735,7 +800,11 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   highlights. Colour from opaque shapes, not thin washes: date tickets with a
   lit month band, glowing status dots, support group labels, cards lit by the
   accent and support.
-- **Unreleased** — *Share this look*: export and import themes (a theme
+- **Unreleased** — Backdrops: abstract patterns (ripples, waves, contours,
+  geometry, light burst, dots, arrows, shapes) over a solid, gradient or glow
+  base, with strength and size. Full width: `FullBleed`, `HeroSection`,
+  `AppShell width`. The component menu: ask which component to use before
+  building a section; app archetypes to start from. *Share this look*: export and import themes (a theme
   file, the brand.config line, tokens.css), so the showcase is a playground
   for apps; Docker compose for the showcase. Themes use only real colours (and their shades); every
   team has Home and Away looks, some Toronto and Ottawa teams Retro ones;

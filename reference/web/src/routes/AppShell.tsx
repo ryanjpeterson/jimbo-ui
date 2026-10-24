@@ -23,8 +23,12 @@ export interface ShellTab {
   also?: string[];
 }
 
-export function AppShell({ tabs, actions, onRefresh, children }: {
+const WIDTHS = { column: "max-w-5xl", wide: "max-w-7xl", full: "max-w-none" } as const;
+
+export function AppShell({ tabs, actions, onRefresh, width = "column", children }: {
   tabs: ShellTab[];
+  /** Page width: the reading column (default), wide (dashboards, galleries) or the full screen. */
+  width?: keyof typeof WIDTHS;
   /** Round buttons on the right of the top bar — use TopBarButton. */
   actions?: ReactNode;
   /** Pull to refresh at the top of any page; omit to turn it off. */
@@ -40,7 +44,7 @@ export function AppShell({ tabs, actions, onRefresh, children }: {
     <div className="min-h-full overflow-x-clip">
       {/* Top padding clears the status bar / notch in standalone mode. */}
       <header className="sticky top-0 z-40 border-b border-border bg-bg/90 pt-[env(safe-area-inset-top)] backdrop-blur-md">
-        <div className="mx-auto flex h-14 max-w-5xl items-center justify-between gap-4 px-4 sm:h-16 sm:px-6">
+        <div className={cn("mx-auto flex h-14 items-center justify-between gap-4 px-4 sm:h-16 sm:px-6", WIDTHS[width])}>
           <div className="flex h-full items-center gap-8">
             <Link to="/" aria-label="Home"><HeaderTitle /></Link>
             {/* Desktop: bold links with an accent underline on the active one. */}
@@ -74,7 +78,7 @@ export function AppShell({ tabs, actions, onRefresh, children }: {
         </div>
       )}
 
-      <main className="mx-auto max-w-5xl px-4 pt-6 pb-[calc(6.5rem+env(safe-area-inset-bottom))] sm:px-6 sm:py-8">{children}</main>
+      <main className={cn("mx-auto px-4 pt-6 pb-[calc(6.5rem+env(safe-area-inset-bottom))] sm:px-6 sm:py-8", WIDTHS[width])}>{children}</main>
 
       {/* Phones: a floating, frosted dock above the home indicator; content fades out behind it. */}
       <div aria-hidden className="pointer-events-none fixed inset-x-0 bottom-0 z-30 h-[calc(6rem+env(safe-area-inset-bottom))] bg-gradient-to-t from-bg via-bg/70 to-transparent sm:hidden" />
