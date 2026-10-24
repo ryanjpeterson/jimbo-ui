@@ -35,19 +35,8 @@ try {
   copyFileSync(join(root, "foundation/src/lib/theme.ts"), join(dir, "theme.ts"));
   writeFileSync(join(dir, "brand.config.ts"), `export const BRAND = { name: "", storagePrefix: "x", defaultTheme: ${JSON.stringify(theme)} };\n`);
   writeFileSync(join(dir, "run.ts"), `
-import { deriveColors, FONTS, fullTheme, luminance } from "./theme";
-const t = ${JSON.stringify(theme)};
-const lines = Object.entries(deriveColors(t)).map(([k, v]) => "  --c-" + k + ": " + v.map(Math.round).join(" ") + ";");
-// Type styles other than the default sans (index.html must load their Google Fonts too).
-const f = fullTheme(t).fonts;
-if (f.headings !== "archivo") lines.push("  --font-display: " + FONTS[f.headings!]!.css + ";");
-if (f.body !== "inter") lines.push("  --font-body: " + FONTS[f.body!]!.css + ";");
-console.log([
-  "/* This app's default theme tokens (\\"R G B\\" channels), so the page looks right",
-  "   before any script runs. Owned by the app; generate from BRAND.defaultTheme",
-  "   with jimbo-ui's scripts/tokens.mjs. src/lib/theme.ts overrides them at runtime. */",
-  ":root {", ...lines, "  color-scheme: " + (luminance(t.background) > 0.4 ? "light" : "dark") + ";", "}",
-].join("\\n"));
+import { tokensCss } from "./theme";
+console.log(tokensCss(${JSON.stringify(theme)}));
 `);
   process.stdout.write(execFileSync("npx", ["-y", "tsx", join(dir, "run.ts")], { encoding: "utf8" }));
 } finally {

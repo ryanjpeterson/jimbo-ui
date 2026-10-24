@@ -94,7 +94,8 @@ this check, then the preview workflow if they want detail.
   search, with colour-circle tiles, *Make it yours* (four colours with the
   *Infer it* switches and readability warnings), *Type* (headings and body:
   fonts with weight and spacing sliders), vibrancy and contrast sliders,
-  favicon, live preview and the save bar. Adapt it only
+  *Share this look* (export and import), favicon, live preview and the save
+  bar. Adapt it only
   to fit the app: how admins reach it (an admin tab, a settings link, behind
   sign-in), who may save (the app's admin role), where it saves (the app's
   server; with no server, the browser — like
@@ -124,7 +125,11 @@ release without touching that working copy, export it:
   flag's) into templates that pass the checks
 - `hooks/check-version.mjs` — the session-start version check for apps
 - `showcase/` — a demo app built only from the release's code; published as a
-  private page (URL in the README) so anyone can see what an app gets
+  private page (URL in the README) so anyone can see what an app gets. Also
+  the **playground**: design a theme there, export it (*Share this look*),
+  and import it into an app's Brand page or paste its `brand.config` line and
+  `tokens.css` into the app. `docker compose up --build` runs it on
+  http://localhost:4460
 - `skills/jimbo-ui/guide.md` — the guide
 
 Each app has `jimbo-ui.json` at its repo root: `version`, `webRoot`, and a

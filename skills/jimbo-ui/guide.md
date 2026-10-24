@@ -58,9 +58,24 @@ The stack is React + TypeScript + Vite + Tailwind CSS 3 (with `clsx` and
 (reference, then foundation and starter, then stand-ins for the server parts
 in `showcase/overrides/`). It runs the real Brand page, Style guide and kit,
 plus Home, List and Detail demo pages, with the theme saved in the browser.
-`npm --prefix showcase run dev` runs it locally; each release publishes it as
-a private page (URL in the README) — the way to see what an app would get
-without having one.
+`npm --prefix showcase run dev` runs it locally, or with Docker:
+`docker compose up --build` serves the built app on http://localhost:4460
+(`JIMBO_PORT`), and `docker compose --profile dev up` a live-reloading dev
+server on 4461 (`JIMBO_DEV_PORT`). Each release publishes it as a private
+page (URL in the README) — the way to see what an app would get without
+having one.
+
+**Playground:** the showcase is also where to design a theme for an app.
+Pick and tune a look on its Theme tab, then *Share this look* → export. A
+**theme file** (`{ "kind": "jimbo-ui/theme", "version": 1, "theme": { … } }`
+— only what the theme sets, so inferred colours stay inferred) imports into
+any jimbo.ui app's Brand page; the **brand.config** line replaces an app's
+`defaultTheme`; **tokens.css** replaces the app's `src/styles/tokens.css`.
+Themes go the other way too: export from an app, import into the showcase.
+The helpers are in `theme.ts`: `exportTheme`, `importTheme` (accepts a theme
+file, a bare theme or anything with a `theme` / `defaultTheme`; drops
+unknown fields, clamps numbers), `brandConfigLine`, `tokensCss` (what
+`scripts/tokens.mjs` prints).
 
 **Reference (adapt to the app):** the UI kit (`kit.tsx`), the app shell
 (`AppShell.tsx`: pass tabs, top-bar actions and routes), Brand page, Style
@@ -95,7 +110,9 @@ Every app built on jimbo.ui has, behind its admin access:
   *Tonal* inference, *Vibrancy* and *Contrast* sliders, readability
   warnings), *Type* (a font for headings and one for body — sans, serif, mono
   or, for headings, decorative — each with weight and letter-spacing
-  sliders), *Favicon*, a
+  sliders), *Share this look* (export the theme being edited as a theme
+  file, the `brand.config.ts` line or `tokens.css`; import a theme file to
+  preview it), *Favicon*, a
   link to the Style guide, live preview across the app and a floating save
   bar (*Undo* / *Save*; leaving restores the saved theme).
 - **Style guide** (`/admin/style`): every shared component in the current
@@ -718,7 +735,9 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   highlights. Colour from opaque shapes, not thin washes: date tickets with a
   lit month band, glowing status dots, support group labels, cards lit by the
   accent and support.
-- **Unreleased** — Themes use only real colours (and their shades); every
+- **Unreleased** — *Share this look*: export and import themes (a theme
+  file, the brand.config line, tokens.css), so the showcase is a playground
+  for apps; Docker compose for the showcase. Themes use only real colours (and their shades); every
   team has Home and Away looks, some Toronto and Ottawa teams Retro ones;
   provinces sit on their flag's field. Tonal inference, vibrancy and contrast
   sliders. 25 fonts (incl. blackletter and Marcellus) with weight and spacing

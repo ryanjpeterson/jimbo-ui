@@ -13,7 +13,17 @@ rules and how to start, update and release.
 **See it:** the [showcase](https://claude.ai/artifact/F4KAFYCkxZGZB7zKdaWjWC)
 (private page) is a working demo built from the latest release's code — every
 theme, component and pattern an app gets. Run it locally with
-`npm --prefix showcase install && npm --prefix showcase run dev` (port 4455).
+`npm --prefix showcase install && npm --prefix showcase run dev` (port 4455),
+or with Docker:
+
+```bash
+docker compose up --build
+```
+
+(http://localhost:4460; `docker compose --profile dev up` for live reload on
+4461). It's also a **playground**: design a theme on its Theme tab, then
+*Share this look* exports a theme file to import into an app's Brand page, or
+the `brand.config.ts` line and `tokens.css` to paste into the app.
 
 ## What's here
 

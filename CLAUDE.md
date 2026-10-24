@@ -51,7 +51,11 @@ dot in the accent; the favicon is the only graphic.
 
 - Showcase: `npm --prefix showcase install` once, then the **jimbo-ui-showcase**
   launch config (port 4455) or `npm --prefix showcase run dev`. It has Home,
-  List, Kit and Theme tabs; theme changes are saved in the browser.
+  List, Kit and Theme tabs; theme changes are saved in the browser. With
+  Docker: `docker compose up --build` (built app, port 4460) or
+  `docker compose --profile dev up` (live reload, port 4461). It doubles as a
+  playground: Theme → *Share this look* exports a theme file, brand.config
+  line or tokens.css for an app.
 - Typecheck: `npm --prefix showcase run typecheck` (assembles `.jimbo/` and
   checks the showcase plus all reference and foundation code).
 - Contrast: `node scripts/contrast.mjs --check` must pass for every template

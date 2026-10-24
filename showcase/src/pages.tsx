@@ -42,7 +42,7 @@ export function HomeDemo() {
       <PageHeader eyebrow={`jimbo.ui ${__JIMBO_VERSION__} · showcase`} title="Overview" />
       <p className="meta -mt-5 max-w-xl">
         Everything here is rendered from this release's own code, the same files an app gets. The
-        content is example data. Change the look on the Theme tab and every page follows.
+        content is example data. Change the look on the Theme tab and every page follows — then export it (Share this look) to use in an app.
       </p>
 
       <StatGrid>

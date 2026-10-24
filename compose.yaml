@@ -1,0 +1,31 @@
+# Run the jimbo.ui showcase locally as a web app — a playground for trying
+# themes and exporting them to apps (Theme tab → Share this look).
+#
+#   docker compose up --build              built app on http://localhost:4460
+#   docker compose --profile dev up        live-reloading dev server on http://localhost:4461
+#
+# Ports: JIMBO_PORT / JIMBO_DEV_PORT. Themes are kept in the browser.
+services:
+  showcase:
+    build:
+      context: .
+      dockerfile: showcase/Dockerfile
+    ports:
+      - "${JIMBO_PORT:-4460}:80"
+    restart: unless-stopped
+
+  dev:
+    profiles: [dev]
+    image: node:22-alpine
+    working_dir: /repo
+    command: sh -c "npm --prefix showcase install --no-audit --no-fund && npm --prefix showcase run dev"
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
+    volumes:
+      - .:/repo
+      - showcase_node_modules:/repo/showcase/node_modules
+    ports:
+      - "${JIMBO_DEV_PORT:-4461}:4455"
+
+volumes:
+  showcase_node_modules:

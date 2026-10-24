@@ -29,6 +29,16 @@ Clearer separation, a calmer surface (less glass, less round, flat swatches), fo
   provinces and territories on their flags' field colours. They use **only
   their own colours** and shades of them — no invented hues, no reds turned
   pink. 363 templates in all, every one passing the checks. `Template.kit`.
+- **Share this look (import / export):** the Brand page exports the theme
+  being edited as a theme file (`jimbo-ui/theme` JSON), the app's
+  `brand.config.ts` `defaultTheme` line or its `tokens.css`, and imports a
+  theme file to preview it — so the showcase works as a playground for
+  designing a theme for any app, and themes move between apps. Helpers in
+  `theme.ts`: `exportTheme`, `importTheme`, `brandConfigLine`, `tokensCss`
+  (`scripts/tokens.mjs` now prints `tokensCss`).
+- **Docker:** `compose.yaml` and `showcase/Dockerfile` run the showcase as a
+  local web app — `docker compose up --build` (nginx, port 4460) or
+  `docker compose --profile dev up` (live reload, port 4461).
 - **Tonal inference:** `Theme.infer: "tonal"` fills a missing highlight or
   support with lighter or darker versions of the accent (the default,
   `"contrast"`, picks new hues). The Brand page has a *Contrasting / Tonal*
@@ -135,7 +145,8 @@ Clearer separation, a calmer surface (less glass, less round, flat swatches), fo
   every theming feature (guide section 1, "Admin theming pages"); add them if
   missing, adapted to the app. Apps without a server: save the theme in the
   browser rather than having no Brand page.
-- Apps that track the reference: port the Brand page's categories, sub-tabs
+- Apps that track the reference: port the Brand page's *Share this look*
+  section (export and import), categories, sub-tabs
   and search (`TemplateGrid`), and the *Type* section, the
   kit's radius and glass changes (`Badge`, `Tabs`, `PillTabs`, `ViewSwitch`,
   `Sheet`) and `AppShell` (top bar, dock).
