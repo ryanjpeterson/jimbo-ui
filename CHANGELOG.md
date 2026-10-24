@@ -29,6 +29,8 @@ Clearer separation, a calmer surface (less glass, less round, flat swatches), fo
   provinces and territories on their flags' field colours. They use **only
   their own colours** and shades of them — no invented hues, no reds turned
   pink. 363 templates in all, every one passing the checks. `Template.kit`.
+- **Pilot** template (Everyday · Dark): the pilot app's original palette —
+  lime, hot pink and cyan on near-black.
 - **Backdrops:** `Theme.backdrop` — an abstract pattern (ripples, waves,
   contours, geometry, light burst, dot grid, arrows, shapes, or none) over a
   base (solid, gradient, or the glow orbs as before), with strength and size.

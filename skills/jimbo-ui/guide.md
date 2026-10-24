@@ -450,7 +450,47 @@ are off.
 
 The Everyday and Holiday templates, hand-picked:
 
+**Dark**
 
+| Name | Vibe | Accent | Highlight | Support | Background |
+| --- | --- | --- | --- | --- | --- |
+| Volt (default) | Lime, hot pink, sky | `#A8FF3E` | `#FF3D6E` | `#2EC5FF` | `#141416` |
+| Pilot | Lime, hot pink, cyan — the original | `#A8FF3E` | `#FF3D6E` | `#3DFFE8` | `#141416` |
+| Neon night | Cyan, magenta, lemon | `#2EF2FF` | `#FF2ED1` | `#FFE53D` | `#0A0A12` |
+| Acid | Yellow, orange, violet | `#F5FF2E` | `#FF5A1F` | `#B98CFF` | `#0D0D0B` |
+| Sunset strip | Orange, pink, teal | `#FF8A3D` | `#FF3D7F` | `#3DDCC8` | `#1A0F1F` |
+| Deep sea | Teal, coral, periwinkle | `#3DFFC5` | `#FF7A59` | `#9BB0FF` | `#071A1F` |
+| Ultraviolet | Purple, pink, mint | `#B48CFF` | `#FF5FA2` | `#5CF2B8` | `#120F1C` |
+| Ember | Gold, fire, ice | `#FFB23D` | `#FF3D3D` | `#7FD4FF` | `#17110D` |
+| Blackout | White, red, blue | `#F2F2F2` | `#FF3D3D` | `#4D94FF` | `#000000` |
+| Two-tone | Periwinkle; the rest inferred | `#9DB2FF` | inferred | inferred | `#101418` |
+
+**Mid**
+
+| Name | Vibe | Accent | Highlight | Support | Background |
+| --- | --- | --- | --- | --- | --- |
+| Slate | Frost, sand, heather | `#88C0D0` | `#EBCB8B` | `#D3AECB` | `#2E3440` |
+| Denim | Yellow, coral, aqua | `#FFD23F` | `#EE6C4D` | `#8EE6DC` | `#23395B` |
+| Forest | Gold, clay, sky | `#E9C46A` | `#F4A261` | `#AEDBF5` | `#1F3A2E` |
+| Burgundy | Rosé, butter, mint | `#F7B2BD` | `#FFD166` | `#A6EBCF` | `#4A1C2B` |
+| Dusk | Peach, mint, butter | `#FFB4A2` | `#9DE0AD` | `#FFE38A` | `#3D3B6B` |
+| Concrete | Lemon, pink, sky | `#FFE066` | `#FF8FA3` | `#9AD8FF` | `#45484D` |
+| Fog | Navy, red, pine | `#1E3A8A` | `#B91C1C` | `#14532D` | `#C8CDD4` |
+| Sage | Pine, wine, navy | `#1F3D2B` | `#8B1E3F` | `#1E2F6B` | `#B7C9B0` |
+| Clay | Plum, teal, rust | `#3B1F5C` | `#0F4C5C` | `#6B260B` | `#D9B8A0` |
+
+**Light**
+
+| Name | Vibe | Accent | Highlight | Support | Background |
+| --- | --- | --- | --- | --- | --- |
+| Daylight | Green, pink, violet | `#1F7A4D` | `#D6336C` | `#5B3FD1` | `#F6F4EF` |
+| Gig poster | Red, blue, green | `#D7261E` | `#1E4FD7` | `#0F6B4F` | `#F3EAD6` |
+| Newsprint | Black, red, blue | `#111111` | `#E11D48` | `#1D4ED8` | `#FFFFFF` |
+| Mint | Teal, rust, purple | `#0F766E` | `#C2410C` | `#6D28D9` | `#E6F4EE` |
+| Blush | Raspberry, violet, teal | `#BE185D` | `#6D28D9` | `#0B5E57` | `#FCE8EE` |
+| Sky | Cobalt, pink, green | `#1D4ED8` | `#DB2777` | `#116632` | `#E8F0FB` |
+| Lemonade | Violet, red, teal | `#7C3AED` | `#DC2626` | `#0B5C73` | `#FFF7CC` |
+| Peach | Rust, teal, plum | `#C2410C` | `#0E7490` | `#86198F` | `#FFE8D6` |
 
 **Holidays** (through the year)
 

@@ -98,6 +98,10 @@ Follow "change and release the guidelines" in `skills/jimbo-ui/SKILL.md`. In sho
 - The pilot app is **Tinnitus A Go Go** (the first app on jimbo.ui, which it
   was split out of). Try new patterns there first, then bring them back
   generic. Its name stays out of everything but this file and the changelog.
+  Its colours are two templates: **Volt** (its current default) and **Pilot**
+  (its original palette from its first commit: lime `#A8FF3E`, hot pink
+  `#FF3D6E`, cyan `#3DFFE8` on `#141416`; it also had orange `#FF8C3A`, a
+  fifth colour a theme can't hold).
 - When starting an app, ask which archetype fits; when building UI in an
   app, ask which existing component to use for each feature or section (the
   archetypes and component menu, guide section 9) before building.
