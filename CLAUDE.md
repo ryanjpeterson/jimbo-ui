@@ -18,7 +18,7 @@ neutral names and examples. Before every commit, scan for the first app's
 name and domain words:
 
 ```bash
-git ls-files | grep -v "package-lock\|CLAUDE.md\|CHANGELOG" | xargs grep -il "tinnitus\|tagg\b\|concert\|festival\|venue\|attended\|immich\|media\.backup\|mediabackup"
+git ls-files | grep -v "package-lock\|CLAUDE.md\|CHANGELOG" | xargs grep -il "tinnitus\|tagg\b\|concert\|festival\|venue\|attended\|immich\|jimbo\.backup\|jimbobackup\|jimbo-backup"
 ```
 
 It must print nothing. Add an app's words to it when a new app adopts jimbo.ui.
