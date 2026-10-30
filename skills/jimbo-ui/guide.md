@@ -7,13 +7,16 @@ implementations of everything below are in the repo's `reference/` folder.
 
 - **The rules:** this guide. It's versioned with the jimbo-ui repo; see
   `CHANGELOG.md` for what changed in each version and what apps must do.
-- **The living picture:** each app's **Style guide** page (`/admin/style`)
-  renders every shared component in that app's current theme.
+- **The living picture:** the Style guide tab of each app's **jimbo-ui
+  config** section (`/jimbo-ui`) renders every shared component in that
+  app's current theme; the showcase's Components tab does the same.
+- **The library:** `registry/` lists every app on jimbo-ui and every UI
+  element across them, so nothing is built twice (section 13).
 - **Theme:** two to four colours (accent and background always; highlight
   and support set or inferred), each with lighter and darker shades, picked
   from Everyday, Holidays, Countries, Provinces or Sports templates (or a
-  search across them) or fine-tuned on each app's
-  **Brand & theme** admin page.
+  search across them) or fine-tuned on the Theme tab of each app's
+  jimbo-ui config section.
 - **Look:** flat colour on coloured shapes, depth from layers — solid
   surfaces with a light frost, softly rounded corners (not pills), a
   backdrop behind the page, and flat circles of the theme's colours as a
@@ -23,7 +26,8 @@ implementations of everything below are in the repo's `reference/` folder.
 
 **Contents:** 1 How apps use jimbo-ui · 2 Brand · 3 Theme engine · 4 Theme
 templates · 5 Typography · 6 Layout and shell · 7 Surfaces, depth and motion ·
-8 Components · 9 Patterns · 10 Icons · 11 Accessibility · 12 Don'ts
+8 Components · 9 Patterns · 10 Icons · 11 Accessibility · 12 Don'ts ·
+13 One library, no duplicates
 
 ---
 
@@ -41,7 +45,7 @@ The stack is React + TypeScript + Vite + Tailwind CSS 3 (with `clsx` and
 | **Reference** | `reference/` | The app's own equivalents | Generic implementations. Apps adapt and extend them with their own domain pieces; on update, changes are ported by hand (the changelog says which) |
 
 **Foundation:** `src/lib/theme.ts` (theme engine), `src/lib/themes.ts`
-(templates), `src/lib/cn.ts`, `src/lib/gestures.ts`,
+(templates), `src/lib/jimbo.ts` (the release's version and links), `src/lib/cn.ts`, `src/lib/gestures.ts`,
 `src/components/ui/button.tsx`, `src/components/ColorPicker.tsx`,
 `src/styles/globals.css`, `tailwind.config.js`.
 
@@ -57,8 +61,10 @@ The stack is React + TypeScript + Vite + Tailwind CSS 3 (with `clsx` and
 
 **Showcase:** `showcase/` is a small app built only from a release's code
 (reference, then foundation and starter, then stand-ins for the server parts
-in `showcase/overrides/`). It runs the real Brand page, Style guide and kit,
-plus Home, List and Detail demo pages, with the theme saved in the browser.
+in `showcase/overrides/`). It runs the real jimbo-ui config section and kit,
+a Home page with a carousel of looks (each slide a piece of the kit in its
+own theme, font and backdrop, via `ThemeScope`), a Components tab, and the
+Archetypes, with the theme saved in the browser.
 `npm --prefix showcase run dev` runs it locally, or with Docker:
 `docker compose up --build` serves the built app on http://localhost:4460
 (`JIMBO_PORT`), and `docker compose --profile dev up` a live-reloading dev
@@ -70,7 +76,7 @@ having one.
 Pick and tune a look on its Theme tab, then *Share this look* → export. A
 **theme file** (`{ "kind": "jimbo-ui/theme", "version": 1, "theme": { … } }`
 — only what the theme sets, so inferred colours stay inferred) imports into
-any jimbo.ui app's Brand page; the **brand.config** line replaces an app's
+any jimbo.ui app's jimbo-ui config section; the **brand.config** line replaces an app's
 `defaultTheme`; **tokens.css** replaces the app's `src/styles/tokens.css`.
 Themes go the other way too: export from an app, import into the showcase.
 The helpers are in `theme.ts`: `exportTheme`, `importTheme` (accepts a theme
@@ -79,8 +85,10 @@ unknown fields, clamps numbers), `brandConfigLine`, `tokensCss` (what
 `scripts/tokens.mjs` prints).
 
 **Reference (adapt to the app):** the UI kit (`kit.tsx`), the app shell
-(`AppShell.tsx`: pass tabs, top-bar actions and routes), Brand page, Style
-guide page, `HeaderTitle.tsx` (the app's name as header text), `useBrand.ts`, and
+(`AppShell.tsx`: pass tabs, top-bar actions and routes), the jimbo-ui
+config section (`JimboConfigPage.tsx` with `config/ThemePanel.tsx` and
+`config/StyleGuidePanel.tsx`), `MapView.tsx`, the archetypes
+(`archetypes/catalogue.tsx`, `archetypes/dashboard.tsx`), `HeaderTitle.tsx` (the app's name as header text), `useBrand.ts`, and
 `index.html` (pre-paint script, fonts, PWA tags).
 
 **Server side (optional):** an app that lets admins change the theme stores
@@ -95,53 +103,81 @@ they stay inferred), `DELETE /admin/theme` (back to defaults), and
 JPEG ≤ 1 MB; refuse SVGs with scripts, event handlers or foreign objects).
 The app's API client exposes these as `getTheme`, `setTheme`, `resetTheme`,
 `uploadBrandAsset`, `removeBrandAsset`. An app without a server keeps the
-Brand page and saves the theme in the browser instead, with the same five
+section and saves the theme in the browser instead, with the same five
 functions over localStorage (`showcase/overrides/lib/api.ts` is exactly
 that).
 
-### Admin theming pages (every app)
+### The jimbo-ui config section (every app)
 
-Every app built on jimbo.ui has, behind its admin access:
+Every app has **exactly one** place for brand, theme and style guide
+options, and it's the same in every app, so a person who's themed one app
+can theme any:
 
-- **Brand & theme** (`/admin/brand`): *Pick a look* (Everyday, Holidays,
-  Countries, Provinces and Sports categories with league and city tabs, and
-  a search box; tiles are miniatures of the app with the theme's colours as
-  circles), *Make it yours* (the four colours as round tabs, the inline
-  picker, *Infer it* switches for highlight and support with *Contrasting* /
-  *Tonal* inference, *Vibrancy* and *Contrast* sliders, readability
-  warnings), *Type* (a font for headings and one for body — sans, serif, mono
-  or, for headings, decorative — each with weight and letter-spacing
-  sliders), *Share this look* (export the theme being edited as a theme
-  file, the `brand.config.ts` line or `tokens.css`; import a theme file to
-  preview it), *Favicon*, a
-  link to the Style guide, live preview across the app and a floating save
-  bar (*Undo* / *Save*; leaving restores the saved theme).
-- **Style guide** (`/admin/style`): every shared component in the current
-  theme, plus the app's own.
+- **Name:** "jimbo-ui config". **Route:** `/jimbo-ui` (`?tab=` picks the tab).
+- **Where:** a link in the app's settings or admin area
+  (`JimboConfigLink`) — never a dock tab.
+- **Tabs, in this order:**
+  1. **Theme** — *Pick a look* (Everyday, Holidays, Countries, Provinces and
+     Sports with league and city tabs, and search; tiles are miniatures of
+     the app with the theme's colours as circles), *Make it yours* (the four
+     colours as round tabs, the inline picker, *Infer it* switches with
+     *Contrasting* / *Tonal* inference, *Vibrancy* and *Contrast* sliders,
+     readability warnings), *Type* (headings and body fonts with weight and
+     spacing), *Backdrop*, *Share this look* (export and import), live
+     preview across the app and a floating save bar (*Undo* / *Save*).
+  2. **Brand** — the name as header text at each size, and the favicon.
+  3. **Style guide** — every shared component in the current theme
+     (including an unsaved look), plus the app's own.
+  4. **About** — the jimbo-ui version, the app's registry status (from its
+     `jimbo-ui.json`, passed in as `__JIMBO_APP__` by Vite's `define`) and a
+     link to the showcase.
+  5. **App** (optional) — anything app-specific. Nothing goes anywhere else.
+- **The theme set here is the app-wide default for everyone.**
+- No separate Brand pages, theme pickers in settings, or standalone Style
+  guide pages.
 
-Build them from the reference pages and keep the Brand page **nearly
-identical** from app to app, so a person who's themed one app can theme
-any. Adapt only what the app needs: how admins reach the pages, who may
-save, where it saves (server or browser), copy and examples, and the app's
-own components on the Style guide. Leave out a part only when the app
-can't support it (no storage for a favicon upload, say), and note it in the
-app's `docs/brand.md`. Templates, colour editing and type are never left
-out.
+**Access**, from `auth` in `jimbo-ui.json`. The reference takes
+`canConfigure` from the app, so the same code serves both:
+
+| `auth` | Who sees the section | Server |
+| --- | --- | --- |
+| `"admin"` (the app has sign-in and roles) | Admins only: the route redirects everyone else home and the link isn't rendered (`canConfigure={user?.isAdmin}`) | Every route that saves the theme or brand checks admin itself (`PUT`/`DELETE /admin/theme`, favicon uploads) — hiding the UI isn't enough. Non-admins get the default theme |
+| `"none"` (local or single-user) | Anyone using the app (`canConfigure`) | No gate |
+
+Adapt only where it saves (the app's server, or the browser with no
+server), the copy, and the App tab. Leave out a part only when the app
+can't support it (no storage for a favicon upload) and say so in the app's
+`docs/brand.md`. Templates, colour editing and type are never left out.
 
 ### `jimbo-ui.json` (in each app's repo root)
 
 ```json
 {
-  "version": "0.7.0",
+  "version": "0.8.0",
   "webRoot": "apps/web",
+  "auth": "admin",
   "reference": {
     "web/src/components/ui/kit.tsx": "apps/web/src/components/ui/kit.tsx",
-    "web/src/routes/AppShell.tsx": "apps/web/src/routes/AppShell.tsx"
+    "web/src/routes/JimboConfigPage.tsx": "apps/web/src/routes/JimboConfigPage.tsx"
+  },
+  "registry": { "registered": "2026-10-30", "audited": "2026-10-30" },
+  "components": {
+    "uses": ["sheet", "event-row", "page-header"],
+    "local": [
+      { "name": "PlaceAutocomplete", "path": "apps/web/src/routes/AddPage.tsx", "kind": "candidate", "matches": "autocomplete" },
+      { "name": "OrderEditor", "path": "apps/web/src/routes/OrderPage.tsx", "kind": "domain", "matches": null }
+    ],
+    "overrides": [{ "id": "event-row", "path": "apps/web/src/components/ui/kit.tsx", "why": "maps the app's statuses" }]
   }
 }
 ```
 
-`version` is the jimbo-ui version the app is on. At the start of every
+`version` is the jimbo-ui version the app is on. `auth` gates the config
+section (above). `registry` mirrors its row in `registry/apps.json`.
+`components` is the app's side of the registry: `uses` (registry ids of
+kit pieces it uses), `local` (its own components — `domain` or
+`candidate`, and the registry id it `matches`, if any) and `overrides` (kit
+pieces it wraps or adapts). At the start of every
 Claude Code session in the app, the jimbo-ui plugin compares it with the
 installed release and says when there are newer guidelines to bring in (see
 "Versions" below). Foundation and starter files
@@ -200,7 +236,7 @@ component and pattern rules (sections 8–9).
   which is the brand's one flourish.
 - Sizes: 22 px in the top bar (`sm`), 30 px (`md`), 44 px (`lg`) for brand
   moments like a sign-in screen or the Style guide.
-- It follows the theme everywhere: top bar, sign-in, Brand page miniatures.
+- It follows the theme everywhere: top bar, sign-in, theme miniatures.
 - The **favicon** is the one graphic: the theme's colours as overlapping
   circles on the background, recoloured with the theme; an uploaded favicon (SVG, PNG,
   WebP or JPEG ≤ 1 MB) replaces it and can be reset to the built-in one.
@@ -224,16 +260,24 @@ white). Four is the most, and a theme needn't be four different hues.
 **Vibrancy and contrast.** Two sliders tune any theme: `Theme.vibrancy`
 (0.4–1.5) scales the brand colours' saturation (the page's by half as much);
 `Theme.contrast` (0.8–1.6) scales how far cards, fields and borders step from
-the page. The Brand page warns if a setting costs readability.
+the page. The Theme tab warns if a setting costs readability.
 
-**Backdrop.** Behind every page sits an abstract backdrop in the theme's
-colours (`Theme.backdrop`, `backdropCss`): a **pattern** — none, ripples
-(rings from two corners), waves (layered along the bottom), contours
-(topographic lines), geometry (a triangle lattice), light burst (rays from
-the top), dot grid, arrows (chevrons), shapes (scattered circles, triangles,
-squiggles) — over a **base**: solid (the page colour), gradient (a sweep of
-accent and support) or glow (soft colour glows, the default). **Strength**
-(0–1) and **size** (0.5–2) sliders tune it. Patterns are inline SVG or
+**Backdrop.** Behind every page sits a backdrop in the theme's colours
+(`Theme.backdrop`, `backdropCss`): a **pattern** from four groups
+(`BACKDROP_GROUPS`, `BACKDROPS`), or none —
+
+| Group | Patterns |
+| --- | --- |
+| **Abstract** | ripples (rings from two corners), waves (layered along the bottom), contours (topographic lines), shapes (scattered circles, triangles, squiggles), blobs (three soft organic shapes), flow (lines across the page), confetti (small dashes), light burst (rays from the top) |
+| **Geo** | triangles, hexagons (a honeycomb), diamonds (harlequin), grid (graph paper), arrows (chevrons) |
+| **Vintage** | halftone (print dots fading from a corner), retro stripes (three bands round a corner), sunburst (wide rays from the bottom), deco fans (art deco scallops) |
+| **Texture** | dot grid, grain (fine film grain), paper (soft mottle), linen (a fine crosshatch) |
+
+— over a **base**: solid (the page colour), gradient (a sweep of accent and
+support) or glow (soft colour glows, the default). Four sliders tune it:
+**strength** (0–1, pattern and base together), **size** (0.5–2),
+**contrast** (0.3–2, how far the pattern stands out; the base stays) and
+**saturation** (0–1.6, the pattern's and base's colour: 0 is greys). Patterns are inline SVG or
 gradients, static (no motion), fixed to the screen, and set as `--bg-image` /
 `--bg-size` / `--bg-position` / `--bg-repeat` so the pre-paint script applies
 them too. Cards stay solid, so text never sits on the pattern; page titles
@@ -396,7 +440,7 @@ family of tokens:
 
 ### Readability (WCAG)
 
-Checked live on the Brand page for the colours an admin picks (and for the
+Checked live on the Theme tab for the colours an admin picks (and for the
 inferred ones, which are built to pass):
 - Body text ≥ 4.5:1 on the background.
 - Accent and highlight ≥ 3:1 on the background.
@@ -415,24 +459,43 @@ most: keep them dark enough (luminance under about 0.07) for 7:1.
 
 ## 4. Theme templates
 
-The Brand page offers these (`foundation/src/lib/themes.ts`) in five
+The Theme tab offers these (`foundation/src/lib/themes.ts`) in six
 categories, chosen with wrapping pills, plus a search box across all of them
-(name, vibe, category and tab; accents ignored, so "quebec" finds Québec):
+(name, vibe, category and tab; accents ignored, so "quebec" finds Québec).
+
+**Each look comes once, in three page tones.** A **Light / Mid / Dark**
+switch above the grid sets the tone every tile shows: light (a near-white
+page tinted with the look's colour), mid (a deep or muted page) or dark
+(near-black). A look is a family (`TemplateFamily`: one palette, team, flag
+or game) holding the templates written for it by tone (`toneOf`); the
+other tones are made from **its own colours** by `atTone` — the page is
+its most colourful colour, deepened or paled, and each role takes the first
+own colour that reads on it, nudged lighter or darker (reds and oranges never
+paled into pink; a role nothing fills is left to shades of the accent).
+Every look in every tone passes the readability checks; one that can't be
+made in a tone shows its nearest and says so ("Dark only"). A team's old
+Home and Away looks are now its dark (or mid) and light tones.
 
 | Category | What's in it | Shown as |
 | --- | --- | --- |
-| **Everyday** | Dark, Mid and Light originals | Stacked groups |
+| **Everyday** | The originals, one list (once split into Dark, Mid and Light) | One group |
 | **Holidays** | Through the year, Lunar new year to New year's eve | One group |
 | **Countries** | Flags by region: Americas, Europe, Asia and Pacific, Africa | Stacked groups |
 | **Provinces** | Canada's 13 provinces and territories, each on its flag's field colour | One group |
-| **Sports** | NHL, NBA, MLB, NFL (every team, each in **Home** and **Away**, some Toronto and Ottawa teams in **Retro** too), then **Toronto**, **Ottawa** and **Chicago** (every team from the city, across leagues — MLS, CFL, WNBA, PWHL, NWSL, CPL, NLL, AHL, OHL too) | Sub-tabs (`tabs: true`), one at a time, with a Home / Away / Retro switch |
+| **Games** | **The Legend of Zelda**: twelve games' palettes, from the 1986 original to Echoes of Wisdom (colours only, no artwork) | One group |
+| **Sports** | NHL, NBA, MLB, NFL (every team; some Toronto and Ottawa teams have a **Retro** look too), then **Toronto**, **Ottawa** and **Chicago** (every team from the city, across leagues — MLS, CFL, WNBA, PWHL, NWSL, CPL, NLL, AHL, OHL too) | Sub-tabs (`tabs: true`), one at a time |
 
 Each template is drawn as a miniature of the app with its colours as
 circles. Every one passes the readability checks. An app whose default isn't
 one of them gets it as an extra "Yours" card at the front of Everyday.
-`TEMPLATE_SETS` has the categories; `TEMPLATE_GROUPS` every group in one
-list (city tabs repeat league teams); `ALL_TEMPLATES` every template once;
-`sameTheme` compares two themes.
+`FAMILY_SETS` has the categories as looks; `ALL_FAMILIES` every look once;
+`familyAt(f, tone)` a look in a tone (or null), `familyLook(f, tone)` what a
+tile shows (that tone or the nearest), `familyTones(f)` the tones it comes
+in. The written templates are still there for older Theme tabs:
+`TEMPLATE_SETS`, `TEMPLATE_GROUPS`, `ALL_TEMPLATES`; `sameTheme` compares
+two themes. `templateScores` / `templateIssues` (in `theme.ts`) run the
+readability targets on any theme; `scripts/contrast.mjs` runs them on every
+look in every tone.
 
 **Team, country and province themes** use **only their own colours** —
 and lighter or darker versions of them that still read as that colour —
@@ -673,7 +736,7 @@ and body fonts.
 | `RangeField` | A labelled slider (weight, spacing, strength…) with its value shown |
 | `Section` | A titled card holding one block of content |
 | `List` + `ListGroupLabel` | A card of rows, optionally grouped (by month); group labels are support text with an 8 px support dot, on a support wash fading right |
-| `EventRow` | A dated item. `DateBlock` on the left, a `status` dot (`{ tone, label }`); `selected`/`onSelect` for select mode |
+| `EventRow` | A dated item. `DateBlock` on the left, a `status` dot (`{ tone, label, live? }` — `live` pulses); `to` to go somewhere or `onOpen` to open something in place (a log in a `Sheet`); `selected`/`onSelect` for select mode |
 | `EntityRow` | A named thing with an avatar (a person, a place) |
 | `DateBlock` | A tear-off calendar ticket (52 px wide, 12 px radius, `surface-2`): the month on a solid highlight band, the day big below, then the year or weekday |
 | `MediaCard` | Image-led grid card (`aspect="portrait"` for posters) |
@@ -687,20 +750,29 @@ and body fonts.
 | `Pager` | Paging long lists |
 | `Sheet` | **The** modal: bottom sheet on phones, dialog on desktop |
 | `ImageViewer` | Full-screen image (tap or Escape to close) |
-| `Badge` / `Tone` / `TONES` | A status as a chip, in one of the fixed tones |
+| `Badge` / `Tone` / `TONES` | A status as a chip, in one of the fixed tones; `dot` puts a status dot before the label (`live` pulses it) |
 | `EmptyState` | No data — `ThemeDots` above, say what's missing and offer the next step |
 | `Loading` | Skeleton shaped like a page (never a bare spinner) |
 | `ViewSwitch` | Two or three views of one page as links (List ⇄ Map) |
 | `HeaderTitle` (`components/HeaderTitle.tsx`) | The app's name as header text — the brand; `sm`/`md`/`lg` (22/30/44 px) |
 | `ColorPicker` (`components/ColorPicker.tsx`) | Inline colour picker: saturation/brightness field, hue slider (28–36 px thumbs, drag anywhere), one row of 8 quick swatches, hex box with a preview chip. Never the native `<input type=color>` — it opens a different dialog on every platform |
-| `ThemeCard` (`routes/BrandPage.tsx`) | A theme shown as a miniature of the app (header text, a support avatar, a support eyebrow, a date-row card, a primary and a secondary button — all flat), then a row of circles — every colour it uses, inferred ones with a dashed ring — then name and vibe |
+| `ThemeCard` (`routes/config/ThemePanel.tsx`) | A theme shown as a miniature of the app (header text, a support avatar, a support eyebrow, a date-row card, a primary and a secondary button — all flat), then a row of circles — every colour it uses, inferred ones with a dashed ring — then name and vibe |
+| `KeyValue` | A read-only label and value: `inline` (settings, a job's details) or `stacked` (a detail page's facts). Several in a `List` or `Section flush` |
+| `SwitchRow` | One setting on or off: the whole row is the switch (`role="switch"`), a label and a hint |
+| `Autocomplete` | Pick an existing record as you type, or `onCreate` a new one: a field with matches under it (arrow keys, Enter, Escape). For several, keep picks as chips above it |
+| `LIVE` | Add to a status dot to pulse it while something is happening; `RowStatus.live` and `Badge live` use it |
+| `ThemeScope` | Part of the page in another theme — colours, type and backdrop (`themeVars`, `.theme-scope`) — without touching the rest: carousels of looks, previews |
+| `MapView` (`components/MapView.tsx`) | **Every map.** Places as flat highlight pins (`markerIcon`) on the theme's map style (`mapStyles`: the page colour for land, accent-tinted roads, no POIs or transit); `size` `compact` (160 px, inline, no gestures), `full` (320 px), `fill` (a map page). With no Maps key it draws a themed preview with the same pins |
+| `MapPinCard` (`components/MapView.tsx`) | The chosen place on a map page, floating above the dock: name, a line, what's there |
+| `JimboConfigPage` / `JimboConfigLink` (`routes/JimboConfigPage.tsx`) | The jimbo-ui config section (section 1) and its one link in settings |
 | `Button` (`ui/button.tsx`) | `primary` (one per view), `secondary`, `ghost`, `danger`; `sm`/`md`/`lg` |
 
 CSS classes for plain elements: `.card`, `.field`, `.btn …`, `.chip`,
 `.link-action`, `.eyebrow`, `.meta`, `.label`, `.h-page`, `.h-section`.
 
-Adding a component: build it from tokens, put it in the kit, add it to the
-Style guide page, and list it here.
+Adding a component: check the registry first (section 13). Build it from
+tokens, put it in the kit, add it to the Style guide panel and the
+showcase, list it here, and set its registry entry to `kit`.
 
 ---
 
@@ -722,11 +794,12 @@ one here fits.
 | **A block of content** | `Section` (titled card) · plain `.card` · `FullBleed` band (`surface`, or a brand colour) · `Sheet` (when it's a choice or a short flow) |
 | **Calls to action** | primary `Button` · `LinkCard` with `accent` · `FullBleed` band in a brand colour · `HeroSection` actions |
 | **Switching views** | `Tabs` (2–4, segmented) · `PillTabs` (wrapping filters) · `ViewSwitch` (list ⇄ map) · `SelectField` (many options on phones) |
-| **Finding things** | `SearchField` · `PillTabs` filters · `SelectField` sort |
+| **Finding things** | `SearchField` · `PillTabs` filters · `SelectField` sort · `Autocomplete` (pick or add a record) |
 | **Empty or loading** | `EmptyState` (with `ThemeDots`) · `Loading` skeleton |
 | **Status** | `Badge` (detail pages) · status dot on rows · `DateBlock` ticket |
-| **Settings** | `.field`, `SelectField`, `RangeField`, `Tabs` as a switch, `Section` cards |
+| **Settings** | `SwitchRow` (on/off), `KeyValue` (read-only), `.field`, `SelectField`, `RangeField`, `Tabs`, `Section` cards |
 | **Page width** | column (default) · wide · full (`AppShell width`) |
+| **Places** | `MapView` (`compact` inline, `full` in a section, `fill` as a map page) + `MapPinCard` · `List` + `EntityRow` with `ViewSwitch` list ⇄ map |
 
 Ask with the options as choices (Claude Code's question tool where it's
 available), one question per feature or section, recommending one. Then
@@ -740,6 +813,8 @@ fills in. **Ask which one fits** (with the closest recommended), or mix two.
 
 | Archetype | For | Tabs (dock) | Width | Main pages | Backdrop |
 | --- | --- | --- | --- | --- | --- |
+| **Catalogue** ★ | A log of dated entries, the people and places in them, and numbers about it all (from the pilot app) | Home · Entries · People · Places | column | Home: `HeroSection`, `StatGrid`, "Coming up" `EventRow`, `RankedList`; Entries: `SearchField`, `PillTabs`, grouped `List` + `EventRow`, select mode, `Pager`; Entry: `Hero`, `Section`s, a compact `MapView`, edit in a `Sheet`; People: `EntityRow`; Places: list ⇄ map (`ViewSwitch`, `MapView fill`, `MapPinCard`) | ripples |
+| **Single-page dashboard** ★ | One screen that answers "is everything fine?" for jobs it watches (reports, syncs, checks, builds) | none, or Home · Runs · Settings | column | One page: a verdict line (accent fine, highlight needs a look), `StatGrid`, job rows (status dot that pulses while running, last run, a Run button, errors inline), recent runs as `EventRow` opening a log in a `Sheet`, settings as label / value rows | dots or none |
 | **Tracker** | Logging things you do, see or collect over time | Home · List · Add · Stats · Me | column | Home: `HeroSection` or `PageHeader`, `StatGrid`, "Coming up" `List` + `EventRow`; List: `SearchField`, `PillTabs`, grouped `List` + `EventRow`, select mode; Detail: `Hero` / `Banner`, `Section`s; Stats: `StatGrid`, `RankedList` | glow or dots |
 | **Collection** | A library of items with pictures (records, books, recipes, gear) | Home · Browse · Add · Lists · Me | wide | Browse: `SearchField`, filters, `MediaCard` grid; Detail: `Hero` with the image; Lists: `LinkCard`s | geometry or none |
 | **Dashboard** | Numbers and status at a glance (finance, health, ops) | Today · Trends · Alerts · Settings | wide | `StatGrid` first, `Section` cards with charts, `RankedList`, `Badge` statuses, `FullBleed` band for the headline | dots or contours |
@@ -748,8 +823,15 @@ fills in. **Ask which one fits** (with the closest recommended), or mix two.
 | **Showcase** | A public face: a landing page, a portfolio, an event site | Home · About · Work · Contact | full | `HeroSection` (`lg`), `FullBleed` bands, `MediaCard` grid, `LinkCard` calls to action | burst or shapes |
 | **Tool** | One job done well (a calculator, converter, generator) | — (or ≤ 3) | column | One `Section` with fields, `RangeField`s and `Tabs`; the result in a `card`; history in a `List` | dots or none |
 
-Every archetype keeps the admin pages (Brand & theme, Style guide) and the
-rules above; the archetype only sets the starting shape.
+★ **Templates you can copy:** `reference/web/src/archetypes/catalogue.tsx`
+and `dashboard.tsx` are working pages built from the kit with neutral
+example content (try them on the showcase's Archetypes tab). Copy the file,
+rename the nouns, map the statuses, swap the sample data for the app's API,
+and drop or add tabs. The other archetypes are shapes to build from the
+menu.
+
+Every archetype keeps the jimbo-ui config section and the rules above; the
+archetype only sets the starting shape.
 
 - **Theme editor:** templates first, in categories with a search box (tap
   to try; the whole app changes live), then *Make it yours* — tap which
@@ -780,6 +862,12 @@ rules above; the archetype only sets the starting shape.
 - **Errors:** inline, near what failed, in the highlight colour; keep the
   user's input.
 - **Offline / pending:** a slim yellow banner under the top bar.
+- **Maps:** always `MapView`, in the theme's map style with flat highlight
+  pins. A map page fills the page under the top bar, with `ViewSwitch`
+  (List | Map) floating top-left and `MapPinCard` for the chosen place above
+  the dock; inline maps are `size="compact"` inside a `Section`. Pick a
+  place from a list to focus it on the map. The Maps key is
+  `VITE_GOOGLE_MAPS_API_KEY`; without it the preview still shows the pins.
 
 ---
 
@@ -794,7 +882,7 @@ rules above; the archetype only sets the starting shape.
 
 ## 11. Accessibility checklist
 
-- Readability targets in section 3 (the Brand page warns when they're missed;
+- Readability targets in section 3 (the Theme tab warns when they're missed;
   every template passes).
 - Focus is visible (`focus:ring-2 ring-accent/20` on fields,
   `focus-visible:ring-accent/50` on buttons).
@@ -816,6 +904,56 @@ rules above; the archetype only sets the starting shape.
 - No native colour inputs, and no browser alerts except as a last-resort
   error.
 - No new font sizes outside the scale in section 5.
+
+---
+
+## 13. One library, no duplicates
+
+jimbo-ui keeps a registry of every app on it (`registry/apps.json`) and a
+catalogue of every UI element across them (`registry/components.json`), so
+the UI library grows in one place and every app feels the same.
+
+Each component entry has an `id`, a canonical `name`, its `purpose` (one
+sentence on what it's *for*, not what it looks like), a `tier`, its
+`source` (the kit path, or `app:path` if it isn't in the kit yet), `usedBy`
+(apps), `aliases` (other names the same thing goes by — "Modal", "Drawer",
+"BottomSheet" → `Sheet`) and `variants` (the props that cover differences
+between apps).
+
+| Tier | Means |
+| --- | --- |
+| `foundation` | Copied into every app (`Button`, `.card`, `.field`…) |
+| `kit` | In `reference/`, adapted per app |
+| `pattern` | A behaviour the guide describes (save bar, offline banner, background work ring) |
+| `candidate` | Built in an app, generic — may be promoted |
+| `domain` | Only that app's (its add flows, its data tools). Listed, **never copied into jimbo-ui** |
+
+**The dedupe rules:**
+
+1. **Match by purpose and behaviour, not by name.** Before anything is
+   added, compare it against every registry entry and its aliases. A
+   "HistoryRow" that shows a dated thing with a status is an `EventRow`; a
+   "StateChip" that shows a status as a short label is a `Badge`.
+2. **A match is that component.** Record the app's name as an alias. If it
+   needs to differ, add a variant prop to the canonical component. **Never
+   add a second component.**
+3. **Promotion:** a component moves into the kit when two or more apps need
+   it, or at once if it's clearly generic. Promotion means a generic rewrite
+   with neutral names, plus the kit, this guide, the showcase and the Style
+   guide panel, released as a minor version with "Apps must: Nothing" and an
+   **Available** list. Apps adopt it when they consolidate.
+4. **Domain components stay in the app.** They're listed so nobody rebuilds
+   them as something generic by mistake, but their code never comes here.
+5. **Always pull jimbo-ui before writing to the registry**, so updates from
+   different app chats don't overwrite each other.
+
+`node scripts/inventory.mjs` prints the component × app table, candidates
+more than one app has built, kit components no app uses, apps behind the
+latest release, raw hex or palette colours in app code (split into
+hand-written status tones, black or white overlays, and raw colours), and
+apps whose config section is missing, split up or gated wrong. The
+registry holds app names and paths only, so it's the one place app names
+appear in jimbo-ui.
 
 ---
 
@@ -882,3 +1020,19 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   (was 1.55:1) and cards to 1.2:1 against the page (was 1.16:1); rows are
   divided by etched lines (`.divide-etched`), including rows grouped under a
   label, and are a little taller (76 px).
+- **0.8.0** — One library, no duplicates: `registry/` (apps and every UI
+  element across them, with purpose, tier, aliases and variants), the
+  dedupe and promotion rules (section 13) and `scripts/inventory.mjs`. One
+  **jimbo-ui config** section per app at `/jimbo-ui` (Theme, Brand, Style
+  guide, About, App) replaces the Brand & theme and Style guide pages;
+  admin-only when the app has auth, checked on the server too. `MapView`
+  and `MapPinCard` for every map, `ThemeScope` and `themeVars` for theming
+  part of a page. Two archetypes as templates to copy: Catalogue and
+  Single-page dashboard. The showcase opens on a carousel of looks, with
+  Components, Archetypes and Settings tabs. Promoted to the kit: `KeyValue`,
+  `SwitchRow`, `Autocomplete`, `Badge dot`, `EventRow onOpen` and live
+  statuses (`LIVE`). Every look comes once, in light, mid and dark
+  (`FAMILY_SETS`, `atTone`), replacing Home / Away and Everyday's three
+  lists; a Games category with Legend of Zelda looks. Backdrops in four
+  groups (abstract, geo, vintage, texture — 21 patterns) with contrast and
+  saturation sliders.

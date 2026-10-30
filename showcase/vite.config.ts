@@ -7,7 +7,11 @@ const version = (JSON.parse(readFileSync(path.resolve(__dirname, "../.claude-plu
 
 export default defineConfig({
   base: "./",
-  define: { __JIMBO_VERSION__: JSON.stringify(version) },
+  define: {
+    __JIMBO_VERSION__: JSON.stringify(version),
+    // What an app passes from its jimbo-ui.json, for the config section's About tab.
+    __JIMBO_APP__: JSON.stringify({ name: "showcase", version, auth: "none" }),
+  },
   plugins: [react()],
   resolve: {
     alias: {

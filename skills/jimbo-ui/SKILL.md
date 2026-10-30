@@ -1,11 +1,11 @@
 ---
 name: jimbo-ui
-description: Ryan's shared brand and UI system, jimbo.ui (repo and plugin jimbo-ui), for his web apps — theme engine with two to four colours and their shades, everyday, flag and holiday templates, glass and circle-motif look, Tailwind tokens, UI kit, floating tab-dock app shell and interaction patterns. Use when building, styling or reviewing UI in an app that has a jimbo-ui.json, when starting a new app "in my style" / "like my other apps" / "with jimbo-ui", when asked to update an app to the latest jimbo-ui or brand guidelines, whether there are new brand guidelines, or to preview what an update would change, when checking contrast across themes, or when changing and releasing the jimbo-ui guidelines themselves.
+description: Ryan's shared brand and UI system, jimbo.ui (repo and plugin jimbo-ui), for his web apps — theme engine with two to four colours and their shades, everyday, flag and holiday templates, glass and circle-motif look, Tailwind tokens, UI kit, floating tab-dock app shell and interaction patterns. Use when building, styling or reviewing UI in an app that has a jimbo-ui.json, when starting a new app "in my style" / "like my other apps" / "with jimbo-ui", when asked to update an app to the latest jimbo-ui or brand guidelines, whether there are new brand guidelines, or to preview what an update would change, when checking contrast across themes, when changing and releasing the jimbo-ui guidelines themselves, and for the registry of apps and components — add this to the jimbo ui registry, register this app with jimbo-ui, audit this app's UI against jimbo-ui, consolidate this app with jimbo-ui, use the jimbo-ui versions of my components.
 ---
 
 # jimbo.ui
 
-**This is jimbo.ui 0.7.0.** (Kept in step with the plugin version and the
+**This is jimbo.ui 0.8.0.** (Kept in step with the plugin version and the
 newest numbered `CHANGELOG.md` entry; `scripts/versions.mjs` checks.)
 jimbo.ui is a work in progress, so it's on 0.x: work collects under
 "Unreleased" in the changelog and is numbered only when Ryan asks for a
@@ -67,10 +67,9 @@ this check, then the preview workflow if they want detail.
   spacing (`Theme.fonts`); use `font-display` / `font-body`, never a named
   family.
 - Colour tuning: `Theme.infer` (contrasting or tonal), `Theme.vibrancy` and
-  `Theme.contrast` — all on the Brand page.
-- Themes made from real things (teams, flags, provinces) use only their own
-  colours and shades of them — never an invented hue; sports teams come in
-  Home and Away (and some Retro).
+  `Theme.contrast` — all on the jimbo-ui config section's Theme tab.
+- Themes made from real things (teams, flags, provinces, games) use only
+  their own colours and shades of them — never an invented hue.
 - **Circles** (guide section 2): always one flat fill — no gradient, shine,
   glow, shadow, outline or ring, and no orbs or blurred blobs. Side by side
   with a 4 px gap, never overlapping. Sizes: 8 px inline (`ThemeDots`, label
@@ -78,19 +77,38 @@ this check, then the preview workflow if they want detail.
   The page colour as a swatch gets a 1 px `border-border`; inferred colours
   show at 55% opacity. Only in empty states, status, label dots, avatars and
   colour swatches — never above a page title or as decoration.
-- Templates come in five categories: **Everyday** (dark, mid, light),
-  **Holidays**, **Countries** (by region), **Provinces** and **Sports** (every
-  NHL, NBA, MLB and NFL team, plus Toronto, Ottawa and Chicago tabs), with a
-  search box (guide section 4). New team, country or place themes come from
-  their real colours via `scripts/template-from-colours.mjs`.
+- **Each look comes once, in light, mid and dark** (guide section 4): a
+  Light / Mid / Dark switch sets the page tone every tile shows; tones a
+  look wasn't written in are made from its own colours (`atTone`,
+  `FAMILY_SETS`, `familyLook`), and every look in every tone passes the
+  checks. Six categories: **Everyday**, **Holidays**, **Countries** (by
+  region), **Provinces**, **Games** (The Legend of Zelda) and **Sports**
+  (every NHL, NBA, MLB and NFL team, plus Toronto, Ottawa and Chicago tabs),
+  with a search box. New team, country, place or game looks come from their
+  real colours via `scripts/template-from-colours.mjs`.
 - Phone first at 375 px; floating frosted tab dock (≤ 5 tabs); things pinned
   to the bottom sit above it; touch targets ≥ 44 px; no horizontal scroll
   strips; nothing hover-only.
 - One modal style (`Sheet`); one primary button per view; sentence case;
   plain, short, slightly wry copy.
 - Use the kit (`.card`, `.btn`, `.field`, `.chip`, `.eyebrow`, `.meta`,
-  `PageHeader`, `List`, `Section`…) before inventing anything. A new shared
-  component goes in the kit, the app's Style guide page, and the guide.
+  `PageHeader`, `List`, `Section`, `KeyValue`, `SwitchRow`,
+  `Autocomplete`…) before inventing anything. A new shared
+  component goes in the kit, the Style guide panel, the showcase and the guide.
+- **One library, no duplicates** (guide section 13). Every UI element in
+  every app is in `registry/components.json`. Before adding one, **match it
+  by purpose and behaviour, not by name**, against every entry and its
+  aliases. A match *is* that component: record the name as an alias, and if
+  it must differ, add a variant prop to the canonical one — never a second
+  component. A component moves into the kit when two or more apps need it
+  (or at once when it's clearly generic): a generic rewrite with neutral
+  names, plus the kit, guide, showcase and Style guide panel, released as a
+  minor version with "Apps must: Nothing" and an "Available" list. Domain
+  components stay in their app — listed, never copied. **Pull jimbo-ui
+  before writing to the registry**, so app chats don't overwrite each other.
+- **Maps** use `MapView` (`components/MapView.tsx`): the theme's map style
+  (`mapStyles`), flat highlight pins (`markerIcon`), `MapPinCard` for the
+  chosen place, `ViewSwitch` for list ⇄ map. Never a stock map style.
 - **Ask before building a feature or section:** "What existing component do
   you want to use for this feature or section's styling?" — offer 3–4
   fitting options from the component menu (guide section 9: e.g. for a list,
@@ -101,27 +119,31 @@ this check, then the preview workflow if they want detail.
 - **New apps start from an archetype** (Tracker, Collection, Dashboard,
   Directory, Planner, Showcase, Tool — guide section 9): ask which fits
   before building.
-- Backdrops and width: the theme's backdrop (`Theme.backdrop` — ripples,
-  waves, contours, geometry, light burst, dots, arrows, shapes over a solid,
-  gradient or glow base) is behind every page; full-width sections use
+- Backdrops and width: the theme's backdrop (`Theme.backdrop` — 21
+  patterns in four groups, **Abstract**, **Geo**, **Vintage** and
+  **Texture**, over a solid, gradient or glow base, with strength, size,
+  contrast and saturation sliders) is behind every page; full-width sections use
   `FullBleed` and `HeroSection`, and `AppShell width` sets the page width.
-- **Every app has the admin theming pages built in:** a **Brand & theme**
-  page (`/admin/brand`) and a **Style guide** (`/admin/style`), from
-  `reference/web/src/routes/BrandPage.tsx` and `StyleGuidePage.tsx`. Keep the
-  Brand page nearly identical — the template categories (Everyday,
-  Holidays, Countries, Provinces, Sports with league and city tabs) and
-  search, with colour-circle tiles, *Make it yours* (four colours with the
-  *Infer it* switches and readability warnings), *Type* (headings and body:
-  fonts with weight and spacing sliders), vibrancy and contrast sliders,
-  *Share this look* (export and import), favicon, live preview and the save
-  bar. Adapt it only
-  to fit the app: how admins reach it (an admin tab, a settings link, behind
-  sign-in), who may save (the app's admin role), where it saves (the app's
-  server; with no server, the browser — like
-  `showcase/overrides/lib/api.ts`), and its copy and examples (the Style
-  guide adds the app's own components). Drop a part only when the app truly
-  can't support it (e.g. favicon upload with nowhere to store it) and say so
-  in the app's `docs/brand.md`; never drop templates, colour editing or type.
+- **One jimbo-ui config section per app** (guide section 1). Every brand,
+  theme and style guide option lives there and nowhere else — no separate
+  Brand pages, theme pickers in settings, or standalone Style guide pages.
+  It's the same in every app: named **jimbo-ui config**, at **`/jimbo-ui`**,
+  reached from the app's settings or admin area (never a dock tab), with
+  tabs **Theme** (templates, colours, type, backdrop, live preview and
+  readability checks), **Brand** (name and header text preview, favicon),
+  **Style guide** (the live kit plus the app's components) and **About**
+  (jimbo-ui version, registry status, the showcase link). App-specific
+  additions go in its **App** tab, nowhere else. The theme set there is the
+  app-wide default for everyone. Build it from
+  `reference/web/src/routes/JimboConfigPage.tsx` (with `config/ThemePanel`
+  and `config/StyleGuidePanel`), passing `canConfigure`:
+  - `auth: "admin"` in `jimbo-ui.json`: the section, its route and its link
+    exist only for admins (`canConfigure={user.isAdmin}`), and **every
+    server route that saves the theme or brand checks admin on the server**.
+    Non-admins get the default theme and never see the section.
+  - `auth: "none"`: open to anyone using the app (`canConfigure`).
+  Adapt only where it saves (the app's server, or the browser with no
+  server) and the App tab. Never drop templates, colour editing or type.
 
 ## Where the files are
 
@@ -133,8 +155,18 @@ release without touching that working copy, export it:
 
 - `foundation/` — copied verbatim into apps (never edited in an app)
 - `starter/` — copied once into a new app, then app-owned
-- `reference/` — generic implementations (kit, shell, header text, Brand and
-  Style guide pages), adapted and extended per app
+- `reference/` — generic implementations (kit, shell, header text, `MapView`,
+  the jimbo-ui config section, and the **archetypes** in
+  `web/src/archetypes/`: `catalogue.tsx` and `dashboard.tsx`), adapted and
+  extended per app
+- `registry/apps.json` — every app on jimbo-ui (repo, web root, version,
+  auth, registered, last audited); `registry/components.json` — every UI
+  element across all apps (id, name, purpose, tier, source, usedBy, aliases,
+  variants). Names and paths only, never app code
+- `scripts/inventory.mjs` — reads the registry and the apps' checkouts and
+  prints the component × app table, candidates to promote, unused kit
+  components, apps behind, raw colours in app code, and whether each app's
+  config section is missing, split up or gated wrong
 - `scripts/tokens.mjs` — prints an app's `tokens.css` for its colours
   (accent, highlight or `-`, background, optional support)
 - `scripts/contrast.mjs` — contrast and colour-separation report for every
@@ -146,20 +178,24 @@ release without touching that working copy, export it:
 - `showcase/` — a demo app built only from the release's code; published as a
   private page (URL in the README) so anyone can see what an app gets. Also
   the **playground**: design a theme there, export it (*Share this look*),
-  and import it into an app's Brand page or paste its `brand.config` line and
+  and import it into an app's jimbo-ui config section or paste its `brand.config` line and
   `tokens.css` into the app. `docker compose up --build` runs it on
   http://localhost:4460
 - `skills/jimbo-ui/guide.md` — the guide
 
-Each app has `jimbo-ui.json` at its repo root: `version`, `webRoot`, and a
-`reference` map (reference file → the app's equivalent). Guide section 1
+Each app has `jimbo-ui.json` at its repo root: `version`, `webRoot`, `auth`
+(`"admin"` or `"none"`), a `reference` map (reference file → the app's
+equivalent), `registry` (`registered`, `audited`) and `components`
+(`uses` — registry ids; `local` — `{ name, path, kind: domain|candidate,
+matches }`; `overrides` — kit pieces the app wraps). Guide section 1
 explains all of this.
 
 ## Workflow: start a new app on jimbo-ui
 
-0. **Ask which archetype fits** (guide section 9: Tracker, Collection,
-   Dashboard, Directory, Planner, Showcase, Tool — or a mix), recommending
-   the closest. It sets the dock tabs, page width, main pages and backdrop.
+0. **Ask which archetype fits** (guide section 9: Catalogue and
+   Single-page dashboard — real templates in `reference/web/src/archetypes/`
+   to copy and remix — or Tracker, Collection, Dashboard, Directory,
+   Planner, Showcase, Tool, or a mix), recommending the closest. It sets the dock tabs, page width, main pages and backdrop.
    Then, as you build each page, ask which component to use for each feature
    or section (the component menu).
 1. Export the latest release (highest `jimbo-ui--v*` tag).
@@ -171,13 +207,16 @@ explains all of this.
 4. Adapt from `reference/`: `index.html` (pre-paint script with the app's
    prefix, fonts, PWA tags), the app shell and its tabs, the kit (drop
    map the app's statuses onto the kit's tones and add its domain components), `BRAND.name` as the header text,
-   and the admin **Brand & theme** and **Style guide** pages with every
-   theming feature (see the core rule above), wired to the app's theme API
-   if it has a server, or saved in the browser if it doesn't.
-5. Write `jimbo-ui.json` with the version and the reference map, and a short
-   `docs/brand.md` in the app noting its identity choices and pointing here.
-6. Typecheck, run it, and look at the Style guide page in a dark and a light
-   template at phone width. On the Brand page, try a template from each set,
+   the archetype's pages if one fits, and the **jimbo-ui config** section
+   with every theming feature (see the core rule above), gated by `auth`,
+   wired to the app's theme API if it has a server, or saved in the browser
+   if it doesn't.
+5. Write `jimbo-ui.json` (version, webRoot, auth, reference map,
+   components), a short `docs/brand.md` noting its identity choices, and
+   the jimbo-ui block in its `CLAUDE.md` (see "Register an app"); add the
+   app to the registry.
+6. Typecheck, run it, and look at the Style guide tab in a dark and a light
+   template at phone width. On the Theme tab, try a template from each set,
    a two-colour theme (highlight and support inferred), each type style and
    a save, and check the choice survives a reload.
 
@@ -205,10 +244,9 @@ update", or before updating if the user wants to look first.
    - **Apps must steps:** each one, and which of the app's files it touches
      (use the `reference` map and a search of the app for affected classes or
      names).
-   - **Admin theming pages:** whether the app's Brand & theme and Style guide
-     pages have every feature the new reference has (template sets, colour
-     circles, infer switches, type styles, favicon, save bar) and what's
-     missing — or whether the app has no such pages yet.
+   - **jimbo-ui config section:** whether the app has the one section at
+     `/jimbo-ui`, gated by its `auth`, with every feature the new reference
+     has — or which separate brand, theme or style pages it still has.
    - **Reference changes:** a summary of `git diff <old> <new> -- reference/`,
      and whether the app's mapped files still look like the old reference
      (easy port) or have diverged (hand work).
@@ -235,13 +273,67 @@ update", or before updating if the user wants to look first.
    (and any other app code the change applies to, e.g. a renamed class).
 5. If the changelog says the theme engine's derivation changed, regenerate
    `tokens.css` from `BRAND.defaultTheme`.
-6. Make sure the app's admin Brand & theme and Style guide pages have every
-   theming feature the current reference has (core rule above); add the
-   pages if the app doesn't have them yet, and port anything missing, adapted
-   to the app.
-7. Typecheck and build; check the Style guide and Brand pages at phone width.
+6. Make sure the app's jimbo-ui config section has every theming feature
+   the current reference has (core rule above) and is gated right; build it
+   if the app doesn't have it yet, moving any separate brand, theme or style
+   pages into it.
+7. Typecheck and build; check the config section's tabs at phone width.
 8. Set `version` in `jimbo-ui.json`, add an entry to the app's own changelog
    ("Updated to jimbo-ui 0.6.0: …"), and commit. Push only if the user asks.
+
+## Workflow: register an app
+
+"Register this app with jimbo-ui", "audit this app's UI against jimbo-ui",
+"add this to the jimbo ui registry". Changes no app code.
+
+1. Pull `~/Development/jimbo-ui`. Clone or pull the app from GitHub into
+   `~/Development/<name>` (`gh repo clone ryanjpeterson/<name>`).
+2. Read its `jimbo-ui.json`, or note that it's missing.
+3. Work out whether it has auth and roles (an admin flag, a `requireAdmin`
+   on the server): that's `auth` — `"admin"` or `"none"`.
+4. Inventory every UI component, class pattern and interaction pattern:
+   its kit file, `components/`, and the components defined inside route
+   files. Note which kit pieces it uses.
+5. Find every brand, theme and style guide screen or option it has today
+   and where it lives (routes, settings links, theme pickers).
+6. Classify each piece against `registry/components.json` with the dedupe
+   rules: **uses** (the kit's), **duplicate** (same purpose as an entry —
+   an alias, maybe a variant), **candidate** (generic, not in the kit yet),
+   **domain** (only this app's).
+7. Update the app's `jimbo-ui.json` (`auth`, `registry`, `components`) and
+   both registry files (`apps.json`; `components.json` usedBy, aliases,
+   new candidates and domain entries). Run `node scripts/inventory.mjs`.
+8. On a branch in the app, add this block to its `CLAUDE.md` (create it if
+   missing):
+   > This app uses jimbo-ui. Before creating a new UI component, check
+   > registry/components.json in jimbo-ui for an existing one with the same
+   > purpose. All brand, theme and style options belong in the jimbo-ui
+   > config section (/jimbo-ui), admin-only if this app has auth. After
+   > adding or changing a UI component, update this app's entry in the
+   > jimbo-ui registry.
+9. Report: what it reuses; duplicates of existing components, each with a
+   merge plan; new candidates; domain-only pieces; token-rule violations
+   (from the inventory); and a plan for moving its brand, theme and style
+   options into the jimbo-ui config section with the right gating.
+10. Ask before promoting anything, and before committing to the app's repo.
+
+## Workflow: consolidate an app
+
+"Consolidate this app with jimbo-ui", "use the jimbo-ui versions of my
+components". In the app's own session.
+
+1. Pull jimbo-ui. Read the app's `jimbo-ui.json` and the registry.
+2. On a branch: for each `local` component that now has a canonical kit
+   version, replace it with the kit component, choosing the matching variant
+   props, and delete the local file.
+3. Move every brand, theme and style guide option into the jimbo-ui config
+   section, applying the access rules; remove the old pages, routes and
+   settings entries.
+4. Update `uses` / `local` in `jimbo-ui.json` and `usedBy` in the registry
+   (pull first; commit the registry in jimbo-ui).
+5. Typecheck and build. With `auth: "admin"`, check that a non-admin can't
+   reach `/jimbo-ui` or call the save route (expect a 401/403). Show the
+   user any visual differences before committing.
 
 ## Workflow: change and release the guidelines
 
@@ -256,7 +348,11 @@ To release one:
    `reference/` files by hand. Search the repo for the app's name and domain
    words before committing.
 2. Update `skills/jimbo-ui/guide.md` (the relevant section and its change log)
-   and this file if a core rule or workflow changed. If the theme engine or
+   and this file if a core rule or workflow changed. **Promoting a
+   component:** rewrite it generically, add it to the kit, the Style guide
+   panel, the showcase and guide section 8, set its registry entry's tier to
+   `kit` with the kit path, and list it under **Available** in the changelog
+   ("Apps must: Nothing"). If the theme engine or
    templates changed, run `node scripts/contrast.mjs --check` — every template
    must pass. If the shell or kit changed, keep `showcase/src/Shell.tsx` and
    the demo pages in step.
@@ -267,8 +363,8 @@ To release one:
    Unreleased above it. Versions (jimbo.ui is a work in progress, so 0.x): minor (0.6 → 0.7) when
    apps must change their own code, patch for fixes and small additions.
 4. Bump `version` in `.claude-plugin/plugin.json`,
-   `.claude-plugin/marketplace.json` and the "This is jimbo.ui" line at the
-   top of this file; `node scripts/versions.mjs` must pass. Start the
+   `.claude-plugin/marketplace.json`, `foundation/src/lib/jimbo.ts` and the
+   "This is jimbo.ui" line at the top of this file; `node scripts/versions.mjs` must pass. Start the
    changelog entry with a one-line summary — the session-start check shows it
    to every app that's behind.
 5. `claude plugin validate .`, commit, `claude plugin tag .` (creates

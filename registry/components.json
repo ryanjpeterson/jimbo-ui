@@ -1,0 +1,1212 @@
+{
+  "$comment": "Every UI element across all apps on jimbo-ui. Match by purpose, not name; see the guide's \"One library, no duplicates\". Pull jimbo-ui before writing here. Names and paths only — never app code.",
+  "tiers": {
+    "foundation": "Copied into every app",
+    "kit": "In reference/, adapted per app",
+    "pattern": "A behaviour the guide describes",
+    "candidate": "Built in an app, generic — may be promoted",
+    "domain": "Stays in the app; listed, never copied"
+  },
+  "components": [
+    {
+      "id": "button",
+      "name": "Button",
+      "purpose": "Triggers an action; one primary per view.",
+      "tier": "foundation",
+      "source": "foundation/src/components/ui/button.tsx",
+      "usedBy": [
+        "tinnitus-a-go-go",
+        "jimbo-backup"
+      ],
+      "aliases": [
+        "Btn",
+        "ActionButton"
+      ],
+      "variants": {
+        "variant": "primary | secondary | ghost | danger",
+        "size": "sm | md | lg"
+      }
+    },
+    {
+      "id": "color-picker",
+      "name": "ColorPicker",
+      "purpose": "Picks one colour inline without the platform's colour dialog.",
+      "tier": "foundation",
+      "source": "foundation/src/components/ColorPicker.tsx",
+      "usedBy": [
+        "tinnitus-a-go-go",
+        "jimbo-backup"
+      ],
+      "aliases": [
+        "ColourPicker",
+        "ColorInput"
+      ],
+      "variants": {}
+    },
+    {
+      "id": "card",
+      "name": ".card",
+      "purpose": "Groups related content on a raised surface.",
+      "tier": "foundation",
+      "source": "foundation/src/styles/globals.css#.card",
+      "usedBy": [
+        "tinnitus-a-go-go",
+        "jimbo-backup"
+      ],
+      "aliases": [
+        "Card",
+        "CardHeader",
+        "CardContent",
+        "CardFooter",
+        "Panel",
+        "Box"
+      ],
+      "variants": {}
+    },
+    {
+      "id": "field",
+      "name": ".field",
+      "purpose": "Takes typed input from the user.",
+      "tier": "foundation",
+      "source": "foundation/src/styles/globals.css#.field",
+      "usedBy": [
+        "tinnitus-a-go-go",
+        "jimbo-backup"
+      ],
+      "aliases": [
+        "Input",
+        "TextInput",
+        "TextField"
+      ],
+      "variants": {}
+    },
+    {
+      "id": "label",
+      "name": ".label",
+      "purpose": "Names a form field.",
+      "tier": "foundation",
+      "source": "foundation/src/styles/globals.css#.label",
+      "usedBy": [
+        "tinnitus-a-go-go",
+        "jimbo-backup"
+      ],
+      "aliases": [
+        "Label",
+        "FieldLabel"
+      ],
+      "variants": {}
+    },
+    {
+      "id": "chip",
+      "name": ".chip",
+      "purpose": "Shows a small tag or a toggleable filter.",
+      "tier": "foundation",
+      "source": "foundation/src/styles/globals.css#.chip",
+      "usedBy": [
+        "tinnitus-a-go-go",
+        "jimbo-backup"
+      ],
+      "aliases": [
+        "Tag",
+        "Pill"
+      ],
+      "variants": {}
+    },
+    {
+      "id": "dot",
+      "name": ".dot-*",
+      "purpose": "Marks something with one theme colour as a flat circle.",
+      "tier": "foundation",
+      "source": "foundation/src/styles/globals.css#.dot-accent",
+      "usedBy": [
+        "tinnitus-a-go-go",
+        "jimbo-backup"
+      ],
+      "aliases": [
+        "Orb",
+        ".orb-*",
+        "Swatch"
+      ],
+      "variants": {
+        "colour": "accent | highlight | support"
+      }
+    },
+    {
+      "id": "app-shell",
+      "name": "AppShell",
+      "purpose": "Frames every page: top bar with the app's name, floating tab dock, pull to refresh.",
+      "tier": "kit",
+      "source": "reference/web/src/routes/AppShell.tsx",
+      "usedBy": [
+        "tinnitus-a-go-go",
+        "jimbo-backup"
+      ],
+      "aliases": [
+        "Layout",
+        "Shell",
+        "Navbar",
+        "BottomNav",
+        "TabBar"
+      ],
+      "variants": {
+        "width": "column | wide | full",
+        "tabs": "ShellTab[] (≤ 5)",
+        "actions": "top-bar buttons"
+      }
+    },
+    {
+      "id": "top-bar-button",
+      "name": "TopBarButton",
+      "purpose": "Puts a page-wide action (search, add) in the top bar.",
+      "tier": "kit",
+      "source": "reference/web/src/routes/AppShell.tsx#TopBarButton",
+      "usedBy": [
+        "tinnitus-a-go-go",
+        "jimbo-backup"
+      ],
+      "aliases": [
+        "HeaderButton",
+        "IconButton"
+      ],
+      "variants": {
+        "primary": "boolean"
+      }
+    },
+    {
+      "id": "dock-icon",
+      "name": "DockIcon",
+      "purpose": "Draws a tab's icon in the dock.",
+      "tier": "kit",
+      "source": "reference/web/src/routes/AppShell.tsx#DockIcon",
+      "usedBy": [
+        "tinnitus-a-go-go",
+        "jimbo-backup"
+      ],
+      "aliases": [
+        "BottomNavIcon",
+        "TabIcon"
+      ],
+      "variants": {}
+    },
+    {
+      "id": "header-title",
+      "name": "HeaderTitle",
+      "purpose": "Shows the app's name as its brand, with a dot in the accent.",
+      "tier": "kit",
+      "source": "reference/web/src/components/HeaderTitle.tsx",
+      "usedBy": [
+        "jimbo-backup"
+      ],
+      "aliases": [
+        "Wordmark",
+        "Logo",
+        "BrandName"
+      ],
+      "variants": {
+        "size": "sm | md | lg"
+      }
+    },
+    {
+      "id": "jimbo-config",
+      "name": "JimboConfigPage",
+      "purpose": "Holds every brand, theme and style guide option for the app, in one place at /jimbo-ui.",
+      "tier": "kit",
+      "source": "reference/web/src/routes/JimboConfigPage.tsx",
+      "usedBy": [],
+      "aliases": [
+        "BrandPage",
+        "ThemePage",
+        "StyleGuidePage",
+        "AppearanceSettings",
+        "ThemePicker"
+      ],
+      "variants": {
+        "canConfigure": "boolean (admin check, or true with no auth)",
+        "app": "the app's own extra subsection"
+      }
+    },
+    {
+      "id": "theme-card",
+      "name": "ThemeCard",
+      "purpose": "Shows a theme as a miniature of the app to choose from.",
+      "tier": "kit",
+      "source": "reference/web/src/routes/config/ThemePanel.tsx#ThemeCard",
+      "usedBy": [
+        "tinnitus-a-go-go",
+        "jimbo-backup"
+      ],
+      "aliases": [
+        "ThemeTile",
+        "TemplateCard"
+      ],
+      "variants": {}
+    },
+    {
+      "id": "badge",
+      "name": "Badge",
+      "purpose": "Shows a status as a short coloured label.",
+      "tier": "kit",
+      "source": "reference/web/src/components/ui/kit.tsx#Badge",
+      "usedBy": [
+        "tinnitus-a-go-go",
+        "jimbo-backup"
+      ],
+      "aliases": [
+        "StatusBadge",
+        "InviteBadge",
+        "VolumeChip",
+        "StatusChip",
+        "Pill"
+      ],
+      "variants": {
+        "tone": "Tone",
+        "dot": "a status dot before the label (was VolumeChip)",
+        "live": "pulses the dot"
+      }
+    },
+    {
+      "id": "tones",
+      "name": "TONES / Tone",
+      "purpose": "Maps an app's statuses onto the fixed set of tones.",
+      "tier": "kit",
+      "source": "reference/web/src/components/ui/kit.tsx#TONES",
+      "usedBy": [
+        "tinnitus-a-go-go",
+        "jimbo-backup"
+      ],
+      "aliases": [
+        "STATUS",
+        "STATUS_TONES",
+        "statusColors"
+      ],
+      "variants": {
+        "tone": "accent | highlight | support | yellow | purple | red | muted"
+      }
+    },
+    {
+      "id": "status-dot",
+      "name": "STATUS_DOT",
+      "purpose": "Shows a row's status as a small flat circle.",
+      "tier": "kit",
+      "source": "reference/web/src/components/ui/kit.tsx#STATUS_DOT",
+      "usedBy": [
+        "tinnitus-a-go-go",
+        "jimbo-backup"
+      ],
+      "aliases": [
+        "StatusDot",
+        "Indicator"
+      ],
+      "variants": {
+        "tone": "Tone",
+        "live": "LIVE — pulses while running (was RUNNING)"
+      }
+    },
+    {
+      "id": "chevron",
+      "name": "Chevron",
+      "purpose": "Signals that a row opens something.",
+      "tier": "kit",
+      "source": "reference/web/src/components/ui/kit.tsx#Chevron",
+      "usedBy": [
+        "tinnitus-a-go-go",
+        "jimbo-backup"
+      ],
+      "aliases": [
+        "Arrow",
+        "Caret"
+      ],
+      "variants": {}
+    },
+    {
+      "id": "theme-dots",
+      "name": "ThemeDots",
+      "purpose": "Shows the theme's colours as the circle motif.",
+      "tier": "kit",
+      "source": "reference/web/src/components/ui/kit.tsx#ThemeDots",
+      "usedBy": [],
+      "aliases": [
+        "Swatches",
+        "ColourDots"
+      ],
+      "variants": {
+        "size": "8 | 12 | 16"
+      }
+    },
+    {
+      "id": "full-bleed",
+      "name": "FullBleed",
+      "purpose": "Runs a section edge to edge.",
+      "tier": "kit",
+      "source": "reference/web/src/components/ui/kit.tsx#FullBleed",
+      "usedBy": [],
+      "aliases": [
+        "Band",
+        "Strip",
+        "FullWidth"
+      ],
+      "variants": {
+        "tone": "surface | accent | highlight | support",
+        "flush": "boolean"
+      }
+    },
+    {
+      "id": "hero-section",
+      "name": "HeroSection",
+      "purpose": "Opens a page with a big title over a pattern, no photo.",
+      "tier": "kit",
+      "source": "reference/web/src/components/ui/kit.tsx#HeroSection",
+      "usedBy": [],
+      "aliases": [
+        "Jumbotron",
+        "Splash",
+        "Landing"
+      ],
+      "variants": {
+        "size": "md | lg",
+        "align": "start | center",
+        "pattern": "a backdrop"
+      }
+    },
+    {
+      "id": "page-header",
+      "name": "PageHeader",
+      "purpose": "Titles an index page.",
+      "tier": "kit",
+      "source": "reference/web/src/components/ui/kit.tsx#PageHeader",
+      "usedBy": [
+        "tinnitus-a-go-go",
+        "jimbo-backup"
+      ],
+      "aliases": [
+        "PageTitle",
+        "Header"
+      ],
+      "variants": {}
+    },
+    {
+      "id": "back-button",
+      "name": "BackButton",
+      "purpose": "Goes back to the page before.",
+      "tier": "kit",
+      "source": "reference/web/src/components/ui/kit.tsx#BackButton",
+      "usedBy": [],
+      "aliases": [
+        "Back"
+      ],
+      "variants": {}
+    },
+    {
+      "id": "banner",
+      "name": "Banner",
+      "purpose": "Opens a detail page over a blurred photo, full width.",
+      "tier": "kit",
+      "source": "reference/web/src/components/ui/kit.tsx#Banner",
+      "usedBy": [
+        "tinnitus-a-go-go"
+      ],
+      "aliases": [
+        "Cover"
+      ],
+      "variants": {}
+    },
+    {
+      "id": "hero",
+      "name": "Hero",
+      "purpose": "Opens a detail page with its image and title.",
+      "tier": "kit",
+      "source": "reference/web/src/components/ui/kit.tsx#Hero",
+      "usedBy": [
+        "tinnitus-a-go-go"
+      ],
+      "aliases": [
+        "DetailHeader"
+      ],
+      "variants": {
+        "aspect": "square | wide"
+      }
+    },
+    {
+      "id": "image-viewer",
+      "name": "ImageViewer",
+      "purpose": "Shows images full screen.",
+      "tier": "kit",
+      "source": "reference/web/src/components/ui/kit.tsx#ImageViewer",
+      "usedBy": [
+        "tinnitus-a-go-go"
+      ],
+      "aliases": [
+        "PhotoCarousel",
+        "Lightbox",
+        "Gallery viewer"
+      ],
+      "variants": {
+        "items": "proposed: several images with swipe between them (PhotoCarousel)",
+        "initialIndex": "proposed"
+      }
+    },
+    {
+      "id": "section",
+      "name": "Section",
+      "purpose": "Holds one titled block of content.",
+      "tier": "kit",
+      "source": "reference/web/src/components/ui/kit.tsx#Section",
+      "usedBy": [
+        "tinnitus-a-go-go",
+        "jimbo-backup"
+      ],
+      "aliases": [
+        "Card section",
+        "Panel"
+      ],
+      "variants": {
+        "flush": "boolean",
+        "count": "number"
+      }
+    },
+    {
+      "id": "list",
+      "name": "List",
+      "purpose": "Holds rows in one card.",
+      "tier": "kit",
+      "source": "reference/web/src/components/ui/kit.tsx#List",
+      "usedBy": [
+        "tinnitus-a-go-go",
+        "jimbo-backup"
+      ],
+      "aliases": [
+        "Table",
+        "Rows"
+      ],
+      "variants": {}
+    },
+    {
+      "id": "list-group-label",
+      "name": "ListGroupLabel",
+      "purpose": "Starts a group of rows (a month, a kind).",
+      "tier": "kit",
+      "source": "reference/web/src/components/ui/kit.tsx#ListGroupLabel",
+      "usedBy": [
+        "tinnitus-a-go-go",
+        "jimbo-backup"
+      ],
+      "aliases": [
+        "Group",
+        "GroupHeader",
+        "Divider"
+      ],
+      "variants": {}
+    },
+    {
+      "id": "date-block",
+      "name": "DateBlock",
+      "purpose": "Shows a date as a tear-off calendar ticket.",
+      "tier": "kit",
+      "source": "reference/web/src/components/ui/kit.tsx#DateBlock",
+      "usedBy": [
+        "tinnitus-a-go-go",
+        "jimbo-backup"
+      ],
+      "aliases": [
+        "DateTicket",
+        "CalendarIcon"
+      ],
+      "variants": {}
+    },
+    {
+      "id": "event-row",
+      "name": "EventRow",
+      "purpose": "Shows a dated item in a list, with its status.",
+      "tier": "kit",
+      "source": "reference/web/src/components/ui/kit.tsx#EventRow",
+      "usedBy": [
+        "tinnitus-a-go-go",
+        "jimbo-backup"
+      ],
+      "aliases": [
+        "RunRow",
+        "ConcertRow",
+        "ShowRow",
+        "ItemRow"
+      ],
+      "variants": {
+        "status": "{ tone, label }",
+        "selected": "select mode",
+        "status.live": "pulsing dot while running",
+        "onOpen": "opens something in place instead of a link (was RunRow)"
+      }
+    },
+    {
+      "id": "entity-row",
+      "name": "EntityRow",
+      "purpose": "Shows a named thing (a person, a place) with an avatar.",
+      "tier": "kit",
+      "source": "reference/web/src/components/ui/kit.tsx#EntityRow",
+      "usedBy": [
+        "tinnitus-a-go-go"
+      ],
+      "aliases": [
+        "Avatar row",
+        "SearchSheet Row"
+      ],
+      "variants": {}
+    },
+    {
+      "id": "media-card",
+      "name": "MediaCard",
+      "purpose": "Leads with an image in a grid.",
+      "tier": "kit",
+      "source": "reference/web/src/components/ui/kit.tsx#MediaCard",
+      "usedBy": [
+        "tinnitus-a-go-go"
+      ],
+      "aliases": [
+        "PosterCard",
+        "FlyerCard",
+        "Tile"
+      ],
+      "variants": {
+        "aspect": "square | portrait"
+      }
+    },
+    {
+      "id": "link-card",
+      "name": "LinkCard",
+      "purpose": "Navigates somewhere, as a card.",
+      "tier": "kit",
+      "source": "reference/web/src/components/ui/kit.tsx#LinkCard",
+      "usedBy": [
+        "tinnitus-a-go-go",
+        "jimbo-backup"
+      ],
+      "aliases": [
+        "NavCard",
+        "SettingsLink"
+      ],
+      "variants": {
+        "accent": "boolean"
+      }
+    },
+    {
+      "id": "stat-tile",
+      "name": "StatTile",
+      "purpose": "Shows one headline number.",
+      "tier": "kit",
+      "source": "reference/web/src/components/ui/kit.tsx#StatTile",
+      "usedBy": [
+        "tinnitus-a-go-go"
+      ],
+      "aliases": [
+        "Metric",
+        "KPI",
+        "Stat cell"
+      ],
+      "variants": {
+        "accent": "accent | highlight | support",
+        "size": "proposed: sm — a compact cell for admin summaries (dl stat grids)"
+      }
+    },
+    {
+      "id": "stat-grid",
+      "name": "StatGrid",
+      "purpose": "Lays out headline numbers.",
+      "tier": "kit",
+      "source": "reference/web/src/components/ui/kit.tsx#StatGrid",
+      "usedBy": [
+        "tinnitus-a-go-go"
+      ],
+      "aliases": [
+        "Stats",
+        "dl stat grid"
+      ],
+      "variants": {}
+    },
+    {
+      "id": "ranked-list",
+      "name": "RankedList",
+      "purpose": "Shows a top-N with counts.",
+      "tier": "kit",
+      "source": "reference/web/src/components/ui/kit.tsx#RankedList",
+      "usedBy": [
+        "tinnitus-a-go-go"
+      ],
+      "aliases": [
+        "Leaderboard",
+        "TopList"
+      ],
+      "variants": {}
+    },
+    {
+      "id": "search-field",
+      "name": "SearchField",
+      "purpose": "Searches or filters as you type.",
+      "tier": "kit",
+      "source": "reference/web/src/components/ui/kit.tsx#SearchField",
+      "usedBy": [
+        "tinnitus-a-go-go"
+      ],
+      "aliases": [
+        "SearchInput",
+        "SearchBar"
+      ],
+      "variants": {}
+    },
+    {
+      "id": "range-field",
+      "name": "RangeField",
+      "purpose": "Sets a number with a labelled slider.",
+      "tier": "kit",
+      "source": "reference/web/src/components/ui/kit.tsx#RangeField",
+      "usedBy": [
+        "tinnitus-a-go-go",
+        "jimbo-backup"
+      ],
+      "aliases": [
+        "Slider"
+      ],
+      "variants": {}
+    },
+    {
+      "id": "select-field",
+      "name": "SelectField",
+      "purpose": "Picks one option from many.",
+      "tier": "kit",
+      "source": "reference/web/src/components/ui/kit.tsx#SelectField",
+      "usedBy": [
+        "tinnitus-a-go-go",
+        "jimbo-backup"
+      ],
+      "aliases": [
+        "Select",
+        "Dropdown",
+        "YearPicker"
+      ],
+      "variants": {}
+    },
+    {
+      "id": "tabs",
+      "name": "Tabs",
+      "purpose": "Switches between 2–4 views of one thing.",
+      "tier": "kit",
+      "source": "reference/web/src/components/ui/kit.tsx#Tabs",
+      "usedBy": [
+        "tinnitus-a-go-go"
+      ],
+      "aliases": [
+        "SegmentedControl",
+        "Toggle group"
+      ],
+      "variants": {}
+    },
+    {
+      "id": "pill-tabs",
+      "name": "PillTabs",
+      "purpose": "Filters by one of several values.",
+      "tier": "kit",
+      "source": "reference/web/src/components/ui/kit.tsx#PillTabs",
+      "usedBy": [
+        "tinnitus-a-go-go"
+      ],
+      "aliases": [
+        "FilterPills",
+        "Chips"
+      ],
+      "variants": {}
+    },
+    {
+      "id": "pager",
+      "name": "Pager",
+      "purpose": "Pages through a long list.",
+      "tier": "kit",
+      "source": "reference/web/src/components/ui/kit.tsx#Pager",
+      "usedBy": [
+        "tinnitus-a-go-go"
+      ],
+      "aliases": [
+        "Pagination"
+      ],
+      "variants": {}
+    },
+    {
+      "id": "sheet",
+      "name": "Sheet",
+      "purpose": "The one modal: bottom sheet on phones, dialog on desktop.",
+      "tier": "kit",
+      "source": "reference/web/src/components/ui/kit.tsx#Sheet",
+      "usedBy": [
+        "tinnitus-a-go-go",
+        "jimbo-backup"
+      ],
+      "aliases": [
+        "Modal",
+        "Drawer",
+        "BottomSheet",
+        "Dialog",
+        "Popup",
+        "LogSheet",
+        "SearchSheet",
+        "AddConcertModal"
+      ],
+      "variants": {
+        "wide": "boolean",
+        "title": "string",
+        "subtitle": "node"
+      }
+    },
+    {
+      "id": "loading",
+      "name": "Loading",
+      "purpose": "Shows a page-shaped skeleton while data loads.",
+      "tier": "kit",
+      "source": "reference/web/src/components/ui/kit.tsx#Loading",
+      "usedBy": [
+        "tinnitus-a-go-go",
+        "jimbo-backup"
+      ],
+      "aliases": [
+        "Spinner",
+        "Skeleton"
+      ],
+      "variants": {}
+    },
+    {
+      "id": "empty-state",
+      "name": "EmptyState",
+      "purpose": "Says what's missing and offers the next step.",
+      "tier": "kit",
+      "source": "reference/web/src/components/ui/kit.tsx#EmptyState",
+      "usedBy": [
+        "tinnitus-a-go-go",
+        "jimbo-backup"
+      ],
+      "aliases": [
+        "NoData",
+        "Placeholder"
+      ],
+      "variants": {}
+    },
+    {
+      "id": "theme-scope",
+      "name": "ThemeScope",
+      "purpose": "Shows part of a page in another theme without changing the rest.",
+      "tier": "kit",
+      "source": "reference/web/src/components/ui/kit.tsx#ThemeScope",
+      "usedBy": [],
+      "aliases": [
+        "ThemePreview",
+        "Scoped theme"
+      ],
+      "variants": {}
+    },
+    {
+      "id": "map-view",
+      "name": "MapView",
+      "purpose": "Shows places on a map in the theme's colours.",
+      "tier": "kit",
+      "source": "reference/web/src/components/MapView.tsx",
+      "usedBy": [],
+      "aliases": [
+        "VenueMap",
+        "MapPage map",
+        "Map",
+        "LocationMap"
+      ],
+      "variants": {
+        "size": "compact | full | fill",
+        "selected": "pin id",
+        "theme": "only inside ThemeScope"
+      }
+    },
+    {
+      "id": "map-pin-card",
+      "name": "MapPinCard",
+      "purpose": "Shows the chosen place on a map page, above the dock.",
+      "tier": "kit",
+      "source": "reference/web/src/components/MapView.tsx#MapPinCard",
+      "usedBy": [],
+      "aliases": [
+        "VenuePopup",
+        "VenuePanel",
+        "MarkerPopup"
+      ],
+      "variants": {}
+    },
+    {
+      "id": "view-switch",
+      "name": "ViewSwitch",
+      "purpose": "Switches between two or three views of one page as links.",
+      "tier": "kit",
+      "source": "reference/web/src/components/ui/kit.tsx#ViewSwitch",
+      "usedBy": [
+        "tinnitus-a-go-go"
+      ],
+      "aliases": [
+        "VenueViewSwitch",
+        "ListMapToggle"
+      ],
+      "variants": {
+        "floating": "boolean"
+      }
+    },
+    {
+      "id": "save-bar",
+      "name": "Save bar",
+      "purpose": "Offers Undo / Save above the dock while there's something unsaved.",
+      "tier": "pattern",
+      "source": "reference/web/src/routes/config/ThemePanel.tsx",
+      "usedBy": [
+        "tinnitus-a-go-go",
+        "jimbo-backup"
+      ],
+      "aliases": [
+        "Unsaved changes bar"
+      ],
+      "variants": {}
+    },
+    {
+      "id": "offline-banner",
+      "name": "Offline banner",
+      "purpose": "Says the app is offline and how many changes are waiting.",
+      "tier": "pattern",
+      "source": "tinnitus-a-go-go:apps/web/src/routes/AppShell.tsx#OfflineBanner",
+      "usedBy": [
+        "tinnitus-a-go-go"
+      ],
+      "aliases": [
+        "OfflineBanner",
+        "Pending banner"
+      ],
+      "variants": {}
+    },
+    {
+      "id": "background-work",
+      "name": "Background work ring",
+      "purpose": "Shows background work (uploads, syncing) as a progress ring in a corner, with pause and cancel.",
+      "tier": "pattern",
+      "source": "tinnitus-a-go-go:apps/web/src/components/UploadIndicator.tsx",
+      "usedBy": [
+        "tinnitus-a-go-go"
+      ],
+      "aliases": [
+        "UploadIndicator",
+        "ProgressRing"
+      ],
+      "variants": {}
+    },
+    {
+      "id": "select-mode",
+      "name": "Select mode",
+      "purpose": "Turns rows into toggles with a floating action bar.",
+      "tier": "pattern",
+      "source": "reference/web/src/components/ui/kit.tsx#EventRow",
+      "usedBy": [
+        "tinnitus-a-go-go"
+      ],
+      "aliases": [
+        "Bulk select",
+        "Multi-select"
+      ],
+      "variants": {}
+    },
+    {
+      "id": "key-value",
+      "name": "KeyValue",
+      "purpose": "Shows a read-only label and its value.",
+      "tier": "kit",
+      "source": "reference/web/src/components/ui/kit.tsx#KeyValue",
+      "usedBy": [
+        "tinnitus-a-go-go",
+        "jimbo-backup"
+      ],
+      "aliases": [
+        "dl / dt rows",
+        "DetailRow",
+        "MetaRow",
+        "InfoRow"
+      ],
+      "variants": {
+        "layout": "inline (label left, value right) | stacked (label above)"
+      }
+    },
+    {
+      "id": "autocomplete",
+      "name": "Autocomplete",
+      "purpose": "Picks an existing record as you type, or makes a new one.",
+      "tier": "kit",
+      "source": "reference/web/src/components/ui/kit.tsx#Autocomplete",
+      "usedBy": [
+        "tinnitus-a-go-go"
+      ],
+      "aliases": [
+        "VenueAutocomplete",
+        "ArtistAutocomplete",
+        "ArtistInput",
+        "Combobox",
+        "Typeahead"
+      ],
+      "variants": {
+        "multiple": "boolean (a lineup)",
+        "allowNew": "boolean"
+      }
+    },
+    {
+      "id": "switch-row",
+      "name": "SwitchRow",
+      "purpose": "Turns one setting on or off, as a row with a label and a hint.",
+      "tier": "kit",
+      "source": "reference/web/src/components/ui/kit.tsx#SwitchRow",
+      "usedBy": [
+        "tinnitus-a-go-go"
+      ],
+      "aliases": [
+        "Toggle",
+        "Switch",
+        "Checkbox row"
+      ],
+      "variants": {}
+    },
+    {
+      "id": "progress-bar",
+      "name": "ProgressBar",
+      "purpose": "Shows how far along a known-length job is.",
+      "tier": "candidate",
+      "source": "tinnitus-a-go-go:apps/web/src/routes/AccountPage.tsx#OfflineCard",
+      "usedBy": [
+        "tinnitus-a-go-go"
+      ],
+      "aliases": [
+        "Progress",
+        "Meter"
+      ],
+      "variants": {
+        "tone": "Tone"
+      }
+    },
+    {
+      "id": "bar-chart",
+      "name": "BarChart",
+      "purpose": "Compares counts across a few categories as bars.",
+      "tier": "candidate",
+      "source": "tinnitus-a-go-go:apps/web/src/routes/StatsPage.tsx#YearBars",
+      "usedBy": [
+        "tinnitus-a-go-go"
+      ],
+      "aliases": [
+        "YearBars",
+        "MiniVBars",
+        "Histogram"
+      ],
+      "variants": {
+        "direction": "horizontal | vertical",
+        "split": "two-part bars"
+      }
+    },
+    {
+      "id": "heatmap",
+      "name": "Heatmap",
+      "purpose": "Shows how often something happens across a grid of days or weeks.",
+      "tier": "candidate",
+      "source": "tinnitus-a-go-go:apps/web/src/routes/StatsPage.tsx#Heatmap",
+      "usedBy": [
+        "tinnitus-a-go-go"
+      ],
+      "aliases": [
+        "Calendar heatmap",
+        "ActivityGrid"
+      ],
+      "variants": {}
+    },
+    {
+      "id": "timeline",
+      "name": "Timeline",
+      "purpose": "Shows milestones in order along a line.",
+      "tier": "candidate",
+      "source": "tinnitus-a-go-go:apps/web/src/routes/StatsPage.tsx#Milestones",
+      "usedBy": [
+        "tinnitus-a-go-go"
+      ],
+      "aliases": [
+        "Milestones",
+        "History"
+      ],
+      "variants": {}
+    },
+    {
+      "id": "share-button",
+      "name": "ShareButton",
+      "purpose": "Makes an image of something and opens the share sheet.",
+      "tier": "candidate",
+      "source": "tinnitus-a-go-go:apps/web/src/components/ui/kit.tsx#ShareButton",
+      "usedBy": [
+        "tinnitus-a-go-go"
+      ],
+      "aliases": [
+        "Share",
+        "ExportImage"
+      ],
+      "variants": {}
+    },
+    {
+      "id": "code-block",
+      "name": "CodeBlock",
+      "purpose": "Shows raw text (a log, a config) in monospace, wrapped.",
+      "tier": "candidate",
+      "source": "jimbo-backup:web/src/components/ui/kit.tsx#LogSheet",
+      "usedBy": [
+        "jimbo-backup"
+      ],
+      "aliases": [
+        "LogView",
+        "pre",
+        "Console"
+      ],
+      "variants": {
+        "follow": "stays scrolled to the end while it grows"
+      }
+    },
+    {
+      "id": "verdict",
+      "name": "Verdict",
+      "purpose": "Answers \"is everything fine?\" in one line before the details.",
+      "tier": "candidate",
+      "source": "jimbo-backup:web/src/routes/HomePage.tsx#Verdict",
+      "usedBy": [
+        "jimbo-backup"
+      ],
+      "aliases": [
+        "StatusSummary",
+        "Headline status"
+      ],
+      "variants": {
+        "tone": "accent (fine) | highlight (needs a look)"
+      }
+    },
+    {
+      "id": "tinnitus.status-badge",
+      "name": "StatusBadge",
+      "purpose": "The app's attendance statuses as kit badges.",
+      "tier": "domain",
+      "source": "tinnitus-a-go-go:apps/web/src/components/ui/kit.tsx#StatusBadge",
+      "usedBy": [
+        "tinnitus-a-go-go"
+      ],
+      "aliases": [],
+      "variants": {},
+      "matches": "badge"
+    },
+    {
+      "id": "tinnitus.wordmark",
+      "name": "Wordmark",
+      "purpose": "The app's vector name in the top bar and sign-in pages.",
+      "tier": "domain",
+      "source": "tinnitus-a-go-go:apps/web/src/components/Wordmark.tsx",
+      "usedBy": [
+        "tinnitus-a-go-go"
+      ],
+      "aliases": [],
+      "variants": {},
+      "matches": "header-title",
+      "note": "A logo — the no-logo rule says HeaderTitle. Ryan's call."
+    },
+    {
+      "id": "tinnitus.add-flows",
+      "name": "Add and edit flows",
+      "purpose": "Adding and editing the app's records (sheets, editors, lineups, setlists).",
+      "tier": "domain",
+      "source": "tinnitus-a-go-go:apps/web/src/routes/AddConcertModal.tsx",
+      "usedBy": [
+        "tinnitus-a-go-go"
+      ],
+      "aliases": [],
+      "variants": {},
+      "matches": "sheet"
+    },
+    {
+      "id": "tinnitus.map",
+      "name": "Map views",
+      "purpose": "The app's map page: its place list grouped by area beside the map.",
+      "tier": "domain",
+      "source": "tinnitus-a-go-go:apps/web/src/routes/MapPage.tsx",
+      "usedBy": [
+        "tinnitus-a-go-go"
+      ],
+      "aliases": [],
+      "variants": {},
+      "matches": "map-view"
+    },
+    {
+      "id": "tinnitus.follow-up",
+      "name": "Follow-up prompt",
+      "purpose": "A daily floating prompt to settle past records.",
+      "tier": "domain",
+      "source": "tinnitus-a-go-go:apps/web/src/routes/FollowUpPrompt.tsx",
+      "usedBy": [
+        "tinnitus-a-go-go"
+      ],
+      "aliases": [],
+      "variants": {}
+    },
+    {
+      "id": "tinnitus.data-tools",
+      "name": "Data tools",
+      "purpose": "Duplicate merging, health checks and imports for the app's data.",
+      "tier": "domain",
+      "source": "tinnitus-a-go-go:apps/web/src/routes/DataCleanupPage.tsx",
+      "usedBy": [
+        "tinnitus-a-go-go"
+      ],
+      "aliases": [],
+      "variants": {}
+    },
+    {
+      "id": "tinnitus.services-panel",
+      "name": "ServicesPanel",
+      "purpose": "Links to the app's back-end services for admins.",
+      "tier": "domain",
+      "source": "tinnitus-a-go-go:apps/web/src/components/ServicesPanel.tsx",
+      "usedBy": [
+        "tinnitus-a-go-go"
+      ],
+      "aliases": [],
+      "variants": {}
+    },
+    {
+      "id": "tinnitus.year-review",
+      "name": "Year review",
+      "purpose": "A year's records as a poster wall with stats.",
+      "tier": "domain",
+      "source": "tinnitus-a-go-go:apps/web/src/routes/YearReviewPage.tsx",
+      "usedBy": [
+        "tinnitus-a-go-go"
+      ],
+      "aliases": [],
+      "variants": {},
+      "matches": "media-card"
+    },
+    {
+      "id": "backup.backup-row",
+      "name": "BackupRow",
+      "purpose": "One backup job with its last run and a Run button.",
+      "tier": "domain",
+      "source": "jimbo-backup:web/src/components/ui/kit.tsx#BackupRow",
+      "usedBy": [
+        "jimbo-backup"
+      ],
+      "aliases": [],
+      "variants": {}
+    },
+    {
+      "id": "backup.log-sheet",
+      "name": "LogSheet",
+      "purpose": "A run's log in a sheet, following along while it runs.",
+      "tier": "domain",
+      "source": "jimbo-backup:web/src/components/ui/kit.tsx#LogSheet",
+      "usedBy": [
+        "jimbo-backup"
+      ],
+      "aliases": [],
+      "variants": {},
+      "matches": "sheet"
+    }
+  ]
+}

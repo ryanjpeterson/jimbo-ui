@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Check that every place that states jimbo.ui's version agrees: both plugin
- * manifests, the skill's "This is jimbo.ui X" line, and the newest
+ * manifests, the foundation's JIMBO_UI.version, the skill's "This is jimbo.ui X" line, and the newest
  * CHANGELOG.md entry. Exits 1 and lists them when they don't.
  *
  *   node scripts/versions.mjs
@@ -16,6 +16,7 @@ const found = {
   "plugin.json": JSON.parse(read(".claude-plugin/plugin.json")).version,
   "marketplace.json": JSON.parse(read(".claude-plugin/marketplace.json")).plugins[0].version,
   "SKILL.md": /This is jimbo\.ui (\d+\.\d+\.\d+)/.exec(read("skills/jimbo-ui/SKILL.md"))?.[1],
+  "foundation jimbo.ts": /version: "(\d+\.\d+\.\d+)"/.exec(read("foundation/src/lib/jimbo.ts"))?.[1],
   "CHANGELOG.md": /^## (\d+\.\d+\.\d+)/m.exec(read("CHANGELOG.md"))?.[1],
 };
 const all = new Set(Object.values(found));

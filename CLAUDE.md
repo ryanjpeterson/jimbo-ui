@@ -18,10 +18,12 @@ neutral names and examples. Before every commit, scan for the first app's
 name and domain words:
 
 ```bash
-git ls-files | grep -v "package-lock\|CLAUDE.md\|CHANGELOG" | xargs grep -il "tinnitus\|tagg\b\|concert\|festival\|venue\|attended\|immich\|jimbo\.backup\|jimbobackup\|jimbo-backup"
+git ls-files | grep -v "package-lock\|CLAUDE.md\|CHANGELOG\|^registry/" | xargs grep -il "tinnitus\|tagg\b\|concert\|festival\|venue\|attended\|immich\|jimbo\.backup\|jimbobackup\|jimbo-backup"
 ```
 
 It must print nothing. Add an app's words to it when a new app adopts jimbo.ui.
+`registry/` is the one exception: it names the apps and their components
+(names and paths only, never code), so the scan skips it.
 
 ## Layout
 
@@ -29,9 +31,10 @@ It must print nothing. Add an app's words to it when a new app adopts jimbo.ui.
 | --- | --- | --- |
 | `foundation/` | Theme engine, templates, `globals.css`, Tailwind config, `Button`, `ColorPicker`, `cn`, gestures | Copied verbatim into apps on every update — never holds app values |
 | `starter/` | `brand.config.ts`, `tokens.css`, `favicon.svg` | Copied once into a new app, then app-owned |
-| `reference/` | Generic kit, `AppShell`, `HeaderTitle`, Brand and Style guide pages, `useBrand`, `index.html` | Apps adapt and extend them |
+| `reference/` | Generic kit, `AppShell`, `HeaderTitle`, `MapView`, the jimbo-ui config section (`JimboConfigPage` + `routes/config/`), the archetypes (`archetypes/catalogue.tsx`, `dashboard.tsx`), `useBrand`, `index.html` | Apps adapt and extend them |
+| `registry/` | `apps.json` (every app on jimbo-ui) and `components.json` (every UI element across them) | Pull before writing; names and paths only |
 | `showcase/` | Demo app assembled from reference → foundation → starter → `showcase/overrides/` | Published as a private page each release |
-| `scripts/` | `tokens.mjs` (an app's `tokens.css`), `contrast.mjs` (template contrast report), `versions.mjs` (versions agree), `build-zip.sh` (claude.ai upload) | |
+| `scripts/` | `inventory.mjs` (registry report), `tokens.mjs` (an app's `tokens.css`), `contrast.mjs` (template contrast report), `versions.mjs` (versions agree), `build-zip.sh` (claude.ai upload) | |
 | `hooks/` | `hooks.json` + `check-version.mjs`: tells an app's session when it's behind the installed release | |
 | `skills/jimbo-ui/` | `SKILL.md` (core rules + workflows), `guide.md` (the full guide) | |
 | `.claude-plugin/` | `plugin.json` and `marketplace.json` | Versions must match |
@@ -42,27 +45,31 @@ shades; coloured shapes flat with a slight outline (no gloss or glows), depth
 from layers (lightly frosted solid surfaces, borders, the backdrop); circles
 always flat, side by side, at fixed sizes — no orbs; softly rounded corners, not pills; sans, mono or serif type
 for headings and body;
-circles of the theme colours as a motif; templates in Everyday, Holidays, Countries,
-Provinces and Sports categories (team themes from real colours, via
-`scripts/template-from-colours.mjs`); no brand colour white or grey;
+circles of the theme colours as a motif; each look once, in light, mid and
+dark (made from its own colours where it wasn't written); templates in
+Everyday, Holidays, Countries, Provinces, Games and Sports categories (team,
+flag and game themes from real colours, via `scripts/template-from-colours.mjs`);
+backdrops in Abstract, Geo, Vintage and Texture groups; no brand colour white or grey;
 no logo — the brand is the app's name as header text (`HeaderTitle`), with a
 dot in the accent; the favicon is the only graphic.
 
 ## Running and checking
 
 - Showcase: `npm --prefix showcase install` once, then the **jimbo-ui-showcase**
-  launch config (port 4455) or `npm --prefix showcase run dev`. It has Home,
-  List, Kit and Theme tabs; theme changes are saved in the browser. With
+  launch config (port 4455) or `npm --prefix showcase run dev`. It has Home (a
+  carousel of looks), Components, Archetypes and Settings tabs, with the
+  jimbo-ui config section under Settings; theme changes are saved in the browser. With
   Docker: `docker compose up --build` (built app, port 4460) or
   `docker compose --profile dev up` (live reload, port 4461). It doubles as a
-  playground: Theme → *Share this look* exports a theme file, brand.config
+  playground: Settings → jimbo-ui config → Theme → *Share this look* exports a theme file, brand.config
   line or tokens.css for an app.
 - Typecheck: `npm --prefix showcase run typecheck` (assembles `.jimbo/` and
   checks the showcase plus all reference and foundation code).
 - Contrast: `node scripts/contrast.mjs --check` must pass for every template
   after any change to `theme.ts` or `themes.ts`.
 - Plugin manifests: `claude plugin validate --strict .`
-- Versions: `node scripts/versions.mjs` (manifests, SKILL.md, CHANGELOG agree)
+- Versions: `node scripts/versions.mjs` (manifests, `foundation/src/lib/jimbo.ts`, SKILL.md, CHANGELOG agree)
+- Registry: `node scripts/inventory.mjs` (reads the apps' checkouts in `~/Development`)
 - Check UI at phone width (375 px) in a dark, a mid and a light template.
 
 ## Releasing
@@ -76,7 +83,7 @@ Follow "change and release the guidelines" in `skills/jimbo-ui/SKILL.md`. In sho
    fixes and small additions; 1.0.0 only when Ryan calls it stable. Record
    work under "Unreleased" as you go; don't number or tag anything until
    Ryan asks for a release.
-3. Bump `version` in both `.claude-plugin` files and the "This is jimbo.ui"
+3. Bump `version` in both `.claude-plugin` files, `foundation/src/lib/jimbo.ts` and the "This is jimbo.ui"
    line in `SKILL.md`. Start the changelog entry with a one-line summary (the
    session-start check shows it to apps).
 4. Run the checks above, commit, `claude plugin tag .` (creates

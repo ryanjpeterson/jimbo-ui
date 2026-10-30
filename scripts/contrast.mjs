@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * Contrast and variety report for every theme template, using the foundation
- * theme engine.
+ * Contrast and variety report for every look in every page tone (light, mid,
+ * dark — as written or made by atTone), using the foundation theme engine.
  *
  *   node scripts/contrast.mjs          table of every template
  *   node scripts/contrast.mjs --check  exit 1 if any template misses a target
@@ -25,47 +25,35 @@ try {
   for (const f of ["theme.ts", "themes.ts"]) copyFileSync(join(root, "foundation/src/lib", f), join(dir, f));
   writeFileSync(join(dir, "brand.config.ts"), `export const BRAND = { name: "Default", storagePrefix: "x", defaultTheme: { accent: "#A8FF3E", highlight: "#FF3D6E", background: "#141416", support: "#2EC5FF" } };\n`);
   writeFileSync(join(dir, "run.ts"), `
-import { contrast, hexToRgb, themeHex } from "./theme";
-import { TEMPLATE_SETS } from "./themes";
-const T = { text: 7, muted: 4.5, subtle: 3.5, border: 1.75, card: 1.19, accent: 3, highlight: 3, support: 4.5, button: 4.5, apart: 10 };
-/** CIE76 ΔE between two hex colours (sRGB → Lab, D65). */
-function deltaE(a: string, b: string): number {
-  const lab = (hex: string) => {
-    const [r, g, bl] = hexToRgb(hex).map((v) => { const c = v / 255; return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; }) as [number, number, number];
-    const f = (t: number) => (t > 0.008856 ? Math.cbrt(t) : 7.787 * t + 16 / 116);
-    const [x, y, z] = [(r * 0.4124 + g * 0.3576 + bl * 0.1805) / 0.95047, r * 0.2126 + g * 0.7152 + bl * 0.0722, (r * 0.0193 + g * 0.1192 + bl * 0.9505) / 1.08883].map(f) as [number, number, number];
-    return [116 * y - 16, 500 * (x - y), 200 * (y - z)];
-  };
-  const [p, q] = [lab(a), lab(b)];
-  return Math.hypot(p[0]! - q[0]!, p[1]! - q[1]!, p[2]! - q[2]!);
-}
+import { PAGE_TONES, TEMPLATE_TARGETS as T, templateScores } from "./theme";
+import { familyAt, FAMILY_SETS } from "./themes";
 const check = process.argv.includes("--check");
-let fails = 0;
-const cols = ["text", "muted", "subtle", "border", "card", "accent", "highlight", "support", "button", "apart"] as const;
-console.log("template".padEnd(26) + cols.map((c) => c.slice(0, 6).padEnd(7)).join(""));
+let fails = 0, made = 0, unmade: string[] = [];
+const cols = Object.keys(T) as (keyof typeof T)[];
+console.log("look".padEnd(30) + cols.map((c) => c.slice(0, 6).padEnd(7)).join(""));
 const seen = new Set<string>();
-for (const s of TEMPLATE_SETS) for (const g of s.groups) {
-  // City tabs repeat league teams; check each template once.
-  const fresh = g.templates.filter((t) => !seen.has(t.name + "|" + t.vibe));
+for (const s of FAMILY_SETS) for (const g of s.groups) {
+  // City tabs repeat league teams; check each look once.
+  const fresh = g.families.filter((f) => !seen.has(f.key));
   if (!fresh.length) continue;
   console.log("— " + s.label + (g.label !== s.label ? " · " + g.label : ""));
-  for (const t of fresh) {
-    seen.add(t.name + "|" + t.vibe);
-    const c = themeHex(t.theme);
-    const r: Record<(typeof cols)[number], number> = {
-      text: contrast(c.text!, c.surface!), muted: contrast(c["text-muted"]!, c.surface!), subtle: contrast(c["text-subtle"]!, c.surface!),
-      border: contrast(c.border!, c.surface!), card: contrast(c.surface!, c.bg!),
-      accent: contrast(c.accent!, c.bg!), highlight: contrast(c.highlight!, c.bg!), support: contrast(c.support!, c.surface!),
-      button: contrast(c["on-accent"]!, c.accent!),
-      // Accent and highlight need 15 apart; the other pairs 10 (scaled so the one target, 10, covers both).
-      apart: Math.min(deltaE(c.accent!, c.highlight!) * (10 / 15), deltaE(c.accent!, c.support!), deltaE(c.highlight!, c.support!)),
-    };
-    const bad = cols.filter((k) => r[k] < T[k]);
-    fails += bad.length ? 1 : 0;
-    console.log(t.name.slice(0, 25).padEnd(26) + cols.map((k) => (k === "apart" ? r[k].toFixed(0) : r[k].toFixed(2)).padEnd(7)).join("") + (bad.length ? " low: " + bad.join(", ") : ""));
+  for (const f of fresh) {
+    seen.add(f.key);
+    // Every tone: as written, or made from the look's own colours (a tone it can't make falls back to its nearest).
+    for (const tone of PAGE_TONES) {
+      const t = familyAt(f, tone);
+      if (!t) { unmade.push(f.name + " (" + tone + ")"); continue; }
+      if (!f.authored[tone]) made++;
+      const r = templateScores(t.theme);
+      const bad = cols.filter((k) => r[k] < T[k]);
+      fails += bad.length ? 1 : 0;
+      const label = (f.name.slice(0, 20) + " · " + tone + (f.authored[tone] ? "" : "*")).padEnd(30);
+      console.log(label + cols.map((k) => (k === "apart" ? r[k].toFixed(0) : r[k].toFixed(2)).padEnd(7)).join("") + (bad.length ? " low: " + bad.join(", ") : ""));
+    }
   }
 }
-if (check && fails) { console.error(fails + " template(s) below target"); process.exit(1); }
+console.log("\\n" + seen.size + " looks; " + made + " tones made from their own colours (*); shown at their nearest tone: " + (unmade.join(", ") || "none"));
+if (check && fails) { console.error(fails + " look(s) below target"); process.exit(1); }
 `);
   execFileSync("npx", ["-y", "tsx", join(dir, "run.ts"), ...process.argv.slice(2)], { stdio: "inherit" });
 } catch (e) {

@@ -19,6 +19,105 @@ the matching 0.x release.
 
 Nothing yet.
 
+## 0.8.0 — 2026-10-30
+
+One library with no duplicates, one jimbo-ui config section per app, every look in light, mid and dark, 21 backdrops, maps in the theme, and two archetypes to copy.
+
+### Added
+- **Registry:** `registry/apps.json` (every app on jimbo-ui: repo, web
+  root, version, auth, registered, last audited) and
+  `registry/components.json` (every UI element across all apps: id, name,
+  purpose, tier — foundation, kit, pattern, candidate or domain — source,
+  usedBy, aliases, variants). Names and paths only, never app code.
+- **Dedupe rules** (guide section 13): match by purpose and behaviour, not
+  name; a match is that component (an alias, maybe a variant prop), never a
+  second one; promote at two apps or when clearly generic; domain pieces
+  stay in their app; pull before writing to the registry.
+- **`scripts/inventory.mjs`:** component × app table, candidates built by
+  more than one app, unused kit components, apps behind, raw colours in app
+  code, and config sections that are missing, split up or gated wrong.
+- **The jimbo-ui config section** (`reference/web/src/routes/JimboConfigPage.tsx`):
+  one place at `/jimbo-ui` with Theme, Brand, Style guide, About and an
+  optional App tab, gated by `canConfigure`; `JimboConfigLink` for the
+  app's settings. The old Brand and Style guide pages are now its panels
+  (`routes/config/ThemePanel.tsx`, `routes/config/StyleGuidePanel.tsx`).
+- **`MapView` and `MapPinCard`** (`reference/web/src/components/MapView.tsx`):
+  every map in the theme's style with flat highlight pins; a themed preview
+  when there's no Maps key. Needs `@vis.gl/react-google-maps`.
+- **`ThemeScope`** (kit) and **`themeVars`** (`theme.ts`): theme part of a
+  page — colours, type and backdrop — without touching the rest;
+  `.theme-scope` in `globals.css`.
+- **Archetypes as templates:** `reference/web/src/archetypes/catalogue.tsx`
+  (Home · Entries · People · Places, with a map) and `dashboard.tsx` (a
+  single-page dashboard of jobs, runs and settings), to copy and remix.
+- `foundation/src/lib/jimbo.ts`: the release's version and links
+  (`JIMBO_UI`), and the app's `jimbo-ui.json` when Vite passes it in
+  (`__JIMBO_APP__`) for the About tab.
+- `jimbo-ui.json` gains `auth` (`"admin"` or `"none"`), `registry` and
+  `components` (`uses`, `local`, `overrides`).
+- Skill workflows **Register an app** and **Consolidate an app**, with
+  their trigger phrases.
+- **Every look in light, mid and dark:** each palette, team, flag or game
+  is one tile (`FAMILY_SETS`, `TemplateFamily`), and a Light / Mid / Dark
+  switch sets the page tone every tile shows. Tones a look wasn't written
+  in are made from its own colours (`atTone`, `familyAt`, `familyLook`);
+  every look passes the checks in every tone it's shown in (237 looks, 332
+  made tones). `toneOf`, `PAGE_TONES`, `templateScores`, `templateIssues`
+  in `theme.ts`; `scripts/contrast.mjs` now checks every look in every tone.
+- **Games** category: twelve Legend of Zelda palettes, from the 1986
+  original to Echoes of Wisdom.
+- **Backdrops in four groups** (`BACKDROP_GROUPS`): Abstract (adds blobs,
+  flow, confetti), Geo (adds hexagons, diamonds, grid), Vintage (halftone,
+  retro stripes, sunburst, deco fans) and Texture (adds grain, paper,
+  linen) — 21 patterns. New `Backdrop.contrast` (how far the pattern stands
+  out) and `Backdrop.saturation` (its colour, down to greys) sliders.
+
+### Available (promoted to the kit)
+- **`KeyValue`** — a read-only label and value, `inline` or `stacked`.
+- **`SwitchRow`** — one setting on or off, the whole row the switch.
+- **`Autocomplete`** — pick an existing record as you type, or add one.
+- **`Badge dot` / `live`** — a status dot in the chip, pulsing while live.
+- **`EventRow onOpen`** — open something in place instead of a link; and
+  **`RowStatus.live`** / **`LIVE`** — a status dot that pulses while running.
+
+### Changed
+- The showcase opens on a hero with a carousel of looks (each slide a piece
+  of the kit in its own theme, font and backdrop); its tabs are Home,
+  Components, Archetypes and Settings, with the jimbo-ui config section
+  under Settings.
+- `applyTheme` uses `themeVars`; no change to what it sets.
+- The Theme tab: Everyday's Dark, Mid and Light lists are one list, and
+  sports teams' Home / Away / Retro switch is gone — the tone switch covers
+  it (a team's away look is its light tone). Retro looks are their own tiles.
+
+### Removed
+- The separate Brand & theme (`/admin/brand`) and Style guide
+  (`/admin/style`) pages, as pages — they live on as the config section's tabs.
+
+### Apps must
+- **Adopt the jimbo-ui config section:** port `JimboConfigPage.tsx` and
+  `routes/config/` from the reference; route it at `/jimbo-ui`; put
+  `JimboConfigLink` in the app's settings or admin area (not the dock).
+  Move every brand, theme and style guide option into it (app-specific
+  extras go in its App tab) and remove `/admin/brand`, `/admin/style` and
+  any other theme pickers or links to them.
+- **Gate it by `auth`:** add `"auth"` to `jimbo-ui.json`. With `"admin"`,
+  pass `canConfigure={user?.isAdmin}` (the route redirects everyone else,
+  the link doesn't render) and make sure every server route that saves the
+  theme or brand checks admin on the server. With `"none"`, pass
+  `canConfigure`.
+- Pass the app's `jimbo-ui.json` to the About tab: in `vite.config.ts`,
+  `define: { __JIMBO_APP__: JSON.stringify({ name, ...jimboUiJson }) }`.
+- If the app shows a map: use `MapView` (and `MapPinCard` on a map page)
+  instead of its own.
+- Port the Theme tab's template grid from `routes/config/ThemePanel.tsx`
+  (families with the Light / Mid / Dark switch) and its grouped backdrop
+  picker with the contrast and saturation sliders. Saved themes still load
+  as they are.
+- Nothing for the promoted components — use them when you consolidate.
+- Get registered: "register this app with jimbo-ui" (fills `components` and
+  the registry); later, "consolidate this app with jimbo-ui".
+
 ## 0.7.0 — 2026-10-30
 
 Clearer separation, a calmer surface (less glass, less round, flat swatches), fonts and sliders, and themes for teams and places.
