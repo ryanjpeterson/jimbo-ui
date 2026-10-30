@@ -212,7 +212,9 @@
       "purpose": "Holds every brand, theme and style guide option for the app, in one place at /jimbo-ui.",
       "tier": "kit",
       "source": "reference/web/src/routes/JimboConfigPage.tsx",
-      "usedBy": [],
+      "usedBy": [
+        "tinnitus-a-go-go"
+      ],
       "aliases": [
         "BrandPage",
         "ThemePage",
@@ -804,7 +806,9 @@
       "purpose": "Shows places on a map in the theme's colours.",
       "tier": "kit",
       "source": "reference/web/src/components/MapView.tsx",
-      "usedBy": [],
+      "usedBy": [
+        "tinnitus-a-go-go"
+      ],
       "aliases": [
         "VenueMap",
         "MapPage map",

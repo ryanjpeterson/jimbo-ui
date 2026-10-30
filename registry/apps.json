@@ -5,7 +5,7 @@
       "name": "tinnitus-a-go-go",
       "repo": "ryanjpeterson/tinnitus-a-go-go",
       "webRoot": "apps/web",
-      "version": "0.6.0",
+      "version": "0.8.0",
       "auth": "admin",
       "registered": "2026-10-30",
       "audited": "2026-10-30"
