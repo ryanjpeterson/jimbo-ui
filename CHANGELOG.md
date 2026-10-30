@@ -17,6 +17,10 @@ the matching 0.x release.
 
 ## Unreleased
 
+Nothing yet.
+
+## 0.7.0 — 2026-10-30
+
 Clearer separation, a calmer surface (less glass, less round, flat swatches), fonts and sliders, and themes for teams and places.
 
 ### Added

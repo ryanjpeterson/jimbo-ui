@@ -132,7 +132,7 @@ out.
 
 ```json
 {
-  "version": "0.6.0",
+  "version": "0.7.0",
   "webRoot": "apps/web",
   "reference": {
     "web/src/components/ui/kit.tsx": "apps/web/src/components/ui/kit.tsx",
@@ -856,7 +856,7 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   highlights. Colour from opaque shapes, not thin washes: date tickets with a
   lit month band, glowing status dots, support group labels, cards lit by the
   accent and support.
-- **Unreleased** — Circles: every circle flat (no orbs, outlines or rings),
+- **0.7.0 (2026-10-30)** — Circles: every circle flat (no orbs, outlines or rings),
   side by side, at fixed sizes; `.dot-*`. Backdrops: abstract patterns (ripples, waves, contours,
   geometry, light burst, dots, arrows, shapes) over a solid, gradient or glow
   base, with strength and size. Full width: `FullBleed`, `HeroSection`,
