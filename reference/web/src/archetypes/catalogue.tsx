@@ -65,27 +65,29 @@ export const CATALOGUE_TABS = [
 
 export function CatalogueRoutes({ base = "", nav }: { base?: string; nav?: (current: string) => ReactNode }) {
   const at = (p: string) => `${base}${p}`;
+  // Heroes tuck under the top bar only when nothing sits above them.
+  const pullUp = !nav;
   const page = (current: string, el: ReactNode) => <>{nav?.(current)}{el}</>;
   return (
     <Routes>
-      <Route index element={page("/", <CatalogueHome at={at} />)} />
-      <Route path="entries" element={page("/entries", <Entries at={at} />)} />
-      <Route path="entries/:id" element={page("/entries", <EntryPage at={at} />)} />
-      <Route path="people" element={page("/people", <People at={at} />)} />
-      <Route path="places" element={page("/places", <Places at={at} />)} />
-      <Route path="map" element={page("/places", <PlacesMap at={at} />)} />
+      <Route index element={page("/", <CatalogueHome at={at} pullUp={pullUp} />)} />
+      <Route path="entries" element={page("/entries", <Entries at={at} pullUp={pullUp} />)} />
+      <Route path="entries/:id" element={page("/entries", <EntryPage at={at} pullUp={pullUp} />)} />
+      <Route path="people" element={page("/people", <People at={at} pullUp={pullUp} />)} />
+      <Route path="places" element={page("/places", <Places at={at} pullUp={pullUp} />)} />
+      <Route path="map" element={page("/places", <PlacesMap at={at} pullUp={pullUp} />)} />
     </Routes>
   );
 }
 
-type At = { at: (p: string) => string };
+type At = { at: (p: string) => string; pullUp?: boolean };
 
-function CatalogueHome({ at }: At) {
+function CatalogueHome({ at, pullUp }: At) {
   const next = ENTRIES.find((e) => e.status === GOING)!;
   const byPlace = countBy(ENTRIES, (e) => e.place);
   return (
     <div className="space-y-8">
-      <HeroSection eyebrow="Catalogue" title="Your year so far" pattern="ripples">
+      <HeroSection eyebrow="Catalogue" title="Your year so far" pattern="ripples" pullUp={pullUp}>
         A log of things you've done, who was there and where — with the numbers.
       </HeroSection>
       <StatGrid>
@@ -161,14 +163,14 @@ function Entries({ at }: At) {
   );
 }
 
-function EntryPage({ at }: At) {
+function EntryPage({ at, pullUp }: At) {
   const { id } = useParams();
   const item = ENTRIES.find((s) => s.id === id) ?? ENTRIES[0]!;
   const place = placeOf(item.place);
   const [sheet, setSheet] = useState(false);
   return (
     <div className="space-y-6">
-      <Hero eyebrow={`${monthOf(item.date)} · ${place.label}`} title={item.title} back={{ to: at("/entries"), label: "Entries" }}
+      <Hero pullUp={pullUp} eyebrow={`${monthOf(item.date)} · ${place.label}`} title={item.title} back={{ to: at("/entries"), label: "Entries" }}
         badge={<Badge tone={item.status.tone}>{item.status.label}</Badge>}
         actions={<><Button size="sm" onClick={() => setSheet(true)}>Edit…</Button><Button size="sm" variant="secondary">Share</Button></>}>
         <p className="meta">A detail page opens with a hero: back, status, title, actions.</p>

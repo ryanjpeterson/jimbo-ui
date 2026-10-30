@@ -159,7 +159,7 @@ export function FullBleed({ children, tone = "none", flush = false, pad = true, 
  * gradient. Use at the top of a landing or home page; `size="lg"` fills most
  * of the first screen. Pulls up under the top bar like `Banner`.
  */
-export function HeroSection({ eyebrow, title, children, actions, pattern = "ripples", size = "md", align = "left" }: {
+export function HeroSection({ eyebrow, title, children, actions, pattern = "ripples", size = "md", align = "left", pullUp = true }: {
   eyebrow?: ReactNode;
   title: ReactNode;
   /** A line or two under the title. */
@@ -168,11 +168,13 @@ export function HeroSection({ eyebrow, title, children, actions, pattern = "ripp
   pattern?: BackdropPattern;
   size?: "md" | "lg";
   align?: "left" | "center";
+  /** Tuck up under the top bar (the default, when it opens the page). Turn off when something sits above it. */
+  pullUp?: boolean;
 }) {
   const { theme } = useBrand();
   const look = backdropCss({ ...theme, backdrop: { pattern, base: "gradient", intensity: 0.75, scale: 0.8 } });
   return (
-    <FullBleed pad={false} className="-mt-6 mb-2 border-b border-border sm:-mt-8"
+    <FullBleed pad={false} className={cn("mb-2 border-b border-border", pullUp ? "-mt-6 sm:-mt-8" : "border-t")}
       style={{ backgroundImage: look.image, backgroundSize: look.size, backgroundPosition: look.position, backgroundRepeat: look.repeat }}>
       <div className={cn("flex flex-col justify-end gap-3 py-10 sm:py-14", size === "lg" ? "min-h-[62dvh]" : "min-h-[34dvh]", align === "center" && "items-center text-center")}>
         {eyebrow && <p className="eyebrow text-support">{eyebrow}</p>}
@@ -234,7 +236,7 @@ export function BackButton({ to, label, overlay = false }: { to: string; label: 
  * Full-width banner at the top of a page: the backdrop runs edge to edge of
  * the screen with no frame, while its content lines up with the page column.
  */
-export function Banner({ backdrop, glow = "accent", back, badge, children }: {
+export function Banner({ backdrop, glow = "accent", back, badge, children, pullUp = true }: {
   /** Image blurred to fill the banner; falls back to a soft accent gradient. */
   backdrop?: string | null;
   glow?: "accent" | "highlight" | "support" | "yellow" | "purple";
@@ -242,6 +244,8 @@ export function Banner({ backdrop, glow = "accent", back, badge, children }: {
   /** Top-right of the banner, opposite the back button (e.g. a status flag). */
   badge?: ReactNode;
   children: ReactNode;
+  /** Tuck up under the top bar (the default, when it opens the page). Turn off when something sits above it. */
+  pullUp?: boolean;
 }) {
   const glowCls = {
     accent: "from-accent-900/70",
@@ -253,7 +257,7 @@ export function Banner({ backdrop, glow = "accent", back, badge, children }: {
 
   return (
     // Breaks out of the page column to the full screen width and up against the app bar.
-    <section className="relative isolate -mt-6 mb-6 ml-[calc(50%-50vw)] w-screen overflow-hidden sm:-mt-8 sm:mb-8">
+    <section className={cn("relative isolate mb-6 ml-[calc(50%-50vw)] w-screen overflow-hidden sm:mb-8", pullUp && "-mt-6 sm:-mt-8")}>
       {/* Backdrop: the image itself, blurred and scaled up so it fills the whole
           banner edge to edge (scaling hides the soft edges blur leaves behind). */}
       {backdrop ? (
@@ -310,7 +314,7 @@ export function ImageViewer({ src, alt, onClose }: { src: string; alt: string; o
  * Banner for detail pages: thumbnail (tap for full size), eyebrow, big title,
  * meta lines and pill actions over the blurred image.
  */
-export function Hero({ imageUrl, imageAlt, eyebrow, title, children, actions, back, badge, accent = "accent", square = false }: {
+export function Hero({ imageUrl, imageAlt, eyebrow, title, children, actions, back, badge, accent = "accent", square = false, pullUp = true }: {
   imageUrl?: string | null;
   imageAlt?: string;
   eyebrow?: ReactNode;
@@ -323,6 +327,8 @@ export function Hero({ imageUrl, imageAlt, eyebrow, title, children, actions, ba
   accent?: "accent" | "highlight" | "support" | "yellow" | "purple";
   /** Square thumbnail (people, places) instead of a portrait one (posters). */
   square?: boolean;
+  /** As `Banner`'s: off when something sits above the hero. */
+  pullUp?: boolean;
 }) {
   const glow = {
     accent: "from-accent-900/70",
@@ -338,7 +344,7 @@ export function Hero({ imageUrl, imageAlt, eyebrow, title, children, actions, ba
   );
 
   return (
-    <Banner backdrop={imageUrl} glow={accent} back={back} badge={badge}>
+    <Banner backdrop={imageUrl} glow={accent} back={back} badge={badge} pullUp={pullUp}>
       {viewing && imageUrl && <ImageViewer src={imageUrl} alt={imageAlt ?? title} onClose={() => setViewing(false)} />}
       <div className="flex items-end gap-4 pb-6 pt-6 sm:gap-8 sm:pb-8 sm:pt-10">
         <div className={thumbCls}>

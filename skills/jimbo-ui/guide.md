@@ -768,7 +768,7 @@ and body fonts.
 | --- | --- |
 | `PageHeader` | Every index page's title row |
 | `Hero` / `Banner` | Detail page header over a blurred image (full width) |
-| `HeroSection` | Full-width page opener with no photo: eyebrow, big title, a line, actions, over a backdrop pattern (`pattern`, any of the backdrops) on a gradient; `size="lg"` fills most of the first screen; `align="center"` |
+| `HeroSection` | Full-width page opener with no photo: eyebrow, big title, a line, actions, over a backdrop pattern (`pattern`, any of the backdrops) on a gradient; `size="lg"` fills most of the first screen; `align="center"`. It tucks up under the top bar; pass `pullUp={false}` when something sits above it (as `Banner` and `Hero` take too) |
 | `FullBleed` | Any section edge to edge: a band (`tone`: `surface`, or a flat `accent` / `highlight` / `support` with its `on-` text), a strip of media (`flush`), a call to action. Content lines up with the page column unless `flush` |
 | `RangeField` | A labelled slider (weight, spacing, strength…) with its value shown |
 | `Section` | A titled card holding one block of content |

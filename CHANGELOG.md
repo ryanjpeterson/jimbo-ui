@@ -17,7 +17,13 @@ the matching 0.x release.
 
 ## Unreleased
 
-Nothing yet.
+### Fixed
+- `HeroSection`, `Banner` and `Hero` tucked up under the top bar even when
+  something sat above them, covering it (the showcase's catalogue tabs).
+  They take `pullUp={false}` for that case; the default is unchanged.
+
+### Apps must
+- Nothing — pass `pullUp={false}` only where something sits above a hero.
 
 ## 0.8.3 — 2026-10-31
 
