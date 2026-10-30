@@ -14,9 +14,10 @@ implementations of everything below are in the repo's `reference/` folder.
   from Everyday, Holidays, Countries, Provinces or Sports templates (or a
   search across them) or fine-tuned on each app's
   **Brand & theme** admin page.
-- **Look:** flat colour with a slight outline on coloured shapes, depth from
-  layers — solid surfaces with a light frost, softly rounded corners (not pills), soft colour orbs, and
-  circles of the theme's colours as a recurring motif.
+- **Look:** flat colour on coloured shapes, depth from layers — solid
+  surfaces with a light frost, softly rounded corners (not pills), a
+  backdrop behind the page, and flat circles of the theme's colours as a
+  recurring motif (no orbs).
 - **Type:** sans (Archivo and Inter), mono (JetBrains Mono) or serif
   (Fraunces and Source Serif 4), chosen separately for headings and body.
 
@@ -231,7 +232,7 @@ colours (`Theme.backdrop`, `backdropCss`): a **pattern** — none, ripples
 (topographic lines), geometry (a triangle lattice), light burst (rays from
 the top), dot grid, arrows (chevrons), shapes (scattered circles, triangles,
 squiggles) — over a **base**: solid (the page colour), gradient (a sweep of
-accent and support) or glow (soft colour orbs, the default). **Strength**
+accent and support) or glow (soft colour glows, the default). **Strength**
 (0–1) and **size** (0.5–2) sliders tune it. Patterns are inline SVG or
 gradients, static (no motion), fixed to the screen, and set as `--bg-image` /
 `--bg-size` / `--bg-position` / `--bg-repeat` so the pre-paint script applies
@@ -251,7 +252,7 @@ glows on them. Depth comes from layers (cards, borders, shadows under
 floating things), not shading. Floating things are **lightly
 frosted**: mostly solid, a soft blur and a crisp border — never
 see-through glass. Corners are **softly rounded, not pills**: circles are
-kept for the motif (avatars, dots, orbs, round icon buttons). Cards carry a breath of the accent (top left)
+kept for the motif (avatars, dots, swatches, round icon buttons). Cards carry a breath of the accent (top left)
 and support (bottom right).
 
 **Colour comes from opaque shapes, not thin washes.** A faint wash of a
@@ -261,11 +262,26 @@ solid, lit things instead: the date ticket's month band, lit avatars and
 pills, status dots, flat colour circles, coloured text. Washes are for tinting the
 same hue family (done chips, warnings), not for adding colour.
 
-**The circle motif.** The theme's colours as circles turn up here and there:
-`ThemeDots` in empty states (never above page titles), a small orb beside a
-stat's label, avatar circles, colour circles on theme tiles, three soft
-orbs behind the page, and the favicon. Keep them small and few — a motif, not
-wallpaper.
+**Circles — the motif, and its rules.** The theme's colours as circles
+turn up here and there. Every circle follows these rules:
+
+- **Flat.** One solid fill (`.dot-accent`, `.dot-highlight`, `.dot-support`,
+  or a tone). No gradient, shine, glow, shadow, outline or ring — and no
+  "orbs" (shaded spheres, blurred colour blobs) anywhere.
+- **Side by side, never overlapping.** A row of circles has a 4 px gap
+  (6 px from 16 px up). No stacked or overlapping dots, no ring to separate
+  them.
+- **Fixed sizes:** 8 px inline (`ThemeDots`, the dot before a stat label or
+  a month header), 10 px status dots on rows, 16 px colour swatches (theme
+  tiles), 40–48 px editor swatches and avatars.
+- **The page colour as a swatch** gets a 1 px `border-border`, so it shows
+  against the page — the one circle with an edge.
+- **Inferred colours** show at 55% opacity, not with a dashed ring.
+- **Where they go:** `ThemeDots` in empty states and brand moments; a dot
+  before a stat's label and a month header; status dots on rows; avatars;
+  colour swatches on theme tiles, the editor and the Style guide; the
+  favicon. Nowhere else — never above a page title, never as decoration or
+  wallpaper.
 
 Status colours are **fixed tones**, not themed, because they carry meaning
 (`Tone` and `TONES` in the kit). An app maps its own statuses onto them, with
@@ -349,10 +365,10 @@ family of tokens:
 (same tokens). New code uses `accent`, `highlight` and their `-950…` washes.
 
 ### Where else the theme goes
-- **Page background:** `bg` with three soft orbs — accent (20%) top left,
-  highlight (16%) right, support (16%) bottom left (`radial-gradient(circle
-  at …)`) — over a fade to `bg-deep`, all fixed. Cards are 90% opaque, so the
-  orbs tint them as they pass behind.
+- **Page background:** the backdrop (above). Its default glow base is three
+  soft colour glows — accent (20%) top left, highlight (16%) right, support
+  (16%) bottom left (`radial-gradient(circle at …)`) — over a fade to
+  `bg-deep`, all fixed.
 - **Browser chrome:** `<meta name="theme-color">` = background;
   `color-scheme` = light or dark to match.
 - **Text selection:** accent fill, on-accent text.
@@ -510,8 +526,8 @@ The Everyday and Holiday templates, hand-picked:
 | New year's eve | Champagne, fuchsia and ice | `#F2C14E` | `#FF3DA5` | `#5BC0FF` | `#0A0A0F` |
 
 "Inferred" means the template leaves that colour to the engine (Two-tone shows
-a two-colour theme). Each theme tile shows its colours as circles under the
-miniature, inferred ones with a dashed ring.
+a two-colour theme). Each theme tile shows its colours as flat circles side
+by side under the miniature, inferred ones faded.
 
 **Writing a new template:** on dark and mid-dark backgrounds use bright,
 saturated colours; on light and mid-light ones use deep ones (luminance
@@ -622,7 +638,7 @@ and body fonts.
 | --- | --- |
 | `.card` | 14 px radius, `border-border` (full strength), gradient `surface → bg-deep` top to bottom at 97%, under a 9% accent glow from the top left and a 9% support glow from the bottom right; inner top highlight `inset 0 1px 0 rgba(255,255,255,.06)`, soft drop `0 12px 32px -16px rgba(0,0,0,.7)` |
 | `.glass` / `.card-glass` | Lightly frosted: `bg-surface/90`, `backdrop-blur-md`, `border-border`, soft drop. For tabs, the secondary top-bar buttons, the pager and anything over a banner |
-| `.orb-accent/highlight/support` | A brand colour as a **flat circle with a slight outline**: the colour, plus `inset 0 0 0 1px` of its darker shade at 55%. Fully round; size it with utilities. The circle motif — swatches, avatars, stat dots, `ThemeDots`. No gloss or sphere shading on swatches |
+| `.dot-accent/highlight/support` | A brand colour as a **flat circle**: one solid fill, nothing else (see Circles in section 2). Size it with utilities. `.orb-*` are older names for the same thing |
 | `.divide-etched` | Lines between stacked items, on the parent like `divide-y`: a full-strength `border` line with a faint light line under it (`inset 0 1px 0 rgba(255,255,255,.05)`). It also reaches one level down, so rows grouped in wrappers (a month's label and rows) are divided too. Lists, ranked lists |
 | `.lit-accent/highlight/support` | A solid brand fill: flat colour, `inset 0 0 0 1px` of its darker shade at 55%, `on-c` text. Active tabs and pills, select ticks, the date band, count badges (the name is from when they were shaded) |
 | `.field` | 11 px radius, `bg-surface-2`, `border-border`, 15 px text, `px-4`; focus = accent border + 2 px accent ring at 20% |
@@ -656,14 +672,14 @@ and body fonts.
 | `FullBleed` | Any section edge to edge: a band (`tone`: `surface`, or a flat `accent` / `highlight` / `support` with its `on-` text), a strip of media (`flush`), a call to action. Content lines up with the page column unless `flush` |
 | `RangeField` | A labelled slider (weight, spacing, strength…) with its value shown |
 | `Section` | A titled card holding one block of content |
-| `List` + `ListGroupLabel` | A card of rows, optionally grouped (by month); group labels are support text with a support orb, on a support wash fading right |
+| `List` + `ListGroupLabel` | A card of rows, optionally grouped (by month); group labels are support text with an 8 px support dot, on a support wash fading right |
 | `EventRow` | A dated item. `DateBlock` on the left, a `status` dot (`{ tone, label }`); `selected`/`onSelect` for select mode |
 | `EntityRow` | A named thing with an avatar (a person, a place) |
 | `DateBlock` | A tear-off calendar ticket (52 px wide, 12 px radius, `surface-2`): the month on a solid highlight band, the day big below, then the year or weekday |
 | `MediaCard` | Image-led grid card (`aspect="portrait"` for posters) |
 | `LinkCard` | A card that navigates (eyebrow / title / sub); `accent` for the one to notice |
-| `StatTile` / `StatGrid` | Headline numbers (`accent="accent"` / `"highlight"` / `"support"`: the number in that colour, a small orb by the label and a soft pool of it in the corner) |
-| `ThemeDots` | The circle motif: the theme's three colours as small overlapping orbs. In empty states and brand moments — not above page titles |
+| `StatTile` / `StatGrid` | Headline numbers (`accent="accent"` / `"highlight"` / `"support"`: the number in that colour, an 8 px dot by the label and a soft pool of it in the corner) |
+| `ThemeDots` | The circle motif: the theme's three colours as flat 8 px dots side by side (4 px apart). In empty states and brand moments — never above a page title |
 | `RankedList` | Top-N lists with counts |
 | `SearchField`, `SelectField` | Search and single-choice filters (select on phones) |
 | `Tabs` | 2–4 mutually exclusive views (segmented) |
@@ -840,7 +856,8 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   highlights. Colour from opaque shapes, not thin washes: date tickets with a
   lit month band, glowing status dots, support group labels, cards lit by the
   accent and support.
-- **Unreleased** — Backdrops: abstract patterns (ripples, waves, contours,
+- **Unreleased** — Circles: every circle flat (no orbs, outlines or rings),
+  side by side, at fixed sizes; `.dot-*`. Backdrops: abstract patterns (ripples, waves, contours,
   geometry, light burst, dots, arrows, shapes) over a solid, gradient or glow
   base, with strength and size. Full width: `FullBleed`, `HeroSection`,
   `AppShell width`. The component menu: ask which component to use before

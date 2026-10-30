@@ -39,7 +39,8 @@ It must print nothing. Add an app's words to it when a new app adopts jimbo.ui.
 Brand decisions so far: two to four source colours (accent and background
 always; highlight and support set or inferred), each with lighter and darker
 shades; coloured shapes flat with a slight outline (no gloss or glows), depth
-from layers (lightly frosted solid surfaces, borders, soft colour orbs); softly rounded corners, not pills; sans, mono or serif type
+from layers (lightly frosted solid surfaces, borders, the backdrop); circles
+always flat, side by side, at fixed sizes — no orbs; softly rounded corners, not pills; sans, mono or serif type
 for headings and body;
 circles of the theme colours as a motif; templates in Everyday, Holidays, Countries,
 Provinces and Sports categories (team themes from real colours, via

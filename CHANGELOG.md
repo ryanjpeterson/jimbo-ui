@@ -86,6 +86,14 @@ Clearer separation, a calmer surface (less glass, less round, flat swatches), fo
   page colour, light or road-grey page, and kit), checked templates out.
 
 ### Changed
+- **Circles are flat, side by side, at fixed sizes.** Every circle is one
+  solid fill — no outline, ring, gradient, glow or shadow, and no orbs: the
+  blurred colour blobs behind a photo-less `Banner` are gone. `ThemeDots`
+  are 8 px dots side by side with a 4 px gap (they overlapped with a ring);
+  status dots, label dots, avatars and swatches lose their outlines;
+  inferred swatches show faded instead of dash-ringed; the page-colour swatch
+  keeps a hairline border. New `.dot-accent/highlight/support` (`.orb-*` stay
+  as older names). The guide spells out the rules (section 2, Circles).
 - "Flags" is now **Countries**, grouped by region.
 - **The separation check allows tonal themes:** accent and highlight at least
   15 apart (ΔE), and no two of the three closer than 10 (was 20 for all).
@@ -165,7 +173,9 @@ Clearer separation, a calmer surface (less glass, less round, flat swatches), fo
   missing, adapted to the app. Apps without a server: save the theme in the
   browser rather than having no Brand page.
 - Copy `globals.css` (the page background now reads `--bg-image` and
-  friends). Apps with a theme server: accept and return an optional
+  friends; `.dot-*`). Apps with circles of their own: make them flat, side
+  by side and at the guide's sizes (overlapping dots with rings, outlined or
+  shaded circles, decorative orbs all go). Apps with a theme server: accept and return an optional
   `backdrop`.
 - Apps that track the reference: port the kit's `FullBleed`, `HeroSection`
   and `RangeField`, `AppShell`'s `width`, the Brand page's *Backdrop* section

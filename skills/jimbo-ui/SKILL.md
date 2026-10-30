@@ -58,8 +58,8 @@ this check, then the preview workflow if they want detail.
   inferred. Light backgrounds flip text dark automatically. Spread the
   colours: a page shows more than the accent, and no brand colour is white or
   grey.
-- Coloured shapes are flat with a slight outline (`.lit-*`, `.btn-primary`,
-  `.orb-*`) — no gloss or glows; depth comes from layers, borders and shadows, lightly frosted `.glass` (mostly solid, never
+- Coloured shapes are flat (`.lit-*`, `.btn-primary`, `.dot-*`) — no gloss,
+  gradients or glows; depth comes from layers, borders and shadows, lightly frosted `.glass` (mostly solid, never
   see-through). Softly rounded corners, not pills (`rounded-control` for
   buttons and pills); full circles only for the motif.
 - Type: the theme picks a font for headings and one for body (`FONTS`:
@@ -71,8 +71,13 @@ this check, then the preview workflow if they want detail.
 - Themes made from real things (teams, flags, provinces) use only their own
   colours and shades of them — never an invented hue; sports teams come in
   Home and Away (and some Retro).
-- The circle motif, here and there: `ThemeDots`, `.orb-*` (flat circles with a slight outline),
-  avatars, colour circles on theme tiles. Small and few.
+- **Circles** (guide section 2): always one flat fill — no gradient, shine,
+  glow, shadow, outline or ring, and no orbs or blurred blobs. Side by side
+  with a 4 px gap, never overlapping. Sizes: 8 px inline (`ThemeDots`, label
+  dots), 10 px status, 16 px swatches, 40–48 px editor swatches and avatars.
+  The page colour as a swatch gets a 1 px `border-border`; inferred colours
+  show at 55% opacity. Only in empty states, status, label dots, avatars and
+  colour swatches — never above a page title or as decoration.
 - Templates come in five categories: **Everyday** (dark, mid, light),
   **Holidays**, **Countries** (by region), **Provinces** and **Sports** (every
   NHL, NBA, MLB and NFL team, plus Toronto, Ottawa and Chicago tabs), with a
