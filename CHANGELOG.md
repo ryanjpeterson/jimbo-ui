@@ -17,7 +17,33 @@ the matching 0.x release.
 
 ## Unreleased
 
+### Added
+- **Charts.** `TrendChart` (one to three lines over time, a crosshair you
+  tap, drag or arrow-key, and a readout that names each series),
+  `BarChart` (horizontal rows or vertical columns — promoted from the
+  `bar-chart` candidate), `Sparkline`, and a `trend` prop on `StatTile`.
+  Flat SVG in the theme's colours, with a hidden table of the numbers for
+  screen readers. The guide's new Charts pattern says when to use which.
+- **Rows or tiles.** `List layout="tiles"` shows the same children as a
+  grid of cards; `LayoutSwitch` and `useListLayout` let people pick and
+  remember it. Supporting variants: `Section plain` (no card, for tiles
+  under a title), `Tabs size="sm"` (a compact switch for a section's action
+  slot), `List bare` (no card, inside `Section flush`).
+- Both dashboard archetypes use them: the single-page dashboard template
+  has sparklines on its stats, a jobs list you can switch to tiles, and a
+  bar chart and a trend chart. The Style guide panel shows every chart and
+  the tiles layout.
+
+### Available
+`TrendChart`, `BarChart`, `Sparkline`, `StatTile trend`, `List layout`,
+`LayoutSwitch`, `useListLayout`, `Section plain`, `Tabs size="sm"` — in
+the reference kit; port them when an app wants them.
+
 ### Fixed
+- `divide-etched` reached into every `<div>` child, so a row built as a
+  `<div>` (a job row, a `KeyValue`) got a stray divider line inside it. It
+  now only reaches into list groups — a wrapper that starts with a
+  `ListGroupLabel`, which carries a new `list-group-label` class.
 - **No more hard edge under banners and heroes.** `Banner` (and `Hero`) and
   `HeroSection` faded to solid page colour, or ended on a border, so over a
   page backdrop they stopped on a visible line. Their background layer now
@@ -36,6 +62,10 @@ the matching 0.x release.
   layer behind the content, give the layer `fade-out`, and remove any
   border under it or fade to `bg`.
 - Pass `pullUp={false}` only where something sits above a hero.
+- Port `ListGroupLabel` from the reference kit (it adds the
+  `list-group-label` class); without it, grouped lists lose the dividers
+  between their rows. Any workaround for the stray line (rows as
+  `<article>` rather than `<div>`) can go.
 
 ## 0.8.3 — 2026-10-31
 

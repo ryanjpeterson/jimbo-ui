@@ -463,7 +463,8 @@
       ],
       "variants": {
         "flush": "boolean",
-        "count": "number"
+        "count": "number",
+        "plain": "no card (tiles under a title)"
       }
     },
     {
@@ -477,10 +478,16 @@
         "jimbo-backup"
       ],
       "aliases": [
+        "CardGrid",
+        "Grid",
+        "Rows",
         "Table",
-        "Rows"
+        "TileGrid"
       ],
-      "variants": {}
+      "variants": {
+        "layout": "rows | tiles",
+        "bare": "no card, inside Section flush"
+      }
     },
     {
       "id": "list-group-label",
@@ -605,7 +612,8 @@
       ],
       "variants": {
         "accent": "accent | highlight | support",
-        "size": "proposed: sm — a compact cell for admin summaries (dl stat grids)"
+        "size": "proposed: sm — a compact cell for admin summaries (dl stat grids)",
+        "trend": "number[] — a Sparkline under the number"
       }
     },
     {
@@ -698,7 +706,9 @@
         "SegmentedControl",
         "Toggle group"
       ],
-      "variants": {}
+      "variants": {
+        "size": "md | sm (inline, for a section's action slot)"
+      }
     },
     {
       "id": "pill-tabs",
@@ -990,20 +1000,68 @@
       "id": "bar-chart",
       "name": "BarChart",
       "purpose": "Compares counts across a few categories as bars.",
-      "tier": "candidate",
-      "source": "tinnitus-a-go-go:apps/web/src/routes/StatsPage.tsx#YearBars",
+      "tier": "kit",
+      "source": "reference/web/src/components/ui/kit.tsx#BarChart",
       "usedBy": [
         "tinnitus-a-go-go"
       ],
       "aliases": [
-        "YearBars",
+        "ColumnChart",
+        "Histogram",
         "MiniVBars",
-        "Histogram"
+        "YearBars"
       ],
       "variants": {
         "direction": "horizontal | vertical",
-        "split": "two-part bars"
+        "tone": "accent | support | highlight",
+        "split": "proposed: two-part bars"
       }
+    },
+    {
+      "id": "trend-chart",
+      "name": "TrendChart",
+      "purpose": "Shows how one to three amounts change over time.",
+      "tier": "kit",
+      "source": "reference/web/src/components/ui/kit.tsx#TrendChart",
+      "usedBy": [],
+      "aliases": [
+        "LineChart",
+        "AreaChart",
+        "TimeSeries"
+      ],
+      "variants": {
+        "series": "1–3, tones in order accent · support · highlight",
+        "format": "value formatter"
+      }
+    },
+    {
+      "id": "sparkline",
+      "name": "Sparkline",
+      "purpose": "Shows a small trend with no axes.",
+      "tier": "kit",
+      "source": "reference/web/src/components/ui/kit.tsx#Sparkline",
+      "usedBy": [],
+      "aliases": [
+        "MiniChart",
+        "TrendLine"
+      ],
+      "variants": {
+        "tone": "accent | support | highlight"
+      }
+    },
+    {
+      "id": "layout-switch",
+      "name": "LayoutSwitch",
+      "purpose": "Lets people show a list as rows or tiles, and remembers it.",
+      "tier": "kit",
+      "source": "reference/web/src/components/ui/kit.tsx#LayoutSwitch",
+      "usedBy": [],
+      "aliases": [
+        "GridListToggle",
+        "ViewModeToggle",
+        "useListLayout"
+      ],
+      "variants": {}
     },
     {
       "id": "heatmap",

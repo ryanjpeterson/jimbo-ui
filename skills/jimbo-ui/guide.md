@@ -772,18 +772,22 @@ and body fonts.
 | `HeroSection` | Full-width page opener with no photo: eyebrow, big title, a line, actions, over a backdrop pattern (`pattern`, any of the backdrops) on a gradient; `size="lg"` fills most of the first screen; `align="center"`. It tucks up under the top bar; pass `pullUp={false}` when something sits above it (as `Banner` and `Hero` take too) |
 | `FullBleed` | Any section edge to edge: a band (`tone`: `surface`, or a flat `accent` / `highlight` / `support` with its `on-` text), a strip of media (`flush`), a call to action. Content lines up with the page column unless `flush` |
 | `RangeField` | A labelled slider (weight, spacing, strength…) with its value shown |
-| `Section` | A titled card holding one block of content |
-| `List` + `ListGroupLabel` | A card of rows, optionally grouped (by month); group labels are support text with an 8 px support dot, on a support wash fading right |
+| `Section` | A titled card holding one block of content; `plain` drops the card (a grid of tiles under a title) |
+| `List` + `ListGroupLabel` | A card of rows, optionally grouped (by month: a wrapper that starts with a `ListGroupLabel`); group labels are support text with an 8 px support dot, on a support wash fading right. `layout="tiles"` shows the same children as a grid of cards (one column on phones, two or three wider); `bare` drops the card for use inside `Section flush` |
+| `LayoutSwitch` + `useListLayout` | Lets people pick rows or tiles for a `List` (small `Tabs` in the section's action slot); the choice is remembered per list in the browser |
 | `EventRow` | A dated item. `DateBlock` on the left, a `status` dot (`{ tone, label, live? }` — `live` pulses); `to` to go somewhere or `onOpen` to open something in place (a log in a `Sheet`); `selected`/`onSelect` for select mode |
 | `EntityRow` | A named thing with an avatar (a person, a place) |
 | `DateBlock` | A tear-off calendar ticket (52 px wide, 12 px radius, `surface-2`): the month on a solid highlight band, the day big below, then the year or weekday |
 | `MediaCard` | Image-led grid card (`aspect="portrait"` for posters) |
 | `LinkCard` | A card that navigates (eyebrow / title / sub); `accent` for the one to notice |
-| `StatTile` / `StatGrid` | Headline numbers (`accent="accent"` / `"highlight"` / `"support"`: the number in that colour, an 8 px dot by the label and a soft pool of it in the corner) |
+| `StatTile` / `StatGrid` | Headline numbers (`accent="accent"` / `"highlight"` / `"support"`: the number in that colour, an 8 px dot by the label and a soft pool of it in the corner); `trend` adds a `Sparkline` of recent values under the number |
+| `Sparkline` | A small trend with no axes: a 2 px line in the subtle text colour, the latest point as a dot in the tone |
+| `TrendChart` | Change over time: one to three lines over the same labels, one y-axis. One series gets a 10% wash; tap, drag, hover or arrow-key to move the crosshair, and the readout above shows the values there (latest by default) and names each series |
+| `BarChart` | Comparing a few amounts in one tone: `horizontal` rows (label, bar, value at the tip; `to` links each) or `vertical` columns over a short run (tap a column to read it; the largest shows until you do) |
 | `ThemeDots` | The circle motif: the theme's three colours as flat 8 px dots side by side (4 px apart). In empty states and brand moments — never above a page title |
 | `RankedList` | Top-N lists with counts |
 | `SearchField`, `SelectField` | Search and single-choice filters (select on phones) |
-| `Tabs` | 2–4 mutually exclusive views (segmented) |
+| `Tabs` | 2–4 mutually exclusive views (segmented); `size="sm"` is a compact inline switch for a section's action slot |
 | `PillTabs` | Filters on desktop |
 | `Pager` | Paging long lists |
 | `Sheet` | **The** modal: bottom sheet on phones, dialog on desktop |
@@ -852,10 +856,10 @@ fills in. **Ask which one fits** (with the closest recommended), or mix two.
 | Archetype | For | Tabs (dock) | Width | Main pages | Backdrop |
 | --- | --- | --- | --- | --- | --- |
 | **Catalogue** ★ | A log of dated entries, the people and places in them, and numbers about it all (from the pilot app) | Home · Entries · People · Places | column | Home: `HeroSection`, `StatGrid`, "Coming up" `EventRow`, `RankedList`; Entries: `SearchField`, `PillTabs`, grouped `List` + `EventRow`, select mode, `Pager`; Entry: `Hero`, `Section`s, a compact `MapView`, edit in a `Sheet`; People: `EntityRow`; Places: list ⇄ map (`ViewSwitch`, `MapView fill`, `MapPinCard`) | ripples |
-| **Single-page dashboard** ★ | One screen that answers "is everything fine?" for jobs it watches (reports, syncs, checks, builds) | none, or Home · Runs · Settings | column | One page: a verdict line (accent fine, highlight needs a look), `StatGrid`, job rows (status dot that pulses while running, last run, a Run button, errors inline), recent runs as `EventRow` opening a log in a `Sheet`, settings as label / value rows | dots or none |
+| **Single-page dashboard** ★ | One screen that answers "is everything fine?" for jobs it watches (reports, syncs, checks, builds) | none, or Home · Runs · Settings | column | One page: a verdict line (accent fine, highlight needs a look), `StatGrid` with `trend` sparklines, jobs as rows or tiles (`List` + `LayoutSwitch`: status dot that pulses while running, last run, a Run button, errors inline), charts (`BarChart` of runs per day, `TrendChart` of run times), recent runs as `EventRow` opening a log in a `Sheet`, settings as label / value rows | dots or none |
 | **Tracker** | Logging things you do, see or collect over time | Home · List · Add · Stats · Me | column | Home: `HeroSection` or `PageHeader`, `StatGrid`, "Coming up" `List` + `EventRow`; List: `SearchField`, `PillTabs`, grouped `List` + `EventRow`, select mode; Detail: `Hero` / `Banner`, `Section`s; Stats: `StatGrid`, `RankedList` | glow or dots |
 | **Collection** | A library of items with pictures (records, books, recipes, gear) | Home · Browse · Add · Lists · Me | wide | Browse: `SearchField`, filters, `MediaCard` grid; Detail: `Hero` with the image; Lists: `LinkCard`s | geometry or none |
-| **Dashboard** | Numbers and status at a glance (finance, health, ops) | Today · Trends · Alerts · Settings | wide | `StatGrid` first, `Section` cards with charts, `RankedList`, `Badge` statuses, `FullBleed` band for the headline | dots or contours |
+| **Dashboard** | Numbers and status at a glance (finance, health, ops) | Today · Trends · Alerts · Settings | wide | `StatGrid` (with `trend`) first, `Section` cards with `TrendChart` and `BarChart`, `RankedList`, `Badge` statuses, `FullBleed` band for the headline | dots or contours |
 | **Directory** | People, places or groups to find and visit | Find · Map · Saved · Me | column | `SearchField`, `List` + `EntityRow` (avatars), `ViewSwitch` list ⇄ map, Detail `Hero` (square) | contours |
 | **Planner** | Plans, events and schedules ahead | Upcoming · Calendar · Add · Me | column | Upcoming: `List` + `EventRow` grouped by month (date tickets); Detail: `Banner`; adding in a `Sheet` | waves or ripples |
 | **Showcase** | A public face: a landing page, a portfolio, an event site | Home · About · Work · Contact | full | `HeroSection` (`lg`), `FullBleed` bands, `MediaCard` grid, `LinkCard` calls to action | burst or shapes |
@@ -893,6 +897,20 @@ archetype only sets the starting shape.
 - **Gestures:** pull to refresh at the top of a page; horizontal swipe between
   siblings (days of a multi-day event); swipe down to close full-screen media. Mark
   carousels/maps `data-no-swipe`.
+- **Charts:** always the kit's (`TrendChart`, `BarChart`, `Sparkline`,
+  `StatTile trend`), in a `Section` titled with what's plotted. Pick the
+  form first: one number is a `StatTile`, a few amounts are bars, change
+  over time is a line. Series take accent, support and highlight in that
+  order, three at most — more is a table or several charts — and one
+  y-axis only. Colour is never the only way to tell series apart (theme
+  colours are brighter than a chart palette would be, and people pick their
+  own): one series has no legend, two or three are named in the readout
+  beside a line key, and every chart carries a hidden table of its numbers.
+  Text stays in text colours; only marks take the series colour. Nothing is
+  hover-only: a tap reads a value too.
+- **Rows or tiles:** a list people scan by name is rows; one where each
+  item has more to show (a status, a button, a line of detail) can offer
+  tiles too, with `LayoutSwitch` — same children, remembered per list.
 - **Lists:** newest first for the past, soonest first for the future; group by
   month; status as a small flat dot in rows (`STATUS_DOT` + the tone's
   `dot`: a 10 px circle with a slight dark outline), a badge on detail pages.
@@ -1091,3 +1109,10 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   layer is masked out (`.fade-out`, `.fade-both`) so the page's backdrop
   shows through, instead of ending on a border or a fade to solid page
   colour. `pullUp={false}` for heroes with something above them.
+  Charts in the kit: `TrendChart`, `BarChart` (promoted from a candidate),
+  `Sparkline` and `StatTile trend`, with a Charts pattern (form first;
+  accent, support, highlight; three series at most; never colour alone).
+  Lists can be rows or tiles (`List layout`, `LayoutSwitch`,
+  `useListLayout`; `Section plain`, `Tabs size="sm"`), and the dashboard
+  archetypes use both. `divide-etched` only reaches into list groups now,
+  not into a `<div>` row's own children.

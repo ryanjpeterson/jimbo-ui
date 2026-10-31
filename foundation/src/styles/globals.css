@@ -217,10 +217,11 @@
   /* Etched dividers between stacked items (rows in a list): a full-strength
      border with a faint light line under it, so each row reads as its own
      strip in dark and light themes alike. Use on the parent, like divide-y;
-     it also reaches one level down, so rows grouped in wrappers (a month's
-     label and rows in a <div>) get lines between them too. */
+     it also reaches one level down into groups — a wrapper that starts with
+     a ListGroupLabel (a month's label and its rows) — but not into an
+     ordinary row, so a <div> row's own children get no lines. */
   .divide-etched > :not(:first-child),
-  .divide-etched > div > :not(:first-child) {
+  .divide-etched > :has(> .list-group-label:first-child) > :not(:first-child) {
     border-top: 1px solid rgb(var(--c-border));
     box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.05);
   }

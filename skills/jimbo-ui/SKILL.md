@@ -111,6 +111,11 @@ this check, then the preview workflow if they want detail.
   minor version with "Apps must: Nothing" and an "Available" list. Domain
   components stay in their app — listed, never copied. **Pull jimbo-ui
   before writing to the registry**, so app chats don't overwrite each other.
+- **Charts** use the kit's `TrendChart`, `BarChart`, `Sparkline` and
+  `StatTile trend` (guide section 9, Charts): form first, series in accent,
+  support, highlight (three at most), one y-axis, never colour alone, and a
+  tap reads a value as well as a hover. A list with more than a name per
+  item can offer rows or tiles (`List layout`, `LayoutSwitch`).
 - **Maps** use `MapView` (`components/MapView.tsx`): the theme's map style
   (`mapStyles`), flat highlight pins (`markerIcon`), `MapPinCard` for the
   chosen place, `ViewSwitch` for list ⇄ map. Never a stock map style.

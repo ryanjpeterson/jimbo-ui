@@ -26,7 +26,7 @@ export function ArchetypesPage() {
       <p className="meta -mt-3 max-w-xl">Ready-made app shapes to copy and remix. Each one is real pages built from the kit, with neutral example content.</p>
       <div className="grid gap-3 sm:grid-cols-2">
         <LinkCard to="/archetypes/catalogue" eyebrow="Catalogue" title="A log of things, people and places" sub="Home · Entries · People · Places, with a map" accent />
-        <LinkCard to="/archetypes/dashboard" eyebrow="Single-page dashboard" title="Is everything fine?" sub="Jobs with a Run button, recent runs, settings" />
+        <LinkCard to="/archetypes/dashboard" eyebrow="Single-page dashboard" title="Is everything fine?" sub="Jobs as rows or tiles, charts, recent runs, settings" />
       </div>
       <p className="meta">The guide lists the rest (Tracker, Collection, Directory, Planner, Showcase, Tool) by their shape.</p>
     </div>

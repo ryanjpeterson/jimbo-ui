@@ -6,14 +6,18 @@
  * Shape: one page (dock tabs optional: Home · Runs · Settings, at most three),
  * plus the jimbo-ui config section under Settings.
  *   A verdict line (accent when fine, highlight when something needs a look)
- *   StatGrid of the headline numbers
- *   Section of job rows: status dot (pulsing while running), last run, Run button, errors inline
+ *   StatGrid of the headline numbers, each with a Sparkline of its recent values
+ *   Section of jobs — as rows or tiles (LayoutSwitch, remembered): status dot
+ *     (pulsing while running), last run, Run button, errors inline
+ *   Charts: runs per day (BarChart, vertical) and how long runs took (TrendChart)
  *   Section of recent runs as EventRow; a run opens its log in a Sheet (?run=…)
  *   Section of read-only settings as label / value rows
  */
 
 import { useSearchParams } from "react-router-dom";
-import { EventRow, KeyValue, LIVE, PageHeader, Section, Sheet, STATUS_DOT, StatGrid, StatTile, TONES, type Tone } from "@/components/ui/kit";
+import {
+  BarChart, EventRow, KeyValue, LayoutSwitch, List, LIVE, PageHeader, Section, Sheet, STATUS_DOT, StatGrid, StatTile, TONES, TrendChart, useListLayout, type Tone,
+} from "@/components/ui/kit";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
 
@@ -30,6 +34,14 @@ const JOBS: Job[] = [
   { id: "b", name: "Sync the shared folder", from: "with the cloud", status: "running", last: "Running since 10:42" },
   { id: "c", name: "Check the website", from: "every hour", status: "failed", last: "Failed yesterday", error: "The site didn't answer." },
 ];
+const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const RUNS_PER_DAY = [3, 4, 2, 5, 3, 1, 3];
+const DATES = Array.from({ length: 14 }, (_, i) => `Oct ${17 + i}`);
+const MINUTES = {
+  report: [4, 4, 5, 4, 6, 5, 4, 4, 5, 7, 5, 4, 4, 4],
+  sync: [11, 9, 12, 14, 10, 9, 13, 18, 15, 12, 11, 16, 14, 12],
+};
+
 const RUNS = [
   { id: "r1", date: "2026-10-30", title: "Sync the shared folder", sub: "Started 10:42 · 1,204 files", running: true },
   { id: "r2", date: "2026-10-30", title: "Nightly report", sub: "Started 08:00 · 3 pages", running: false },
@@ -41,6 +53,7 @@ export function DashboardPage() {
   const [params, setParams] = useSearchParams();
   const log = RUNS.find((r) => r.id === params.get("run")) ?? null;
   const trouble = JOBS.filter((j) => j.status === "failed").length;
+  const [layout, setLayout] = useListLayout("dashboard-jobs");
   return (
     <div className="space-y-6">
       <PageHeader eyebrow="Dashboard" title="All jobs" />
@@ -50,15 +63,15 @@ export function DashboardPage() {
 
       <StatGrid>
         <StatTile label="Jobs" value={JOBS.length} accent="accent" />
-        <StatTile label="Runs this week" value={21} accent="support" />
-        <StatTile label="Uptime" value="99%" />
-        <StatTile label="Failed" value={trouble} accent="highlight" />
+        <StatTile label="Runs this week" value={21} accent="support" trend={[14, 18, 16, 19, 17, 22, 21]} />
+        <StatTile label="Uptime" value="99%" trend={[97, 99, 98, 100, 99, 99, 99]} />
+        <StatTile label="Failed" value={trouble} accent="highlight" trend={[0, 0, 2, 1, 0, 0, 1]} />
       </StatGrid>
 
-      <Section title="Jobs" count={JOBS.length} flush>
-        <div className="divide-etched">
+      <Section title="Jobs" count={JOBS.length} action={<LayoutSwitch value={layout} onChange={setLayout} />} plain>
+        <List layout={layout}>
           {JOBS.map((j) => (
-            <div key={j.id} className="flex items-start gap-3 px-4 py-3.5">
+            <div key={j.id} className="flex h-full items-start gap-3 px-4 py-3.5">
               <span title={STATUS[j.status].label} aria-label={STATUS[j.status].label}
                 className={cn(STATUS_DOT, "mt-1.5", TONES[STATUS[j.status].tone].dot, j.status === "running" && LIVE)} />
               <span className="min-w-0 flex-1">
@@ -69,8 +82,19 @@ export function DashboardPage() {
               <Button size="sm" variant="secondary" disabled={j.status === "running" || !!j.error}>Run</Button>
             </div>
           ))}
-        </div>
+        </List>
       </Section>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Section title="Runs this week">
+          <BarChart direction="vertical" tone="support" title="Runs per day this week"
+            items={DAYS.map((d, i) => ({ id: d, label: d, value: RUNS_PER_DAY[i]! }))} />
+        </Section>
+        <Section title="Minutes per run">
+          <TrendChart labels={DATES} title="Minutes per run, last two weeks" format={(n) => `${n}m`}
+            series={[{ label: "Sync", values: MINUTES.sync }, { label: "Report", values: MINUTES.report }]} />
+        </Section>
+      </div>
 
       <Section title="Recent runs" count={RUNS.length} flush>
         <div className="divide-etched">
