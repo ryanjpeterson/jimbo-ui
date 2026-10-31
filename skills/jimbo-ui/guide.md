@@ -280,14 +280,14 @@ the page. The Colours tab warns if a setting costs readability.
 
 **Backdrop.** Behind every page sits a backdrop in the theme's colours
 (`Theme.backdrop`, `backdropCss`): a **pattern** from four groups
-(`BACKDROP_GROUPS`, `BACKDROPS`), or none —
+(`BACKDROP_GROUPS`, `BACKDROPS`, twelve each), or none —
 
 | Group | Patterns |
 | --- | --- |
-| **Abstract** | ripples (rings from two corners), waves (layered along the bottom), contours (topographic lines), shapes (scattered circles, triangles, squiggles), blobs (three soft organic shapes), flow (lines across the page), confetti (small dashes), light burst (rays from the top) |
-| **Geo** | triangles, hexagons (a honeycomb), diamonds (harlequin), grid (graph paper), arrows (chevrons) |
-| **Vintage** | halftone (print dots fading from a corner), retro stripes (three bands round a corner), sunburst (wide rays from the bottom), deco fans (art deco scallops) |
-| **Texture** | dot grid, grain (fine film grain), paper (soft mottle), linen (a fine crosshatch) |
+| **Abstract** | ripples (rings from two corners), waves (layered along the bottom), contours (topographic lines), shapes (scattered circles, triangles, squiggles), blobs (three soft organic shapes), flow (lines across the page), confetti (small dashes), light burst (rays from the top), swirl (a spiral from a corner), ribbons (three broad bands), scribble (looping lines), rain (slanted strokes) |
+| **Geo** | triangles, hexagons (a honeycomb), diamonds (harlequin), grid (graph paper), arrows (chevrons), squares (nested), zigzag, rings, crosses, scales (fish scales), cubes (isometric), checks (a faint checkerboard) |
+| **Vintage** | halftone (print dots fading from a corner), retro stripes (three bands round a corner), sunburst (wide rays from the bottom), deco fans (art deco scallops), pinstripe, gingham, polka, plaid, argyle, racing stripes (across a corner), trellis (a studded lattice), bauhaus (quarter circles and blocks) |
+| **Texture** | dot grid, grain (fine film grain), paper (soft mottle), linen (a fine crosshatch), concrete, brushed (horizontal streaks), sand (coarse grain), speckle, crosshatch, twill (a diagonal weave), carbon (a tiny check), ribbed |
 
 — over a **base**: solid (the page colour), gradient (a sweep of accent and
 support) or glow (soft colour glows, the default). Four sliders tune it:
@@ -1152,3 +1152,4 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   Plex Sans, Work Sans, Avenir (Nunito Sans off Apple), Figtree,
   Baskerville, Cormorant, Lora, five monos, Old print and Uncial in.
   Headings and body each get a size (± em) that every text size follows.
+  Twelve backdrops per group (48 patterns).

@@ -151,9 +151,13 @@ export type Backdrop = {
 };
 export type BackdropPattern =
   | "none" | "ripples" | "waves" | "contours" | "shapes" | "blobs" | "flow" | "confetti" | "burst"
+  | "swirl" | "ribbons" | "scribble" | "rain"
   | "geometry" | "hexagons" | "diamonds" | "grid" | "arrows"
+  | "squares" | "zigzag" | "rings" | "crosses" | "scales" | "cubes" | "checks"
   | "halftone" | "stripes" | "sunburst" | "deco"
-  | "dots" | "grain" | "paper" | "linen";
+  | "pinstripe" | "gingham" | "polka" | "plaid" | "argyle" | "racing" | "trellis" | "bauhaus"
+  | "dots" | "grain" | "paper" | "linen"
+  | "concrete" | "brushed" | "sand" | "speckle" | "crosshatch" | "twill" | "carbon" | "ribbed";
 export const BACKDROP_GROUPS = ["Abstract", "Geo", "Vintage", "Texture"] as const;
 export const BACKDROPS: { key: BackdropPattern; label: string; hint: string; group: (typeof BACKDROP_GROUPS)[number] | null }[] = [
   { key: "none", label: "None", hint: "Just the base", group: null },
@@ -165,19 +169,46 @@ export const BACKDROPS: { key: BackdropPattern; label: string; hint: string; gro
   { key: "flow", label: "Flow", hint: "Lines flowing across the page", group: "Abstract" },
   { key: "confetti", label: "Confetti", hint: "Small dashes in every colour", group: "Abstract" },
   { key: "burst", label: "Light burst", hint: "Rays from the top", group: "Abstract" },
+  { key: "swirl", label: "Swirl", hint: "A spiral unwinding from a corner", group: "Abstract" },
+  { key: "ribbons", label: "Ribbons", hint: "Three broad bands across the page", group: "Abstract" },
+  { key: "scribble", label: "Scribble", hint: "Loose looping lines", group: "Abstract" },
+  { key: "rain", label: "Rain", hint: "Short slanted strokes", group: "Abstract" },
   { key: "geometry", label: "Triangles", hint: "A triangle lattice", group: "Geo" },
   { key: "hexagons", label: "Hexagons", hint: "A honeycomb", group: "Geo" },
   { key: "diamonds", label: "Diamonds", hint: "A harlequin of diamonds", group: "Geo" },
   { key: "grid", label: "Grid", hint: "Graph paper, a heavier line every fourth", group: "Geo" },
   { key: "arrows", label: "Arrows", hint: "Chevrons heading up", group: "Geo" },
+  { key: "squares", label: "Squares", hint: "Nested squares", group: "Geo" },
+  { key: "zigzag", label: "Zigzag", hint: "Rows of zigzag lines", group: "Geo" },
+  { key: "rings", label: "Rings", hint: "A grid of small rings", group: "Geo" },
+  { key: "crosses", label: "Crosses", hint: "Small plus signs", group: "Geo" },
+  { key: "scales", label: "Scales", hint: "Overlapping fish scales", group: "Geo" },
+  { key: "cubes", label: "Cubes", hint: "An isometric cube lattice", group: "Geo" },
+  { key: "checks", label: "Checks", hint: "A faint checkerboard", group: "Geo" },
   { key: "halftone", label: "Halftone", hint: "Print dots fading from a corner", group: "Vintage" },
   { key: "stripes", label: "Retro stripes", hint: "Three bands sweeping round a corner", group: "Vintage" },
   { key: "sunburst", label: "Sunburst", hint: "Wide rays rising from the bottom", group: "Vintage" },
   { key: "deco", label: "Deco fans", hint: "Art deco scallops", group: "Vintage" },
+  { key: "pinstripe", label: "Pinstripe", hint: "Fine vertical stripes", group: "Vintage" },
+  { key: "gingham", label: "Gingham", hint: "Crossed bands, picnic-cloth style", group: "Vintage" },
+  { key: "polka", label: "Polka", hint: "Spaced-out polka dots", group: "Vintage" },
+  { key: "plaid", label: "Plaid", hint: "A tartan of crossing stripes", group: "Vintage" },
+  { key: "argyle", label: "Argyle", hint: "Diamonds with a crossing line", group: "Vintage" },
+  { key: "racing", label: "Racing stripes", hint: "Three stripes across a corner", group: "Vintage" },
+  { key: "trellis", label: "Trellis", hint: "A diagonal lattice with studs", group: "Vintage" },
+  { key: "bauhaus", label: "Bauhaus", hint: "Quarter circles and blocks", group: "Vintage" },
   { key: "dots", label: "Dot grid", hint: "Fine dots", group: "Texture" },
   { key: "grain", label: "Grain", hint: "Fine film grain", group: "Texture" },
   { key: "paper", label: "Paper", hint: "Soft mottled paper", group: "Texture" },
   { key: "linen", label: "Linen", hint: "A fine woven crosshatch", group: "Texture" },
+  { key: "concrete", label: "Concrete", hint: "Blotchy, like poured concrete", group: "Texture" },
+  { key: "brushed", label: "Brushed", hint: "Fine horizontal streaks, like brushed metal", group: "Texture" },
+  { key: "sand", label: "Sand", hint: "Coarse grain", group: "Texture" },
+  { key: "speckle", label: "Speckle", hint: "Scattered flecks", group: "Texture" },
+  { key: "crosshatch", label: "Crosshatch", hint: "Fine diagonal hatching", group: "Texture" },
+  { key: "twill", label: "Twill", hint: "Diagonal weave, like denim", group: "Texture" },
+  { key: "carbon", label: "Carbon", hint: "A tiny woven check", group: "Texture" },
+  { key: "ribbed", label: "Ribbed", hint: "Fine horizontal ribs", group: "Texture" },
 ];
 export const BACKDROP_BASES = ["solid", "gradient", "glow"] as const;
 
@@ -699,6 +730,177 @@ export function backdropCss(input: Theme): BackdropLayers {
       const gap = n(4 * sc);
       add(`repeating-linear-gradient(0deg, ${rgba(c.text!, 0.05 * k)} 0 1px, transparent 1px ${gap}px)`, "100% 100%");
       add(`repeating-linear-gradient(90deg, ${rgba(c.text!, 0.04 * k)} 0 1px, transparent 1px ${gap}px)`, "100% 100%");
+      break;
+    }
+    // ── Abstract ─────────────────────────────────────────────────────────
+    case "swirl": {
+      let d = "";
+      for (let t = 0; t < 7 * Math.PI * 2; t += 0.12) {
+        const r = 14 * sc * t;
+        d += `${t ? "L" : "M"}${n(120 + r * Math.cos(t))} ${n(120 + r * Math.sin(t))}`;
+      }
+      add(svg(`<path d='${d}' fill='none' stroke='${c.accent!}' stroke-width='1.6' stroke-opacity='${(0.18 * k).toFixed(3)}'/>`, 1000, 1000), "cover", "center");
+      break;
+    }
+    case "ribbons": {
+      const cols = [c.accent!, c.support!, c.highlight!];
+      const body = cols.map((col, i) => {
+        const y = (260 + i * 210) * 1, w = 70 * sc;
+        return `<path d='M-100 ${y + 180} C 400 ${y - 120}, 1100 ${y + 260}, 1700 ${y - 60}' fill='none' stroke='${col}' stroke-width='${n(w)}' stroke-linecap='round' stroke-opacity='${(0.08 * k).toFixed(3)}'/>`;
+      }).join("");
+      add(svg(body, 1600, 900), "cover", "center");
+      break;
+    }
+    case "scribble": {
+      const so = (0.2 * k).toFixed(3);
+      const body = `<path d='M20 60 c20 -40 50 -40 40 0 s-40 30 -10 40 s50 -50 80 -20 s10 50 40 30' fill='none' stroke='${c.accent!}' stroke-width='2' stroke-linecap='round' stroke-opacity='${so}'/>`
+        + `<path d='M150 170 c-20 -30 20 -50 30 -20 s-30 40 0 50 s40 -20 30 -50' fill='none' stroke='${c.support!}' stroke-width='2' stroke-linecap='round' stroke-opacity='${so}'/>`;
+      add(svg(body, 240, 240, "none"), `${n(240 * sc)}px ${n(240 * sc)}px`, "0 0", "repeat");
+      break;
+    }
+    case "rain": {
+      const so = (0.18 * k).toFixed(3);
+      const drops: [number, number, string][] = [[10, 10, c.accent!], [50, 34, c.support!], [28, 62, c.accent!], [70, 80, c.highlight!], [6, 90, c.support!]];
+      const body = drops.map(([x, y, col]) => `<path d='M${x} ${y} l6 14' stroke='${col}' stroke-width='1.6' stroke-linecap='round' stroke-opacity='${so}'/>`).join("");
+      add(svg(body, 90, 110, "none"), `${n(90 * sc)}px ${n(110 * sc)}px`, "0 0", "repeat");
+      break;
+    }
+    // ── Geo ──────────────────────────────────────────────────────────────
+    case "squares": {
+      const body = [36, 24, 12].map((h, i) => `<rect x='${40 - h}' y='${40 - h}' width='${h * 2}' height='${h * 2}' fill='none' stroke='${i === 0 ? c.accent! : c.support!}' stroke-width='1.2' stroke-opacity='${(0.16 * k).toFixed(3)}'/>`).join("");
+      add(svg(body, 80, 80, "none"), `${n(80 * sc)}px ${n(80 * sc)}px`, "0 0", "repeat");
+      break;
+    }
+    case "zigzag": {
+      const body = `<path d='M0 12 L10 2 L20 12 L30 2 L40 12' fill='none' stroke='${c.accent!}' stroke-width='1.6' stroke-linejoin='round' stroke-opacity='${(0.18 * k).toFixed(3)}'/>`
+        + `<path d='M0 32 L10 22 L20 32 L30 22 L40 32' fill='none' stroke='${c.support!}' stroke-width='1.6' stroke-linejoin='round' stroke-opacity='${(0.12 * k).toFixed(3)}'/>`;
+      add(svg(body, 40, 40, "none"), `${n(40 * sc)}px ${n(40 * sc)}px`, "0 0", "repeat");
+      break;
+    }
+    case "rings": {
+      const body = `<circle cx='20' cy='20' r='8' fill='none' stroke='${c.accent!}' stroke-width='1.4' stroke-opacity='${(0.18 * k).toFixed(3)}'/>`
+        + `<circle cx='0' cy='0' r='3' fill='${c.support!}' fill-opacity='${(0.12 * k).toFixed(3)}'/><circle cx='40' cy='40' r='3' fill='${c.support!}' fill-opacity='${(0.12 * k).toFixed(3)}'/>`;
+      add(svg(body, 40, 40, "none"), `${n(40 * sc)}px ${n(40 * sc)}px`, "0 0", "repeat");
+      break;
+    }
+    case "crosses": {
+      const body = `<path d='M16 10 v12 M10 16 h12' stroke='${c.accent!}' stroke-width='2' stroke-linecap='round' stroke-opacity='${(0.18 * k).toFixed(3)}'/>`
+        + `<path d='M48 42 v12 M42 48 h12' stroke='${c.support!}' stroke-width='2' stroke-linecap='round' stroke-opacity='${(0.14 * k).toFixed(3)}'/>`;
+      add(svg(body, 64, 64, "none"), `${n(64 * sc)}px ${n(64 * sc)}px`, "0 0", "repeat");
+      break;
+    }
+    case "scales": {
+      const so = (0.18 * k).toFixed(3);
+      const arc = (x: number, y: number) => `<path d='M${x - 20} ${y} A20 20 0 0 0 ${x + 20} ${y}' fill='none' stroke='${c.accent!}' stroke-width='1.3' stroke-opacity='${so}'/>`;
+      add(svg(arc(20, 0) + arc(0, 20) + arc(40, 20) + arc(20, 40), 40, 40, "none"), `${n(40 * sc)}px ${n(40 * sc)}px`, "0 0", "repeat");
+      break;
+    }
+    case "cubes": {
+      const h = 30, w = n(h * 1.732);
+      const body = `<path d='M0 ${h / 2} L${w / 2} 0 L${w} ${h / 2} L${w / 2} ${h} Z' fill='${c.accent!}' fill-opacity='${(0.06 * k).toFixed(3)}'/>`
+        + `<path d='M0 ${h / 2} V${h * 1.5} L${w / 2} ${h * 2} V${h} Z' fill='${c.support!}' fill-opacity='${(0.04 * k).toFixed(3)}'/>`
+        + `<path d='M0 ${h / 2} L${w / 2} 0 L${w} ${h / 2} L${w / 2} ${h} Z M${w / 2} ${h} V${h * 2} M0 ${h / 2} V${h * 1.5} M${w} ${h / 2} V${h * 1.5}' fill='none' stroke='${c["text-subtle"]!}' stroke-opacity='${(0.14 * k).toFixed(3)}'/>`;
+      add(svg(body, w, h * 2, "none"), `${n(w * sc)}px ${n(h * 2 * sc)}px`, "0 0", "repeat");
+      break;
+    }
+    case "checks": {
+      const body = `<rect width='20' height='20' fill='${c.accent!}' fill-opacity='${(0.05 * k).toFixed(3)}'/><rect x='20' y='20' width='20' height='20' fill='${c.accent!}' fill-opacity='${(0.05 * k).toFixed(3)}'/>`;
+      add(svg(body, 40, 40, "none"), `${n(40 * sc)}px ${n(40 * sc)}px`, "0 0", "repeat");
+      break;
+    }
+    // ── Vintage ──────────────────────────────────────────────────────────
+    case "pinstripe": {
+      const gap = n(14 * sc);
+      add(`repeating-linear-gradient(90deg, ${rgba(c.accent!, 0.12 * k)} 0 1px, transparent 1px ${gap}px)`, "100% 100%");
+      break;
+    }
+    case "gingham": {
+      const w = n(16 * sc);
+      add(`repeating-linear-gradient(0deg, ${rgba(c.accent!, 0.06 * k)} 0 ${w}px, transparent ${w}px ${n(w * 2)}px)`, "100% 100%");
+      add(`repeating-linear-gradient(90deg, ${rgba(c.accent!, 0.06 * k)} 0 ${w}px, transparent ${w}px ${n(w * 2)}px)`, "100% 100%");
+      break;
+    }
+    case "polka": {
+      const body = `<circle cx='15' cy='15' r='6' fill='${c.highlight!}' fill-opacity='${(0.12 * k).toFixed(3)}'/><circle cx='45' cy='45' r='6' fill='${c.accent!}' fill-opacity='${(0.12 * k).toFixed(3)}'/>`;
+      add(svg(body, 60, 60, "none"), `${n(60 * sc)}px ${n(60 * sc)}px`, "0 0", "repeat");
+      break;
+    }
+    case "plaid": {
+      const s1 = n(80 * sc);
+      for (const deg of [0, 90]) {
+        add(`repeating-linear-gradient(${deg}deg, ${rgba(c.accent!, 0.07 * k)} 0 ${n(18 * sc)}px, transparent ${n(18 * sc)}px ${n(30 * sc)}px, ${rgba(c.support!, 0.06 * k)} ${n(30 * sc)}px ${n(34 * sc)}px, transparent ${n(34 * sc)}px ${s1}px)`, "100% 100%");
+      }
+      break;
+    }
+    case "argyle": {
+      const body = `<path d='M30 0 L60 40 L30 80 L0 40 Z' fill='${c.accent!}' fill-opacity='${(0.06 * k).toFixed(3)}'/>`
+        + `<path d='M0 0 L60 80 M60 0 L0 80' stroke='${c.highlight!}' stroke-width='1' stroke-dasharray='4 4' stroke-opacity='${(0.16 * k).toFixed(3)}'/>`;
+      add(svg(body, 60, 80, "none"), `${n(60 * sc)}px ${n(80 * sc)}px`, "0 0", "repeat");
+      break;
+    }
+    case "racing": {
+      const cols = [c.accent!, c.highlight!, c.support!];
+      const body = cols.map((col, i) => {
+        const o = (i * 70 + 120) * sc;
+        return `<path d='M${n(1600 - o)} -50 L-50 ${n(1600 - o)}' stroke='${col}' stroke-width='${n(40 * sc)}' stroke-opacity='${(0.12 * k).toFixed(3)}'/>`;
+      }).join("");
+      add(svg(body, 1600, 900, "xMinYMin slice"), "cover", "left top");
+      break;
+    }
+    case "trellis": {
+      const body = `<path d='M0 0 L40 40 M40 0 L0 40' stroke='${c.accent!}' stroke-width='1.2' stroke-opacity='${(0.16 * k).toFixed(3)}'/><circle cx='20' cy='20' r='2.4' fill='${c.highlight!}' fill-opacity='${(0.2 * k).toFixed(3)}'/>`;
+      add(svg(body, 40, 40, "none"), `${n(40 * sc)}px ${n(40 * sc)}px`, "0 0", "repeat");
+      break;
+    }
+    case "bauhaus": {
+      const fo = (0.08 * k).toFixed(3);
+      const body = `<path d='M0 0 H60 A60 60 0 0 1 0 60 Z' fill='${c.accent!}' fill-opacity='${fo}'/>`
+        + `<rect x='60' y='60' width='60' height='60' fill='${c.support!}' fill-opacity='${fo}'/>`
+        + `<path d='M120 120 V60 A60 60 0 0 0 60 120 Z' fill='${c.highlight!}' fill-opacity='${fo}'/>`;
+      add(svg(body, 120, 120, "none"), `${n(120 * sc)}px ${n(120 * sc)}px`, "0 0", "repeat");
+      break;
+    }
+    // ── Texture ──────────────────────────────────────────────────────────
+    case "concrete":
+    case "brushed":
+    case "sand": {
+      const [r, g, bl] = hexToRgb(c.text!).map((v) => (v / 255).toFixed(3));
+      const set = { concrete: ["0.012", 5, 0.16, 520], brushed: ["0.008 0.9", 2, 0.12, 300], sand: ["0.55", 3, 0.26, 200] }[b.pattern] as [string, number, number, number];
+      const body = `<filter id='n'><feTurbulence type='fractalNoise' baseFrequency='${set[0]}' numOctaves='${set[1]}' stitchTiles='stitch'/>`
+        + `<feColorMatrix values='0 0 0 0 ${r} 0 0 0 0 ${g} 0 0 0 0 ${bl} 0 0 0 ${(set[2] * k).toFixed(3)} 0'/></filter><rect width='100%' height='100%' filter='url(#n)'/>`;
+      add(svg(body, set[3], set[3], "none"), `${n(set[3] * sc)}px ${n(set[3] * sc)}px`, "0 0", "repeat");
+      break;
+    }
+    case "speckle": {
+      let body = "", seed = 7;
+      const rnd = () => ((seed = (seed * 9301 + 49297) % 233280) / 233280);
+      for (let i = 0; i < 40; i++) {
+        const col = [c.text!, c.accent!, c.support!][i % 3]!;
+        body += `<circle cx='${n(rnd() * 120)}' cy='${n(rnd() * 120)}' r='${n(0.6 + rnd() * 1.1)}' fill='${col}' fill-opacity='${(0.18 * k).toFixed(3)}'/>`;
+      }
+      add(svg(body, 120, 120, "none"), `${n(120 * sc)}px ${n(120 * sc)}px`, "0 0", "repeat");
+      break;
+    }
+    case "crosshatch": {
+      const gap = n(9 * sc);
+      add(`repeating-linear-gradient(45deg, ${rgba(c.text!, 0.06 * k)} 0 1px, transparent 1px ${gap}px)`, "100% 100%");
+      add(`repeating-linear-gradient(-45deg, ${rgba(c.text!, 0.05 * k)} 0 1px, transparent 1px ${gap}px)`, "100% 100%");
+      break;
+    }
+    case "twill": {
+      const gap = n(5 * sc);
+      add(`repeating-linear-gradient(60deg, ${rgba(c.support!, 0.1 * k)} 0 1.5px, transparent 1.5px ${gap}px)`, "100% 100%");
+      break;
+    }
+    case "carbon": {
+      const so = (0.08 * k).toFixed(3);
+      const body = `<rect width='4' height='4' fill='${c.text!}' fill-opacity='${so}'/><rect x='4' y='4' width='4' height='4' fill='${c.text!}' fill-opacity='${so}'/>`;
+      add(svg(body, 8, 8, "none"), `${n(8 * sc)}px ${n(8 * sc)}px`, "0 0", "repeat");
+      break;
+    }
+    case "ribbed": {
+      const gap = n(6 * sc);
+      add(`repeating-linear-gradient(0deg, ${rgba(c.text!, 0.07 * k)} 0 1px, transparent 1px ${n(gap / 2)}px, ${rgba(c.bg!, 0.15 * k)} ${n(gap / 2)}px ${gap}px)`, "100% 100%");
       break;
     }
   }

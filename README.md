@@ -3,7 +3,7 @@
 Ryan's shared brand and UI system for web apps (repo and plugin name:
 `jimbo-ui`): a theme engine
 that turns two to four colours into a full palette with shades, 237 looks — each in light, mid and dark — (everyday, holidays,
-countries, provinces, sports teams and Zelda games), 21 backdrops, frosted glass and a circle motif, Tailwind tokens, a UI kit, a phone-first, full-screen app shell with a
+countries, provinces, sports teams and Zelda games), 48 backdrops, frosted glass and a circle motif, Tailwind tokens, a UI kit, a phone-first, full-screen app shell with a
 floating tab dock, maps in the theme, two app archetypes to copy, the
 patterns that make the apps feel alike, and a **registry** of every app and
 every UI element across them so nothing gets built twice. It's

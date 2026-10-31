@@ -28,6 +28,11 @@ the matching 0.x release.
   or Avenir on Apple devices, Nunito Sans elsewhere), Figtree; Baskerville,
   Cormorant, Lora; Roboto Mono, Source Code, DM Mono, Red Hat Mono,
   Inconsolata; Old print, Uncial.
+- **Backdrops, twelve per group** (48): Abstract adds swirl, ribbons,
+  scribble, rain; Geo adds squares, zigzag, rings, crosses, scales, cubes,
+  checks; Vintage adds pinstripe, gingham, polka, plaid, argyle, racing
+  stripes, trellis, bauhaus; Texture adds concrete, brushed, sand, speckle,
+  crosshatch, twill, carbon, ribbed.
 
 ### Removed
 - Fonts Oswald, Pixel, Bungee, Neon and Script. A saved theme that used
