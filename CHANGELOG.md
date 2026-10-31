@@ -15,7 +15,9 @@ now 0.1.0–0.5.0 (1.0.0 → 0.1.0, 1.1.0 → 0.2.0, 2.0.0 → 0.3.0, 3.0.0 → 
 3.1.0 → 0.5.0). An app whose `jimbo-ui.json` still says an old number is on
 the matching 0.x release.
 
-## Unreleased
+## 0.8.4 — 2026-10-31
+
+Openers fade into the page (no hard edge under banners and heroes), plus charts and rows-or-tiles lists.
 
 ### Added
 - **Charts.** `TrendChart` (one to three lines over time, a crosshair you

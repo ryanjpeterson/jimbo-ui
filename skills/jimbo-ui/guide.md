@@ -1105,7 +1105,7 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   header text.
 - **0.8.3** — `html`, `body` and `#root` keep `height: 100%` again, so
   `min-h-full` pages (sign-in screens) fill the screen.
-- **Unreleased** — Full-width openers fade into the page: their background
+- **0.8.4** — Full-width openers fade into the page: their background
   layer is masked out (`.fade-out`, `.fade-both`) so the page's backdrop
   shows through, instead of ending on a border or a fade to solid page
   colour. `pullUp={false}` for heroes with something above them.
