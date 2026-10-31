@@ -122,12 +122,20 @@ function LookCarousel() {
   return (
     <div className="space-y-3">
       <ThemeScope theme={theme} className="overflow-hidden rounded-2xl border border-border p-4 transition-colors duration-500 sm:p-6">
-        <div className="mb-4 flex items-baseline justify-between gap-3">
+        <div className="mb-4 flex h-8 items-baseline justify-between gap-3 overflow-hidden">
           <p className="font-display text-2xl leading-none text-text-base">{s.template} <span className="font-body text-sm font-semibold capitalize text-text-subtle">{s.tone}</span></p>
           <p className="truncate text-xs text-text-subtle">{s.show}</p>
         </div>
-        <div key={i} className="animate-[fadein_.5s_ease]"><s.Render theme={theme} /></div>
-        <p className="mt-4 text-xs text-text-muted">
+        {/* Every slide sits in the same cell, only the current one shown, so the box is always the tallest slide's height. */}
+        <div className="grid">
+          {SLIDES.map((x, n) => (
+            <div key={n} style={{ gridArea: "1 / 1" }} aria-hidden={n !== i}
+              className={cn("self-start", n === i ? "animate-[fadein_.5s_ease]" : "invisible")}>
+              <x.Render theme={theme} />
+            </div>
+          ))}
+        </div>
+        <p className="mt-4 line-clamp-2 min-h-[2lh] text-xs text-text-muted">
           {FONTS[s.headings]?.label ?? s.headings} headings · {FONTS[s.body]?.label ?? s.body} body · {BACKDROPS.find((b) => b.key === s.backdrop)?.label ?? s.backdrop} on {s.base}
         </p>
       </ThemeScope>
@@ -151,7 +159,7 @@ function LookCarousel() {
 export function HomeDemo() {
   return (
     <div className="space-y-8">
-      <HeroSection eyebrow={`jimbo.ui ${__JIMBO_VERSION__} · showcase`} title="One kit, any look" pattern="ripples"
+      <HeroSection eyebrow={`jimbo.ui ${__JIMBO_VERSION__} · showcase`} title="One kit, any look" pattern="none"
         actions={<>
           <Link to="/components" className="btn btn-primary">See every component</Link>
           <Link to="/jimbo-ui" className="btn btn-secondary">Make a look</Link>
