@@ -675,7 +675,8 @@ and body fonts.
     status bar.
   - The page colour is on `html` and the backdrop is a fixed layer the full
     height of the screen (`body::before`, `100lvh`), so it never stops short
-    or scrolls away; `body` and `#root` are at least `100dvh` tall.
+    or scrolls away; `html`, `body` and `#root` are `height: 100%` (so pages
+    can use `h-full` / `min-h-full`) and `#root` at least `100dvh`.
   - Insets come from `globals.css`, never `env()` in app code:
     `--safe-top`, `--safe-bottom`, `--safe-left`, `--safe-right`, plus
     `--top-bar` (the top bar's height with the status bar: where sticky
@@ -1080,3 +1081,5 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
 - **0.8.2** — A solid status bar (`default`, coloured by `theme-color`)
   instead of `black-translucent`, whose iOS 26.1+ system blur covered the
   header text.
+- **0.8.3** — `html`, `body` and `#root` keep `height: 100%` again, so
+  `min-h-full` pages (sign-in screens) fill the screen.

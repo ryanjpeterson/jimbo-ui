@@ -19,6 +19,19 @@ the matching 0.x release.
 
 Nothing yet.
 
+## 0.8.3 — 2026-10-31
+
+Fix: pages that fill the screen with `min-h-full` (sign-in screens) work again.
+
+### Changed
+- `globals.css`: `html`, `body` and `#root` are `height: 100%` again. 0.8.1
+  made `body` and `#root` a minimum height only, so `h-full` / `min-h-full`
+  inside them shrank to their content and centred screens sat at the top.
+  `#root` keeps its `100dvh` minimum.
+
+### Apps must
+- Nothing beyond copying the foundation files.
+
 ## 0.8.2 — 2026-10-31
 
 A solid status bar on installed apps, so iOS's top-edge blur no longer covers the header.
