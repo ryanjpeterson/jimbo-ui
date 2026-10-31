@@ -1061,7 +1061,7 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   lists; a Games category with Legend of Zelda looks. Backdrops in four
   groups (abstract, geo, vintage, texture — 21 patterns) with contrast and
   saturation sliders.
-- **Unreleased** — Full screen on phones: `viewport-fit=cover` required
+- **0.8.1** — Full screen on phones: `viewport-fit=cover` required
   (and added by `applyTheme` when missing), the backdrop a fixed
   full-screen layer, page colour on `html`, `100dvh` minimum height, and
   the safe-area variables (`--safe-top` … `--above-dock`) for everything

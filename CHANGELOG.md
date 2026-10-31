@@ -17,6 +17,12 @@ the matching 0.x release.
 
 ## Unreleased
 
+Nothing yet.
+
+## 0.8.1 — 2026-10-31
+
+Full screen on phones: pages fill the screen and nothing sits under the status bar.
+
 ### Changed
 - **Full screen on phones.** Layouts fill the screen edge to edge and top to
   bottom, and nothing sits under the status bar's blur or the home
