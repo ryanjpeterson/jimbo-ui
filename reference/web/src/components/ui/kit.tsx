@@ -174,8 +174,11 @@ export function HeroSection({ eyebrow, title, children, actions, pattern = "ripp
   const { theme } = useBrand();
   const look = backdropCss({ ...theme, backdrop: { pattern, base: "gradient", intensity: 0.75, scale: 0.8 } });
   return (
-    <FullBleed pad={false} className={cn("mb-2 border-b border-border", pullUp ? "-mt-6 sm:-mt-8" : "border-t")}
-      style={{ backgroundImage: look.image, backgroundSize: look.size, backgroundPosition: look.position, backgroundRepeat: look.repeat }}>
+    <FullBleed pad={false} className={cn("isolate mb-2", pullUp && "-mt-6 sm:-mt-8")}>
+      {/* The pattern fades out top and bottom (.fade-out, plus .fade-in when something sits above),
+          so the opener melts into the page's backdrop instead of ending on a line. */}
+      <div aria-hidden="true" className={cn("fade-out absolute inset-0 -z-10", !pullUp && "fade-both")}
+        style={{ backgroundImage: look.image, backgroundSize: look.size, backgroundPosition: look.position, backgroundRepeat: look.repeat }} />
       <div className={cn("flex flex-col justify-end gap-3 py-10 sm:py-14", size === "lg" ? "min-h-[62dvh]" : "min-h-[34dvh]", align === "center" && "items-center text-center")}>
         {eyebrow && <p className="eyebrow text-support">{eyebrow}</p>}
         <h1 className="font-display text-[40px] leading-[1.02] text-text-base sm:text-6xl">{title}</h1>
@@ -259,16 +262,17 @@ export function Banner({ backdrop, glow = "accent", back, badge, children, pullU
     // Breaks out of the page column to the full screen width and up against the app bar.
     <section className={cn("relative isolate mb-6 ml-[calc(50%-50vw)] w-screen overflow-hidden sm:mb-8", pullUp && "-mt-6 sm:-mt-8")}>
       {/* Backdrop: the image itself, blurred and scaled up so it fills the whole
-          banner edge to edge (scaling hides the soft edges blur leaves behind). */}
-      {backdrop ? (
-        <img src={backdrop} alt="" aria-hidden="true"
-          className="absolute inset-0 -z-20 h-full w-full scale-150 object-cover blur-2xl saturate-150" />
-      ) : (
-        <div className={cn("absolute inset-0 -z-20 bg-gradient-to-br via-support-950/60 to-bg", glowCls)} />
-      )}
-      {/* Light overall dim, fading into the page at the bottom so there's no hard edge. */}
-      <div className="absolute inset-0 -z-10 bg-black/35" />
-      <div className="absolute inset-0 -z-10 bg-gradient-to-t from-bg via-bg/40 to-transparent" />
+          banner edge to edge (scaling hides the soft edges blur leaves behind),
+          under a light dim. The whole layer fades out at the bottom (.fade-out), so
+          the page's own backdrop shows through — never a hard edge or a band of page colour. */}
+      <div aria-hidden="true" className={cn("fade-out absolute inset-0 -z-10 overflow-hidden", !pullUp && "fade-both")}>
+        {backdrop ? (
+          <img src={backdrop} alt="" className="absolute inset-0 h-full w-full scale-150 object-cover blur-2xl saturate-150" />
+        ) : (
+          <div className={cn("absolute inset-0 bg-gradient-to-br via-support-950/60 to-transparent", glowCls)} />
+        )}
+        <div className="absolute inset-0 bg-black/35" />
+      </div>
 
       <div className="mx-auto max-w-5xl px-4 sm:px-6">
         {(back || badge) && (

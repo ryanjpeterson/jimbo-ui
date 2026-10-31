@@ -740,6 +740,7 @@ and body fonts.
 | `.glass` / `.card-glass` | Lightly frosted: `bg-surface/90`, `backdrop-blur-md`, `border-border`, soft drop. For tabs, the secondary top-bar buttons, the pager and anything over a banner |
 | `.dot-accent/highlight/support` | A brand colour as a **flat circle**: one solid fill, nothing else (see Circles in section 2). Size it with utilities. `.orb-*` are older names for the same thing |
 | `.divide-etched` | Lines between stacked items, on the parent like `divide-y`: a full-strength `border` line with a faint light line under it (`inset 0 1px 0 rgba(255,255,255,.05)`). It also reaches one level down, so rows grouped in wrappers (a month's label and rows) are divided too. Lists, ranked lists |
+| `.fade-out` (`.fade-both`) | **How a full-width opener ends.** A banner, a hero, a photo or gradient header never stops on a hard edge, a border, or a fade to solid `bg` — the page behind has its backdrop (pattern and glow), so any of those shows as a line. Put the opener's background (blurred photo, dim, gradient, pattern) in its own layer behind the content and mask that layer out to transparent: `.fade-out` fades the bottom 45%; add `.fade-both` to fade the top too when something sits above it. Mask the background, never the text. `Banner`, `Hero` and `HeroSection` do this |
 | `.lit-accent/highlight/support` | A solid brand fill: flat colour, `inset 0 0 0 1px` of its darker shade at 55%, `on-c` text. Active tabs and pills, select ticks, the date band, count badges (the name is from when they were shaded) |
 | `.field` | 11 px radius, `bg-surface-2`, `border-border`, 15 px text, `px-4`; focus = accent border + 2 px accent ring at 20% |
 | `.btn` | 10 px radius (`rounded-control`), 44 px tall on phones (40 px desktop), `px-5`, 15 px semibold; `.btn-sm` 36 px (32 px desktop); `lg` 48 px |
@@ -937,6 +938,9 @@ archetype only sets the starting shape.
   `text-white` on cards or on accent/highlight fills) — use tokens and the
   `on-*` colours.
 - No second modal style, no full-screen blocking spinners.
+- No hard bottom edge on a full-width image or gradient header: no border
+  under it, no fade to solid `bg`, no `overflow-hidden` cut. Fade its
+  background layer out with `.fade-out` (section 7).
 - No horizontal scrolling rows, no hover-only actions.
 - No native colour inputs, and no browser alerts except as a last-resort
   error.
@@ -1083,3 +1087,7 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   header text.
 - **0.8.3** — `html`, `body` and `#root` keep `height: 100%` again, so
   `min-h-full` pages (sign-in screens) fill the screen.
+- **Unreleased** — Full-width openers fade into the page: their background
+  layer is masked out (`.fade-out`, `.fade-both`) so the page's backdrop
+  shows through, instead of ending on a border or a fade to solid page
+  colour. `pullUp={false}` for heroes with something above them.

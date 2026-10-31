@@ -58,6 +58,11 @@ this check, then the preview workflow if they want detail.
   inferred. Light backgrounds flip text dark automatically. Spread the
   colours: a page shows more than the accent, and no brand colour is white or
   grey.
+- Full-width openers (banners, heroes, photo or gradient headers) **fade
+  into the page**: mask their background layer out with `.fade-out`
+  (`.fade-both` when something sits above) — never a hard bottom edge, a
+  border under them, or a fade to solid `bg` (the page's backdrop makes
+  that a line).
 - Coloured shapes are flat (`.lit-*`, `.btn-primary`, `.dot-*`) — no gloss,
   gradients or glows; depth comes from layers, borders and shadows, lightly frosted `.glass` (mostly solid, never
   see-through). Softly rounded corners, not pills (`rounded-control` for

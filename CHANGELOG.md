@@ -18,12 +18,24 @@ the matching 0.x release.
 ## Unreleased
 
 ### Fixed
+- **No more hard edge under banners and heroes.** `Banner` (and `Hero`) and
+  `HeroSection` faded to solid page colour, or ended on a border, so over a
+  page backdrop they stopped on a visible line. Their background layer now
+  fades out to transparent (`.fade-out` in `globals.css`; `.fade-both` also
+  fades the top when something sits above), letting the page's backdrop
+  show through.
 - `HeroSection`, `Banner` and `Hero` tucked up under the top bar even when
   something sat above them, covering it (the showcase's catalogue tabs).
   They take `pullUp={false}` for that case; the default is unchanged.
 
 ### Apps must
-- Nothing — pass `pullUp={false}` only where something sits above a hero.
+- Copy the foundation files (`globals.css` has `.fade-out`), and port
+  `Banner` and `HeroSection` from the reference kit.
+- Any page header of the app's own with a blurred photo or gradient behind
+  it (a year or profile header, say): move that background into its own
+  layer behind the content, give the layer `fade-out`, and remove any
+  border under it or fade to `bg`.
+- Pass `pullUp={false}` only where something sits above a hero.
 
 ## 0.8.3 — 2026-10-31
 
