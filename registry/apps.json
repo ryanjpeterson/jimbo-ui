@@ -14,7 +14,7 @@
       "name": "jimbo-backup",
       "repo": "ryanjpeterson/jimbo-backup",
       "webRoot": "web",
-      "version": "0.7.0",
+      "version": "0.8.1",
       "auth": "none",
       "registered": "2026-10-30",
       "audited": "2026-10-30"
