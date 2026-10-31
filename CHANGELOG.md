@@ -33,6 +33,9 @@ the matching 0.x release.
   checks; Vintage adds pinstripe, gingham, polka, plaid, argyle, racing
   stripes, trellis, bauhaus; Texture adds concrete, brushed, sand, speckle,
   crosshatch, twill, carbon, ribbed.
+- **Brands** category on the Looks tab: companies' own palettes, colours
+  only. First, **Marcone** — Pantone 1795 red with its parent mSupply's
+  navy — written light and dark, mid made from its own colours.
 - **The iOS home-screen icon follows the theme.** `applyFavicon` draws the
   recoloured favicon (or an uploaded one) as a 180 px PNG on the theme's
   background and points `apple-touch-icon` at it (`themedFavicon`,

@@ -47,8 +47,8 @@ always flat, side by side, at fixed sizes — no orbs; softly rounded corners, n
 for headings and body;
 circles of the theme colours as a motif; each look once, in light, mid and
 dark (made from its own colours where it wasn't written); templates in
-Everyday, Holidays, Countries, Provinces, Games and Sports categories (team,
-flag and game themes from real colours, via `scripts/template-from-colours.mjs`);
+Everyday, Holidays, Countries, Provinces, Games, Brands and Sports categories
+(team, flag, game and company themes from real colours, via `scripts/template-from-colours.mjs`);
 backdrops in Abstract, Geo, Vintage and Texture groups; no brand colour white or grey;
 no logo — the brand is the app's name as header text (`HeaderTitle`), with a
 dot in the accent; the favicon is the only graphic.

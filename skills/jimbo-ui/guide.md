@@ -120,7 +120,8 @@ can theme any:
   (`PillTabs scroll`) — one topic per tab, so no tab is a long page of
   everything:
   1. **Looks** (`?tab=theme`) — *Pick a look* (Everyday, Holidays,
-     Countries, Provinces, Games and Sports with league and city tabs, and
+     Countries, Provinces, Games, Brands and Sports with league and city
+     tabs, and
      search; tiles are miniatures of the app with the theme's colours as
      circles) and *Share this look* (export and import).
   2. **Colours** — the four colours as round tabs, the inline picker, *Infer
@@ -484,8 +485,9 @@ most: keep them dark enough (luminance under about 0.07) for 7:1.
 
 ## 4. Theme templates
 
-The Looks tab offers these (`foundation/src/lib/themes.ts`) in six
-categories, chosen with wrapping pills, plus a search box across all of them
+The Looks tab offers these (`foundation/src/lib/themes.ts`) in seven
+categories (Brands: companies' own palettes, colours only — Marcone's
+Pantone 1795 red with its parent mSupply's navy), chosen with wrapping pills, plus a search box across all of them
 (name, vibe, category and tab; accents ignored, so "quebec" finds Québec).
 
 **Each look comes once, in three page tones.** A **Light / Mid / Dark**
@@ -1162,3 +1164,4 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   Headings and body each get a size (± em) that every text size follows.
   Twelve backdrops per group (48 patterns). The iOS home-screen icon
   follows the theme (`applyFavicon` sets `apple-touch-icon` to a themed PNG).
+  A Brands category, starting with Marcone (red and mSupply navy).
