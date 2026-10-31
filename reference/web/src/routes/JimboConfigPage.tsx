@@ -20,9 +20,10 @@ import { BRAND } from "@/lib/brand.config";
 import { JIMBO_APP, JIMBO_UI } from "@/lib/jimbo";
 import { useBrand } from "@/lib/useBrand";
 import { HeaderTitle } from "@/components/HeaderTitle";
-import { LinkCard, PageHeader, PillTabs } from "@/components/ui/kit";
+import { Badge, LinkCard, PageHeader, PillTabs } from "@/components/ui/kit";
 import { ThemePanel } from "./config/ThemePanel";
 import { StyleGuidePanel } from "./config/StyleGuidePanel";
+import { JimboUpdates, useJimboUpdates } from "./config/UpdatesPanel";
 
 type Tab = "theme" | "brand" | "style" | "about" | "app";
 
@@ -47,10 +48,17 @@ export function JimboConfigPage({ canConfigure, app }: { canConfigure: boolean; 
   );
 }
 
-/** The entry in the app's settings or admin area; renders nothing for people who can't configure. */
+/**
+ * The entry in the app's settings or admin area; renders nothing for people
+ * who can't configure. Says so when a newer jimbo-ui release is out.
+ */
 export function JimboConfigLink({ canConfigure }: { canConfigure: boolean }) {
+  const { updates } = useJimboUpdates(canConfigure);
   if (!canConfigure) return null;
-  return <LinkCard to="/jimbo-ui" eyebrow="Look" title="jimbo-ui config" sub="Theme, brand and style guide" />;
+  return (
+    <LinkCard to={updates ? "/jimbo-ui?tab=about" : "/jimbo-ui"} eyebrow="Look" title="jimbo-ui config"
+      sub={updates ? <Badge tone="yellow" dot>jimbo-ui {updates.latest} is out</Badge> : "Theme, brand and style guide"} />
+  );
 }
 
 function BrandPanel() {
@@ -74,6 +82,7 @@ function BrandPanel() {
 }
 
 function AboutPanel() {
+  const { releases } = useJimboUpdates();
   const a = JIMBO_APP;
   const behind = a?.version && a.version !== JIMBO_UI.version;
   const local = a?.components?.local ?? [];
@@ -87,6 +96,7 @@ function AboutPanel() {
   ];
   return (
     <div className="space-y-4">
+      <JimboUpdates releases={releases} />
       <div className="card divide-y divide-border">
         {rows.map(([k, v]) => (
           <p key={k} className="flex min-h-[56px] items-center justify-between gap-4 px-4 py-3">

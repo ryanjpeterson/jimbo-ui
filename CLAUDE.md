@@ -34,7 +34,7 @@ It must print nothing. Add an app's words to it when a new app adopts jimbo.ui.
 | `reference/` | Generic kit, `AppShell`, `HeaderTitle`, `MapView`, the jimbo-ui config section (`JimboConfigPage` + `routes/config/`), the archetypes (`archetypes/catalogue.tsx`, `dashboard.tsx`), `useBrand`, `index.html` | Apps adapt and extend them |
 | `registry/` | `apps.json` (every app on jimbo-ui) and `components.json` (every UI element across them) | Pull before writing; names and paths only |
 | `showcase/` | Demo app assembled from reference → foundation → starter → `showcase/overrides/` | Published as a private page each release |
-| `scripts/` | `inventory.mjs` (registry report), `tokens.mjs` (an app's `tokens.css`), `contrast.mjs` (template contrast report), `versions.mjs` (versions agree), `build-zip.sh` (claude.ai upload) | |
+| `scripts/` | `inventory.mjs` (registry report), `tokens.mjs` (an app's `tokens.css`), `contrast.mjs` (template contrast report), `versions.mjs` (versions agree), `releases.mjs` (`releases.json` from the changelog), `build-zip.sh` (claude.ai upload) | |
 | `hooks/` | `hooks.json` + `check-version.mjs`: tells an app's session when it's behind the installed release | |
 | `skills/jimbo-ui/` | `SKILL.md` (core rules + workflows), `guide.md` (the full guide) | |
 | `.claude-plugin/` | `plugin.json` and `marketplace.json` | Versions must match |
@@ -68,7 +68,7 @@ dot in the accent; the favicon is the only graphic.
 - Contrast: `node scripts/contrast.mjs --check` must pass for every template
   after any change to `theme.ts` or `themes.ts`.
 - Plugin manifests: `claude plugin validate --strict .`
-- Versions: `node scripts/versions.mjs` (manifests, `foundation/src/lib/jimbo.ts`, SKILL.md, CHANGELOG agree)
+- Versions: `node scripts/versions.mjs` (manifests, `foundation/src/lib/jimbo.ts`, SKILL.md, CHANGELOG agree; `releases.json` current — `node scripts/releases.mjs` rewrites it)
 - Registry: `node scripts/inventory.mjs` (reads the apps' checkouts in `~/Development`)
 - Check UI at phone width (375 px) in a dark, a mid and a light template.
 

@@ -181,7 +181,11 @@ release without touching that working copy, export it:
   (accent, highlight or `-`, background, optional support)
 - `scripts/contrast.mjs` — contrast and colour-separation report for every
   template (`--check` fails on a miss)
-- `scripts/versions.mjs` — checks every stated version agrees
+- `scripts/versions.mjs` — checks every stated version agrees, and that
+  `releases.json` is current
+- `scripts/releases.mjs` — writes `releases.json` (every release, its items,
+  the components each names, its Apps must) from the changelog; apps' config
+  sections read it from GitHub to show what a newer release changes
 - `scripts/template-from-colours.mjs` — turns real colours (a team's, a
   flag's) into templates that pass the checks
 - `hooks/check-version.mjs` — the session-start version check for apps
@@ -374,7 +378,8 @@ To release one:
    apps must change their own code, patch for fixes and small additions.
 4. Bump `version` in `.claude-plugin/plugin.json`,
    `.claude-plugin/marketplace.json`, `foundation/src/lib/jimbo.ts` and the
-   "This is jimbo.ui" line at the top of this file; `node scripts/versions.mjs` must pass. Start the
+   "This is jimbo.ui" line at the top of this file; run `node scripts/releases.mjs`
+   to rewrite `releases.json`; `node scripts/versions.mjs` must pass. Start the
    changelog entry with a one-line summary — the session-start check shows it
    to every app that's behind.
 5. `claude plugin validate .`, commit, `claude plugin tag .` (creates

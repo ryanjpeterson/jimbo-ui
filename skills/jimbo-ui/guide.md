@@ -130,7 +130,15 @@ can theme any:
      (including an unsaved look), plus the app's own.
   4. **About** — the jimbo-ui version, the app's registry status (from its
      `jimbo-ui.json`, passed in as `__JIMBO_APP__` by Vite's `define`) and a
-     link to the showcase.
+     link to the showcase. When a newer release is out it says so first
+     (`JimboUpdates`): which releases, what updating would change for this
+     app — to do in its code (**Apps must**), changes to kit components it
+     uses, what comes with the foundation, what's new if it wants it — and
+     the request to paste in the app's Claude session. `JimboConfigLink`
+     shows "jimbo-ui X is out" and opens About. It reads `releases.json`
+     from GitHub at most once a day per person, only for people who can
+     configure, and shows nothing extra when it can't be reached. An app
+     never updates itself.
   5. **App** (optional) — anything app-specific. Nothing goes anywhere else.
 - **The theme set here is the app-wide default for everyone.**
 - No separate Brand pages, theme pickers in settings, or standalone Style
@@ -1116,3 +1124,7 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   `useListLayout`; `Section plain`, `Tabs size="sm"`), and the dashboard
   archetypes use both. `divide-etched` only reaches into list groups now,
   not into a `<div>` row's own children.
+- **Unreleased** — The jimbo-ui config section says when a newer release is
+  out and what updating would change for the app (About tab and the config
+  link), from `releases.json`, which `scripts/releases.mjs` writes from the
+  changelog at each release.

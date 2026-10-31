@@ -2,13 +2,15 @@
 /**
  * Check that every place that states jimbo.ui's version agrees: both plugin
  * manifests, the foundation's JIMBO_UI.version, the skill's "This is jimbo.ui X" line, and the newest
- * CHANGELOG.md entry. Exits 1 and lists them when they don't.
+ * CHANGELOG.md entry — and that releases.json is current with the changelog.
+ * Exits 1 and lists them when they don't.
  *
  *   node scripts/versions.mjs
  */
 import { readFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { buildReleases, serialise } from "./releases.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (p) => readFileSync(join(root, p), "utf8");
@@ -18,7 +20,12 @@ const found = {
   "SKILL.md": /This is jimbo\.ui (\d+\.\d+\.\d+)/.exec(read("skills/jimbo-ui/SKILL.md"))?.[1],
   "foundation jimbo.ts": /version: "(\d+\.\d+\.\d+)"/.exec(read("foundation/src/lib/jimbo.ts"))?.[1],
   "CHANGELOG.md": /^## (\d+\.\d+\.\d+)/m.exec(read("CHANGELOG.md"))?.[1],
+  "releases.json": JSON.parse(read("releases.json")).latest,
 };
+if (read("releases.json") !== serialise(buildReleases())) {
+  console.error("releases.json is out of date with CHANGELOG.md: run node scripts/releases.mjs");
+  process.exit(1);
+}
 const all = new Set(Object.values(found));
 if (all.size === 1 && !all.has(undefined)) console.log(`All at ${[...all][0]}`);
 else {

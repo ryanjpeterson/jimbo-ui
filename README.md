@@ -43,7 +43,8 @@ the `brand.config.ts` line and `tokens.css` to paste into the app.
 | `showcase/` | Demo app built only from a release's code ([published](https://claude.ai/artifact/F4KAFYCkxZGZB7zKdaWjWC)) |
 | `scripts/tokens.mjs` | Prints an app's `tokens.css` for its three colours |
 | `scripts/contrast.mjs` | Contrast and colour-separation report for every template (`--check` for releases) |
-| `scripts/versions.mjs` | Checks the plugin, foundation, skill and changelog versions agree |
+| `scripts/versions.mjs` | Checks the plugin, foundation, skill and changelog versions agree, and `releases.json` is current |
+| `scripts/releases.mjs` | Writes `releases.json` from the changelog; apps' jimbo-ui config section reads it to show what a newer release changes |
 | `hooks/` | Session-start check that tells an app when a newer jimbo.ui is out |
 | `scripts/build-zip.sh` | Builds `dist/jimbo-ui-skill.zip` for claude.ai |
 | `CHANGELOG.md` | Every version and what apps must do |

@@ -1,0 +1,887 @@
+{
+  "$comment": "Generated from CHANGELOG.md by scripts/releases.mjs — don't edit. Apps' jimbo-ui config section reads it to show what a newer release changes.",
+  "latest": "0.8.4",
+  "releases": [
+    {
+      "version": "0.8.4",
+      "date": "2026-10-31",
+      "summary": "Openers fade into the page (no hard edge under banners and heroes), plus charts and rows-or-tiles lists.",
+      "items": [
+        {
+          "kind": "added",
+          "text": "**Charts.** `TrendChart` (one to three lines over time, a crosshair you tap, drag or arrow-key, and a readout that names each series), `BarChart` (horizontal rows or vertical columns — promoted from the `bar-chart` candidate), `Sparkline`, and a `trend` prop on `StatTile`. Flat SVG in the theme's colours, with a hidden table of the numbers for screen readers. The guide's new Charts pattern says when to use which.",
+          "affects": [
+            "trend-chart",
+            "bar-chart",
+            "sparkline",
+            "stat-tile"
+          ]
+        },
+        {
+          "kind": "added",
+          "text": "**Rows or tiles.** `List layout=\"tiles\"` shows the same children as a grid of cards; `LayoutSwitch` and `useListLayout` let people pick and remember it. Supporting variants: `Section plain` (no card, for tiles under a title), `Tabs size=\"sm\"` (a compact switch for a section's action slot), `List bare` (no card, inside `Section flush`).",
+          "affects": [
+            "list",
+            "layout-switch",
+            "section",
+            "tabs"
+          ]
+        },
+        {
+          "kind": "added",
+          "text": "Both dashboard archetypes use them: the single-page dashboard template has sparklines on its stats, a jobs list you can switch to tiles, and a bar chart and a trend chart. The Style guide panel shows every chart and the tiles layout.",
+          "affects": []
+        },
+        {
+          "kind": "available",
+          "text": "`TrendChart`, `BarChart`, `Sparkline`, `StatTile trend`, `List layout`, `LayoutSwitch`, `useListLayout`, `Section plain`, `Tabs size=\"sm\"` — in the reference kit; port them when an app wants them.",
+          "affects": [
+            "trend-chart",
+            "bar-chart",
+            "sparkline",
+            "stat-tile",
+            "list",
+            "layout-switch",
+            "section",
+            "tabs"
+          ]
+        },
+        {
+          "kind": "fixed",
+          "text": "`divide-etched` reached into every `<div>` child, so a row built as a `<div>` (a job row, a `KeyValue`) got a stray divider line inside it. It now only reaches into list groups — a wrapper that starts with a `ListGroupLabel`, which carries a new `list-group-label` class.",
+          "affects": [
+            "key-value",
+            "list-group-label"
+          ]
+        },
+        {
+          "kind": "fixed",
+          "text": "**No more hard edge under banners and heroes.** `Banner` (and `Hero`) and `HeroSection` faded to solid page colour, or ended on a border, so over a page backdrop they stopped on a visible line. Their background layer now fades out to transparent (`.fade-out` in `globals.css`; `.fade-both` also fades the top when something sits above), letting the page's backdrop show through.",
+          "affects": [
+            "banner",
+            "hero",
+            "hero-section"
+          ]
+        },
+        {
+          "kind": "fixed",
+          "text": "`HeroSection`, `Banner` and `Hero` tucked up under the top bar even when something sat above them, covering it (the showcase's catalogue tabs). They take `pullUp={false}` for that case; the default is unchanged.",
+          "affects": [
+            "hero-section",
+            "banner",
+            "hero"
+          ]
+        }
+      ],
+      "appsMust": [
+        "Copy the foundation files (`globals.css` has `.fade-out`), and port `Banner` and `HeroSection` from the reference kit.",
+        "Any page header of the app's own with a blurred photo or gradient behind it (a year or profile header, say): move that background into its own layer behind the content, give the layer `fade-out`, and remove any border under it or fade to `bg`.",
+        "Pass `pullUp={false}` only where something sits above a hero.",
+        "Port `ListGroupLabel` from the reference kit (it adds the `list-group-label` class); without it, grouped lists lose the dividers between their rows. Any workaround for the stray line (rows as `<article>` rather than `<div>`) can go."
+      ]
+    },
+    {
+      "version": "0.8.3",
+      "date": "2026-10-31",
+      "summary": "Fix: pages that fill the screen with `min-h-full` (sign-in screens) work again.",
+      "items": [
+        {
+          "kind": "changed",
+          "text": "`globals.css`: `html`, `body` and `#root` are `height: 100%` again. 0.8.1 made `body` and `#root` a minimum height only, so `h-full` / `min-h-full` inside them shrank to their content and centred screens sat at the top. `#root` keeps its `100dvh` minimum.",
+          "affects": [],
+          "foundation": true
+        }
+      ],
+      "appsMust": []
+    },
+    {
+      "version": "0.8.2",
+      "date": "2026-10-31",
+      "summary": "A solid status bar on installed apps, so iOS's top-edge blur no longer covers the header.",
+      "items": [
+        {
+          "kind": "changed",
+          "text": "**Status bar:** `apple-mobile-web-app-status-bar-style` is `default`, not `black-translucent`. Since iOS 26.1 an installed app with a translucent status bar gets a system blur over the status bar and the top of the page that the page can't turn off; it covered the app's name. With `default`, iOS draws a solid status bar in the `theme-color` (the theme's background, which `applyTheme` already sets) and the page starts below it.",
+          "affects": []
+        },
+        {
+          "kind": "changed",
+          "text": "`scripts/inventory.mjs` flags apps whose status bar isn't `default`.",
+          "affects": []
+        }
+      ],
+      "appsMust": [
+        "Set `<meta name=\"apple-mobile-web-app-status-bar-style\" content=\"default\" />` in `index.html` (as `reference/web/index.html`), and keep the `theme-color` meta with the pre-paint script that sets it.",
+        "Remove the app from the Home Screen and add it again on each phone: iOS reads the status bar style only when it's added."
+      ]
+    },
+    {
+      "version": "0.8.1",
+      "date": "2026-10-31",
+      "summary": "Full screen on phones: pages fill the screen and nothing sits under the status bar.",
+      "items": [
+        {
+          "kind": "changed",
+          "text": "**Full screen on phones.** Layouts fill the screen edge to edge and top to bottom, and nothing sits under the status bar's blur or the home indicator. The page colour is on `html`; the backdrop is a fixed layer the full height of the screen (`body::before`) instead of a body background (iOS ignored `background-attachment: fixed`, so it scrolled and stopped short); `body` and `#root` are at least `100dvh`.",
+          "affects": []
+        },
+        {
+          "kind": "changed",
+          "text": "`AppShell`, `Sheet`, the image viewer, `MapView`, the catalogue archetype and the theme panel's save bar use the new safe-area variables instead of `env()`.",
+          "affects": [
+            "app-shell",
+            "sheet",
+            "map-view"
+          ]
+        },
+        {
+          "kind": "added",
+          "text": "**Safe-area variables** in `globals.css`: `--safe-top`, `--safe-bottom`, `--safe-left`, `--safe-right`, `--top-bar`, `--dock-space`, `--above-dock`.",
+          "affects": [],
+          "foundation": true
+        },
+        {
+          "kind": "added",
+          "text": "`foundation/src/lib/viewport.ts`: `applyTheme` makes sure the viewport meta has `viewport-fit=cover` (an installed app without it draws under the status bar while its insets read 0) and warns in development.",
+          "affects": [],
+          "foundation": true
+        },
+        {
+          "kind": "added",
+          "text": "`scripts/inventory.mjs` reports each app's phone frame: `viewport-fit`, status bar style and raw `env(safe-area-…)` in app code.",
+          "affects": []
+        }
+      ],
+      "appsMust": [
+        "Have `viewport-fit=cover` and `apple-mobile-web-app-status-bar-style` `black-translucent` in `index.html` (as `reference/web/index.html`).",
+        "Drop any `bg-*` or `background-attachment` the app sets on `body` for the backdrop; the foundation draws it.",
+        "Replace `env(safe-area-inset-…)` in their own code with the variables (`pt-[var(--safe-top)]`, `bottom-[var(--above-dock)]`, …), and pad any bar of their own that's fixed to the top of the screen by `--safe-top`.",
+        "Re-copy `AppShell` (or apply its changes: header `pt-[var(--safe-top)]`, main `pb-[var(--dock-space)]`, root `min-h-[100dvh]`).",
+        "Check at 375 px as an installed app: the app's name is clear of the status bar and the page reaches the bottom of the screen."
+      ]
+    },
+    {
+      "version": "0.8.0",
+      "date": "2026-10-30",
+      "summary": "One library with no duplicates, one jimbo-ui config section per app, every look in light, mid and dark, 21 backdrops, maps in the theme, and two archetypes to copy.",
+      "items": [
+        {
+          "kind": "added",
+          "text": "**Registry:** `registry/apps.json` (every app on jimbo-ui: repo, web root, version, auth, registered, last audited) and `registry/components.json` (every UI element across all apps: id, name, purpose, tier — foundation, kit, pattern, candidate or domain — source, usedBy, aliases, variants). Names and paths only, never app code.",
+          "affects": []
+        },
+        {
+          "kind": "added",
+          "text": "**Dedupe rules** (guide section 13): match by purpose and behaviour, not name; a match is that component (an alias, maybe a variant prop), never a second one; promote at two apps or when clearly generic; domain pieces stay in their app; pull before writing to the registry.",
+          "affects": []
+        },
+        {
+          "kind": "added",
+          "text": "**`scripts/inventory.mjs`:** component × app table, candidates built by more than one app, unused kit components, apps behind, raw colours in app code, and config sections that are missing, split up or gated wrong.",
+          "affects": []
+        },
+        {
+          "kind": "added",
+          "text": "**The jimbo-ui config section** (`reference/web/src/routes/JimboConfigPage.tsx`): one place at `/jimbo-ui` with Theme, Brand, Style guide, About and an optional App tab, gated by `canConfigure`; `JimboConfigLink` for the app's settings. The old Brand and Style guide pages are now its panels (`routes/config/ThemePanel.tsx`, `routes/config/StyleGuidePanel.tsx`).",
+          "affects": []
+        },
+        {
+          "kind": "added",
+          "text": "**`MapView` and `MapPinCard`** (`reference/web/src/components/MapView.tsx`): every map in the theme's style with flat highlight pins; a themed preview when there's no Maps key. Needs `@vis.gl/react-google-maps`.",
+          "affects": [
+            "map-view",
+            "map-pin-card"
+          ]
+        },
+        {
+          "kind": "added",
+          "text": "**`ThemeScope`** (kit) and **`themeVars`** (`theme.ts`): theme part of a page — colours, type and backdrop — without touching the rest; `.theme-scope` in `globals.css`.",
+          "affects": [
+            "theme-scope"
+          ]
+        },
+        {
+          "kind": "added",
+          "text": "**Archetypes as templates:** `reference/web/src/archetypes/catalogue.tsx` (Home · Entries · People · Places, with a map) and `dashboard.tsx` (a single-page dashboard of jobs, runs and settings), to copy and remix.",
+          "affects": []
+        },
+        {
+          "kind": "added",
+          "text": "`foundation/src/lib/jimbo.ts`: the release's version and links (`JIMBO_UI`), and the app's `jimbo-ui.json` when Vite passes it in (`__JIMBO_APP__`) for the About tab.",
+          "affects": [],
+          "foundation": true
+        },
+        {
+          "kind": "added",
+          "text": "`jimbo-ui.json` gains `auth` (`\"admin\"` or `\"none\"`), `registry` and `components` (`uses`, `local`, `overrides`).",
+          "affects": []
+        },
+        {
+          "kind": "added",
+          "text": "Skill workflows **Register an app** and **Consolidate an app**, with their trigger phrases.",
+          "affects": []
+        },
+        {
+          "kind": "added",
+          "text": "**Every look in light, mid and dark:** each palette, team, flag or game is one tile (`FAMILY_SETS`, `TemplateFamily`), and a Light / Mid / Dark switch sets the page tone every tile shows. Tones a look wasn't written in are made from its own colours (`atTone`, `familyAt`, `familyLook`); every look passes the checks in every tone it's shown in (237 looks, 332 made tones). `toneOf`, `PAGE_TONES`, `templateScores`, `templateIssues` in `theme.ts`; `scripts/contrast.mjs` now checks every look in every tone.",
+          "affects": [],
+          "foundation": true
+        },
+        {
+          "kind": "added",
+          "text": "**Games** category: twelve Legend of Zelda palettes, from the 1986 original to Echoes of Wisdom.",
+          "affects": []
+        },
+        {
+          "kind": "added",
+          "text": "**Backdrops in four groups** (`BACKDROP_GROUPS`): Abstract (adds blobs, flow, confetti), Geo (adds hexagons, diamonds, grid), Vintage (halftone, retro stripes, sunburst, deco fans) and Texture (adds grain, paper, linen) — 21 patterns. New `Backdrop.contrast` (how far the pattern stands out) and `Backdrop.saturation` (its colour, down to greys) sliders.",
+          "affects": []
+        },
+        {
+          "kind": "available",
+          "text": "**`KeyValue`** — a read-only label and value, `inline` or `stacked`.",
+          "affects": [
+            "key-value"
+          ]
+        },
+        {
+          "kind": "available",
+          "text": "**`SwitchRow`** — one setting on or off, the whole row the switch.",
+          "affects": [
+            "switch-row"
+          ]
+        },
+        {
+          "kind": "available",
+          "text": "**`Autocomplete`** — pick an existing record as you type, or add one.",
+          "affects": [
+            "autocomplete"
+          ]
+        },
+        {
+          "kind": "available",
+          "text": "**`Badge dot` / `live`** — a status dot in the chip, pulsing while live.",
+          "affects": [
+            "badge"
+          ]
+        },
+        {
+          "kind": "available",
+          "text": "**`EventRow onOpen`** — open something in place instead of a link; and **`RowStatus.live`** / **`LIVE`** — a status dot that pulses while running.",
+          "affects": [
+            "event-row"
+          ]
+        },
+        {
+          "kind": "changed",
+          "text": "The showcase opens on a hero with a carousel of looks (each slide a piece of the kit in its own theme, font and backdrop); its tabs are Home, Components, Archetypes and Settings, with the jimbo-ui config section under Settings.",
+          "affects": []
+        },
+        {
+          "kind": "changed",
+          "text": "`applyTheme` uses `themeVars`; no change to what it sets.",
+          "affects": []
+        },
+        {
+          "kind": "changed",
+          "text": "The Theme tab: Everyday's Dark, Mid and Light lists are one list, and sports teams' Home / Away / Retro switch is gone — the tone switch covers it (a team's away look is its light tone). Retro looks are their own tiles.",
+          "affects": []
+        },
+        {
+          "kind": "removed",
+          "text": "The separate Brand & theme (`/admin/brand`) and Style guide (`/admin/style`) pages, as pages — they live on as the config section's tabs.",
+          "affects": []
+        }
+      ],
+      "appsMust": [
+        "**Adopt the jimbo-ui config section:** port `JimboConfigPage.tsx` and `routes/config/` from the reference; route it at `/jimbo-ui`; put `JimboConfigLink` in the app's settings or admin area (not the dock). Move every brand, theme and style guide option into it (app-specific extras go in its App tab) and remove `/admin/brand`, `/admin/style` and any other theme pickers or links to them.",
+        "**Gate it by `auth`:** add `\"auth\"` to `jimbo-ui.json`. With `\"admin\"`, pass `canConfigure={user?.isAdmin}` (the route redirects everyone else, the link doesn't render) and make sure every server route that saves the theme or brand checks admin on the server. With `\"none\"`, pass `canConfigure`.",
+        "Pass the app's `jimbo-ui.json` to the About tab: in `vite.config.ts`, `define: { __JIMBO_APP__: JSON.stringify({ name, ...jimboUiJson }) }`.",
+        "If the app shows a map: use `MapView` (and `MapPinCard` on a map page) instead of its own.",
+        "Port the Theme tab's template grid from `routes/config/ThemePanel.tsx` (families with the Light / Mid / Dark switch) and its grouped backdrop picker with the contrast and saturation sliders. Saved themes still load as they are.",
+        "Nothing for the promoted components — use them when you consolidate.",
+        "Get registered: \"register this app with jimbo-ui\" (fills `components` and the registry); later, \"consolidate this app with jimbo-ui\"."
+      ]
+    },
+    {
+      "version": "0.7.0",
+      "date": "2026-10-30",
+      "summary": "Clearer separation, a calmer surface (less glass, less round, flat swatches), fonts and sliders, and themes for teams and places.",
+      "items": [
+        {
+          "kind": "added",
+          "text": "**Templates from real colours (314):** every NHL, NBA, MLB and NFL team in a **Home** look (its colour) and an **Away** look (white; baseball road grey); Toronto, Ottawa and Chicago teams in other leagues (MLS, CFL, WNBA, PWHL, NWSL, CPL, NLL, AHL, OHL), also home and away; **Retro** looks for Toronto and Ottawa (St. Pats, Raptors ’95, Blue Jays ’77, Original Senators, Senators ’92, Rough Riders); 17 more countries; Canada's 13 provinces and territories on their flags' field colours. They use **only their own colours** and shades of them — no invented hues, no reds turned pink. 363 templates in all, every one passing the checks. `Template.kit`.",
+          "affects": []
+        },
+        {
+          "kind": "added",
+          "text": "**Pilot** template (Everyday · Dark): the pilot app's original palette — lime, hot pink and cyan on near-black.",
+          "affects": []
+        },
+        {
+          "kind": "added",
+          "text": "**Backdrops:** `Theme.backdrop` — an abstract pattern (ripples, waves, contours, geometry, light burst, dot grid, arrows, shapes, or none) over a base (solid, gradient, or the glow orbs as before), with strength and size. `backdropCss`, `BACKDROPS`, `BACKDROP_BASES`; set as `--bg-image` / `--bg-size` / `--bg-position` / `--bg-repeat` (pre-paint applies them). A *Backdrop* section on the Brand page with a preview of each pattern. Exports and imports carry the backdrop; templates keep it.",
+          "affects": []
+        },
+        {
+          "kind": "added",
+          "text": "**Full width:** `FullBleed` (any section edge to edge, in a tone or flush), `HeroSection` (a full-width opener over a pattern, no photo) and `AppShell width` (`column` · `wide` · `full`). The showcase home opens with a `HeroSection` and has a full-width band.",
+          "affects": [
+            "full-bleed",
+            "hero-section",
+            "app-shell"
+          ]
+        },
+        {
+          "kind": "added",
+          "text": "**The component menu (skill and guide):** before building a feature or section, ask which existing component to use, from a menu of options.",
+          "affects": []
+        },
+        {
+          "kind": "added",
+          "text": "**App archetypes (skill and guide):** Tracker, Collection, Dashboard, Directory, Planner, Showcase and Tool — each with dock tabs, page width, the components for its main pages and a backdrop. Starting an app asks which fits first.",
+          "affects": []
+        },
+        {
+          "kind": "added",
+          "text": "**Share this look (import / export):** the Brand page exports the theme being edited as a theme file (`jimbo-ui/theme` JSON), the app's `brand.config.ts` `defaultTheme` line or its `tokens.css`, and imports a theme file to preview it — so the showcase works as a playground for designing a theme for any app, and themes move between apps. Helpers in `theme.ts`: `exportTheme`, `importTheme`, `brandConfigLine`, `tokensCss` (`scripts/tokens.mjs` now prints `tokensCss`).",
+          "affects": [],
+          "foundation": true
+        },
+        {
+          "kind": "added",
+          "text": "**Docker:** `compose.yaml` and `showcase/Dockerfile` run the showcase as a local web app — `docker compose up --build` (nginx, port 4460) or `docker compose --profile dev up` (live reload, port 4461).",
+          "affects": []
+        },
+        {
+          "kind": "added",
+          "text": "**Tonal inference:** `Theme.infer: \"tonal\"` fills a missing highlight or support with lighter or darker versions of the accent (the default, `\"contrast\"`, picks new hues). The Brand page has a *Contrasting / Tonal* switch. `deltaE` is exported.",
+          "affects": []
+        },
+        {
+          "kind": "added",
+          "text": "**Vibrancy and contrast:** `Theme.vibrancy` (0.4–1.5) scales the brand colours' saturation; `Theme.contrast` (0.8–1.6) scales how far cards, fields and borders step from the page. Sliders on the Brand page.",
+          "affects": []
+        },
+        {
+          "kind": "added",
+          "text": "**Fonts:** 25 in `FONTS` — sans (Archivo, Inter, Space Grotesk, DM Sans, Manrope, Oswald), serif (Fraunces, Source Serif, Playfair, EB Garamond, Marcellus — the closest free match to Friz Quadrata — DM Serif), mono (JetBrains Mono, IBM Plex Mono, Space Mono, Fira Code) and decorative, for headings only (Old English, Old German, Gothic, Pirate, Rocker, Typewriter, Pixel, Bungee, Neon, Carved caps, Script). `Theme.fonts` takes a font key for headings and body plus `headingsWeight`, `bodyWeight`, `headingsTracking`, `bodyTracking`, set as `--font-display-weight` / `--font-body-weight` / `-tracking`. Weight and letter-spacing sliders (`RangeField`, kit). Old style names (`sans`, `mono`, `serif`) still work.",
+          "affects": [
+            "range-field"
+          ]
+        },
+        {
+          "kind": "added",
+          "text": "**Categories:** Everyday, Holidays, Countries (Americas, Europe, Asia and Pacific, Africa), Provinces, Sports (sub-tabs: NHL, NBA, MLB, NFL, Toronto, Ottawa, Chicago — city tabs gather every team from that city). `TemplateSet.tabs` shows a category's groups as sub-tabs; `ALL_TEMPLATES` lists every template once.",
+          "affects": []
+        },
+        {
+          "kind": "added",
+          "text": "**Search** on the Brand page across name, vibe, category and tab, ignoring accents.",
+          "affects": []
+        },
+        {
+          "kind": "added",
+          "text": "`scripts/template-from-colours.mjs`: real colours in (with an optional page colour, light or road-grey page, and kit), checked templates out.",
+          "affects": []
+        },
+        {
+          "kind": "changed",
+          "text": "**Circles are flat, side by side, at fixed sizes.** Every circle is one solid fill — no outline, ring, gradient, glow or shadow, and no orbs: the blurred colour blobs behind a photo-less `Banner` are gone. `ThemeDots` are 8 px dots side by side with a 4 px gap (they overlapped with a ring); status dots, label dots, avatars and swatches lose their outlines; inferred swatches show faded instead of dash-ringed; the page-colour swatch keeps a hairline border. New `.dot-accent/highlight/support` (`.orb-*` stay as older names). The guide spells out the rules (section 2, Circles).",
+          "affects": [
+            "banner",
+            "theme-dots"
+          ]
+        },
+        {
+          "kind": "changed",
+          "text": "\"Flags\" is now **Countries**, grouped by region.",
+          "affects": []
+        },
+        {
+          "kind": "changed",
+          "text": "**The separation check allows tonal themes:** accent and highlight at least 15 apart (ΔE), and no two of the three closer than 10 (was 20 for all).",
+          "affects": []
+        },
+        {
+          "kind": "changed",
+          "text": "Sweden, the Maple Leafs and other two-colour brands are shades of their colours rather than borrowing an inferred one; the steel-blue support for black-and-silver teams is gone (greys instead).",
+          "affects": []
+        },
+        {
+          "kind": "changed",
+          "text": "The Brand page picks categories with wrapping `PillTabs` (sub-tabs in a panel below) instead of `Tabs`, so five or more never scroll sideways.",
+          "affects": [
+            "pill-tabs",
+            "tabs"
+          ]
+        },
+        {
+          "kind": "changed",
+          "text": "`scripts/contrast.mjs` checks each template once (city tabs repeat league teams).",
+          "affects": []
+        },
+        {
+          "kind": "changed",
+          "text": "**Every app has the admin theming pages.** The skill and guide now require a Brand & theme page and a Style guide in every app, nearly identical to the reference and adapted only to the app (access, who may save, where it saves, copy, its own components). An app without a server keeps the page and saves the theme in the browser (like the showcase's `api.ts`) instead of dropping it. The start, preview and update workflows check for every theming feature. The theme API carries `fonts`.",
+          "affects": []
+        },
+        {
+          "kind": "changed",
+          "text": "**No dots above page titles.** `PageHeader` eyebrows are plain support text again; `ThemeDots` stays for empty states.",
+          "affects": [
+            "page-header",
+            "theme-dots"
+          ]
+        },
+        {
+          "kind": "changed",
+          "text": "**Flat fills everywhere.** `.btn-primary` and `.lit-*` (active tabs and pills, select ticks, date bands, the top bar's add button) are flat with a slight outline in the colour's darker shade — no gradient, top highlight or glow; `.btn-secondary`, `.glass` and the dock lose their top highlight; the active dock tab is a flat `accent/15` with an outline.",
+          "affects": []
+        },
+        {
+          "kind": "changed",
+          "text": "**Flat swatches.** Colour circles are flat with a slight outline in their own darker shade — no sphere shading or glow: `.orb-*`, `EntityRow` avatars (now `orb-support` with `on-support` text), status dots (`STATUS_DOT` is a 10 px flat dot with a faint dark ring; `TONES[*].dot` is just the fill again), and the Brand page's theme-tile and editor swatches.",
+          "affects": [
+            "entity-row",
+            "status-dot",
+            "tones"
+          ]
+        },
+        {
+          "kind": "changed",
+          "text": "**Less glassy.** `.glass` is mostly solid (`bg-surface/90`, `blur-md`, `border-border`); the top bar, dock, view switch and sheets are solid or near-solid; cards are 97% opaque.",
+          "affects": []
+        },
+        {
+          "kind": "changed",
+          "text": "**Less round, not flat.** Radius scale: cards 14 px (was 18), fields 11 (14), sheets 18 (24), dock 20 (28), active dock tab 14 (22). Buttons and pill tabs use the new `rounded-control` (10 px) instead of full pills; chips 8, tabs 8, badges 6. Circles stay round (avatars, dots, orbs, round icon buttons). Lit fills and shadows stay.",
+          "affects": []
+        },
+        {
+          "kind": "changed",
+          "text": "**Stronger lines and layers.** `CONTRAST_TARGETS`: borders step to 1.8:1 against cards (was 1.55), cards to 1.2:1 against the page (was 1.16), fields and chips to 1.15:1 against cards (was 1.14). The contrast report now requires border ≥ 1.75 and card ≥ 1.19; every template passes.",
+          "affects": []
+        },
+        {
+          "kind": "changed",
+          "text": "Rows are a little taller (`py-3.5`, at least 76 px).",
+          "affects": []
+        },
+        {
+          "kind": "added",
+          "text": "**Type section:** `Theme.fonts` (see Fonts above), set as `--font-display` and `--font-body`, which Tailwind's `font-display` / `font-body` now read. `FONTS`, `FONT_GROUPS`, `fontFor`, `loadFonts`. Brand page gains a *Type* section; templates keep the chosen fonts. `scripts/tokens.mjs --headings= --body=` (font keys). `SavedTheme` type for API data.",
+          "affects": []
+        },
+        {
+          "kind": "added",
+          "text": "`.divide-etched`: a full-strength line with a faint light line under it between stacked items; it also reaches rows grouped in wrappers under a label. `List`, `RankedList` and `Loading` use it.",
+          "affects": [
+            "list",
+            "ranked-list",
+            "loading"
+          ]
+        },
+        {
+          "kind": "fixed",
+          "text": "**A changed theme showed up late.** `useBrand` treated the cached theme as fresh for 5 minutes on every load, so a new look (or one changed on another device) could take that long to appear. The cached copy still paints at once but is marked old (`initialDataUpdatedAt: 0`), so the server's theme is fetched straight away.",
+          "affects": []
+        }
+      ],
+      "appsMust": [
+        "Apps with a theme server: add `initialDataUpdatedAt: 0` to `useBrand`'s query (beside `initialData: cached`), or port the reference `useBrand`.",
+        "Copy the foundation files (`theme.ts`, `globals.css`, `tailwind.config.js`).",
+        "Regenerate `src/styles/tokens.css` (`scripts/tokens.mjs`): the derivation changed.",
+        "App code with `rounded-full` on buttons, tabs or pills: use `rounded-control` (circles keep `rounded-full`). Translucent `bg-*/70`-ish bars of the app's own: make them `/90`–`/95` with `backdrop-blur-md`.",
+        "Apps with a theme server: accept and return optional `infer`, `vibrancy` and `contrast` too, and fonts as keys with weights and tracking (see Fonts); accept and return an optional `fonts` (`{ headings?, body? }`, each `sans` / `mono` / `serif`); `useBrand`'s `withDefaults` takes a `SavedTheme`.",
+        "**Every app:** have the admin Brand & theme and Style guide pages with every theming feature (guide section 1, \"Admin theming pages\"); add them if missing, adapted to the app. Apps without a server: save the theme in the browser rather than having no Brand page.",
+        "Copy `globals.css` (the page background now reads `--bg-image` and friends; `.dot-*`). Apps with circles of their own: make them flat, side by side and at the guide's sizes (overlapping dots with rings, outlined or shaded circles, decorative orbs all go). Apps with a theme server: accept and return an optional `backdrop`.",
+        "Apps that track the reference: port the kit's `FullBleed`, `HeroSection` and `RangeField`, `AppShell`'s `width`, the Brand page's *Backdrop* section and *Share this look* section (export and import), categories, sub-tabs and search (`TemplateGrid`), and the *Type* section, the kit's radius and glass changes (`Badge`, `Tabs`, `PillTabs`, `ViewSwitch`, `Sheet`) and `AppShell` (top bar, dock).",
+        "Apps that track the reference kit: `divide-y divide-border` → `divide-etched` in `List`, `RankedList` and `Loading`, and the row padding change. App lists of their own: use `divide-etched` too."
+      ]
+    },
+    {
+      "version": "0.6.0",
+      "date": "2026-10-23",
+      "summary": "Depth, glass and the circle motif; two colours are enough.",
+      "items": [
+        {
+          "kind": "added",
+          "text": "**Shades for every brand colour** (accent, highlight, support): `-lighter`, `-light`, `-dark`, `-darker`, a lit fill `-top` → `-bottom` (only ever moves away from the on-colour, so button text never gets harder to read) and washes `-950/900/800/700` for all three.",
+          "affects": []
+        },
+        {
+          "kind": "added",
+          "text": "**Two-colour themes:** highlight is optional; `deriveHighlight` infers it from the accent, and support from both. `fullTheme`, `ownColours`, `OPTIONAL_KEYS`.",
+          "affects": []
+        },
+        {
+          "kind": "added",
+          "text": "**Look:** `.glass`, `.card-glass`, `.orb-accent/highlight/support`, `.lit-accent/highlight/support`; lit `.btn-primary` with a glow; three colour orbs behind the page; cards at 90% so the orbs tint them.",
+          "affects": []
+        },
+        {
+          "kind": "added",
+          "text": "**Circle motif:** `ThemeDots` (kit) before page eyebrows and in empty states; orbs by stat labels; lit-circle avatars; colour circles on theme tiles (inferred ones dashed); the starter favicon is three circles (recoloured from all three brand colours).",
+          "affects": [
+            "theme-dots"
+          ]
+        },
+        {
+          "kind": "added",
+          "text": "**Templates:** Canada (Flags) and Two-tone (Everyday, two colours).",
+          "affects": []
+        },
+        {
+          "kind": "added",
+          "text": "Style guide: Shades and depth, Glass and orbs blocks; colours as circles.",
+          "affects": []
+        },
+        {
+          "kind": "added",
+          "text": "`scripts/tokens.mjs` takes `-` for an inferred highlight or support.",
+          "affects": []
+        },
+        {
+          "kind": "changed",
+          "text": "**`Theme.highlight` is optional** (breaking for code that reads it from a `Theme`: use `fullTheme(theme).highlight` or `useBrand().colors`).",
+          "affects": []
+        },
+        {
+          "kind": "changed",
+          "text": "`useBrand()` returns `colors` (all four, inferred filled in) beside `theme` (as set); `withDefaults` keeps a saved theme's missing colours missing.",
+          "affects": []
+        },
+        {
+          "kind": "changed",
+          "text": "Brand page: *Infer it* / *Inferred* switch for highlight and support; saves only the colours that are set.",
+          "affects": []
+        },
+        {
+          "kind": "changed",
+          "text": "Kit: frosted `Tabs`, `ViewSwitch`, `Sheet`, `Pager` and top bar; lit active tabs, pills, select ticks and top-bar main button; `StatTile` and accent `LinkCard` glows; `Banner` without an image gets colour orbs.",
+          "affects": [
+            "tabs",
+            "view-switch",
+            "sheet",
+            "pager",
+            "stat-tile",
+            "link-card",
+            "banner"
+          ]
+        },
+        {
+          "kind": "changed",
+          "text": "**Lists aren't flat:** `DateBlock` is a calendar ticket with the month on a lit highlight band; row status dots are lit spheres with a glow (`STATUS_DOT`; `TONES[*].dot` now carries a shadow colour); `ListGroupLabel` is support text with an orb on a support wash.",
+          "affects": [
+            "date-block",
+            "status-dot",
+            "tones",
+            "list-group-label"
+          ]
+        },
+        {
+          "kind": "changed",
+          "text": "`.card` is lit by the brand colours: a soft accent glow top left and support glow bottom right over its gradient.",
+          "affects": [
+            "card"
+          ],
+          "foundation": true
+        },
+        {
+          "kind": "changed",
+          "text": "Washes: `highlight-700` and `accent-800`/`support-800` added; `accent-hover` is now 20% (was 22%).",
+          "affects": []
+        },
+        {
+          "kind": "changed",
+          "text": "Sweden (amber highlight, sky support), USA (sky highlight, white support) and Hanukkah (silver-blue highlight): no white highlights.",
+          "affects": []
+        }
+      ],
+      "appsMust": [
+        "Copy the foundation files (`theme.ts`, `themes.ts`, `globals.css`, `tailwind.config.js`).",
+        "Regenerate `src/styles/tokens.css` (`scripts/tokens.mjs`): many new tokens.",
+        "Where app code reads `.highlight` (or `.support`) from a `Theme`, read it from `fullTheme(theme)` or `useBrand().colors` instead; the typecheck finds them.",
+        "Apps with a theme server: accept a missing `highlight` (as for `support`) and store only what's sent.",
+        "Apps that track the reference: port `useBrand`, the Brand page, Style guide, kit (`ThemeDots`, `DateBlock`, `ListGroupLabel`, `EventRow`, `TONES`, `STATUS_DOT`, `StatTile`, `Tabs`, `Sheet`, `Pager`, `EntityRow`, `EmptyState`, `Banner`, `LinkCard`, `ViewSwitch`, `PillTabs`) and `AppShell` changes. App rows built on their own date blocks or dots: follow the ticket and glowing-dot pattern (guide sections 2 and 9).",
+        "Optional: replace `public/favicon.svg` with the starter's circles (keep its four marker colours) so the favicon follows all the brand colours."
+      ]
+    },
+    {
+      "version": "0.5.0",
+      "date": "2026-10-23",
+      "summary": "Up to four colours, flag and holiday templates, and apps hear about new releases.",
+      "items": [
+        {
+          "kind": "added",
+          "text": "**Support colour** — an optional fourth colour (`Theme.support`) for page eyebrows, avatars, third place and the page's bottom-left glow, with tokens `support`, `support-hover`, `on-support` and `support-950/900/700`. Themes without one get it derived (`deriveSupport`, `fullTheme`), so three-colour themes and saved settings keep working. `THEME_KEYS`, `FullTheme`.",
+          "affects": []
+        },
+        {
+          "kind": "added",
+          "text": "**Flags** (10) and **Holidays** (12) template sets beside **Everyday** (`TEMPLATE_SETS`; `TEMPLATE_GROUPS` still lists every group; `sameTheme`).",
+          "affects": []
+        },
+        {
+          "kind": "added",
+          "text": "**Version check:** the plugin runs `hooks/check-version.mjs` at session start; in an app whose `jimbo-ui.json` is behind the installed release, it says so and lists what's new. The skill states its version and does the same check when used. `scripts/versions.mjs` keeps every stated version in step.",
+          "affects": []
+        },
+        {
+          "kind": "changed",
+          "text": "Every Everyday template has a support colour; vibes name all three.",
+          "affects": []
+        },
+        {
+          "kind": "changed",
+          "text": "`scripts/contrast.mjs` also checks accent, highlight and support contrast, button text, and that the three colours are clearly apart (ΔE ≥ 20).",
+          "affects": []
+        },
+        {
+          "kind": "changed",
+          "text": "`scripts/tokens.mjs` takes an optional fourth argument (support).",
+          "affects": []
+        },
+        {
+          "kind": "changed",
+          "text": "Reference: Brand page has set tabs, four colour tabs and a support warning; `ThemeCard` shows support; `PageHeader` eyebrows, `EntityRow` initials and `RankedList` third place use support; `StatTile`, `Banner` and `Hero` take `\"support\"`; Style guide shows the four colours and support tokens; `useBrand`'s `withDefaults` keeps a saved support.",
+          "affects": [
+            "theme-card",
+            "page-header",
+            "entity-row",
+            "ranked-list",
+            "stat-tile",
+            "banner",
+            "hero"
+          ]
+        },
+        {
+          "kind": "changed",
+          "text": "Starter default theme has a support colour (`#2EC5FF`).",
+          "affects": []
+        }
+      ],
+      "appsMust": [
+        "Copy the foundation files (`theme.ts`, `themes.ts`, `globals.css`, `tailwind.config.js`).",
+        "Regenerate `src/styles/tokens.css` (the support tokens are new): add a `support` to `BRAND.defaultTheme` if you want to choose it, then `node scripts/tokens.mjs <accent> <highlight> <background> [support]`.",
+        "Apps that track the reference: port the Brand page, Style guide, `useBrand` and kit changes above.",
+        "Apps with a theme server: accept and return an optional `support` (`#RRGGBB`) alongside the other three."
+      ]
+    },
+    {
+      "version": "0.4.0",
+      "date": "2026-10-23",
+      "summary": "Branded **jimbo.ui** (the repo and plugin keep the name `jimbo-ui`).",
+      "items": [
+        {
+          "kind": "changed",
+          "text": "**No logo — header text.** The reference `Wordmark` is replaced by `HeaderTitle`: the app's name (`BRAND.name`) in the display face and text colour, with any dot in the accent (\"jimbo.ui\"). The top bar, Style guide and Brand page miniatures use it.",
+          "affects": [
+            "header-title"
+          ]
+        },
+        {
+          "kind": "changed",
+          "text": "**Starter `brand.config.ts`:** `logo` is gone; `name` is the header text.",
+          "affects": []
+        },
+        {
+          "kind": "changed",
+          "text": "**Brand page:** the uploads section is favicon-only.",
+          "affects": []
+        },
+        {
+          "kind": "changed",
+          "text": "**Server contract:** `GET /public/theme` returns `{ theme, faviconUrl }`; only `favicon` uploads (`/admin/theme/favicon`).",
+          "affects": []
+        },
+        {
+          "kind": "changed",
+          "text": "Showcase branded jimbo.ui.",
+          "affects": []
+        },
+        {
+          "kind": "removed",
+          "text": "`reference/web/src/components/Wordmark.tsx` and logo uploads.",
+          "affects": []
+        }
+      ],
+      "appsMust": [
+        "Copy the foundation files (comment changes only in `theme.ts`).",
+        "Apps that track the reference shell or Brand page: use `HeaderTitle` in the top bar instead of a logo, drop the logo upload row and `logoUrl`, and remove `logo` from `brand.config.ts`. Apps that keep their own logo can skip this."
+      ]
+    },
+    {
+      "version": "0.3.0",
+      "date": "2026-10-23",
+      "summary": "jimbo-ui is now fully generic: no app's code, names, artwork or sample content.",
+      "items": [
+        {
+          "kind": "changed",
+          "text": "**Reference kit is neutral.** Statuses are fixed **tones** — `Tone` (`accent` · `yellow` · `purple` · `red` · `muted`), `TONES` and `Badge` — that an app maps its own statuses onto; `EventRow`'s `status` is `{ tone, label }`. `ViewSwitch({ options, current })` replaces the list/map switch. `Banner`/`Hero` glows and `StatTile` accents are named `accent` / `highlight`. `RankedList` counts default to \"item\". The kit no longer needs an app's types or format helpers (`dateParts` and `initials` are built in).",
+          "affects": [
+            "tones",
+            "badge",
+            "event-row",
+            "view-switch",
+            "banner",
+            "hero",
+            "stat-tile",
+            "ranked-list"
+          ]
+        },
+        {
+          "kind": "changed",
+          "text": "**`AppShell` is reusable:** pass `tabs` (`ShellTab[]`), top-bar `actions` (`TopBarButton`), optional `onRefresh`, and routes as children; `DockIcon` draws tab icons. The showcase uses it directly.",
+          "affects": [
+            "app-shell",
+            "tabs",
+            "top-bar-button",
+            "dock-icon"
+          ]
+        },
+        {
+          "kind": "changed",
+          "text": "**`Wordmark` is typeset** from `BRAND.logo` (`{ word, line }`) in the display face — main word in the accent outlined in the text colour, second line in the highlight. An app with drawn lettering swaps in its own SVG.",
+          "affects": []
+        },
+        {
+          "kind": "changed",
+          "text": "**Starter:** `brand.config.ts` gains `logo`; neutral name, prefix and favicon mark.",
+          "affects": []
+        },
+        {
+          "kind": "changed",
+          "text": "**Generic colour classes:** `accent`, `accent-hover`, `accent-950/900/700`, `highlight`, `highlight-hover`, `highlight-950/900/800`. The old `accent-lime` / `accent-pink` / `lime-*` / `rose-*` names still work. Foundation CSS and components use the new names.",
+          "affects": []
+        },
+        {
+          "kind": "changed",
+          "text": "The default template is named **Volt** (same colours).",
+          "affects": []
+        },
+        {
+          "kind": "changed",
+          "text": "Showcase content is neutral (events, places).",
+          "affects": []
+        },
+        {
+          "kind": "removed",
+          "text": "App-specific reference files: share images, photo carousel, upload ring, the API theme route and its table. The guide now describes the server contract (endpoints and shapes) instead.",
+          "affects": []
+        }
+      ],
+      "appsMust": [
+        "Copy the foundation files (`theme.ts`, `themes.ts`, `globals.css`, `tailwind.config.js`, `button.tsx`, `ColorPicker.tsx`). Existing class names keep working; nothing else is required for apps that keep their own kit and shell.",
+        "Apps that track the reference kit or shell: port the renames above (`StatusBadge` → `Badge` with the app's status → tone map, `status` objects on `EventRow`, `ViewSwitch`, `accent`/`highlight` prop values) and add `logo` to `brand.config.ts` if using the reference `Wordmark`."
+      ]
+    },
+    {
+      "version": "0.2.0",
+      "date": "2026-10-23",
+      "summary": "",
+      "items": [
+        {
+          "kind": "changed",
+          "text": "**Stronger contrast on every theme.** Cards, fields, borders and secondary text no longer use fixed percentages: the engine steps each one just far enough to meet a contrast target on that background (cards 1.16:1 against the page, borders 1.55:1 against cards, muted text 5:1, labels 3.8:1). Mid and light themes gain the most — on Denim, cards went from 1.11:1 to 1.16:1, borders from 1.30:1 to 1.55:1 and labels from 2.8:1 to 3.8:1. Body text is a touch brighter (`#FAF8F4` dark, `#111113` light).",
+          "affects": []
+        },
+        {
+          "kind": "changed",
+          "text": "**Card borders at full strength** (`.card` uses `border-border`, not `/60`).",
+          "affects": [
+            "card"
+          ],
+          "foundation": true
+        },
+        {
+          "kind": "changed",
+          "text": "**Concrete** template background deepened `#55585E` → `#45484D` so body text reaches 7:1.",
+          "affects": []
+        },
+        {
+          "kind": "changed",
+          "text": "**Sheets render into `<body>` through a portal** (reference kit), so a parent's `space-y` margin can no longer push the backdrop down and leave a strip of the page uncovered at the top.",
+          "affects": []
+        },
+        {
+          "kind": "fixed",
+          "text": "`theme.ts` no longer needs Google Maps' type definitions: `mapStyles()` returns its own `MapStyle[]` (same shape), so apps without Maps typecheck.",
+          "affects": [],
+          "foundation": true
+        },
+        {
+          "kind": "added",
+          "text": "**Showcase** (`showcase/`): a demo app built only from the release's code — Home, List (search, filters, select mode) and Detail demo pages, the real Style guide and Brand pages, the shell and dock — published as a private page each release.",
+          "affects": []
+        },
+        {
+          "kind": "added",
+          "text": "**Preview an update**: a skill workflow that reports what updating an app would change (versions, look, foundation diffs, local edits at risk, apps-must steps, reference changes, default colours) without touching anything.",
+          "affects": []
+        },
+        {
+          "kind": "added",
+          "text": "`scripts/contrast.mjs`: contrast report for every template; `--check` fails the release if any template misses a target.",
+          "affects": []
+        }
+      ],
+      "appsMust": [
+        "Copy the foundation files (`theme.ts`, `themes.ts`, `globals.css`).",
+        "Regenerate `src/styles/tokens.css` from `BRAND.defaultTheme` (`scripts/tokens.mjs`) — the derivation changed.",
+        "Port the `Sheet` portal change into the app's kit (`createPortal(…, document.body)` around the backdrop).",
+        "If the app passes `mapStyles()` to Google Maps, nothing changes; if it typed anything as `google.maps.MapTypeStyle[]` from it, use `MapStyle[]`."
+      ]
+    },
+    {
+      "version": "0.1.0",
+      "date": "2026-10-23",
+      "summary": "First release.",
+      "items": [
+        {
+          "kind": "added",
+          "text": "**Theme engine** (`foundation/src/lib/theme.ts`): accent, highlight and background in; every colour token out as CSS variables; light backgrounds flip text dark; map style, map pins and favicon recolouring.",
+          "affects": [],
+          "foundation": true
+        },
+        {
+          "kind": "added",
+          "text": "**25 templates** in Dark / Mid / Light groups (`foundation/src/lib/themes.ts`), all passing the readability checks; an app's own default is added when it isn't one of them.",
+          "affects": [],
+          "foundation": true
+        },
+        {
+          "kind": "added",
+          "text": "**Foundation:** `globals.css` (page background, type scale, `.card`, `.btn`, `.field`, `.chip`…), `tailwind.config.js` tokens, `Button`, `ColorPicker`, `cn`, gestures.",
+          "affects": [
+            "card",
+            "field",
+            "chip",
+            "button",
+            "color-picker"
+          ],
+          "foundation": true
+        },
+        {
+          "kind": "added",
+          "text": "**Starter:** `brand.config.ts` (name, default theme, storage prefix), `tokens.css` (generated by `scripts/tokens.mjs`), `favicon.svg`.",
+          "affects": []
+        },
+        {
+          "kind": "added",
+          "text": "**Reference:** UI kit, app shell with the floating tab dock, Brand page, Style guide page, wordmark, brand hook, `index.html`.",
+          "affects": []
+        },
+        {
+          "kind": "added",
+          "text": "**Guide** (`skills/jimbo-ui/guide.md`) and the **jimbo-ui skill** with workflows to start an app, update an app, and release changes.",
+          "affects": []
+        }
+      ],
+      "appsMust": [
+        "Adopting for the first time: follow \"start a new app\" in the skill, or — for an existing app — split its own values into `brand.config.ts` and `tokens.css`, copy the foundation, and add `jimbo-ui.json`."
+      ]
+    }
+  ]
+}

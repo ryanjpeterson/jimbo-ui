@@ -15,6 +15,36 @@ now 0.1.0–0.5.0 (1.0.0 → 0.1.0, 1.1.0 → 0.2.0, 2.0.0 → 0.3.0, 3.0.0 → 
 3.1.0 → 0.5.0). An app whose `jimbo-ui.json` still says an old number is on
 the matching 0.x release.
 
+## Unreleased
+
+### Added
+- **Apps say when a newer jimbo-ui is out.** The About tab of the jimbo-ui
+  config section (`JimboUpdates`, `useJimboUpdates` in
+  `reference/web/src/routes/config/UpdatesPanel.tsx`) lists the newer
+  releases and sorts what updating would change for the app: to do in its
+  own code (**Apps must**), changes to kit components it uses (from
+  `jimbo-ui.json` `components.uses`), what comes with the foundation, and
+  what's new if it wants it — with the request to paste into the app's
+  Claude session. `JimboConfigLink` shows "jimbo-ui X is out" and opens
+  About. Read from GitHub at most once a day per person, only for people
+  who can configure; nothing extra shows when it can't be reached.
+- **`releases.json`**, written from this changelog by `scripts/releases.mjs`
+  at each release: every release, its items by kind, the components each
+  names (matched against the registry) and its Apps must.
+  `scripts/versions.mjs` checks it's current.
+- `foundation/src/lib/jimbo.ts`: `JIMBO_UI.releases` and `.changelog`,
+  `fetchReleases`, `updatesFor`, `compareVersions` and their types.
+- The showcase's Components tab shows the update check for an app that's
+  current, one release behind and four behind.
+
+### Apps must
+- Copy the foundation files, port `JimboConfigPage.tsx` and add
+  `routes/config/UpdatesPanel.tsx` from the reference.
+- Keep `components.uses` in `jimbo-ui.json` current; it decides which
+  changes count as the app's.
+- If the app has a Content Security Policy, allow
+  `https://raw.githubusercontent.com` in `connect-src`.
+
 ## 0.8.4 — 2026-10-31
 
 Openers fade into the page (no hard edge under banners and heroes), plus charts and rows-or-tiles lists.

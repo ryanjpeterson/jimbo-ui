@@ -1,7 +1,7 @@
 /**
  * Lay the release's code out the way an app would have it, in .jimbo/:
  * reference (the generic kit, shell and pages) first, then foundation and starter on top, then
- * the showcase's stand-ins (overrides/) for the parts that need a server.
+ * the showcase's stand-ins (overrides/) for the parts that need a server, and releases.json.
  * The showcase imports everything from there through the `@/` alias.
  */
 import { cpSync, rmSync } from "node:fs";
@@ -15,4 +15,5 @@ rmSync(out, { recursive: true, force: true });
 for (const layer of ["reference/web/src", "foundation/src", "starter/src", "showcase/overrides"]) {
   cpSync(join(repo, layer), out, { recursive: true });
 }
+cpSync(join(repo, "releases.json"), join(out, "releases.json")); // fixed releases for the update demos
 console.log("Assembled .jimbo/ from reference, foundation, starter and showcase overrides");
