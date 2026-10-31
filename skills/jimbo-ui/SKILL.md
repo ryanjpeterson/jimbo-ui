@@ -100,17 +100,23 @@ this check, then the preview workflow if they want detail.
   `PageHeader`, `List`, `Section`, `KeyValue`, `SwitchRow`,
   `Autocomplete`…) before inventing anything. A new shared
   component goes in the kit, the Style guide panel, the showcase and the guide.
-- **One library, no duplicates** (guide section 13). Every UI element in
-  every app is in `registry/components.json`. Before adding one, **match it
-  by purpose and behaviour, not by name**, against every entry and its
-  aliases. A match *is* that component: record the name as an alias, and if
+- **One library, no duplicates** (guide section 13). jimbo-ui's shared
+  components and candidates are in `registry/components.json`; each app
+  lists the ones it uses and its own in its `jimbo-ui.json`, and
+  `node scripts/inventory.mjs` puts them together. Before adding one,
+  **match it by purpose and behaviour, not by name**, against every
+  catalogue entry and its aliases (and `inventory.mjs --json` for what the
+  other apps have built). A match *is* that component: record the name as an alias, and if
   it must differ, add a variant prop to the canonical one — never a second
   component. A component moves into the kit when two or more apps need it
   (or at once when it's clearly generic): a generic rewrite with neutral
   names, plus the kit, guide, showcase and Style guide panel, released as a
   minor version with "Apps must: Nothing" and an "Available" list. Domain
-  components stay in their app — listed, never copied. **Pull jimbo-ui
-  before writing to the registry**, so app chats don't overwrite each other.
+  components stay in their app — listed in its `jimbo-ui.json`, never in
+  jimbo-ui. **An app's facts live only in its own `jimbo-ui.json`:** an app
+  session never writes them into jimbo-ui. jimbo-ui changes only when an app
+  registers (one line in `apps.json`) or a new generic candidate joins the
+  catalogue — pull jimbo-ui first.
 - **Charts** use the kit's `TrendChart`, `BarChart`, `Sparkline` and
   `StatTile trend` (guide section 9, Charts): form first, series in accent,
   support, highlight (three at most), one y-axis, never colour alone, and a
@@ -170,11 +176,16 @@ release without touching that working copy, export it:
   the jimbo-ui config section, and the **archetypes** in
   `web/src/archetypes/`: `catalogue.tsx`, `dashboard.tsx` and `status.tsx`), adapted and
   extended per app
-- `registry/apps.json` — every app on jimbo-ui (repo, web root, version,
-  auth, registered, last audited); `registry/components.json` — every UI
-  element across all apps (id, name, purpose, tier, source, usedBy, aliases,
-  variants). Names and paths only, never app code
-- `scripts/inventory.mjs` — reads the registry and the apps' checkouts and
+- `registry/apps.json` — every app on jimbo-ui: name, repo, when it
+  registered. Nothing else; the rest is in each app's `jimbo-ui.json`
+- `registry/components.json` — jimbo-ui's catalogue: the shared components
+  (foundation, kit, pattern) and generic candidates (id, name, purpose,
+  tier, aliases, variants). Which apps use each isn't stored; an app's own
+  domain components aren't listed here
+- `scripts/inventory.mjs` — reads each app's `jimbo-ui.json` as pushed
+  (`gh`), and its checkout (`~/Development/<name>`, or `--apps-dir` /
+  `JIMBO_APPS_DIRS`) for the code checks, flagging a stale checkout;
+  `--json` prints the assembled registry. It
   prints the component × app table, candidates to promote, unused kit
   components, apps behind, raw colours in app code, and whether each app's
   config section is missing, split up or gated wrong
@@ -201,8 +212,9 @@ release without touching that working copy, export it:
 Each app has `jimbo-ui.json` at its repo root: `version`, `webRoot`, `auth`
 (`"admin"` or `"none"`), a `reference` map (reference file → the app's
 equivalent), `registry` (`registered`, `audited`) and `components`
-(`uses` — registry ids; `local` — `{ name, path, kind: domain|candidate,
-matches }`; `overrides` — kit pieces the app wraps). Guide section 1
+(`uses` — catalogue ids; `local` — `{ name, path, kind: domain|candidate,
+matches }`; `overrides` — kit pieces the app wraps). It is the only record
+of the app: keep it current in the app's own repo. Guide section 1
 explains all of this.
 
 ## Workflow: start a new app on jimbo-ui
@@ -228,8 +240,9 @@ explains all of this.
    if it doesn't.
 5. Write `jimbo-ui.json` (version, webRoot, auth, reference map,
    components), a short `docs/brand.md` noting its identity choices, and
-   the jimbo-ui block in its `CLAUDE.md` (see "Register an app"); add the
-   app to the registry.
+   the jimbo-ui block in its `CLAUDE.md` (see "Register an app"); add one
+   line for the app to `registry/apps.json` in jimbo-ui (name, repo,
+   registered).
 6. Typecheck, run it, and look at the Style guide tab in a dark and a light
    template at phone width. On the Looks tab, try a template from each set; on
    Colours, a two-colour theme (highlight and support inferred); on Type,
@@ -311,21 +324,26 @@ update", or before updating if the user wants to look first.
    files. Note which kit pieces it uses.
 5. Find every brand, theme and style guide screen or option it has today
    and where it lives (routes, settings links, theme pickers).
-6. Classify each piece against `registry/components.json` with the dedupe
-   rules: **uses** (the kit's), **duplicate** (same purpose as an entry —
+6. Classify each piece against `registry/components.json` (and the other
+   apps, from `node scripts/inventory.mjs --json`) with the dedupe rules: **uses** (the kit's), **duplicate** (same purpose as an entry —
    an alias, maybe a variant), **candidate** (generic, not in the kit yet),
    **domain** (only this app's).
-7. Update the app's `jimbo-ui.json` (`auth`, `registry`, `components`) and
-   both registry files (`apps.json`; `components.json` usedBy, aliases,
-   new candidates and domain entries). Run `node scripts/inventory.mjs`.
+7. Write the app's `jimbo-ui.json` (`auth`, `registry`, `components` —
+   `uses`, and every `local` piece with its kind and the catalogue id it
+   `matches`). In jimbo-ui (pull first), add the app's line to
+   `registry/apps.json` if it's new, and add any **generic** candidate the
+   catalogue doesn't have yet to `registry/components.json` with a neutral
+   name (domain pieces stay out). Push the app's file, then run
+   `node scripts/inventory.mjs`.
 8. On a branch in the app, add this block to its `CLAUDE.md` (create it if
    missing):
    > This app uses jimbo-ui. Before creating a new UI component, check
-   > registry/components.json in jimbo-ui for an existing one with the same
-   > purpose. All brand, theme and style options belong in the jimbo-ui
-   > config section (/jimbo-ui), admin-only if this app has auth. After
-   > adding or changing a UI component, update this app's entry in the
-   > jimbo-ui registry.
+   > registry/components.json in jimbo-ui (and `node scripts/inventory.mjs
+   > --json` there) for an existing one with the same purpose. All brand,
+   > theme and style options belong in the jimbo-ui config section
+   > (/jimbo-ui), admin-only if this app has auth. After adding or changing
+   > a UI component, update `components` in this app's jimbo-ui.json — it's
+   > the only record; don't write app details into jimbo-ui.
 9. Report: what it reuses; duplicates of existing components, each with a
    merge plan; new candidates; domain-only pieces; token-rule violations
    (from the inventory); and a plan for moving its brand, theme and style
@@ -337,15 +355,15 @@ update", or before updating if the user wants to look first.
 "Consolidate this app with jimbo-ui", "use the jimbo-ui versions of my
 components". In the app's own session.
 
-1. Pull jimbo-ui. Read the app's `jimbo-ui.json` and the registry.
+1. Pull jimbo-ui. Read the app's `jimbo-ui.json` and the catalogue.
 2. On a branch: for each `local` component that now has a canonical kit
    version, replace it with the kit component, choosing the matching variant
    props, and delete the local file.
 3. Move every brand, theme and style guide option into the jimbo-ui config
    section, applying the access rules; remove the old pages, routes and
    settings entries.
-4. Update `uses` / `local` in `jimbo-ui.json` and `usedBy` in the registry
-   (pull first; commit the registry in jimbo-ui).
+4. Update `uses` / `local` in the app's `jimbo-ui.json` (the only record —
+   nothing to commit in jimbo-ui).
 5. Typecheck and build. With `auth: "admin"`, check that a non-admin can't
    reach `/jimbo-ui` or call the save route (expect a 401/403). Show the
    user any visual differences before committing.
@@ -365,7 +383,7 @@ To release one:
 2. Update `skills/jimbo-ui/guide.md` (the relevant section and its change log)
    and this file if a core rule or workflow changed. **Promoting a
    component:** rewrite it generically, add it to the kit, the Style guide
-   panel, the showcase and guide section 8, set its registry entry's tier to
+   panel, the showcase and guide section 8, set its catalogue entry's tier to
    `kit` with the kit path, and list it under **Available** in the changelog
    ("Apps must: Nothing"). If the theme engine or
    templates changed, run `node scripts/contrast.mjs --check` — every template

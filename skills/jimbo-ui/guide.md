@@ -10,8 +10,9 @@ implementations of everything below are in the repo's `reference/` folder.
 - **The living picture:** the Style guide tab of each app's **jimbo-ui
   config** section (`/jimbo-ui`) renders every shared component in that
   app's current theme; the showcase's Components tab does the same.
-- **The library:** `registry/` lists every app on jimbo-ui and every UI
-  element across them, so nothing is built twice (section 13).
+- **The library:** `registry/` lists the apps on jimbo-ui and its catalogue
+  of shared components; each app's `jimbo-ui.json` says what it uses and
+  what it has built, so nothing is built twice (section 13).
 - **Theme:** two to four colours (accent and background always; highlight
   and support set or inferred), each with lighter and darker shades, picked
   from Everyday, Holidays, Countries, Provinces or Sports templates (or a
@@ -190,11 +191,12 @@ can't support it (no storage for a favicon upload) and say so in the app's
 ```
 
 `version` is the jimbo-ui version the app is on. `auth` gates the config
-section (above). `registry` mirrors its row in `registry/apps.json`.
-`components` is the app's side of the registry: `uses` (registry ids of
-kit pieces it uses), `local` (its own components — `domain` or
-`candidate`, and the registry id it `matches`, if any) and `overrides` (kit
-pieces it wraps or adapts). At the start of every
+section (above). `registry` says when it registered and was last audited.
+`components`: `uses` (catalogue ids of the kit pieces it uses), `local`
+(its own components — `domain` or `candidate`, and the catalogue id it
+`matches`, if any) and `overrides` (kit pieces it wraps or adapts). **This
+file is the only record of the app** — jimbo-ui doesn't keep a copy, so
+keep it current in the app's repo. At the start of every
 Claude Code session in the app, the jimbo-ui plugin compares it with the
 installed release and says when there are newer guidelines to bring in (see
 "Versions" below). Foundation and starter files
@@ -848,9 +850,9 @@ and body fonts.
 CSS classes for plain elements: `.card`, `.field`, `.btn …`, `.chip`,
 `.link-action`, `.eyebrow`, `.meta`, `.label`, `.h-page`, `.h-section`.
 
-Adding a component: check the registry first (section 13). Build it from
+Adding a component: check the catalogue first (section 13). Build it from
 tokens, put it in the kit, add it to the Style guide panel and the
-showcase, list it here, and set its registry entry to `kit`.
+showcase, list it here, and set its catalogue entry to `kit`.
 
 ---
 
@@ -1005,29 +1007,45 @@ archetype only sets the starting shape.
 
 ## 13. One library, no duplicates
 
-jimbo-ui keeps a registry of every app on it (`registry/apps.json`) and a
-catalogue of every UI element across them (`registry/components.json`), so
-the UI library grows in one place and every app feels the same.
+The UI library grows in one place and every app feels the same. **Each
+fact lives in one place:**
 
-Each component entry has an `id`, a canonical `name`, its `purpose` (one
+- **jimbo-ui** keeps the list of apps (`registry/apps.json`: name, repo,
+  when it registered — nothing else) and its **catalogue**
+  (`registry/components.json`): the shared components and the generic
+  candidates an app has built.
+- **Each app** keeps everything about itself in its `jimbo-ui.json`:
+  version, auth, web root, the catalogue components it uses, and its own
+  components (domain or candidate, and what they match).
+- **`node scripts/inventory.mjs`** puts them together when you need the
+  whole picture — reading each app's `jimbo-ui.json` as pushed to GitHub
+  (`gh`), and its checkout for the code checks (`~/Development/<name>`, or
+  `--apps-dir` / `JIMBO_APPS_DIRS`; a checkout that disagrees with GitHub
+  is flagged as stale). `--json` prints the assembled registry, with the
+  apps that use each component.
+
+So updating an app never touches jimbo-ui, nothing drifts, and app details
+stay out of jimbo-ui.
+
+Each catalogue entry has an `id`, a canonical `name`, its `purpose` (one
 sentence on what it's *for*, not what it looks like), a `tier`, its
-`source` (the kit path, or `app:path` if it isn't in the kit yet), `usedBy`
-(apps), `aliases` (other names the same thing goes by — "Modal", "Drawer",
-"BottomSheet" → `Sheet`) and `variants` (the props that cover differences
-between apps).
+`source` (the kit path), `aliases` (other names the same thing goes by —
+"Modal", "Drawer", "BottomSheet" → `Sheet`) and `variants` (the props
+that cover differences between apps).
 
 | Tier | Means |
 | --- | --- |
 | `foundation` | Copied into every app (`Button`, `.card`, `.field`…) |
 | `kit` | In `reference/`, adapted per app |
 | `pattern` | A behaviour the guide describes (save bar, offline banner, background work ring) |
-| `candidate` | Built in an app, generic — may be promoted |
-| `domain` | Only that app's (its add flows, its data tools). Listed, **never copied into jimbo-ui** |
+| `candidate` | Built in an app, generic — may be promoted. In the catalogue with a neutral name; the app's copy is in its `jimbo-ui.json` |
+| `domain` | Only that app's (its add flows, its data tools). Listed in the app's `jimbo-ui.json` only — **never in jimbo-ui** |
 
 **The dedupe rules:**
 
 1. **Match by purpose and behaviour, not by name.** Before anything is
-   added, compare it against every registry entry and its aliases. A
+   added, compare it against every catalogue entry and its aliases, and
+   what the other apps have built (`inventory.mjs --json`). A
    "HistoryRow" that shows a dated thing with a status is an `EventRow`; a
    "StateChip" that shows a status as a short label is a `Badge`.
 2. **A match is that component.** Record the app's name as an alias. If it
@@ -1038,18 +1056,20 @@ between apps).
    with neutral names, plus the kit, this guide, the showcase and the Style
    guide panel, released as a minor version with "Apps must: Nothing" and an
    **Available** list. Apps adopt it when they consolidate.
-4. **Domain components stay in the app.** They're listed so nobody rebuilds
-   them as something generic by mistake, but their code never comes here.
-5. **Always pull jimbo-ui before writing to the registry**, so updates from
-   different app chats don't overwrite each other.
+4. **Domain components stay in the app.** They're listed in its
+   `jimbo-ui.json` so nobody rebuilds them as something generic by mistake,
+   but they never come here.
+5. **An app session writes only to its own `jimbo-ui.json`.** jimbo-ui
+   changes only when an app registers (its line in `apps.json`) or a new
+   generic candidate joins the catalogue — pull jimbo-ui first.
 
 `node scripts/inventory.mjs` prints the component × app table, candidates
 more than one app has built, kit components no app uses, apps behind the
 latest release, raw hex or palette colours in app code (split into
 hand-written status tones, black or white overlays, and raw colours), and
-apps whose config section is missing, split up or gated wrong. The
-registry holds app names and paths only, so it's the one place app names
-appear in jimbo-ui.
+apps whose config section is missing, split up or gated wrong.
+`registry/apps.json` holds app names and repos only, so it's the one
+place app names appear in jimbo-ui.
 
 ---
 
@@ -1167,3 +1187,9 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   follows the theme (`applyFavicon` sets `apple-touch-icon` to a themed PNG).
   A Brands category, starting with Marcone (red and mSupply navy). A third
   archetype to copy, **Status monitor** (`archetypes/status.tsx`).
+- **Unreleased** — Each fact in one place: an app's details live only in
+  its `jimbo-ui.json`; `registry/apps.json` is just names and repos, and
+  `registry/components.json` is jimbo-ui's catalogue (no `usedBy`, no
+  domain entries). `inventory.mjs` reads the apps' pushed `jimbo-ui.json`
+  with `gh`, flags stale checkouts, and `--json` prints the assembled
+  registry. App sessions no longer commit to jimbo-ui.

@@ -17,6 +17,29 @@ the matching 0.x release.
 
 ## Unreleased
 
+### Changed
+- **Each fact in one place.** An app's details — version, auth, web root,
+  the components it uses and its own — live only in its `jimbo-ui.json`.
+  `registry/apps.json` is just each app's name, repo and registration
+  date; `registry/components.json` is jimbo-ui's catalogue (shared
+  components and generic candidates, no `usedBy`, no app-only entries or
+  app-specific aliases). App sessions no longer commit to jimbo-ui when
+  they update or consolidate.
+- `scripts/inventory.mjs` puts the registry together from the apps: each
+  app's `jimbo-ui.json` as pushed (read with `gh`), its checkout for the
+  code checks (`~/Development`, `--apps-dir` or `JIMBO_APPS_DIRS`), a
+  warning when a checkout is stale, and `--json` for the assembled
+  registry.
+- The scan for app words now covers the catalogue too; only
+  `registry/apps.json` is skipped.
+
+### Apps must
+- Keep `components` in `jimbo-ui.json` current (`uses`, and `local` with
+  each piece's kind and the catalogue id it matches) — it's the only record.
+  An app with no `components` yet runs "Consolidate an app".
+- Update the jimbo-ui block in the app's `CLAUDE.md` to the new wording in
+  SKILL.md ("Register an app", step 8).
+
 ## 0.10.0 — 2026-10-31
 
 Nine fonts per group with a size for headings and body, twelve backdrops per group, a themed iOS icon, a Brands category and a Status monitor archetype.

@@ -1,32 +1,20 @@
 {
-  "$comment": "Every app on jimbo-ui. Pull jimbo-ui before writing here. Names and paths only — never app code.",
+  "$comment": "Every app on jimbo-ui: its name, its repo and when it joined — nothing else. Everything about an app (version, auth, web root, the components it uses and its own) lives in that app's jimbo-ui.json; scripts/inventory.mjs reads them. Add a line here only when an app registers.",
   "apps": [
     {
       "name": "tinnitus-a-go-go",
       "repo": "ryanjpeterson/tinnitus-a-go-go",
-      "webRoot": "apps/web",
-      "version": "0.10.0",
-      "auth": "admin",
-      "registered": "2026-10-30",
-      "audited": "2026-10-30"
+      "registered": "2026-10-30"
     },
     {
       "name": "jimbo-backup",
       "repo": "ryanjpeterson/jimbo-backup",
-      "webRoot": "web",
-      "version": "0.8.3",
-      "auth": "none",
-      "registered": "2026-10-30",
-      "audited": "2026-10-30"
+      "registered": "2026-10-30"
     },
     {
       "name": "jimbos-servarr",
       "repo": "ryanjpeterson/jimbos-servarr",
-      "webRoot": "dashboard",
-      "version": "0.9.0",
-      "auth": "none",
-      "registered": "2026-10-31",
-      "audited": "2026-10-31"
+      "registered": "2026-10-31"
     }
   ]
 }

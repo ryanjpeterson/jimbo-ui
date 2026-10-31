@@ -4,9 +4,10 @@ Ryan's shared brand and UI system for web apps (repo and plugin name:
 `jimbo-ui`): a theme engine
 that turns two to four colours into a full palette with shades, 237 looks — each in light, mid and dark — (everyday, holidays,
 countries, provinces, sports teams and Zelda games), 48 backdrops, frosted glass and a circle motif, Tailwind tokens, a UI kit, a phone-first, full-screen app shell with a
-floating tab dock, maps in the theme, two app archetypes to copy, the
-patterns that make the apps feel alike, and a **registry** of every app and
-every UI element across them so nothing gets built twice. It's
+floating tab dock, maps in the theme, three app archetypes to copy, the
+patterns that make the apps feel alike, and a **registry** — the apps on
+jimbo-ui and a catalogue of shared components, with each app describing
+itself in its own `jimbo-ui.json` — so nothing gets built twice. It's
 generic on purpose: no app's code, names or artwork live here.
 
 It is also a **Claude Code plugin**: the `jimbo-ui` skill teaches Claude the
@@ -38,7 +39,7 @@ the `brand.config.ts` line and `tokens.css` to paste into the app.
 | `foundation/` | Code copied verbatim into apps (never edited there) |
 | `starter/` | Code copied once into a new app, then app-owned |
 | `reference/` | Generic kit, shell, header text, maps, the jimbo-ui config section and the archetypes, adapted per app |
-| `registry/` | Every app on jimbo-ui and every UI element across them |
+| `registry/` | The apps on jimbo-ui (names and repos) and the catalogue of shared components; each app's details are in its own `jimbo-ui.json`, and `scripts/inventory.mjs` puts them together |
 | `scripts/inventory.mjs` | Registry report: component × app table, what to promote, raw colours, config-section checks |
 | `showcase/` | Demo app built only from a release's code ([published](https://claude.ai/artifact/F4KAFYCkxZGZB7zKdaWjWC)) |
 | `scripts/tokens.mjs` | Prints an app's `tokens.css` for its three colours |
@@ -84,7 +85,8 @@ Settings → Capabilities → Skills.
    typechecks and commits.
 
 6. **Register and consolidate:** in an app, "register this app with
-   jimbo-ui" inventories its UI into the registry (changing no app code);
+   jimbo-ui" inventories its UI into its own `jimbo-ui.json` and adds it to
+   the list of apps (changing no app code);
    "consolidate this app with jimbo-ui" swaps its own copies for the kit's
    and moves its brand and theme options into the jimbo-ui config section.
 

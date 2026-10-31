@@ -18,12 +18,12 @@ neutral names and examples. Before every commit, scan for the first app's
 name and domain words:
 
 ```bash
-git ls-files | grep -v "package-lock\|CLAUDE.md\|CHANGELOG\|^registry/" | xargs grep -il "tinnitus\|tagg\b\|concert\|festival\|venue\|attended\|immich\|jimbo\.backup\|jimbobackup\|jimbo-backup\|servarr\|gluetun\|qbittorrent\|prowlarr\|sonarr\|radarr\|slskd\|mullvad\|wireguard\|tailscale\|navidrome"
+git ls-files | grep -v "package-lock\|CLAUDE.md\|CHANGELOG\|^registry/apps.json" | xargs grep -il "tinnitus\|tagg\b\|concert\|festival\|venue\|attended\|immich\|jimbo\.backup\|jimbobackup\|jimbo-backup\|servarr\|gluetun\|qbittorrent\|prowlarr\|sonarr\|radarr\|slskd\|mullvad\|wireguard\|tailscale\|navidrome"
 ```
 
 It must print nothing. Add an app's words to it when a new app adopts jimbo.ui.
-`registry/` is the one exception: it names the apps and their components
-(names and paths only, never code), so the scan skips it.
+`registry/apps.json` is the one exception: it names the apps (names and
+repos only, never code), so the scan skips it.
 
 ## Layout
 
@@ -32,7 +32,7 @@ It must print nothing. Add an app's words to it when a new app adopts jimbo.ui.
 | `foundation/` | Theme engine, templates, `globals.css`, Tailwind config, `Button`, `ColorPicker`, `cn`, gestures | Copied verbatim into apps on every update — never holds app values |
 | `starter/` | `brand.config.ts`, `tokens.css`, `favicon.svg` | Copied once into a new app, then app-owned |
 | `reference/` | Generic kit, `AppShell`, `HeaderTitle`, `MapView`, the jimbo-ui config section (`JimboConfigPage` + `routes/config/`), the archetypes (`archetypes/catalogue.tsx`, `dashboard.tsx`, `status.tsx`), `useBrand`, `index.html` | Apps adapt and extend them |
-| `registry/` | `apps.json` (every app on jimbo-ui) and `components.json` (every UI element across them) | Pull before writing; names and paths only |
+| `registry/` | `apps.json` (the apps: name, repo, registered) and `components.json` (jimbo-ui's catalogue: shared components and generic candidates) | An app's details live only in its own `jimbo-ui.json`; `scripts/inventory.mjs` puts them together |
 | `showcase/` | Demo app assembled from reference → foundation → starter → `showcase/overrides/` | Published as a private page each release |
 | `scripts/` | `inventory.mjs` (registry report), `tokens.mjs` (an app's `tokens.css`), `contrast.mjs` (template contrast report), `versions.mjs` (versions agree), `releases.mjs` (`releases.json` from the changelog), `build-zip.sh` (claude.ai upload) | |
 | `hooks/` | `hooks.json` + `check-version.mjs`: tells an app's session when it's behind the installed release | |
@@ -69,7 +69,7 @@ dot in the accent; the favicon is the only graphic.
   after any change to `theme.ts` or `themes.ts`.
 - Plugin manifests: `claude plugin validate --strict .`
 - Versions: `node scripts/versions.mjs` (manifests, `foundation/src/lib/jimbo.ts`, SKILL.md, CHANGELOG agree; `releases.json` current — `node scripts/releases.mjs` rewrites it)
-- Registry: `node scripts/inventory.mjs` (reads the apps' checkouts in `~/Development`)
+- Registry: `node scripts/inventory.mjs` (each app's pushed `jimbo-ui.json` via `gh`, checkouts in `~/Development` or `JIMBO_APPS_DIRS` for code checks; `--json` for the assembled registry)
 - Check UI at phone width (375 px) in a dark, a mid and a light template.
 
 ## Releasing
