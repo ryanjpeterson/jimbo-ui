@@ -23,7 +23,7 @@
       "name": "jimbos-servarr",
       "repo": "ryanjpeterson/jimbos-servarr",
       "webRoot": "dashboard",
-      "version": "0.8.4",
+      "version": "0.9.0",
       "auth": "none",
       "registered": "2026-10-31",
       "audited": "2026-10-31"
