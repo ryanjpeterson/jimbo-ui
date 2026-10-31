@@ -88,7 +88,7 @@ unknown fields, clamps numbers), `brandConfigLine`, `tokensCss` (what
 (`AppShell.tsx`: pass tabs, top-bar actions and routes), the jimbo-ui
 config section (`JimboConfigPage.tsx` with `config/ThemePanel.tsx` and
 `config/StyleGuidePanel.tsx`), `MapView.tsx`, the archetypes
-(`archetypes/catalogue.tsx`, `archetypes/dashboard.tsx`), `HeaderTitle.tsx` (the app's name as header text), `useBrand.ts`, and
+(`archetypes/catalogue.tsx`, `archetypes/dashboard.tsx`, `archetypes/status.tsx`), `HeaderTitle.tsx` (the app's name as header text), `useBrand.ts`, and
 `index.html` (pre-paint script, fonts, PWA tags).
 
 **Server side (optional):** an app that lets admins change the theme stores
@@ -893,6 +893,7 @@ fills in. **Ask which one fits** (with the closest recommended), or mix two.
 | --- | --- | --- | --- | --- | --- |
 | **Catalogue** ★ | A log of dated entries, the people and places in them, and numbers about it all (from the pilot app) | Home · Entries · People · Places | column | Home: `HeroSection`, `StatGrid`, "Coming up" `EventRow`, `RankedList`; Entries: `SearchField`, `PillTabs`, grouped `List` + `EventRow`, select mode, `Pager`; Entry: `Hero`, `Section`s, a compact `MapView`, edit in a `Sheet`; People: `EntityRow`; Places: list ⇄ map (`ViewSwitch`, `MapView fill`, `MapPinCard`) | ripples |
 | **Single-page dashboard** ★ | One screen that answers "is everything fine?" for jobs it watches (reports, syncs, checks, builds) | none, or Home · Runs · Settings | column | One page: a verdict line (accent fine, highlight needs a look), `StatGrid` with `trend` sparklines, jobs as rows or tiles (`List` + `LayoutSwitch`: status dot that pulses while running, last run, a Run button, errors inline), charts (`BarChart` of runs per day, `TrendChart` of run times), recent runs as `EventRow` opening a log in a `Sheet`, settings as label / value rows | dots or none |
+| **Status monitor** ★ | The services you run — are they up, how fast do they answer, how are they reached — with a way into each (self-hosted apps, sites, devices, APIs) | none, or Status · Settings | column | One page: `PageHeader`; the connection they go out through (`Section` of `KeyValue` rows, a status `Badge` in its action slot); `StatGrid` (up, average response, uptime, checks, with `trend`); services as rows or tiles (`List` + `LayoutSwitch`: status dot, name and what it is, how it's reached, its last answer, recent checks as a row of flat dots, an *Open* button disabled while it's down); history over a range (`Tabs size="sm"`) as `TrendChart`s and `BarChart`s | contours or none |
 | **Tracker** | Logging things you do, see or collect over time | Home · List · Add · Stats · Me | column | Home: `HeroSection` or `PageHeader`, `StatGrid`, "Coming up" `List` + `EventRow`; List: `SearchField`, `PillTabs`, grouped `List` + `EventRow`, select mode; Detail: `Hero` / `Banner`, `Section`s; Stats: `StatGrid`, `RankedList` | glow or dots |
 | **Collection** | A library of items with pictures (records, books, recipes, gear) | Home · Browse · Add · Lists · Me | wide | Browse: `SearchField`, filters, `MediaCard` grid; Detail: `Hero` with the image; Lists: `LinkCard`s | geometry or none |
 | **Dashboard** | Numbers and status at a glance (finance, health, ops) | Today · Trends · Alerts · Settings | wide | `StatGrid` (with `trend`) first, `Section` cards with `TrendChart` and `BarChart`, `RankedList`, `Badge` statuses, `FullBleed` band for the headline | dots or contours |
@@ -901,8 +902,8 @@ fills in. **Ask which one fits** (with the closest recommended), or mix two.
 | **Showcase** | A public face: a landing page, a portfolio, an event site | Home · About · Work · Contact | full | `HeroSection` (`lg`), `FullBleed` bands, `MediaCard` grid, `LinkCard` calls to action | burst or shapes |
 | **Tool** | One job done well (a calculator, converter, generator) | — (or ≤ 3) | column | One `Section` with fields, `RangeField`s and `Tabs`; the result in a `card`; history in a `List` | dots or none |
 
-★ **Templates you can copy:** `reference/web/src/archetypes/catalogue.tsx`
-and `dashboard.tsx` are working pages built from the kit with neutral
+★ **Templates you can copy:** `reference/web/src/archetypes/catalogue.tsx`,
+`dashboard.tsx` and `status.tsx` are working pages built from the kit with neutral
 example content (try them on the showcase's Archetypes tab). Copy the file,
 rename the nouns, map the statuses, swap the sample data for the app's API,
 and drop or add tabs. The other archetypes are shapes to build from the
@@ -1164,4 +1165,5 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   Headings and body each get a size (± em) that every text size follows.
   Twelve backdrops per group (48 patterns). The iOS home-screen icon
   follows the theme (`applyFavicon` sets `apple-touch-icon` to a themed PNG).
-  A Brands category, starting with Marcone (red and mSupply navy).
+  A Brands category, starting with Marcone (red and mSupply navy). A third
+  archetype to copy, **Status monitor** (`archetypes/status.tsx`).

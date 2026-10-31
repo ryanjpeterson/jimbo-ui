@@ -33,6 +33,12 @@ the matching 0.x release.
   checks; Vintage adds pinstripe, gingham, polka, plaid, argyle, racing
   stripes, trellis, bauhaus; Texture adds concrete, brushed, sand, speckle,
   crosshatch, twill, carbon, ribbed.
+- **Status monitor archetype** (`reference/web/src/archetypes/status.tsx`,
+  on the showcase's Archetypes tab): the services you run, whether each is
+  up, how fast it answers and how it's reached, recent checks as a row of
+  dots, an Open button, and history charts over a range. From auditing the
+  registered apps: the catalogue and the single-page dashboard already
+  cover the other two.
 - **Brands** category on the Looks tab: companies' own palettes, colours
   only. First, **Marcone** — Pantone 1795 red with its parent mSupply's
   navy — written light and dark, mid made from its own colours.

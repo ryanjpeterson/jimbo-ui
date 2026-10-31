@@ -175,6 +175,7 @@ export function HomeDemo() {
         <div className="grid gap-3 sm:grid-cols-2">
           <LinkCard to="/archetypes/catalogue" eyebrow="Archetype" title="Catalogue" sub="Entries, people, places, numbers — with a map" accent />
           <LinkCard to="/archetypes/dashboard" eyebrow="Archetype" title="Single-page dashboard" sub="Is everything fine? Jobs, runs, settings" />
+          <LinkCard to="/archetypes/status" eyebrow="Archetype" title="Status monitor" sub="Is every service up? Checks, response, history" />
         </div>
       </section>
     </div>

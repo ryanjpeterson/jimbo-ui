@@ -31,7 +31,7 @@ It must print nothing. Add an app's words to it when a new app adopts jimbo.ui.
 | --- | --- | --- |
 | `foundation/` | Theme engine, templates, `globals.css`, Tailwind config, `Button`, `ColorPicker`, `cn`, gestures | Copied verbatim into apps on every update — never holds app values |
 | `starter/` | `brand.config.ts`, `tokens.css`, `favicon.svg` | Copied once into a new app, then app-owned |
-| `reference/` | Generic kit, `AppShell`, `HeaderTitle`, `MapView`, the jimbo-ui config section (`JimboConfigPage` + `routes/config/`), the archetypes (`archetypes/catalogue.tsx`, `dashboard.tsx`), `useBrand`, `index.html` | Apps adapt and extend them |
+| `reference/` | Generic kit, `AppShell`, `HeaderTitle`, `MapView`, the jimbo-ui config section (`JimboConfigPage` + `routes/config/`), the archetypes (`archetypes/catalogue.tsx`, `dashboard.tsx`, `status.tsx`), `useBrand`, `index.html` | Apps adapt and extend them |
 | `registry/` | `apps.json` (every app on jimbo-ui) and `components.json` (every UI element across them) | Pull before writing; names and paths only |
 | `showcase/` | Demo app assembled from reference → foundation → starter → `showcase/overrides/` | Published as a private page each release |
 | `scripts/` | `inventory.mjs` (registry report), `tokens.mjs` (an app's `tokens.css`), `contrast.mjs` (template contrast report), `versions.mjs` (versions agree), `releases.mjs` (`releases.json` from the changelog), `build-zip.sh` (claude.ai upload) | |

@@ -52,6 +52,7 @@ export function ArchetypesPage() {
       <div className="grid gap-3 sm:grid-cols-2">
         <LinkCard to="/archetypes/catalogue" eyebrow="Catalogue" title="A log of things, people and places" sub="Home · Entries · People · Places, with a map" accent />
         <LinkCard to="/archetypes/dashboard" eyebrow="Single-page dashboard" title="Is everything fine?" sub="Jobs as rows or tiles, charts, recent runs, settings" />
+        <LinkCard to="/archetypes/status" eyebrow="Status monitor" title="Is every service up?" sub="Connection, services with recent checks, history" />
       </div>
       <p className="meta">The guide lists the rest (Tracker, Collection, Directory, Planner, Showcase, Tool) by their shape.</p>
     </div>

@@ -168,7 +168,7 @@ release without touching that working copy, export it:
 - `starter/` — copied once into a new app, then app-owned
 - `reference/` — generic implementations (kit, shell, header text, `MapView`,
   the jimbo-ui config section, and the **archetypes** in
-  `web/src/archetypes/`: `catalogue.tsx` and `dashboard.tsx`), adapted and
+  `web/src/archetypes/`: `catalogue.tsx`, `dashboard.tsx` and `status.tsx`), adapted and
   extended per app
 - `registry/apps.json` — every app on jimbo-ui (repo, web root, version,
   auth, registered, last audited); `registry/components.json` — every UI
@@ -207,8 +207,8 @@ explains all of this.
 
 ## Workflow: start a new app on jimbo-ui
 
-0. **Ask which archetype fits** (guide section 9: Catalogue and
-   Single-page dashboard — real templates in `reference/web/src/archetypes/`
+0. **Ask which archetype fits** (guide section 9: Catalogue,
+   Single-page dashboard and Status monitor — real templates in `reference/web/src/archetypes/`
    to copy and remix — or Tracker, Collection, Dashboard, Directory,
    Planner, Showcase, Tool, or a mix), recommending the closest. It sets the dock tabs, page width, main pages and backdrop.
    Then, as you build each page, ask which component to use for each feature

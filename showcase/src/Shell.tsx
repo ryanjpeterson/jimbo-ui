@@ -9,6 +9,7 @@ import { useApplyBrand } from "@/lib/useBrand";
 import { JimboConfigPage } from "@/routes/JimboConfigPage";
 import { CatalogueRoutes } from "@/archetypes/catalogue";
 import { DashboardPage } from "@/archetypes/dashboard";
+import { StatusPage } from "@/archetypes/status";
 import { HomeDemo } from "./Home";
 import { ArchetypesPage, CatalogueNav, ComponentsPage, SettingsPage } from "./pages";
 
@@ -39,6 +40,7 @@ export function Shell() {
         <Route path="/archetypes" element={<ArchetypesPage />} />
         <Route path="/archetypes/catalogue/*" element={<CatalogueRoutes base="/archetypes/catalogue" nav={(current) => <CatalogueNav current={current} />} />} />
         <Route path="/archetypes/dashboard" element={<DashboardPage />} />
+        <Route path="/archetypes/status" element={<StatusPage />} />
         <Route path="/settings" element={<SettingsPage />} />
         {/* No sign-in here, so like an app with auth "none" the section is open. */}
         <Route path="/jimbo-ui" element={<JimboConfigPage canConfigure />} />
