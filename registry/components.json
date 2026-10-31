@@ -16,7 +16,8 @@
       "source": "foundation/src/components/ui/button.tsx",
       "usedBy": [
         "tinnitus-a-go-go",
-        "jimbo-backup"
+        "jimbo-backup",
+        "jimbos-servarr"
       ],
       "aliases": [
         "Btn",
@@ -35,7 +36,8 @@
       "source": "foundation/src/components/ColorPicker.tsx",
       "usedBy": [
         "tinnitus-a-go-go",
-        "jimbo-backup"
+        "jimbo-backup",
+        "jimbos-servarr"
       ],
       "aliases": [
         "ColourPicker",
@@ -139,7 +141,8 @@
       "source": "reference/web/src/routes/AppShell.tsx",
       "usedBy": [
         "tinnitus-a-go-go",
-        "jimbo-backup"
+        "jimbo-backup",
+        "jimbos-servarr"
       ],
       "aliases": [
         "Layout",
@@ -162,7 +165,8 @@
       "source": "reference/web/src/routes/AppShell.tsx#TopBarButton",
       "usedBy": [
         "tinnitus-a-go-go",
-        "jimbo-backup"
+        "jimbo-backup",
+        "jimbos-servarr"
       ],
       "aliases": [
         "HeaderButton",
@@ -180,7 +184,8 @@
       "source": "reference/web/src/routes/AppShell.tsx#DockIcon",
       "usedBy": [
         "tinnitus-a-go-go",
-        "jimbo-backup"
+        "jimbo-backup",
+        "jimbos-servarr"
       ],
       "aliases": [
         "BottomNavIcon",
@@ -195,7 +200,8 @@
       "tier": "kit",
       "source": "reference/web/src/components/HeaderTitle.tsx",
       "usedBy": [
-        "jimbo-backup"
+        "jimbo-backup",
+        "jimbos-servarr"
       ],
       "aliases": [
         "Wordmark",
@@ -213,7 +219,8 @@
       "tier": "kit",
       "source": "reference/web/src/routes/JimboConfigPage.tsx",
       "usedBy": [
-        "tinnitus-a-go-go"
+        "tinnitus-a-go-go",
+        "jimbos-servarr"
       ],
       "aliases": [
         "BrandPage",
@@ -251,7 +258,8 @@
       "source": "reference/web/src/components/ui/kit.tsx#Badge",
       "usedBy": [
         "tinnitus-a-go-go",
-        "jimbo-backup"
+        "jimbo-backup",
+        "jimbos-servarr"
       ],
       "aliases": [
         "StatusBadge",
@@ -274,7 +282,8 @@
       "source": "reference/web/src/components/ui/kit.tsx#TONES",
       "usedBy": [
         "tinnitus-a-go-go",
-        "jimbo-backup"
+        "jimbo-backup",
+        "jimbos-servarr"
       ],
       "aliases": [
         "STATUS",
@@ -293,7 +302,8 @@
       "source": "reference/web/src/components/ui/kit.tsx#STATUS_DOT",
       "usedBy": [
         "tinnitus-a-go-go",
-        "jimbo-backup"
+        "jimbo-backup",
+        "jimbos-servarr"
       ],
       "aliases": [
         "StatusDot",
@@ -378,7 +388,8 @@
       "source": "reference/web/src/components/ui/kit.tsx#PageHeader",
       "usedBy": [
         "tinnitus-a-go-go",
-        "jimbo-backup"
+        "jimbo-backup",
+        "jimbos-servarr"
       ],
       "aliases": [
         "PageTitle",
@@ -455,7 +466,8 @@
       "source": "reference/web/src/components/ui/kit.tsx#Section",
       "usedBy": [
         "tinnitus-a-go-go",
-        "jimbo-backup"
+        "jimbo-backup",
+        "jimbos-servarr"
       ],
       "aliases": [
         "Card section",
@@ -475,7 +487,8 @@
       "source": "reference/web/src/components/ui/kit.tsx#List",
       "usedBy": [
         "tinnitus-a-go-go",
-        "jimbo-backup"
+        "jimbo-backup",
+        "jimbos-servarr"
       ],
       "aliases": [
         "CardGrid",
@@ -586,7 +599,8 @@
       "source": "reference/web/src/components/ui/kit.tsx#LinkCard",
       "usedBy": [
         "tinnitus-a-go-go",
-        "jimbo-backup"
+        "jimbo-backup",
+        "jimbos-servarr"
       ],
       "aliases": [
         "NavCard",
@@ -603,7 +617,8 @@
       "tier": "kit",
       "source": "reference/web/src/components/ui/kit.tsx#StatTile",
       "usedBy": [
-        "tinnitus-a-go-go"
+        "tinnitus-a-go-go",
+        "jimbos-servarr"
       ],
       "aliases": [
         "Metric",
@@ -623,7 +638,8 @@
       "tier": "kit",
       "source": "reference/web/src/components/ui/kit.tsx#StatGrid",
       "usedBy": [
-        "tinnitus-a-go-go"
+        "tinnitus-a-go-go",
+        "jimbos-servarr"
       ],
       "aliases": [
         "Stats",
@@ -700,7 +716,8 @@
       "tier": "kit",
       "source": "reference/web/src/components/ui/kit.tsx#Tabs",
       "usedBy": [
-        "tinnitus-a-go-go"
+        "tinnitus-a-go-go",
+        "jimbos-servarr"
       ],
       "aliases": [
         "SegmentedControl",
@@ -773,7 +790,8 @@
       "source": "reference/web/src/components/ui/kit.tsx#Loading",
       "usedBy": [
         "tinnitus-a-go-go",
-        "jimbo-backup"
+        "jimbo-backup",
+        "jimbos-servarr"
       ],
       "aliases": [
         "Spinner",
@@ -789,7 +807,8 @@
       "source": "reference/web/src/components/ui/kit.tsx#EmptyState",
       "usedBy": [
         "tinnitus-a-go-go",
-        "jimbo-backup"
+        "jimbo-backup",
+        "jimbos-servarr"
       ],
       "aliases": [
         "NoData",
@@ -930,7 +949,8 @@
       "source": "reference/web/src/components/ui/kit.tsx#KeyValue",
       "usedBy": [
         "tinnitus-a-go-go",
-        "jimbo-backup"
+        "jimbo-backup",
+        "jimbos-servarr"
       ],
       "aliases": [
         "dl / dt rows",
@@ -1003,7 +1023,8 @@
       "tier": "kit",
       "source": "reference/web/src/components/ui/kit.tsx#BarChart",
       "usedBy": [
-        "tinnitus-a-go-go"
+        "tinnitus-a-go-go",
+        "jimbos-servarr"
       ],
       "aliases": [
         "ColumnChart",
@@ -1023,7 +1044,9 @@
       "purpose": "Shows how one to three amounts change over time.",
       "tier": "kit",
       "source": "reference/web/src/components/ui/kit.tsx#TrendChart",
-      "usedBy": [],
+      "usedBy": [
+        "jimbos-servarr"
+      ],
       "aliases": [
         "LineChart",
         "AreaChart",
@@ -1040,7 +1063,9 @@
       "purpose": "Shows a small trend with no axes.",
       "tier": "kit",
       "source": "reference/web/src/components/ui/kit.tsx#Sparkline",
-      "usedBy": [],
+      "usedBy": [
+        "jimbos-servarr"
+      ],
       "aliases": [
         "MiniChart",
         "TrendLine"
@@ -1055,7 +1080,9 @@
       "purpose": "Lets people show a list as rows or tiles, and remembers it.",
       "tier": "kit",
       "source": "reference/web/src/components/ui/kit.tsx#LayoutSwitch",
-      "usedBy": [],
+      "usedBy": [
+        "jimbos-servarr"
+      ],
       "aliases": [
         "GridListToggle",
         "ViewModeToggle",
@@ -1133,11 +1160,13 @@
       "tier": "candidate",
       "source": "jimbo-backup:web/src/routes/HomePage.tsx#Verdict",
       "usedBy": [
-        "jimbo-backup"
+        "jimbo-backup",
+        "jimbos-servarr"
       ],
       "aliases": [
         "StatusSummary",
-        "Headline status"
+        "Headline status",
+        "verdict line (inline)"
       ],
       "variants": {
         "tone": "accent (fine) | highlight (needs a look)"
@@ -1269,6 +1298,33 @@
       "aliases": [],
       "variants": {},
       "matches": "sheet"
+    },
+    {
+      "id": "check-history",
+      "name": "CheckHistory",
+      "purpose": "The last few up/down checks of something as a row of 8 px dots, oldest first, with empty slots for checks not made yet.",
+      "tier": "candidate",
+      "source": "jimbos-servarr:dashboard/src/routes/DashboardPage.tsx#UptimeDots",
+      "usedBy": [
+        "jimbos-servarr"
+      ],
+      "aliases": [
+        "UptimeDots",
+        "Recent checks"
+      ],
+      "variants": {}
+    },
+    {
+      "id": "servarr.service-row",
+      "name": "ServiceRow",
+      "purpose": "One container: status, route through the VPN or direct, latency, recent checks and an Open button.",
+      "tier": "domain",
+      "source": "jimbos-servarr:dashboard/src/routes/DashboardPage.tsx#ServiceRow",
+      "usedBy": [
+        "jimbos-servarr"
+      ],
+      "aliases": [],
+      "variants": {}
     }
   ]
 }
