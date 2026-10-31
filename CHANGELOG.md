@@ -17,7 +17,39 @@ the matching 0.x release.
 
 ## Unreleased
 
-Nothing yet.
+### Changed
+- **Full screen on phones.** Layouts fill the screen edge to edge and top to
+  bottom, and nothing sits under the status bar's blur or the home
+  indicator. The page colour is on `html`; the backdrop is a fixed layer the
+  full height of the screen (`body::before`) instead of a body background
+  (iOS ignored `background-attachment: fixed`, so it scrolled and stopped
+  short); `body` and `#root` are at least `100dvh`.
+- `AppShell`, `Sheet`, the image viewer, `MapView`, the catalogue archetype
+  and the theme panel's save bar use the new safe-area variables instead of
+  `env()`.
+
+### Added
+- **Safe-area variables** in `globals.css`: `--safe-top`, `--safe-bottom`,
+  `--safe-left`, `--safe-right`, `--top-bar`, `--dock-space`, `--above-dock`.
+- `foundation/src/lib/viewport.ts`: `applyTheme` makes sure the viewport
+  meta has `viewport-fit=cover` (an installed app without it draws under
+  the status bar while its insets read 0) and warns in development.
+- `scripts/inventory.mjs` reports each app's phone frame: `viewport-fit`,
+  status bar style and raw `env(safe-area-…)` in app code.
+
+### Apps must
+- Have `viewport-fit=cover` and `apple-mobile-web-app-status-bar-style`
+  `black-translucent` in `index.html` (as `reference/web/index.html`).
+- Drop any `bg-*` or `background-attachment` the app sets on `body` for the
+  backdrop; the foundation draws it.
+- Replace `env(safe-area-inset-…)` in their own code with the variables
+  (`pt-[var(--safe-top)]`, `bottom-[var(--above-dock)]`, …), and pad any
+  bar of their own that's fixed to the top of the screen by `--safe-top`.
+- Re-copy `AppShell` (or apply its changes: header
+  `pt-[var(--safe-top)]`, main `pb-[var(--dock-space)]`, root
+  `min-h-[100dvh]`).
+- Check at 375 px as an installed app: the app's name is clear of the
+  status bar and the page reaches the bottom of the screen.
 
 ## 0.8.0 — 2026-10-30
 

@@ -43,6 +43,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const dir = mkdtempSync(join(tmpdir(), "jimbo-from-colours-"));
 try {
   copyFileSync(join(root, "foundation/src/lib/theme.ts"), join(dir, "theme.ts"));
+  copyFileSync(join(root, "foundation/src/lib/viewport.ts"), join(dir, "viewport.ts"));
   writeFileSync(join(dir, "brand.config.ts"), `export const BRAND = { name: "", storagePrefix: "x", defaultTheme: { accent: "#A8FF3E", background: "#141416" } };\n`);
   writeFileSync(join(dir, "entries.json"), JSON.stringify(entries));
   writeFileSync(join(dir, "run.ts"), `

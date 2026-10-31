@@ -149,7 +149,7 @@ function Entries({ at }: At) {
       )}
       <Pager page={page} totalPages={3} total={56} pageSize={24} onPage={setPage} />
       {selecting && picked.size > 0 && (
-        <div className="fixed inset-x-0 z-40 flex justify-center px-3 bottom-[calc(5.75rem+env(safe-area-inset-bottom))] sm:bottom-6">
+        <div className="fixed inset-x-0 z-40 flex justify-center px-3 bottom-[var(--above-dock)]">
           <div className="flex w-full max-w-md items-center gap-2 rounded-2xl border border-border bg-surface/95 p-2 pl-4 shadow-2xl backdrop-blur-xl">
             <p className="min-w-0 flex-1 truncate text-sm font-semibold">{picked.size} selected</p>
             <Button size="sm" variant="ghost" onClick={() => setPicked(new Set())}>Clear</Button>

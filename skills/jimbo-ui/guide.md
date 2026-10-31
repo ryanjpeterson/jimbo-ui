@@ -655,7 +655,30 @@ and body fonts.
 - **Installed-app feel:** `apple-mobile-web-app-capable`, translucent status
   bar, no tap highlight, `overscroll-behavior-y: contain` (own pull to
   refresh), smooth scrolling, pinch-zoom allowed.
-- **Top bar:** sticky, 56 px (64 px on desktop) plus the top safe area,
+- **Full screen on phones.** Every app fills the whole screen, edge to edge
+  and top to bottom, and nothing sits under the status bar or the home
+  indicator:
+  - `index.html`'s viewport meta has `viewport-fit=cover`, with the
+    `black-translucent` status bar. Without it, an installed app draws under
+    the status bar while the insets read 0, so the header text lands under
+    the status bar's blur. `applyTheme` adds it if it's missing (and warns in
+    development); `scripts/inventory.mjs` reports apps without it.
+  - The page colour is on `html` and the backdrop is a fixed layer the full
+    height of the screen (`body::before`, `100lvh`), so it never stops short
+    or scrolls away; `body` and `#root` are at least `100dvh` tall.
+  - Insets come from `globals.css`, never `env()` in app code:
+    `--safe-top`, `--safe-bottom`, `--safe-left`, `--safe-right`, plus
+    `--top-bar` (the top bar's height with the status bar: where sticky
+    sub-bars go), `--dock-space` (room under content on phones) and
+    `--above-dock` (where bottom-pinned bars sit). Use them as
+    `pt-[var(--safe-top)]`, `top-[var(--top-bar)]`, `bottom-[var(--above-dock)]`.
+  - Anything fixed to the top edge of a phone screen (the top bar, a viewer's
+    close button, a page's own sticky bar) pads by `--safe-top`; anything at
+    the bottom by `--safe-bottom`; left and right by `--safe-left`/`-right`.
+  - Content is full width on phones: the page frame's `px-4` is the only
+    side margin; no app wraps pages in a narrower box at phone width.
+- **Top bar:** sticky, 56 px (64 px on desktop) plus `--safe-top` (it runs
+  up under the status bar, frosted, and its content starts below it),
   `bg-bg/90` frosted (`backdrop-blur-xl`), bottom border. Left: the header text (and text
   tabs on desktop). Right: 40 px round buttons — search (outlined), **+ add**
   (accent fill), account (avatar initial in an accent circle).
@@ -664,7 +687,8 @@ and body fonts.
   screen). Any one section can go edge to edge on its own with `FullBleed`
   or `HeroSection`, whatever the page width.
 - **Content:** the page width, `px-4` (`sm:px-6`), `pt-6`; bottom padding of
-  6.5 rem + the bottom safe area on phones so nothing hides under the dock.
+  `--dock-space` (6.5 rem + the bottom safe area on phones) so nothing hides
+  under the dock.
 - **Tab dock (phones):** floats 12 px above the bottom safe area, `max-w-md`,
   a 5-column grid in a 20 px-radius slab: `bg-surface/95`, `border-border`,
   `ring-1 ring-black/30`, `backdrop-blur-md`, deep
@@ -673,8 +697,8 @@ and body fonts.
   to 0.92. Tapping the active tab scrolls to the top. A gradient fade from
   `bg` sits behind it so content dissolves under the dock.
 - **Things pinned to the bottom** (save bar, select-mode action bar, upload
-  ring) sit above the dock: `bottom-[calc(5.75rem+env(safe-area-inset-bottom))]`,
-  `sm:bottom-6`.
+  ring) sit above the dock: `bottom-[var(--above-dock)]` (5.75 rem + the
+  bottom safe area on phones, 1.5 rem from `sm:`).
 - **Page anatomy:** `PageHeader` (eyebrow, title, count, actions) → filters →
   content. Detail pages start with a full-width `Hero`/`Banner` (blurred
   image, back button top-left, status top-right, actions below).
@@ -688,6 +712,7 @@ and body fonts.
 
 | z | What |
 | --- | --- |
+| 0 | The backdrop layer (`body::before`); `#root` stacks above it |
 | 30 | Pull-to-refresh spinner, dock fade, sticky sub-bars (offline banner) |
 | 40 | Top bar, tab dock, floating save/action bars |
 | 50 | Sheets (with a `bg-black/70` blurred backdrop) |
@@ -1036,3 +1061,8 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   lists; a Games category with Legend of Zelda looks. Backdrops in four
   groups (abstract, geo, vintage, texture — 21 patterns) with contrast and
   saturation sliders.
+- **Unreleased** — Full screen on phones: `viewport-fit=cover` required
+  (and added by `applyTheme` when missing), the backdrop a fixed
+  full-screen layer, page colour on `html`, `100dvh` minimum height, and
+  the safe-area variables (`--safe-top` … `--above-dock`) for everything
+  at a screen edge.

@@ -2,7 +2,8 @@
 /**
  * The registry at a glance: which app uses which component, what to promote,
  * what nobody uses, who's behind, raw colours in app code, and whether each
- * app's jimbo-ui config section is in one piece and gated right.
+ * app's jimbo-ui config section is in one piece and gated right, and whether
+ * its index.html sets up the full-screen phone frame.
  *
  *   node scripts/inventory.mjs [--apps-dir ~/Development]
  *
@@ -161,3 +162,20 @@ for (const a of apps) {
   results.push([a.name, a.auth, has ? "yes" : "MISSING", split.length ? split.join("; ") : "no", gating]);
 }
 table(results);
+
+// ── 7. The phone frame ─────────────────────────────────────────────────────
+head("Phone frame (index.html: edge to edge under the status bar; no raw insets in app code)");
+const frame = [["App", "viewport-fit=cover", "Status bar", "Raw env(safe-area-…) in app code"]];
+for (const a of apps) {
+  const { dir } = local[a.name];
+  if (!dir) { frame.push([a.name, "?", "?", "not checked out"]); continue; }
+  const htmlPath = join(dir, a.webRoot, "index.html");
+  const html = existsSync(htmlPath) ? readFileSync(htmlPath, "utf8") : "";
+  const viewport = html.match(/<meta[^>]+name=["']viewport["'][^>]*>/i)?.[0] ?? "";
+  const cover = /viewport-fit\s*=\s*cover/.test(viewport);
+  const bar = html.match(/apple-mobile-web-app-status-bar-style["'][^>]*content=["']([^"']+)/i)?.[1] ?? "none";
+  // Insets belong to globals.css (--safe-top and friends); app code uses the variables.
+  const raw = walk(join(dir, a.webRoot, "src")).filter((f) => !/styles\/globals\.css$/.test(f) && /env\(safe-area-inset/.test(readFileSync(f, "utf8")));
+  frame.push([a.name, !html ? "no index.html" : cover ? "yes" : "MISSING", bar === "black-translucent" ? bar : `${bar} (want black-translucent)`, raw.length ? raw.map((f) => relative(join(dir, a.webRoot), f)).join(", ") : "none"]);
+}
+table(frame);

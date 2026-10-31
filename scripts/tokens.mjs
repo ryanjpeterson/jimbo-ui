@@ -33,6 +33,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const dir = mkdtempSync(join(tmpdir(), "jimbo-tokens-"));
 try {
   copyFileSync(join(root, "foundation/src/lib/theme.ts"), join(dir, "theme.ts"));
+  copyFileSync(join(root, "foundation/src/lib/viewport.ts"), join(dir, "viewport.ts"));
   writeFileSync(join(dir, "brand.config.ts"), `export const BRAND = { name: "", storagePrefix: "x", defaultTheme: ${JSON.stringify(theme)} };\n`);
   writeFileSync(join(dir, "run.ts"), `
 import { tokensCss } from "./theme";

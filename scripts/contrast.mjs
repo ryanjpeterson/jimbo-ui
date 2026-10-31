@@ -22,7 +22,7 @@ import { execFileSync } from "node:child_process";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const dir = mkdtempSync(join(tmpdir(), "jimbo-contrast-"));
 try {
-  for (const f of ["theme.ts", "themes.ts"]) copyFileSync(join(root, "foundation/src/lib", f), join(dir, f));
+  for (const f of ["theme.ts", "themes.ts", "viewport.ts"]) copyFileSync(join(root, "foundation/src/lib", f), join(dir, f));
   writeFileSync(join(dir, "brand.config.ts"), `export const BRAND = { name: "Default", storagePrefix: "x", defaultTheme: { accent: "#A8FF3E", highlight: "#FF3D6E", background: "#141416", support: "#2EC5FF" } };\n`);
   writeFileSync(join(dir, "run.ts"), `
 import { PAGE_TONES, TEMPLATE_TARGETS as T, templateScores } from "./theme";
