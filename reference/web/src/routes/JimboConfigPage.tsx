@@ -111,12 +111,12 @@ function AboutPanel() {
       <div className="card divide-y divide-border">
         {rows.map(([k, v]) => (
           <p key={k} className="flex min-h-[56px] items-center justify-between gap-4 px-4 py-3">
-            <span className="text-[15px] font-semibold">{k}</span><span className="text-right text-sm text-text-muted">{v}</span>
+            <span className="text-15 font-semibold">{k}</span><span className="text-right text-sm text-text-muted">{v}</span>
           </p>
         ))}
       </div>
       <a href={JIMBO_UI.showcase} target="_blank" rel="noreferrer" className="card flex items-center justify-between gap-3 p-4 hover:border-accent">
-        <span><span className="eyebrow block">Showcase</span><span className="mt-0.5 block text-[15px] font-semibold">See this release in action</span></span>
+        <span><span className="eyebrow block">Showcase</span><span className="mt-0.5 block text-15 font-semibold">See this release in action</span></span>
         <span className="text-text-subtle">›</span>
       </a>
     </div>

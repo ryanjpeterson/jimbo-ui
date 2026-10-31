@@ -57,7 +57,7 @@ export function DashboardPage() {
   return (
     <div className="space-y-6">
       <PageHeader eyebrow="Dashboard" title="All jobs" />
-      <p className={cn("-mt-3 text-[15px] font-semibold", trouble ? "text-highlight" : "text-accent")}>
+      <p className={cn("-mt-3 text-15 font-semibold", trouble ? "text-highlight" : "text-accent")}>
         {trouble ? `${trouble === 1 ? "One job needs" : `${trouble} jobs need`} a look.` : "Everything's fine."}
       </p>
 
@@ -75,7 +75,7 @@ export function DashboardPage() {
               <span title={STATUS[j.status].label} aria-label={STATUS[j.status].label}
                 className={cn(STATUS_DOT, "mt-1.5", TONES[STATUS[j.status].tone].dot, j.status === "running" && LIVE)} />
               <span className="min-w-0 flex-1">
-                <span className="block truncate text-[15px] font-semibold">{j.name}</span>
+                <span className="block truncate text-15 font-semibold">{j.name}</span>
                 <span className="block text-sm text-text-muted">{j.from}</span>
                 <span className={cn("mt-0.5 block text-sm", j.error ? "text-highlight" : "text-text-subtle")}>{j.error ? `Can't run: ${j.error}` : j.last}</span>
               </span>
@@ -116,7 +116,7 @@ export function DashboardPage() {
       {log && (
         <Sheet wide title={log.title} subtitle={log.sub} onClose={() => setParams({}, { replace: true })}>
           <div className="p-4 sm:p-5">
-            <pre className="whitespace-pre-wrap break-words rounded-xl border border-border bg-bg-deep/80 p-3 font-mono text-[12px] leading-relaxed text-text-muted">
+            <pre className="whitespace-pre-wrap break-words rounded-xl border border-border bg-bg-deep/80 p-3 font-mono text-12 leading-relaxed text-text-muted">
               {"10:42:01  Starting\n10:42:03  Comparing both sides\n10:42:05  Syncing 1,204 files\n…"}
             </pre>
           </div>

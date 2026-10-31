@@ -16,7 +16,8 @@
  *
  * A theme can also pick fonts for headings and body text (`FONTS`: sans, serif,
  * mono and — for headings — decorative faces), with weight and letter spacing,
- * set as `--font-display` / `--font-body` and their `-weight` / `-tracking`;
+ * set as `--font-display` / `--font-body` and their `-weight` / `-tracking` /
+ * `-size` (an em multiple every text size follows: headings and body each ±);
  * and tune colour vibrancy and layer contrast with two sliders.
  *
  * Tokens are CSS variables holding "R G B" channels, so Tailwind classes keep
@@ -45,7 +46,9 @@ export interface Theme {
    * Optional type: a font for headings and one for body text (keys of `FONTS`;
    * defaults Archivo and Inter), each with a weight and letter spacing (em).
    */
-  fonts?: { headings?: FontKey; body?: FontKey; headingsWeight?: number; bodyWeight?: number; headingsTracking?: number; bodyTracking?: number };
+  fonts?: { headings?: FontKey; body?: FontKey; headingsWeight?: number; bodyWeight?: number; headingsTracking?: number; bodyTracking?: number;
+    /** Every heading's / body text's size as a multiple of its usual size (1 = as designed; 0.8–1.3). */
+    headingsSize?: number; bodySize?: number };
   /** Colour vibrancy: 1 as picked, lower is calmer (0.4), higher is louder (1.5). */
   vibrancy?: number;
   /** Layer contrast: 1 is standard; up to 1.6 for cards, borders and labels that stand out more, down to 0.8 for softer. */
@@ -68,7 +71,8 @@ export type SavedTheme = { [K in "accent" | "background" | "highlight" | "suppor
  * The fonts a theme can use. `css` is the font stack; `google` the Google Fonts
  * family query that loads it (Archivo, Inter and JetBrains Mono are in
  * index.html); `weights` the range it has; `body: false` marks display faces
- * that are for headings only (blackletter, pixel, script — unreadable as text).
+ * that are for headings only (blackletter, uncial, old print — unreadable as text).
+ * Nine per group; decorative faces stay dark and old-world rather than novelty.
  */
 export type FontDef = { label: string; group: "Sans" | "Serif" | "Mono" | "Decorative"; css: string; google: string | null; weights: [number, number]; body?: false };
 export const FONTS: Record<string, FontDef> = {
@@ -77,28 +81,38 @@ export const FONTS: Record<string, FontDef> = {
   "space-grotesk":{ label: "Space Grotesk", group: "Sans", css: "'Space Grotesk', ui-sans-serif, system-ui, sans-serif", google: "family=Space+Grotesk:wght@300..700", weights: [300, 700] },
   "dm-sans":      { label: "DM Sans", group: "Sans", css: "'DM Sans', ui-sans-serif, system-ui, sans-serif", google: "family=DM+Sans:opsz,wght@9..40,300..900", weights: [300, 900] },
   manrope:        { label: "Manrope", group: "Sans", css: "'Manrope', ui-sans-serif, system-ui, sans-serif", google: "family=Manrope:wght@300..800", weights: [300, 800] },
-  oswald:         { label: "Oswald", group: "Sans", css: "'Oswald', ui-sans-serif, system-ui, sans-serif", google: "family=Oswald:wght@300..700", weights: [300, 700] },
+  "ibm-plex-sans":{ label: "IBM Plex Sans", group: "Sans", css: "'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif", google: "family=IBM+Plex+Sans:wght@300;400;500;600;700", weights: [300, 700] },
+  "work-sans":    { label: "Work Sans", group: "Sans", css: "'Work Sans', ui-sans-serif, system-ui, sans-serif", google: "family=Work+Sans:wght@300..900", weights: [300, 900] },
+  // Avenir Next / Avenir where the device has them (Apple), Nunito Sans (the nearest Google font) elsewhere.
+  avenir:         { label: "Avenir", group: "Sans", css: "'Avenir Next', 'Avenir', 'Nunito Sans', ui-sans-serif, system-ui, sans-serif", google: "family=Nunito+Sans:wght@300..900", weights: [300, 900] },
+  figtree:        { label: "Figtree", group: "Sans", css: "'Figtree', ui-sans-serif, system-ui, sans-serif", google: "family=Figtree:wght@300..900", weights: [300, 900] },
   fraunces:       { label: "Fraunces", group: "Serif", css: "'Fraunces', ui-serif, Georgia, serif", google: "family=Fraunces:opsz,wght@9..144,300..900", weights: [300, 900] },
   "source-serif": { label: "Source Serif", group: "Serif", css: "'Source Serif 4', ui-serif, Georgia, serif", google: "family=Source+Serif+4:opsz,wght@8..60,300..900", weights: [300, 900] },
   playfair:       { label: "Playfair", group: "Serif", css: "'Playfair Display', ui-serif, Georgia, serif", google: "family=Playfair+Display:wght@400..900", weights: [400, 900] },
   "eb-garamond":  { label: "EB Garamond", group: "Serif", css: "'EB Garamond', ui-serif, Georgia, serif", google: "family=EB+Garamond:wght@400..800", weights: [400, 800] },
   marcellus:      { label: "Marcellus", group: "Serif", css: "'Marcellus', ui-serif, Georgia, serif", google: "family=Marcellus", weights: [400, 400] },
+  "libre-baskerville": { label: "Baskerville", group: "Serif", css: "'Libre Baskerville', ui-serif, Georgia, serif", google: "family=Libre+Baskerville:wght@400;700", weights: [400, 700] },
+  cormorant:      { label: "Cormorant", group: "Serif", css: "'Cormorant Garamond', ui-serif, Georgia, serif", google: "family=Cormorant+Garamond:wght@300;400;500;600;700", weights: [300, 700] },
+  lora:           { label: "Lora", group: "Serif", css: "'Lora', ui-serif, Georgia, serif", google: "family=Lora:wght@400..700", weights: [400, 700] },
   "dm-serif":     { label: "DM Serif", group: "Serif", css: "'DM Serif Display', ui-serif, Georgia, serif", google: "family=DM+Serif+Display", weights: [400, 400], body: false },
   "jetbrains-mono": { label: "JetBrains Mono", group: "Mono", css: "'JetBrains Mono', ui-monospace, SFMono-Regular, monospace", google: "family=JetBrains+Mono:wght@300..800", weights: [300, 800] },
   "ibm-plex-mono":{ label: "IBM Plex Mono", group: "Mono", css: "'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace", google: "family=IBM+Plex+Mono:wght@300;400;500;600;700", weights: [300, 700] },
   "space-mono":   { label: "Space Mono", group: "Mono", css: "'Space Mono', ui-monospace, SFMono-Regular, monospace", google: "family=Space+Mono:wght@400;700", weights: [400, 700] },
   "fira-code":    { label: "Fira Code", group: "Mono", css: "'Fira Code', ui-monospace, SFMono-Regular, monospace", google: "family=Fira+Code:wght@300..700", weights: [300, 700] },
+  "roboto-mono":  { label: "Roboto Mono", group: "Mono", css: "'Roboto Mono', ui-monospace, SFMono-Regular, monospace", google: "family=Roboto+Mono:wght@300..700", weights: [300, 700] },
+  "source-code":  { label: "Source Code", group: "Mono", css: "'Source Code Pro', ui-monospace, SFMono-Regular, monospace", google: "family=Source+Code+Pro:wght@300..900", weights: [300, 900] },
+  "dm-mono":      { label: "DM Mono", group: "Mono", css: "'DM Mono', ui-monospace, SFMono-Regular, monospace", google: "family=DM+Mono:wght@300;400;500", weights: [300, 500] },
+  "red-hat-mono": { label: "Red Hat Mono", group: "Mono", css: "'Red Hat Mono', ui-monospace, SFMono-Regular, monospace", google: "family=Red+Hat+Mono:wght@300..700", weights: [300, 700] },
+  inconsolata:    { label: "Inconsolata", group: "Mono", css: "'Inconsolata', ui-monospace, SFMono-Regular, monospace", google: "family=Inconsolata:wght@300..900", weights: [300, 900] },
   "old-english":  { label: "Old English", group: "Decorative", css: "'UnifrakturCook', serif", google: "family=UnifrakturCook:wght@700", weights: [700, 700], body: false },
   "old-german":   { label: "Old German", group: "Decorative", css: "'UnifrakturMaguntia', serif", google: "family=UnifrakturMaguntia", weights: [400, 400], body: false },
   gothic:         { label: "Gothic", group: "Decorative", css: "'Grenze Gotisch', serif", google: "family=Grenze+Gotisch:wght@300..900", weights: [300, 900], body: false },
   pirate:         { label: "Pirate", group: "Decorative", css: "'Pirata One', serif", google: "family=Pirata+One", weights: [400, 400], body: false },
   rocker:         { label: "Rocker", group: "Decorative", css: "'New Rocker', serif", google: "family=New+Rocker", weights: [400, 400], body: false },
   typewriter:     { label: "Typewriter", group: "Decorative", css: "'Special Elite', ui-monospace, monospace", google: "family=Special+Elite", weights: [400, 400], body: false },
-  pixel:          { label: "Pixel", group: "Decorative", css: "'Press Start 2P', ui-monospace, monospace", google: "family=Press+Start+2P", weights: [400, 400], body: false },
-  bungee:         { label: "Bungee", group: "Decorative", css: "'Bungee', ui-sans-serif, sans-serif", google: "family=Bungee", weights: [400, 400], body: false },
-  neon:           { label: "Neon", group: "Decorative", css: "'Monoton', ui-sans-serif, sans-serif", google: "family=Monoton", weights: [400, 400], body: false },
+  "old-print":    { label: "Old print", group: "Decorative", css: "'IM Fell English', ui-serif, Georgia, serif", google: "family=IM+Fell+English", weights: [400, 400], body: false },
+  uncial:         { label: "Uncial", group: "Decorative", css: "'Uncial Antiqua', ui-serif, Georgia, serif", google: "family=Uncial+Antiqua", weights: [400, 400], body: false },
   carved:         { label: "Carved caps", group: "Decorative", css: "'Cinzel', ui-serif, Georgia, serif", google: "family=Cinzel:wght@400..900", weights: [400, 900], body: false },
-  script:         { label: "Script", group: "Decorative", css: "'Lobster', cursive", google: "family=Lobster", weights: [400, 400], body: false },
 };
 export const FONT_GROUPS = ["Sans", "Serif", "Mono", "Decorative"] as const;
 
@@ -343,6 +357,7 @@ export function fullTheme(theme: Theme): FullTheme {
       headings: fontFor(theme.fonts?.headings, "headings"), body: fontFor(theme.fonts?.body, "body"),
       headingsWeight: theme.fonts?.headingsWeight ?? 800, bodyWeight: theme.fonts?.bodyWeight ?? 400,
       headingsTracking: theme.fonts?.headingsTracking ?? -0.015, bodyTracking: theme.fonts?.bodyTracking ?? 0,
+      headingsSize: theme.fonts?.headingsSize ?? 1, bodySize: theme.fonts?.bodySize ?? 1,
     },
     vibrancy: theme.vibrancy ?? 1,
     contrast: theme.contrast ?? 1,
@@ -376,6 +391,8 @@ export function ownColours(theme: Theme): Theme {
     bodyWeight: f.bodyWeight !== undefined && f.bodyWeight !== 400 ? f.bodyWeight : undefined,
     headingsTracking: f.headingsTracking !== undefined && f.headingsTracking !== -0.015 ? f.headingsTracking : undefined,
     bodyTracking: f.bodyTracking !== undefined && f.bodyTracking !== 0 ? f.bodyTracking : undefined,
+    headingsSize: f.headingsSize !== undefined && f.headingsSize !== 1 ? f.headingsSize : undefined,
+    bodySize: f.bodySize !== undefined && f.bodySize !== 1 ? f.bodySize : undefined,
   }).filter(([, v]) => v !== undefined));
   return {
     accent: theme.accent, background: theme.background,
@@ -720,6 +737,8 @@ export function tokensCss(theme: Theme): string {
   if (f.bodyWeight !== 400) lines.push(`  --font-body-weight: ${f.bodyWeight};`);
   if (f.headingsTracking !== -0.015) lines.push(`  --font-display-tracking: ${f.headingsTracking}em;`);
   if (f.bodyTracking !== 0) lines.push(`  --font-body-tracking: ${f.bodyTracking}em;`);
+  if (f.headingsSize !== 1) lines.push(`  --font-display-size: ${f.headingsSize};`);
+  if (f.bodySize !== 1) lines.push(`  --font-body-size: ${f.bodySize};`);
   return [
     `/* This app's default theme tokens ("R G B" channels), so the page looks right`,
     `   before any script runs. Owned by the app; generate from BRAND.defaultTheme`,
@@ -771,6 +790,7 @@ export function importTheme(text: string): { theme: Theme; name?: string } {
       body: typeof f.body === "string" ? fontFor(f.body, "body") : undefined,
       headingsWeight: num(f.headingsWeight, 100, 900), bodyWeight: num(f.bodyWeight, 100, 900),
       headingsTracking: num(f.headingsTracking, -0.1, 0.3), bodyTracking: num(f.bodyTracking, -0.1, 0.3),
+      headingsSize: num(f.headingsSize, 0.8, 1.3), bodySize: num(f.bodySize, 0.8, 1.3),
     },
     infer: raw.infer === "tonal" ? "tonal" : undefined,
     vibrancy: num(raw.vibrancy, 0.4, 1.5), contrast: num(raw.contrast, 0.8, 1.6),
@@ -799,6 +819,8 @@ export function themeVars(theme: Theme): Record<string, string> {
   vars["--font-body-weight"] = String(f.bodyWeight);
   vars["--font-display-tracking"] = `${f.headingsTracking}em`;
   vars["--font-body-tracking"] = `${f.bodyTracking}em`;
+  vars["--font-display-size"] = String(f.headingsSize);
+  vars["--font-body-size"] = String(f.bodySize);
   const bd = backdropCss(theme);
   vars["--bg-image"] = bd.image;
   vars["--bg-size"] = bd.size;

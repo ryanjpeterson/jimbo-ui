@@ -633,12 +633,22 @@ Archivo 800 at −0.015em and Inter 400 at 0). They're set as `--font-display`,
 
 | Group | Fonts |
 | --- | --- |
-| Sans | **Archivo** (default headings), **Inter** (default body), Space Grotesk, DM Sans, Manrope, Oswald |
-| Serif | Fraunces, Source Serif, Playfair, EB Garamond, **Marcellus** (the closest free match to Friz Quadrata), DM Serif (headings only) |
-| Mono | JetBrains Mono, IBM Plex Mono, Space Mono, Fira Code |
-| Decorative (headings only) | Old English, Old German, Gothic (blackletter), Pirate, Rocker, Typewriter, Pixel, Bungee, Neon, Carved caps, Script |
+| Sans | **Archivo** (default headings), **Inter** (default body), Space Grotesk, DM Sans, Manrope, IBM Plex Sans, Work Sans, **Avenir** (Avenir Next or Avenir on Apple devices, Nunito Sans elsewhere), Figtree |
+| Serif | Fraunces, Source Serif, Playfair, EB Garamond, **Marcellus** (the closest free match to Friz Quadrata), Baskerville, Cormorant, Lora, DM Serif (headings only) |
+| Mono | JetBrains Mono, IBM Plex Mono, Space Mono, Fira Code, Roboto Mono, Source Code, DM Mono, Red Hat Mono, Inconsolata |
+| Decorative (headings only) | Old English, Old German, Gothic (blackletter), Pirate, Rocker, Typewriter, Old print, Uncial, Carved caps |
 
-Decorative faces are for headings only — they're unreadable as body text.
+Nine per group. Decorative faces are for headings only — they're unreadable
+as body text — and stay dark and old-world rather than novelty (no pixel,
+neon, script or rounded display faces).
+
+**Size.** Headings and body text each have a size (`headingsSize`,
+`bodySize`: 0.8–1.3, shown on the Type tab as ± em; +0.10 em is 10% bigger
+throughout). Every Tailwind text size is its usual size × `--fs` — the
+body size, or the headings size inside `font-display` — so the whole scale
+moves together and line heights (ratios) follow. Use the named sizes
+(`text-sm`, `text-xl`, and `text-15`, `text-11`, … for the pixel sizes the
+kit uses), never `text-[15px]`: an arbitrary size doesn't follow.
 Archivo, Inter and JetBrains Mono load from `index.html`; `applyTheme` loads
 any other from Google Fonts when picked (`loadFonts`). An app whose default
 uses another font adds it to `index.html` and passes `--headings=` /
@@ -1138,3 +1148,7 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   changelog at each release. The config section's Theme tab is now four
   tabs — Looks, Colours, Type and Backdrop — sharing one unsaved look and
   save bar, on a tab row that scrolls sideways on phones (`PillTabs scroll`).
+  Nine fonts per group: Oswald, Pixel, Bungee, Neon and Script out; IBM
+  Plex Sans, Work Sans, Avenir (Nunito Sans off Apple), Figtree,
+  Baskerville, Cormorant, Lora, five monos, Old print and Uncial in.
+  Headings and body each get a size (± em) that every text size follows.

@@ -17,6 +17,34 @@ the matching 0.x release.
 
 ## Unreleased
 
+### Added
+- **Text size for headings and body** (`fonts.headingsSize`,
+  `fonts.bodySize`, 0.8–1.3; the Type tab's *Size* slider, shown as ± em).
+  Every Tailwind text size is now its usual size × `--fs` (the body size,
+  or the headings size inside `.font-display`), with ratio line heights, so
+  the whole scale moves together. Named pixel sizes `text-7` … `text-40`
+  replace the kit's `text-[Npx]`.
+- **Fonts, nine per group:** IBM Plex Sans, Work Sans, Avenir (Avenir Next
+  or Avenir on Apple devices, Nunito Sans elsewhere), Figtree; Baskerville,
+  Cormorant, Lora; Roboto Mono, Source Code, DM Mono, Red Hat Mono,
+  Inconsolata; Old print, Uncial.
+
+### Removed
+- Fonts Oswald, Pixel, Bungee, Neon and Script. A saved theme that used
+  one falls back to Archivo for headings and Inter for body.
+
+### Changed
+- Showcase: the home hero draws no pattern of its own over the page's
+  backdrop, and the look carousel keeps one height on every slide.
+
+### Apps must
+- Copy the foundation files (theme, `globals.css`, Tailwind config) and
+  port the kit and config panels (they use `text-15` and friends).
+- Replace `text-[Npx]` in the app's own code with the named size
+  (`text-15`), or add the size to the Tailwind config, so it follows the
+  theme's size.
+- If the app's default theme used a removed font, pick another.
+
 ## 0.9.0 — 2026-10-31
 
 Apps say when a newer jimbo-ui is out and what updating would change; the Theme tab is now Looks, Colours, Type and Backdrop.

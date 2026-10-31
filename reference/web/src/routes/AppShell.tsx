@@ -53,7 +53,7 @@ export function AppShell({ tabs, actions, onRefresh, width = "column", children 
               {tabs.filter((t) => t.to !== "/").map((t) => (
                 <NavLink key={t.to} to={t.to}
                   className={cn(
-                    "relative flex items-center text-[15px] font-semibold transition-colors after:absolute after:inset-x-0 after:bottom-0 after:h-[3px] after:rounded-t after:transition-colors",
+                    "relative flex items-center text-15 font-semibold transition-colors after:absolute after:inset-x-0 after:bottom-0 after:h-[3px] after:rounded-t after:transition-colors",
                     inTab(t) ? "text-text-base after:bg-accent" : "text-text-muted hover:text-text-base after:bg-transparent",
                   )}>
                   {t.label}
@@ -99,7 +99,7 @@ export function AppShell({ tabs, actions, onRefresh, width = "column", children 
                   active ? "bg-accent/15 text-accent shadow-[inset_0_0_0_1px_rgb(var(--c-accent)/0.3)]" : "text-text-muted active:bg-white/5",
                 )}>
                 <DockIcon active={active}>{t.icon}</DockIcon>
-                <span className={cn("text-[10.5px] tracking-wide", active ? "font-bold" : "font-semibold")}>{t.label}</span>
+                <span className={cn("text-10.5 tracking-wide", active ? "font-bold" : "font-semibold")}>{t.label}</span>
               </NavLink>
             );
           })}

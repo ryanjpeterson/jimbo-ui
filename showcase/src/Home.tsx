@@ -87,10 +87,10 @@ const SLIDES: Slide[] = [
   { template: "Pilot", tone: "dark", headings: "archivo", body: "inter", backdrop: "ripples", base: "glow", show: "Headline numbers", Render: Stats },
   { template: "Breath of the Wild", tone: "dark", headings: "marcellus", body: "manrope", backdrop: "hexagons", base: "gradient", show: "Dated lists", Render: Rows },
   { template: "Halloween", tone: "dark", headings: "old-english", body: "space-grotesk", backdrop: "burst", base: "glow", show: "Tabs, badges, buttons", Render: Controls },
-  { template: "Gig poster", tone: "light", headings: "bungee", body: "dm-sans", backdrop: "halftone", base: "solid", show: "The name as the brand", Render: Brand },
+  { template: "Gig poster", tone: "light", headings: "work-sans", body: "dm-sans", backdrop: "halftone", base: "solid", show: "The name as the brand", Render: Brand },
   { template: "The Wind Waker", tone: "mid", headings: "playfair", body: "manrope", backdrop: "stripes", base: "gradient", show: "Forms and fields", Render: Form },
   { template: "Sage", tone: "mid", headings: "space-mono", body: "ibm-plex-mono", backdrop: "contours", base: "solid", show: "Maps in the theme", Render: MapSlide },
-  { template: "Majora's Mask", tone: "light", headings: "oswald", body: "inter", backdrop: "deco", base: "gradient", show: "Dated lists, light", Render: Rows },
+  { template: "Majora's Mask", tone: "light", headings: "libre-baskerville", body: "lora", backdrop: "deco", base: "gradient", show: "Dated lists, light", Render: Rows },
   { template: "Dusk", tone: "dark", headings: "fraunces", body: "eb-garamond", backdrop: "grain", base: "glow", show: "Headline numbers, serif", Render: Stats },
   { template: "Canada", tone: "light", headings: "dm-serif", body: "source-serif", backdrop: "paper", base: "solid", show: "Tabs, badges, buttons", Render: Controls },
 ];
