@@ -1048,22 +1048,65 @@ export function applyTheme(theme: Theme): void {
 }
 
 let faviconTemplate: string | null = null;
+let touchIconKey = "";
 
-/** Point the tab icon at an uploaded favicon, or recolour the built-in one to match the theme. */
+/** The built-in favicon recoloured to a theme: #0B0B0C → background, #A8FF3E → accent, #FF3D6E → highlight, #2EC5FF → support. */
+export function themedFavicon(template: string, input: Theme): string {
+  const theme = fullTheme(input);
+  return template
+    .replace(/#0B0B0C/gi, theme.background)
+    .replace(/#A8FF3E/gi, theme.accent)
+    .replace(/#FF3D6E/gi, theme.highlight)
+    .replace(/#2EC5FF/gi, theme.support);
+}
+
+/**
+ * An image (an SVG data URL, or an uploaded icon's URL) drawn square on the
+ * theme's background as a PNG data URL — an iOS home-screen icon: opaque,
+ * full-bleed (iOS rounds the corners itself), `size` px.
+ */
+export function iconPng(src: string, background: string, size = 180): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      const canvas = Object.assign(document.createElement("canvas"), { width: size, height: size });
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return reject(new Error("no canvas"));
+      ctx.fillStyle = background;
+      ctx.fillRect(0, 0, size, size);
+      ctx.drawImage(img, 0, 0, size, size);
+      try { resolve(canvas.toDataURL("image/png")); } catch (e) { reject(e); }
+    };
+    img.onerror = reject;
+    img.src = src;
+  });
+}
+
+/**
+ * Point the tab icon at an uploaded favicon, or recolour the built-in one to
+ * match the theme — and make the iOS home-screen icon (`apple-touch-icon`)
+ * from the same picture, so adding the app to a Home Screen gets the current
+ * look. iOS keeps an icon from when the app was added: after a theme change,
+ * it shows on phones that add the app from then on (or remove and re-add it).
+ */
 export async function applyFavicon(theme: Theme, customUrl: string | null): Promise<void> {
   const link = document.querySelector<HTMLLinkElement>('link[rel="icon"]');
-  if (!link) return;
-  if (customUrl) { link.href = customUrl; return; }
-  try {
-    const template: string = faviconTemplate ?? (await fetch("/favicon.svg").then((r) => r.text()));
-    faviconTemplate = template;
-    const svg = template
-      .replace(/#0B0B0C/gi, theme.background)
-      .replace(/#A8FF3E/gi, theme.accent)
-      .replace(/#FF3D6E/gi, fullTheme(theme).highlight)
-      .replace(/#2EC5FF/gi, fullTheme(theme).support);
-    link.href = `data:image/svg+xml,${encodeURIComponent(svg)}`;
-  } catch { /* keep the static icon */ }
+  let src = customUrl;
+  if (!src) {
+    try {
+      const template: string = faviconTemplate ?? (await fetch("/favicon.svg").then((r) => r.text()));
+      faviconTemplate = template;
+      src = `data:image/svg+xml,${encodeURIComponent(themedFavicon(template, theme))}`;
+    } catch { return; /* keep the static icons */ }
+  }
+  if (link) link.href = src;
+
+  const touch = document.querySelector<HTMLLinkElement>('link[rel="apple-touch-icon"]');
+  const key = `${src}|${theme.background}`;
+  if (!touch || key === touchIconKey) return;
+  touchIconKey = key;
+  try { touch.href = await iconPng(src, theme.background); } catch { /* keep the static PNG */ }
 }
 
 /** A round map pin in the highlight colour, as an SVG data URL (bigger when selected). */

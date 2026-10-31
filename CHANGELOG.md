@@ -33,6 +33,11 @@ the matching 0.x release.
   checks; Vintage adds pinstripe, gingham, polka, plaid, argyle, racing
   stripes, trellis, bauhaus; Texture adds concrete, brushed, sand, speckle,
   crosshatch, twill, carbon, ribbed.
+- **The iOS home-screen icon follows the theme.** `applyFavicon` draws the
+  recoloured favicon (or an uploaded one) as a 180 px PNG on the theme's
+  background and points `apple-touch-icon` at it (`themedFavicon`,
+  `iconPng` in `theme.ts`). iOS keeps the icon from when the app was
+  added, so a phone that already has it needs to remove it and add it again.
 
 ### Removed
 - Fonts Oswald, Pixel, Bungee, Neon and Script. A saved theme that used
@@ -49,6 +54,8 @@ the matching 0.x release.
   (`text-15`), or add the size to the Tailwind config, so it follows the
   theme's size.
 - If the app's default theme used a removed font, pick another.
+- Keep `<link rel="apple-touch-icon" …>` in `index.html` (the reference has
+  it); `applyFavicon` replaces its picture at runtime.
 
 ## 0.9.0 — 2026-10-31
 

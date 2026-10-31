@@ -438,7 +438,15 @@ family of tokens:
   map from bg → accent; pins are round,
   highlight-filled with a lighter ring (`markerIcon`).
 - **Favicon:** `applyFavicon` swaps the template's `#0B0B0C` → background,
-  `#A8FF3E` → accent, `#FF3D6E` → highlight and `#2EC5FF` → support.
+  `#A8FF3E` → accent, `#FF3D6E` → highlight and `#2EC5FF` → support
+  (`themedFavicon`).
+- **iOS home-screen icon:** `applyFavicon` also draws that icon (or an
+  uploaded one) as a 180 px PNG, full-bleed on the theme's background
+  (`iconPng`), and points `<link rel="apple-touch-icon">` at it, so adding
+  the app to a Home Screen gets the current look. Keep the static
+  `/icons/apple-touch-icon-180.png` in `index.html` as the fallback. iOS
+  keeps the icon from when the app was added: after a theme change, phones
+  that already have it remove it and add it again.
 - **Share images:** background, accent, highlight, text and the accent-900
   wash from the cached theme.
 
@@ -1152,4 +1160,5 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   Plex Sans, Work Sans, Avenir (Nunito Sans off Apple), Figtree,
   Baskerville, Cormorant, Lora, five monos, Old print and Uncial in.
   Headings and body each get a size (± em) that every text size follows.
-  Twelve backdrops per group (48 patterns).
+  Twelve backdrops per group (48 patterns). The iOS home-screen icon
+  follows the theme (`applyFavicon` sets `apple-touch-icon` to a themed PNG).
