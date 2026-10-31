@@ -17,6 +17,10 @@ the matching 0.x release.
 
 ## Unreleased
 
+## 0.10.0 — 2026-10-31
+
+Nine fonts per group with a size for headings and body, twelve backdrops per group, a themed iOS icon, a Brands category and a Status monitor archetype.
+
 ### Added
 - **Text size for headings and body** (`fonts.headingsSize`,
   `fonts.bodySize`, 0.8–1.3; the Type tab's *Size* slider, shown as ± em).

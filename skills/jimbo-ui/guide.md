@@ -1159,7 +1159,7 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   changelog at each release. The config section's Theme tab is now four
   tabs — Looks, Colours, Type and Backdrop — sharing one unsaved look and
   save bar, on a tab row that scrolls sideways on phones (`PillTabs scroll`).
-  Nine fonts per group: Oswald, Pixel, Bungee, Neon and Script out; IBM
+- **0.10.0** — Nine fonts per group: Oswald, Pixel, Bungee, Neon and Script out; IBM
   Plex Sans, Work Sans, Avenir (Nunito Sans off Apple), Figtree,
   Baskerville, Cormorant, Lora, five monos, Old print and Uncial in.
   Headings and body each get a size (± em) that every text size follows.

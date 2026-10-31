@@ -1,7 +1,61 @@
 {
   "$comment": "Generated from CHANGELOG.md by scripts/releases.mjs — don't edit. Apps' jimbo-ui config section reads it to show what a newer release changes.",
-  "latest": "0.9.0",
+  "latest": "0.10.0",
   "releases": [
+    {
+      "version": "0.10.0",
+      "date": "2026-10-31",
+      "summary": "Nine fonts per group with a size for headings and body, twelve backdrops per group, a themed iOS icon, a Brands category and a Status monitor archetype.",
+      "items": [
+        {
+          "kind": "added",
+          "text": "**Text size for headings and body** (`fonts.headingsSize`, `fonts.bodySize`, 0.8–1.3; the Type tab's *Size* slider, shown as ± em). Every Tailwind text size is now its usual size × `--fs` (the body size, or the headings size inside `.font-display`), with ratio line heights, so the whole scale moves together. Named pixel sizes `text-7` … `text-40` replace the kit's `text-[Npx]`.",
+          "affects": []
+        },
+        {
+          "kind": "added",
+          "text": "**Fonts, nine per group:** IBM Plex Sans, Work Sans, Avenir (Avenir Next or Avenir on Apple devices, Nunito Sans elsewhere), Figtree; Baskerville, Cormorant, Lora; Roboto Mono, Source Code, DM Mono, Red Hat Mono, Inconsolata; Old print, Uncial.",
+          "affects": []
+        },
+        {
+          "kind": "added",
+          "text": "**Backdrops, twelve per group** (48): Abstract adds swirl, ribbons, scribble, rain; Geo adds squares, zigzag, rings, crosses, scales, cubes, checks; Vintage adds pinstripe, gingham, polka, plaid, argyle, racing stripes, trellis, bauhaus; Texture adds concrete, brushed, sand, speckle, crosshatch, twill, carbon, ribbed.",
+          "affects": []
+        },
+        {
+          "kind": "added",
+          "text": "**Status monitor archetype** (`reference/web/src/archetypes/status.tsx`, on the showcase's Archetypes tab): the services you run, whether each is up, how fast it answers and how it's reached, recent checks as a row of dots, an Open button, and history charts over a range. From auditing the registered apps: the catalogue and the single-page dashboard already cover the other two.",
+          "affects": []
+        },
+        {
+          "kind": "added",
+          "text": "**Brands** category on the Looks tab: companies' own palettes, colours only. First, **Marcone** — Pantone 1795 red with its parent mSupply's navy — written light and dark, mid made from its own colours.",
+          "affects": []
+        },
+        {
+          "kind": "added",
+          "text": "**The iOS home-screen icon follows the theme.** `applyFavicon` draws the recoloured favicon (or an uploaded one) as a 180 px PNG on the theme's background and points `apple-touch-icon` at it (`themedFavicon`, `iconPng` in `theme.ts`). iOS keeps the icon from when the app was added, so a phone that already has it needs to remove it and add it again.",
+          "affects": [],
+          "foundation": true
+        },
+        {
+          "kind": "removed",
+          "text": "Fonts Oswald, Pixel, Bungee, Neon and Script. A saved theme that used one falls back to Archivo for headings and Inter for body.",
+          "affects": []
+        },
+        {
+          "kind": "changed",
+          "text": "Showcase: the home hero draws no pattern of its own over the page's backdrop, and the look carousel keeps one height on every slide.",
+          "affects": []
+        }
+      ],
+      "appsMust": [
+        "Copy the foundation files (theme, `globals.css`, Tailwind config) and port the kit and config panels (they use `text-15` and friends).",
+        "Replace `text-[Npx]` in the app's own code with the named size (`text-15`), or add the size to the Tailwind config, so it follows the theme's size.",
+        "If the app's default theme used a removed font, pick another.",
+        "Keep `<link rel=\"apple-touch-icon\" …>` in `index.html` (the reference has it); `applyFavicon` replaces its picture at runtime."
+      ]
+    },
     {
       "version": "0.9.0",
       "date": "2026-10-31",
