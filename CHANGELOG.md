@@ -17,6 +17,10 @@ the matching 0.x release.
 
 ## Unreleased
 
+## 0.9.0 — 2026-10-31
+
+Apps say when a newer jimbo-ui is out and what updating would change; the Theme tab is now Looks, Colours, Type and Backdrop.
+
 ### Added
 - **Apps say when a newer jimbo-ui is out.** The About tab of the jimbo-ui
   config section (`JimboUpdates`, `useJimboUpdates` in

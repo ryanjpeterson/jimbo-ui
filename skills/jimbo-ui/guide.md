@@ -1132,7 +1132,7 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   `useListLayout`; `Section plain`, `Tabs size="sm"`), and the dashboard
   archetypes use both. `divide-etched` only reaches into list groups now,
   not into a `<div>` row's own children.
-- **Unreleased** — The jimbo-ui config section says when a newer release is
+- **0.9.0** — The jimbo-ui config section says when a newer release is
   out and what updating would change for the app (About tab and the config
   link), from `releases.json`, which `scripts/releases.mjs` writes from the
   changelog at each release. The config section's Theme tab is now four
