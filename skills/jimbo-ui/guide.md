@@ -413,7 +413,8 @@ family of tokens:
   soft colour glows — accent (20%) top left, highlight (16%) right, support
   (16%) bottom left (`radial-gradient(circle at …)`) — over a fade to
   `bg-deep`, all fixed.
-- **Browser chrome:** `<meta name="theme-color">` = background;
+- **Browser chrome:** `<meta name="theme-color">` = background (it also
+  colours the installed app's solid status bar);
   `color-scheme` = light or dark to match.
 - **Text selection:** accent fill, on-accent text.
 - **Maps:** `mapStyles(theme)` returns plain style rules (`MapStyle[]`, the
@@ -652,17 +653,26 @@ and body fonts.
 ## 6. Layout and shell
 
 - **Phone first.** Design at 375 px wide, then relax at `sm:` (≥ 640 px).
-- **Installed-app feel:** `apple-mobile-web-app-capable`, translucent status
-  bar, no tap highlight, `overscroll-behavior-y: contain` (own pull to
+- **Installed-app feel:** `apple-mobile-web-app-capable`, a solid status bar
+  (`apple-mobile-web-app-status-bar-style` `default`, coloured by
+  `theme-color`), no tap highlight, `overscroll-behavior-y: contain` (own pull to
   refresh), smooth scrolling, pinch-zoom allowed.
 - **Full screen on phones.** Every app fills the whole screen, edge to edge
   and top to bottom, and nothing sits under the status bar or the home
   indicator:
-  - `index.html`'s viewport meta has `viewport-fit=cover`, with the
-    `black-translucent` status bar. Without it, an installed app draws under
-    the status bar while the insets read 0, so the header text lands under
-    the status bar's blur. `applyTheme` adds it if it's missing (and warns in
-    development); `scripts/inventory.mjs` reports apps without it.
+  - The status bar style is `default`, never `black-translucent`. Since
+    iOS 26.1 an installed app with a translucent status bar gets a system
+    blur over the status bar and the top of the page that the page can't
+    turn off, and it covers the header text. With `default`, iOS draws a
+    solid status bar in the `theme-color` (the theme's background, set by
+    `applyTheme`) and the page starts below it. iOS reads the style only
+    when the app is added to the Home Screen: remove and re-add it to see a
+    change.
+  - `index.html`'s viewport meta has `viewport-fit=cover`, so the bottom
+    and side insets (home indicator, landscape notch) are real.
+    `applyTheme` adds it if it's missing (and warns in development);
+    `scripts/inventory.mjs` reports apps without it, or with a translucent
+    status bar.
   - The page colour is on `html` and the backdrop is a fixed layer the full
     height of the screen (`body::before`, `100lvh`), so it never stops short
     or scrolls away; `body` and `#root` are at least `100dvh` tall.
@@ -677,8 +687,9 @@ and body fonts.
     the bottom by `--safe-bottom`; left and right by `--safe-left`/`-right`.
   - Content is full width on phones: the page frame's `px-4` is the only
     side margin; no app wraps pages in a narrower box at phone width.
-- **Top bar:** sticky, 56 px (64 px on desktop) plus `--safe-top` (it runs
-  up under the status bar, frosted, and its content starts below it),
+- **Top bar:** sticky, 56 px (64 px on desktop) plus `--safe-top` (0 under
+  a solid status bar; in a browser with a notch in landscape or any page
+  drawn under the status bar, its content still starts below it),
   `bg-bg/90` frosted (`backdrop-blur-xl`), bottom border. Left: the header text (and text
   tabs on desktop). Right: 40 px round buttons — search (outlined), **+ add**
   (accent fill), account (avatar initial in an accent circle).
@@ -1066,3 +1077,6 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   full-screen layer, page colour on `html`, `100dvh` minimum height, and
   the safe-area variables (`--safe-top` … `--above-dock`) for everything
   at a screen edge.
+- **0.8.2** — A solid status bar (`default`, coloured by `theme-color`)
+  instead of `black-translucent`, whose iOS 26.1+ system blur covered the
+  header text.

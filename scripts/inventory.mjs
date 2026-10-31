@@ -164,7 +164,7 @@ for (const a of apps) {
 table(results);
 
 // ── 7. The phone frame ─────────────────────────────────────────────────────
-head("Phone frame (index.html: edge to edge under the status bar; no raw insets in app code)");
+head("Phone frame (index.html: viewport-fit=cover, solid status bar; no raw insets in app code)");
 const frame = [["App", "viewport-fit=cover", "Status bar", "Raw env(safe-area-…) in app code"]];
 for (const a of apps) {
   const { dir } = local[a.name];
@@ -176,6 +176,6 @@ for (const a of apps) {
   const bar = html.match(/apple-mobile-web-app-status-bar-style["'][^>]*content=["']([^"']+)/i)?.[1] ?? "none";
   // Insets belong to globals.css (--safe-top and friends); app code uses the variables.
   const raw = walk(join(dir, a.webRoot, "src")).filter((f) => !/styles\/globals\.css$/.test(f) && /env\(safe-area-inset/.test(readFileSync(f, "utf8")));
-  frame.push([a.name, !html ? "no index.html" : cover ? "yes" : "MISSING", bar === "black-translucent" ? bar : `${bar} (want black-translucent)`, raw.length ? raw.map((f) => relative(join(dir, a.webRoot), f)).join(", ") : "none"]);
+  frame.push([a.name, !html ? "no index.html" : cover ? "yes" : "MISSING", bar === "default" ? bar : `${bar} (want default)`, raw.length ? raw.map((f) => relative(join(dir, a.webRoot), f)).join(", ") : "none"]);
 }
 table(frame);

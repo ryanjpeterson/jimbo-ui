@@ -19,6 +19,26 @@ the matching 0.x release.
 
 Nothing yet.
 
+## 0.8.2 — 2026-10-31
+
+A solid status bar on installed apps, so iOS's top-edge blur no longer covers the header.
+
+### Changed
+- **Status bar:** `apple-mobile-web-app-status-bar-style` is `default`, not
+  `black-translucent`. Since iOS 26.1 an installed app with a translucent
+  status bar gets a system blur over the status bar and the top of the page
+  that the page can't turn off; it covered the app's name. With `default`,
+  iOS draws a solid status bar in the `theme-color` (the theme's background,
+  which `applyTheme` already sets) and the page starts below it.
+- `scripts/inventory.mjs` flags apps whose status bar isn't `default`.
+
+### Apps must
+- Set `<meta name="apple-mobile-web-app-status-bar-style" content="default" />`
+  in `index.html` (as `reference/web/index.html`), and keep the
+  `theme-color` meta with the pre-paint script that sets it.
+- Remove the app from the Home Screen and add it again on each phone: iOS
+  reads the status bar style only when it's added.
+
 ## 0.8.1 — 2026-10-31
 
 Full screen on phones: pages fill the screen and nothing sits under the status bar.

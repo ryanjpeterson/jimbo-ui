@@ -3,9 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <!-- viewport-fit=cover: the page runs edge to edge under the status bar and
-         home indicator, and the safe-area insets the top bar and dock use are
-         real (guide section 6). Keep it with the translucent status bar below. -->
+    <!-- viewport-fit=cover: the page runs edge to edge past the home indicator
+         and any landscape notch, and the safe-area insets the dock and bars
+         use are real (guide section 6). -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="color-scheme" content="dark" />
     <meta name="description" content="One sentence about the app." />
@@ -28,7 +28,9 @@
     <!-- Installed-app feel on phones (home-screen web app). -->
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <!-- A solid status bar in the theme-color. Not black-translucent: since
+         iOS 26.1 that adds a system blur over the top of the page. -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="My app" />
     <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon-180.png" />
 
