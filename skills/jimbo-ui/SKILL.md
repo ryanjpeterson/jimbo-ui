@@ -72,7 +72,7 @@ this check, then the preview workflow if they want detail.
   spacing (`Theme.fonts`); use `font-display` / `font-body`, never a named
   family.
 - Colour tuning: `Theme.infer` (contrasting or tonal), `Theme.vibrancy` and
-  `Theme.contrast` — all on the jimbo-ui config section's Theme tab.
+  `Theme.contrast` — all on the jimbo-ui config section's Colours tab.
 - Themes made from real things (teams, flags, provinces, games) use only
   their own colours and shades of them — never an invented hue.
 - **Circles** (guide section 2): always one flat fill — no gradient, shine,
@@ -139,8 +139,9 @@ this check, then the preview workflow if they want detail.
   Brand pages, theme pickers in settings, or standalone Style guide pages.
   It's the same in every app: named **jimbo-ui config**, at **`/jimbo-ui`**,
   reached from the app's settings or admin area (never a dock tab), with
-  tabs **Theme** (templates, colours, type, backdrop, live preview and
-  readability checks), **Brand** (name and header text preview, favicon),
+  tabs **Looks** (templates, share a look), **Colours** (the picker,
+  inference, readability checks), **Type**, **Backdrop** — one unsaved look
+  and one save bar across the four — **Brand** (name and header text preview, favicon),
   **Style guide** (the live kit plus the app's components) and **About**
   (jimbo-ui version, registry status, the showcase link). App-specific
   additions go in its **App** tab, nowhere else. The theme set there is the
@@ -230,9 +231,9 @@ explains all of this.
    the jimbo-ui block in its `CLAUDE.md` (see "Register an app"); add the
    app to the registry.
 6. Typecheck, run it, and look at the Style guide tab in a dark and a light
-   template at phone width. On the Theme tab, try a template from each set,
-   a two-colour theme (highlight and support inferred), each type style and
-   a save, and check the choice survives a reload.
+   template at phone width. On the Looks tab, try a template from each set; on
+   Colours, a two-colour theme (highlight and support inferred); on Type,
+   each type style; then change a backdrop and save from another tab, and check the choice survives a reload.
 
 ## Workflow: preview what an update would do (changes nothing)
 

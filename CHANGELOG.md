@@ -37,7 +37,21 @@ the matching 0.x release.
 - The showcase's Components tab shows the update check for an app that's
   current, one release behind and four behind.
 
+### Changed
+- **The Theme tab is now four tabs:** Looks (templates and *Share this
+  look*), Colours, Type and Backdrop, so no tab is a long page of
+  everything. They edit one unsaved look (`useThemeDraft`, held by
+  `JimboConfigPage`) with one save bar (`ThemeSaveBar`) over every tab.
+  `?tab=theme` still opens Looks.
+- The config section's tabs sit on one row that scrolls sideways on
+  phones, with the chosen one kept in view: `PillTabs scroll`.
+
 ### Apps must
+- Port `routes/config/ThemePanel.tsx` (it now exports `LooksPanel`,
+  `ColoursPanel`, `TypePanel`, `BackdropPanel`, `ThemeSaveBar` and
+  `useThemeDraft` instead of `ThemePanel`) and `PillTabs` from the kit.
+  An app that links to the section's colours, type or backdrop can use
+  `?tab=colours`, `type` or `backdrop`.
 - Copy the foundation files, port `JimboConfigPage.tsx` and add
   `routes/config/UpdatesPanel.tsx` from the reference.
 - Keep `components.uses` in `jimbo-ui.json` current; it decides which

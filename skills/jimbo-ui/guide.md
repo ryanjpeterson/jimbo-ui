@@ -15,7 +15,7 @@ implementations of everything below are in the repo's `reference/` folder.
 - **Theme:** two to four colours (accent and background always; highlight
   and support set or inferred), each with lighter and darker shades, picked
   from Everyday, Holidays, Countries, Provinces or Sports templates (or a
-  search across them) or fine-tuned on the Theme tab of each app's
+  search across them) or fine-tuned on the Looks and Colours tabs of each app's
   jimbo-ui config section.
 - **Look:** flat colour on coloured shapes, depth from layers — solid
   surfaces with a light frost, softly rounded corners (not pills), a
@@ -73,7 +73,7 @@ page (URL in the README) — the way to see what an app would get without
 having one.
 
 **Playground:** the showcase is also where to design a theme for an app.
-Pick and tune a look on its Theme tab, then *Share this look* → export. A
+Pick and tune a look on its Looks, Colours, Type and Backdrop tabs, then *Share this look* → export. A
 **theme file** (`{ "kind": "jimbo-ui/theme", "version": 1, "theme": { … } }`
 — only what the theme sets, so inferred colours stay inferred) imports into
 any jimbo.ui app's jimbo-ui config section; the **brand.config** line replaces an app's
@@ -116,19 +116,23 @@ can theme any:
 - **Name:** "jimbo-ui config". **Route:** `/jimbo-ui` (`?tab=` picks the tab).
 - **Where:** a link in the app's settings or admin area
   (`JimboConfigLink`) — never a dock tab.
-- **Tabs, in this order:**
-  1. **Theme** — *Pick a look* (Everyday, Holidays, Countries, Provinces and
-     Sports with league and city tabs, and search; tiles are miniatures of
-     the app with the theme's colours as circles), *Make it yours* (the four
-     colours as round tabs, the inline picker, *Infer it* switches with
-     *Contrasting* / *Tonal* inference, *Vibrancy* and *Contrast* sliders,
-     readability warnings), *Type* (headings and body fonts with weight and
-     spacing), *Backdrop*, *Share this look* (export and import), live
-     preview across the app and a floating save bar (*Undo* / *Save*).
-  2. **Brand** — the name as header text at each size, and the favicon.
-  3. **Style guide** — every shared component in the current theme
+- **Tabs, in this order,** one row that scrolls sideways on phones
+  (`PillTabs scroll`) — one topic per tab, so no tab is a long page of
+  everything:
+  1. **Looks** (`?tab=theme`) — *Pick a look* (Everyday, Holidays,
+     Countries, Provinces, Games and Sports with league and city tabs, and
+     search; tiles are miniatures of the app with the theme's colours as
+     circles) and *Share this look* (export and import).
+  2. **Colours** — the four colours as round tabs, the inline picker, *Infer
+     it* switches with *Contrasting* / *Tonal* inference, *Vibrancy* and
+     *Contrast* sliders, readability warnings.
+  3. **Type** — headings and body fonts with weight and spacing.
+  4. **Backdrop** — the pattern by group, its base, strength, size,
+     contrast and saturation.
+  5. **Brand** — the name as header text at each size, and the favicon.
+  6. **Style guide** — every shared component in the current theme
      (including an unsaved look), plus the app's own.
-  4. **About** — the jimbo-ui version, the app's registry status (from its
+  7. **About** — the jimbo-ui version, the app's registry status (from its
      `jimbo-ui.json`, passed in as `__JIMBO_APP__` by Vite's `define`) and a
      link to the showcase. When a newer release is out it says so first
      (`JimboUpdates`): which releases, what updating would change for this
@@ -139,7 +143,11 @@ can theme any:
      from GitHub at most once a day per person, only for people who can
      configure, and shows nothing extra when it can't be reached. An app
      never updates itself.
-  5. **App** (optional) — anything app-specific. Nothing goes anywhere else.
+  8. **App** (optional) — anything app-specific. Nothing goes anywhere else.
+- **One look is edited across the Looks, Colours, Type and Backdrop tabs**
+  (`useThemeDraft`): it previews live across the app, one save bar
+  (*Undo* / *Save*) floats over every tab while it's unsaved, and leaving
+  the section without saving puts the saved look back.
 - **The theme set here is the app-wide default for everyone.**
 - No separate Brand pages, theme pickers in settings, or standalone Style
   guide pages.
@@ -268,7 +276,7 @@ white). Four is the most, and a theme needn't be four different hues.
 **Vibrancy and contrast.** Two sliders tune any theme: `Theme.vibrancy`
 (0.4–1.5) scales the brand colours' saturation (the page's by half as much);
 `Theme.contrast` (0.8–1.6) scales how far cards, fields and borders step from
-the page. The Theme tab warns if a setting costs readability.
+the page. The Colours tab warns if a setting costs readability.
 
 **Backdrop.** Behind every page sits a backdrop in the theme's colours
 (`Theme.backdrop`, `backdropCss`): a **pattern** from four groups
@@ -449,7 +457,7 @@ family of tokens:
 
 ### Readability (WCAG)
 
-Checked live on the Theme tab for the colours an admin picks (and for the
+Checked live on the Colours tab for the colours an admin picks (and for the
 inferred ones, which are built to pass):
 - Body text ≥ 4.5:1 on the background.
 - Accent and highlight ≥ 3:1 on the background.
@@ -468,7 +476,7 @@ most: keep them dark enough (luminance under about 0.07) for 7:1.
 
 ## 4. Theme templates
 
-The Theme tab offers these (`foundation/src/lib/themes.ts`) in six
+The Looks tab offers these (`foundation/src/lib/themes.ts`) in six
 categories, chosen with wrapping pills, plus a search box across all of them
 (name, vibe, category and tab; accents ignored, so "quebec" finds Québec).
 
@@ -796,7 +804,7 @@ and body fonts.
 | `RankedList` | Top-N lists with counts |
 | `SearchField`, `SelectField` | Search and single-choice filters (select on phones) |
 | `Tabs` | 2–4 mutually exclusive views (segmented); `size="sm"` is a compact inline switch for a section's action slot |
-| `PillTabs` | Filters on desktop |
+| `PillTabs` | Filters on desktop; `scroll` for a page's own sections when there are more than fit (one row that scrolls sideways) |
 | `Pager` | Paging long lists |
 | `Sheet` | **The** modal: bottom sheet on phones, dialog on desktop |
 | `ImageViewer` | Full-screen image (tap or Escape to close) |
@@ -946,7 +954,7 @@ archetype only sets the starting shape.
 
 ## 11. Accessibility checklist
 
-- Readability targets in section 3 (the Theme tab warns when they're missed;
+- Readability targets in section 3 (the Colours tab warns when they're missed;
   every template passes).
 - Focus is visible (`focus:ring-2 ring-accent/20` on fields,
   `focus-visible:ring-accent/50` on buttons).
@@ -1127,4 +1135,6 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
 - **Unreleased** — The jimbo-ui config section says when a newer release is
   out and what updating would change for the app (About tab and the config
   link), from `releases.json`, which `scripts/releases.mjs` writes from the
-  changelog at each release.
+  changelog at each release. The config section's Theme tab is now four
+  tabs — Looks, Colours, Type and Backdrop — sharing one unsaved look and
+  save bar, on a tab row that scrolls sideways on phones (`PillTabs scroll`).
