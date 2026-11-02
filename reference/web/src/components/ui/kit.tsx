@@ -159,6 +159,7 @@ export function FullBleed({ children, tone = "none", flush = false, pad = true, 
  * an abstract pattern in the theme's colours (any backdrop pattern) on a
  * gradient. Use at the top of a landing or home page; `size="lg"` fills most
  * of the first screen. Pulls up under the top bar like `Banner`.
+ * `pattern="none"` draws no layer of its own: the page's backdrop shows through.
  */
 export function HeroSection({ eyebrow, title, children, actions, pattern = "ripples", size = "md", align = "left", pullUp = true }: {
   eyebrow?: ReactNode;
@@ -178,8 +179,10 @@ export function HeroSection({ eyebrow, title, children, actions, pattern = "ripp
     <FullBleed pad={false} className={cn("isolate mb-2", pullUp && "-mt-6 sm:-mt-8")}>
       {/* The pattern fades out top and bottom (.fade-out, plus .fade-in when something sits above),
           so the opener melts into the page's backdrop instead of ending on a line. */}
-      <div aria-hidden="true" className={cn("fade-out absolute inset-0 -z-10", !pullUp && "fade-both")}
-        style={{ backgroundImage: look.image, backgroundSize: look.size, backgroundPosition: look.position, backgroundRepeat: look.repeat }} />
+      {pattern !== "none" && (
+        <div aria-hidden="true" className={cn("fade-out absolute inset-0 -z-10", !pullUp && "fade-both")}
+          style={{ backgroundImage: look.image, backgroundSize: look.size, backgroundPosition: look.position, backgroundRepeat: look.repeat }} />
+      )}
       <div className={cn("flex flex-col justify-end gap-3 py-10 sm:py-14", size === "lg" ? "min-h-[62dvh]" : "min-h-[34dvh]", align === "center" && "items-center text-center")}>
         {eyebrow && <p className="eyebrow text-support">{eyebrow}</p>}
         <h1 className="font-display text-40 leading-[1.02] text-text-base sm:text-6xl">{title}</h1>

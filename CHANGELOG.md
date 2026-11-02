@@ -34,6 +34,21 @@ the matching 0.x release.
 
 ## Unreleased
 
+## 0.11.5 — 2026-11-02
+
+The paper backdrop no longer repeats in a visible grid, and a hero with no pattern lets the page's backdrop run through.
+
+**Update:** fix — drop-in; nothing to change in apps.
+
+### Fixed
+
+- **Paper backdrop** no longer repeats in a visible grid: two noise layers with different seeds at sizes that don't line up (1100 and 737 px) instead of one 420 px tile.
+- **`HeroSection pattern="none"`** draws no layer of its own, so the page's backdrop runs straight through instead of a faded band across it.
+
+### Apps must
+
+- Nothing — copy the foundation files. Apps with a `HeroSection pattern="none"` port it from `reference/web/src/components/ui/kit.tsx`.
+
 ## 0.11.4 — 2026-11-02
 
 Solid fills with no outline, glass on anything over the backdrop, Style guide sections, and a showcase where random looks take turns over every component.

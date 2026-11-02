@@ -719,11 +719,15 @@ export function backdropCss(input: Theme): BackdropLayers {
     case "paper": {
       const [r, g, bl] = hexToRgb(c.text!).map((v) => (v / 255).toFixed(3));
       const fine = b.pattern === "grain";
-      const a = (fine ? 0.22 : 0.14) * k;
-      const body = `<filter id='n'><feTurbulence type='fractalNoise' baseFrequency='${fine ? 0.85 : 0.035}' numOctaves='${fine ? 2 : 4}' stitchTiles='stitch'/>`
-        + `<feColorMatrix values='0 0 0 0 ${r} 0 0 0 0 ${g} 0 0 0 0 ${bl} 0 0 0 ${a.toFixed(3)} 0'/></filter><rect width='100%' height='100%' filter='url(#n)'/>`;
-      const size = fine ? 180 : 420;
-      add(svg(body, size, size, "none"), `${n(size * sc)}px ${n(size * sc)}px`, "0 0", "repeat");
+      const noise = (alpha: number, size: number, seed: number) => {
+        const body = `<filter id='n'><feTurbulence type='fractalNoise' baseFrequency='${fine ? 0.85 : 0.035}' numOctaves='${fine ? 2 : 4}' seed='${seed}' stitchTiles='stitch'/>`
+          + `<feColorMatrix values='0 0 0 0 ${r} 0 0 0 0 ${g} 0 0 0 0 ${bl} 0 0 0 ${alpha.toFixed(3)} 0'/></filter><rect width='100%' height='100%' filter='url(#n)'/>`;
+        add(svg(body, size, size, "none"), `${n(size * sc)}px ${n(size * sc)}px`, "0 0", "repeat");
+      };
+      // Grain is fine enough that its tile never shows. Paper's mottles are big, so one tile
+      // repeats as a visible grid: two seeds at sizes that don't line up only meet again far apart.
+      if (fine) noise(0.22 * k, 180, 0);
+      else { noise(0.09 * k, 1100, 3); noise(0.08 * k, 737, 11); }
       break;
     }
     case "linen": {

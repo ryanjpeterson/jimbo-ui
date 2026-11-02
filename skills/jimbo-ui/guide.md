@@ -1240,3 +1240,5 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   (unselected pills included). The Style guide shows its blocks in sections
   with toggles (`more` adds an app's own). The showcase's Home holds every
   component while ten random looks take turns every 15 seconds.
+- **0.11.5** — Paper backdrop from two offset noise layers, so it doesn't
+  repeat in a grid; `HeroSection pattern="none"` draws no layer of its own.

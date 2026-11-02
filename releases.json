@@ -1,7 +1,30 @@
 {
   "$comment": "Generated from CHANGELOG.md by scripts/releases.mjs — don't edit. Apps' jimbo-ui config section reads it to show what a newer release changes.",
-  "latest": "0.11.4",
+  "latest": "0.11.5",
   "releases": [
+    {
+      "version": "0.11.5",
+      "date": "2026-11-02",
+      "type": "fix",
+      "summary": "The paper backdrop no longer repeats in a visible grid, and a hero with no pattern lets the page's backdrop run through.",
+      "items": [
+        {
+          "kind": "fixed",
+          "text": "**Paper backdrop** no longer repeats in a visible grid: two noise layers with different seeds at sizes that don't line up (1100 and 737 px) instead of one 420 px tile.",
+          "affects": []
+        },
+        {
+          "kind": "fixed",
+          "text": "**`HeroSection pattern=\"none\"`** draws no layer of its own, so the page's backdrop runs straight through instead of a faded band across it.",
+          "affects": [
+            "hero-section"
+          ]
+        }
+      ],
+      "appsMust": [
+        "Nothing — copy the foundation files. Apps with a `HeroSection pattern=\"none\"` port it from `reference/web/src/components/ui/kit.tsx`."
+      ]
+    },
     {
       "version": "0.11.4",
       "date": "2026-11-02",
