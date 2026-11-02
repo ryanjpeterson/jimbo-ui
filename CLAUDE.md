@@ -56,8 +56,8 @@ dot in the accent; the favicon is the only graphic.
 ## Running and checking
 
 - Showcase: `npm --prefix showcase install` once, then the **jimbo-ui-showcase**
-  launch config (port 4455) or `npm --prefix showcase run dev`. It has Home (a
-  carousel of looks), Components, Archetypes and Settings tabs, with the
+  launch config (port 4455) or `npm --prefix showcase run dev`. It has Home (looks to
+  step through), Components, Archetypes and Settings tabs, with the
   jimbo-ui config section under Settings; theme changes are saved in the browser. With
   Docker: `docker compose up --build` (built app, port 4460) or
   `docker compose --profile dev up` (live reload, port 4461). It doubles as a

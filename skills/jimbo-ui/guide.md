@@ -63,7 +63,7 @@ The stack is React + TypeScript + Vite + Tailwind CSS 3 (with `clsx` and
 **Showcase:** `showcase/` is a small app built only from a release's code
 (reference, then foundation and starter, then stand-ins for the server parts
 in `showcase/overrides/`). It runs the real jimbo-ui config section and kit,
-a Home page with a carousel of looks (each slide a piece of the kit in its
+a Home page with looks to step through (each a piece of the kit in its
 own theme, font and backdrop, via `ThemeScope`), a Components tab, and the
 Archetypes, with the theme saved in the browser.
 `npm --prefix showcase run dev` runs it locally, or with Docker:
@@ -862,7 +862,7 @@ and body fonts.
 | `LinkChips` | Related things to go to, as a wrapping row of 44 px linked chips: a label, an optional muted second label and an optional 8 px dot (`tone`). See-also links, neighbours, tags that navigate |
 | `FloatingBar` | A status line and its actions floating above the dock (`--above-dock`): the save bar, a select-mode action bar, Start/Stop for something running (`live` pulses its dot). Pad the page bottom (`pb-20`) so it never covers the last section |
 | `LIVE` | Add to a status dot to pulse it while something is happening; `RowStatus.live` and `Badge live` use it |
-| `ThemeScope` | Part of the page in another theme — colours, type and backdrop (`themeVars`, `.theme-scope`) — without touching the rest: carousels of looks, previews |
+| `ThemeScope` | Part of the page in another theme — colours, type and backdrop (`themeVars`, `.theme-scope`) — without touching the rest: looks to step through, previews |
 | `MapView` (`components/MapView.tsx`) | **Every map.** Places as flat highlight pins (`markerIcon`) on the theme's map style (`mapStyles`: the page colour for land, accent-tinted roads, no POIs or transit); `size` `compact` (160 px, inline, no gestures), `full` (320 px), `fill` (a map page). With no Maps key it draws a themed preview with the same pins |
 | `MapPinCard` (`components/MapView.tsx`) | The chosen place on a map page, floating above the dock: name, a line, what's there |
 | `JimboConfigPage` / `JimboConfigLink` (`routes/JimboConfigPage.tsx`) | The jimbo-ui config section (section 1) and its one link in settings |
@@ -1167,7 +1167,7 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   admin-only when the app has auth, checked on the server too. `MapView`
   and `MapPinCard` for every map, `ThemeScope` and `themeVars` for theming
   part of a page. Two archetypes as templates to copy: Catalogue and
-  Single-page dashboard. The showcase opens on a carousel of looks, with
+  Single-page dashboard. The showcase opens on looks to step through, with
   Components, Archetypes and Settings tabs. Promoted to the kit: `KeyValue`,
   `SwitchRow`, `Autocomplete`, `Badge dot`, `EventRow onOpen` and live
   statuses (`LIVE`). Every look comes once, in light, mid and dark

@@ -34,6 +34,16 @@ the matching 0.x release.
 
 ## Unreleased
 
+**Update:** fix — showcase only; nothing to change in apps.
+
+### Changed
+
+- Showcase: the front page's looks no longer play as a carousel. **Previous** and **Next** step through them, each look fading slowly (1.2 s) into the next; the dots and Play / Pause are gone.
+
+### Apps must
+
+- Nothing — copy the foundation files.
+
 ## 0.11.2 — 2026-11-02
 
 Three components from jimbo-theory join the kit, and EntityRow can show a code in its avatar.
