@@ -1222,7 +1222,7 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   **Update:** line; `versions.mjs` enforces it and `--next` gives the
   number; the session-start check and the About tab show each release's
   type, and the update workflow takes a drop-in update straight through.
-- **Unreleased** — Three kit components from jimbo-theory: `ToggleGrid`
+- **0.11.2** — Three kit components from jimbo-theory: `ToggleGrid`
   (several picks from a small set), `LinkChips` (related things to go to)
   and `FloatingBar` (a status and its actions above the dock; the save bar
   uses it). `EntityRow avatarText` shows a code or number in the avatar.

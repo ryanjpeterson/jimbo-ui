@@ -34,6 +34,8 @@ the matching 0.x release.
 
 ## Unreleased
 
+## 0.11.2 — 2026-11-02
+
 Three components from jimbo-theory join the kit, and EntityRow can show a code in its avatar.
 
 **Update:** feature — drop-in; nothing to change in apps.

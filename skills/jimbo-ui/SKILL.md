@@ -5,7 +5,7 @@ description: Ryan's shared brand and UI system, jimbo.ui (repo and plugin jimbo-
 
 # jimbo.ui
 
-**This is jimbo.ui 0.11.1.** (Kept in step with the plugin version and the
+**This is jimbo.ui 0.11.2.** (Kept in step with the plugin version and the
 newest numbered `CHANGELOG.md` entry; `scripts/versions.mjs` checks.)
 jimbo.ui is a work in progress, so it's on 0.x. **The number says what an
 update takes** (Semantic Versioning, read for 0.x — guide section 1,

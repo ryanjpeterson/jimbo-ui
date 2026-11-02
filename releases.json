@@ -1,7 +1,61 @@
 {
   "$comment": "Generated from CHANGELOG.md by scripts/releases.mjs — don't edit. Apps' jimbo-ui config section reads it to show what a newer release changes.",
-  "latest": "0.11.1",
+  "latest": "0.11.2",
   "releases": [
+    {
+      "version": "0.11.2",
+      "date": "2026-11-02",
+      "type": "feature",
+      "summary": "Three components from jimbo-theory join the kit, and EntityRow can show a code in its avatar.",
+      "items": [
+        {
+          "kind": "added",
+          "text": "**`ToggleGrid`** (kit): several picks from a small fixed set as a wrapping grid of 44 px toggle buttons (`columns`, `smColumns`), picked ones a flat accent fill with `aria-pressed`.",
+          "affects": [
+            "toggle-grid"
+          ]
+        },
+        {
+          "kind": "added",
+          "text": "**`LinkChips`** (kit): related things as a wrapping row of linked chips, each with an optional muted second label and an 8 px dot in a theme colour.",
+          "affects": [
+            "link-chips"
+          ]
+        },
+        {
+          "kind": "added",
+          "text": "**`FloatingBar`** (kit): a status line and its actions floating above the dock, with an optional pulsing `live` dot. The theme save bar now uses it.",
+          "affects": [
+            "floating-bar"
+          ]
+        },
+        {
+          "kind": "added",
+          "text": "**`EntityRow avatarText`**: the placeholder avatar shows a short code or number instead of the name's initials.",
+          "affects": [
+            "entity-row"
+          ]
+        },
+        {
+          "kind": "added",
+          "text": "Guide: section 8 rows for the three, and \"Picking several\" and \"Related things\" in the component menu. The Style guide panel shows them.",
+          "affects": []
+        },
+        {
+          "kind": "available",
+          "text": "`ToggleGrid`, `LinkChips`, `FloatingBar`, `EntityRow avatarText`",
+          "affects": [
+            "toggle-grid",
+            "link-chips",
+            "floating-bar",
+            "entity-row"
+          ]
+        }
+      ],
+      "appsMust": [
+        "Nothing — copy the foundation files. Apps that want them port them from `reference/web/src/components/ui/kit.tsx` (jimbo-theory has its own copies of ToggleGrid and LinkChips and an equivalent practice bar to swap for these)."
+      ]
+    },
     {
       "version": "0.11.1",
       "date": "2026-11-02",
