@@ -34,6 +34,10 @@ the matching 0.x release.
 
 ## Unreleased
 
+## 0.11.3 — 2026-11-02
+
+The showcase steps through its looks with Previous and Next, each fading slowly into the next.
+
 **Update:** fix — showcase only; nothing to change in apps.
 
 ### Changed

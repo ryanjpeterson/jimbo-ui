@@ -1,7 +1,23 @@
 {
   "$comment": "Generated from CHANGELOG.md by scripts/releases.mjs — don't edit. Apps' jimbo-ui config section reads it to show what a newer release changes.",
-  "latest": "0.11.2",
+  "latest": "0.11.3",
   "releases": [
+    {
+      "version": "0.11.3",
+      "date": "2026-11-02",
+      "type": "fix",
+      "summary": "The showcase steps through its looks with Previous and Next, each fading slowly into the next.",
+      "items": [
+        {
+          "kind": "changed",
+          "text": "Showcase: the front page's looks no longer play as a carousel. **Previous** and **Next** step through them, each look fading slowly (1.2 s) into the next; the dots and Play / Pause are gone.",
+          "affects": []
+        }
+      ],
+      "appsMust": [
+        "Nothing — copy the foundation files."
+      ]
+    },
     {
       "version": "0.11.2",
       "date": "2026-11-02",
