@@ -1187,7 +1187,7 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   follows the theme (`applyFavicon` sets `apple-touch-icon` to a themed PNG).
   A Brands category, starting with Marcone (red and mSupply navy). A third
   archetype to copy, **Status monitor** (`archetypes/status.tsx`).
-- **Unreleased** — Each fact in one place: an app's details live only in
+- **0.11.0** — Each fact in one place: an app's details live only in
   its `jimbo-ui.json`; `registry/apps.json` is just names and repos, and
   `registry/components.json` is jimbo-ui's catalogue (no `usedBy`, no
   domain entries). `inventory.mjs` reads the apps' pushed `jimbo-ui.json`

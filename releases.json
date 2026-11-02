@@ -1,7 +1,33 @@
 {
   "$comment": "Generated from CHANGELOG.md by scripts/releases.mjs — don't edit. Apps' jimbo-ui config section reads it to show what a newer release changes.",
-  "latest": "0.10.0",
+  "latest": "0.11.0",
   "releases": [
+    {
+      "version": "0.11.0",
+      "date": "2026-11-02",
+      "summary": "Each app's details live only in its own jimbo-ui.json; jimbo-ui keeps just the list of apps and its component catalogue.",
+      "items": [
+        {
+          "kind": "changed",
+          "text": "**Each fact in one place.** An app's details — version, auth, web root, the components it uses and its own — live only in its `jimbo-ui.json`. `registry/apps.json` is just each app's name, repo and registration date; `registry/components.json` is jimbo-ui's catalogue (shared components and generic candidates, no `usedBy`, no app-only entries or app-specific aliases). App sessions no longer commit to jimbo-ui when they update or consolidate.",
+          "affects": []
+        },
+        {
+          "kind": "changed",
+          "text": "`scripts/inventory.mjs` puts the registry together from the apps: each app's `jimbo-ui.json` as pushed (read with `gh`), its checkout for the code checks (`~/Development`, `--apps-dir` or `JIMBO_APPS_DIRS`), a warning when a checkout is stale, and `--json` for the assembled registry.",
+          "affects": []
+        },
+        {
+          "kind": "changed",
+          "text": "The scan for app words now covers the catalogue too; only `registry/apps.json` is skipped.",
+          "affects": []
+        }
+      ],
+      "appsMust": [
+        "Keep `components` in `jimbo-ui.json` current (`uses`, and `local` with each piece's kind and the catalogue id it matches) — it's the only record. An app with no `components` yet runs \"Consolidate an app\".",
+        "Update the jimbo-ui block in the app's `CLAUDE.md` to the new wording in SKILL.md (\"Register an app\", step 8)."
+      ]
+    },
     {
       "version": "0.10.0",
       "date": "2026-10-31",

@@ -17,6 +17,10 @@ the matching 0.x release.
 
 ## Unreleased
 
+## 0.11.0 — 2026-11-02
+
+Each app's details live only in its own jimbo-ui.json; jimbo-ui keeps just the list of apps and its component catalogue.
+
 ### Changed
 - **Each fact in one place.** An app's details — version, auth, web root,
   the components it uses and its own — live only in its `jimbo-ui.json`.
