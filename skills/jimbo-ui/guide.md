@@ -1211,7 +1211,7 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   domain entries). `inventory.mjs` reads the apps' pushed `jimbo-ui.json`
   with `gh`, flags stale checkouts, and `--json` prints the assembled
   registry. App sessions no longer commit to jimbo-ui.
-- **Unreleased** — The number says what an update takes: Semantic
+- **0.11.1** — The number says what an update takes: Semantic
   Versioning read for 0.x (breaking → 0.MINOR, feature or fix →
   0.x.PATCH; MAJOR / MINOR / PATCH from 1.0.0). Every changelog entry has an
   **Update:** line; `versions.mjs` enforces it and `--next` gives the

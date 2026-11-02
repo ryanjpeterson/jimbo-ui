@@ -1,7 +1,39 @@
 {
   "$comment": "Generated from CHANGELOG.md by scripts/releases.mjs — don't edit. Apps' jimbo-ui config section reads it to show what a newer release changes.",
-  "latest": "0.11.0",
+  "latest": "0.11.1",
   "releases": [
+    {
+      "version": "0.11.1",
+      "date": "2026-11-02",
+      "type": "feature",
+      "summary": "The version number now says what an update takes: a new 0.MINOR needs code changes, a 0.x.PATCH is drop-in.",
+      "items": [
+        {
+          "kind": "changed",
+          "text": "**The number says what an update takes.** Numbering follows Semantic Versioning read for 0.x: a **breaking** release (apps change their own code) is the next 0.MINOR; a **feature** or **fix** release (drop-in) is the next 0.x.PATCH; from 1.0.0, MAJOR / MINOR / PATCH. Every entry here now has an **Update:** line, and the head of this file explains it.",
+          "affects": []
+        },
+        {
+          "kind": "changed",
+          "text": "The update workflow takes an update within the app's 0.MINOR straight through (copy the foundation files, set the version) and previews a breaking one before touching the app's code.",
+          "affects": []
+        },
+        {
+          "kind": "added",
+          "text": "`scripts/versions.mjs` fails a release numbered too low for its type, and `--next` gives the number Unreleased needs.",
+          "affects": []
+        },
+        {
+          "kind": "added",
+          "text": "`releases.json` gives each release's `type`; the session-start check says whether an update is drop-in or needs code changes, and the config section's About tab badges each release (Code changes, New, Fixes) and says which the whole update is (`Release.type`, `Updates.breaking` in `jimbo.ts`).",
+          "affects": [],
+          "foundation": true
+        }
+      ],
+      "appsMust": [
+        "Nothing — copy the foundation files. Port `routes/config/UpdatesPanel.tsx` to see the update type in the About tab."
+      ]
+    },
     {
       "version": "0.11.0",
       "date": "2026-11-02",

@@ -34,6 +34,10 @@ the matching 0.x release.
 
 ## Unreleased
 
+## 0.11.1 — 2026-11-02
+
+The version number now says what an update takes: a new 0.MINOR needs code changes, a 0.x.PATCH is drop-in.
+
 **Update:** feature — drop-in: copy the foundation files; the new pieces are there to adopt when wanted.
 
 ### Changed
