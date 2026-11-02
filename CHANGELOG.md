@@ -1,14 +1,31 @@
 # Changelog
 
-Every release of jimbo-ui, newest first. Each entry ends with **Apps must** —
-the steps the update workflow carries out in each app beyond copying the
+Every release of jimbo-ui, newest first, in the
+[Keep a Changelog](https://keepachangelog.com/) style. Each entry has an
+**Update:** line (breaking, feature or fix) and ends with **Apps must** — the
+steps the update workflow carries out in each app beyond copying the
 foundation files.
 
-**jimbo.ui is a work in progress, so it's on 0.x.** While it is: a release
-that asks apps to change their own code bumps the minor (0.6.0 → 0.7.0);
-fixes and small additions bump the patch (0.6.0 → 0.6.1). 1.0.0 is for when
-Ryan calls it stable. Changes collect under **Unreleased** at the top and only
-get a number when Ryan asks for a release.
+**Numbering follows [Semantic Versioning](https://semver.org/) as it reads
+for 0.x, where the number says what an update takes.** jimbo.ui is a work
+in progress, so it's on 0.x, and each release has an **Update** type:
+
+| Update | What updating takes | 0.x (now) | From 1.0.0 |
+| --- | --- | --- | --- |
+| **breaking** | Apps change their own code — any **Apps must** step beyond copying the foundation files, or anything removed or renamed | minor: 0.11.0 → 0.12.0 | major: 1.4.2 → 2.0.0 |
+| **feature** | Drop-in: copy the foundation files; new pieces to adopt when wanted | patch: 0.11.0 → 0.11.1 | minor: 1.4.2 → 1.5.0 |
+| **fix** | Drop-in: copy the foundation files | patch: 0.11.0 → 0.11.1 | patch: 1.4.2 → 1.4.3 |
+
+So within one 0.MINOR line every update is drop-in, and a new MINOR means
+code changes. `node scripts/versions.mjs --next` says what Unreleased needs;
+`node scripts/versions.mjs` fails a release numbered too low for its type.
+Something to be removed is first marked **Deprecated** in an earlier release
+where possible. A released number never changes: 0.8.1, 0.8.2 and 0.8.4 were
+breaking but went out as patches (before this rule was checked) and keep
+their numbers. 1.0.0 is for when Ryan calls it stable. Changes collect under
+**Unreleased** at the top, in Added, Changed, Deprecated, Removed, Fixed and
+Security, with an **Update:** line, and only get a number when Ryan asks for
+a release.
 
 Releases before 2026-10-23's renumbering were tagged 1.0.0–3.1.0; they are
 now 0.1.0–0.5.0 (1.0.0 → 0.1.0, 1.1.0 → 0.2.0, 2.0.0 → 0.3.0, 3.0.0 → 0.4.0,
@@ -17,9 +34,36 @@ the matching 0.x release.
 
 ## Unreleased
 
+**Update:** feature — drop-in: copy the foundation files; the new pieces are there to adopt when wanted.
+
+### Changed
+- **The number says what an update takes.** Numbering follows Semantic
+  Versioning read for 0.x: a **breaking** release (apps change their own
+  code) is the next 0.MINOR; a **feature** or **fix** release (drop-in) is
+  the next 0.x.PATCH; from 1.0.0, MAJOR / MINOR / PATCH. Every entry here
+  now has an **Update:** line, and the head of this file explains it.
+- The update workflow takes an update within the app's 0.MINOR straight
+  through (copy the foundation files, set the version) and previews a
+  breaking one before touching the app's code.
+
+### Added
+- `scripts/versions.mjs` fails a release numbered too low for its type, and
+  `--next` gives the number Unreleased needs.
+- `releases.json` gives each release's `type`; the session-start check says
+  whether an update is drop-in or needs code changes, and the config
+  section's About tab badges each release (Code changes, New, Fixes) and
+  says which the whole update is (`Release.type`, `Updates.breaking` in
+  `jimbo.ts`).
+
+### Apps must
+- Nothing — copy the foundation files. Port `routes/config/UpdatesPanel.tsx`
+  to see the update type in the About tab.
+
 ## 0.11.0 — 2026-11-02
 
 Each app's details live only in its own jimbo-ui.json; jimbo-ui keeps just the list of apps and its component catalogue.
+
+**Update:** breaking — apps change their own code (the **Apps must** steps).
 
 ### Changed
 - **Each fact in one place.** An app's details — version, auth, web root,
@@ -47,6 +91,8 @@ Each app's details live only in its own jimbo-ui.json; jimbo-ui keeps just the l
 ## 0.10.0 — 2026-10-31
 
 Nine fonts per group with a size for headings and body, twelve backdrops per group, a themed iOS icon, a Brands category and a Status monitor archetype.
+
+**Update:** breaking — apps change their own code (the **Apps must** steps).
 
 ### Added
 - **Text size for headings and body** (`fonts.headingsSize`,
@@ -101,6 +147,8 @@ Nine fonts per group with a size for headings and body, twelve backdrops per gro
 
 Apps say when a newer jimbo-ui is out and what updating would change; the Theme tab is now Looks, Colours, Type and Backdrop.
 
+**Update:** breaking — apps change their own code (the **Apps must** steps).
+
 ### Added
 - **Apps say when a newer jimbo-ui is out.** The About tab of the jimbo-ui
   config section (`JimboUpdates`, `useJimboUpdates` in
@@ -146,6 +194,8 @@ Apps say when a newer jimbo-ui is out and what updating would change; the Theme 
 ## 0.8.4 — 2026-10-31
 
 Openers fade into the page (no hard edge under banners and heroes), plus charts and rows-or-tiles lists.
+
+**Update:** breaking — apps change their own code (the **Apps must** steps).
 
 ### Added
 - **Charts.** `TrendChart` (one to three lines over time, a crosshair you
@@ -201,6 +251,8 @@ the reference kit; port them when an app wants them.
 
 Fix: pages that fill the screen with `min-h-full` (sign-in screens) work again.
 
+**Update:** fix — drop-in: copy the foundation files.
+
 ### Changed
 - `globals.css`: `html`, `body` and `#root` are `height: 100%` again. 0.8.1
   made `body` and `#root` a minimum height only, so `h-full` / `min-h-full`
@@ -213,6 +265,8 @@ Fix: pages that fill the screen with `min-h-full` (sign-in screens) work again.
 ## 0.8.2 — 2026-10-31
 
 A solid status bar on installed apps, so iOS's top-edge blur no longer covers the header.
+
+**Update:** breaking — apps change their own code (the **Apps must** steps).
 
 ### Changed
 - **Status bar:** `apple-mobile-web-app-status-bar-style` is `default`, not
@@ -233,6 +287,8 @@ A solid status bar on installed apps, so iOS's top-edge blur no longer covers th
 ## 0.8.1 — 2026-10-31
 
 Full screen on phones: pages fill the screen and nothing sits under the status bar.
+
+**Update:** breaking — apps change their own code (the **Apps must** steps).
 
 ### Changed
 - **Full screen on phones.** Layouts fill the screen edge to edge and top to
@@ -271,6 +327,8 @@ Full screen on phones: pages fill the screen and nothing sits under the status b
 ## 0.8.0 — 2026-10-30
 
 One library with no duplicates, one jimbo-ui config section per app, every look in light, mid and dark, 21 backdrops, maps in the theme, and two archetypes to copy.
+
+**Update:** breaking — apps change their own code (the **Apps must** steps).
 
 ### Added
 - **Registry:** `registry/apps.json` (every app on jimbo-ui: repo, web
@@ -370,6 +428,8 @@ One library with no duplicates, one jimbo-ui config section per app, every look 
 ## 0.7.0 — 2026-10-30
 
 Clearer separation, a calmer surface (less glass, less round, flat swatches), fonts and sliders, and themes for teams and places.
+
+**Update:** breaking — apps change their own code (the **Apps must** steps).
 
 ### Added
 - **Templates from real colours (314):** every NHL, NBA, MLB and NFL team in
@@ -544,6 +604,8 @@ Clearer separation, a calmer surface (less glass, less round, flat swatches), fo
 
 Depth, glass and the circle motif; two colours are enough.
 
+**Update:** breaking — apps change their own code (the **Apps must** steps).
+
 ### Added
 - **Shades for every brand colour** (accent, highlight, support):
   `-lighter`, `-light`, `-dark`, `-darker`, a lit fill `-top` → `-bottom`
@@ -606,6 +668,8 @@ Depth, glass and the circle motif; two colours are enough.
 
 Up to four colours, flag and holiday templates, and apps hear about new releases.
 
+**Update:** breaking — apps change their own code (the **Apps must** steps).
+
 ### Added
 - **Support colour** — an optional fourth colour (`Theme.support`) for page
   eyebrows, avatars, third place and the page's bottom-left glow, with tokens
@@ -647,6 +711,8 @@ Up to four colours, flag and holiday templates, and apps hear about new releases
 
 Branded **jimbo.ui** (the repo and plugin keep the name `jimbo-ui`).
 
+**Update:** breaking — apps change their own code (the **Apps must** steps).
+
 ### Changed
 - **No logo — header text.** The reference `Wordmark` is replaced by
   `HeaderTitle`: the app's name (`BRAND.name`) in the display face and text
@@ -671,6 +737,8 @@ Branded **jimbo.ui** (the repo and plugin keep the name `jimbo-ui`).
 ## 0.3.0 — 2026-10-23
 
 jimbo-ui is now fully generic: no app's code, names, artwork or sample content.
+
+**Update:** breaking — apps change their own code (the **Apps must** steps).
 
 ### Changed
 - **Reference kit is neutral.** Statuses are fixed **tones** — `Tone`
@@ -712,6 +780,8 @@ jimbo-ui is now fully generic: no app's code, names, artwork or sample content.
   `logo` to `brand.config.ts` if using the reference `Wordmark`.
 
 ## 0.2.0 — 2026-10-23
+
+**Update:** breaking — apps change their own code (the **Apps must** steps).
 
 ### Changed
 - **Stronger contrast on every theme.** Cards, fields, borders and secondary
@@ -755,6 +825,8 @@ jimbo-ui is now fully generic: no app's code, names, artwork or sample content.
 ## 0.1.0 — 2026-10-23
 
 First release.
+
+**Update:** first release — apps adopt it with "Start an app".
 
 ### Added
 - **Theme engine** (`foundation/src/lib/theme.ts`): accent, highlight and

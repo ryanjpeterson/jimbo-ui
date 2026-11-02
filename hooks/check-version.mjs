@@ -32,16 +32,18 @@ const compare = (a, b) => {
   return 0;
 };
 
-/** "## 0.5.0 — 2026-10-23" headings from the changelog, newest first, with each one's first line of prose. */
+/** "## 0.5.0 — 2026-10-23" headings from the changelog, newest first, with each one's first line of prose and its update type. */
 function releases(changelog) {
   const out = [];
   const lines = changelog.split("\n");
   lines.forEach((line, i) => {
     const m = /^## (\d+\.\d+\.\d+)/.exec(line);
     if (!m) return;
-    const next = lines.slice(i + 1).find((l) => l.trim() && !l.startsWith("#"));
+    const intro = lines.slice(i + 1, lines.findIndex((l, j) => j > i && l.startsWith("#")));
+    const next = intro.find((l) => l.trim() && !l.startsWith("**Update:**"));
     const summary = next && !next.startsWith("-") ? next.trim() : "";
-    out.push({ version: m[1], summary });
+    const type = /^\*\*Update:\*\*\s*(breaking|feature|fix)/i.exec(intro.find((l) => l.startsWith("**Update:**")) ?? "")?.[1]?.toLowerCase() ?? "breaking";
+    out.push({ version: m[1], summary, type });
   });
   return out;
 }
@@ -67,10 +69,13 @@ try {
     const newer = existsSync(changelog)
       ? releases(readFileSync(changelog, "utf8")).filter((r) => compare(r.version, app) > 0)
       : [];
-    const list = newer.map((r) => `- ${r.version}${r.summary ? `: ${r.summary}` : ""}`).join("\n");
-    message = `jimbo.ui ${latest} is out; this app is on ${app}. Say "what would the latest jimbo-ui change here?" to preview, or "update to the latest jimbo-ui".`;
+    const list = newer.map((r) => `- ${r.version} (${r.type})${r.summary ? `: ${r.summary}` : ""}`).join("\n");
+    // The number says what it takes (Semantic Versioning, read for 0.x): a breaking release among them means code changes.
+    const breaking = newer.filter((r) => r.type === "breaking").map((r) => r.version);
+    const takes = breaking.length ? `needs code changes (breaking: ${breaking.join(", ")})` : "is drop-in (copy the foundation files)";
+    message = `jimbo.ui ${latest} is out; this app is on ${app} — the update ${takes}. Say "what would the latest jimbo-ui change here?" to preview, or "update to the latest jimbo-ui".`;
     context = [
-      `jimbo.ui: this app is on ${app}${renamed}, and the installed jimbo-ui plugin is ${latest}, so there are newer brand guidelines to bring in.`,
+      `jimbo.ui: this app is on ${app}${renamed}, and the installed jimbo-ui plugin is ${latest}, so there are newer brand guidelines to bring in. The update ${takes}.`,
       newer.length ? `Releases since then (details and "Apps must" steps in ${changelog}):\n${list}` : "",
       "Mention this to the user once, early, in a line, and offer the jimbo-ui skill's preview or update workflow. Don't update without being asked.",
     ].filter(Boolean).join("\n");

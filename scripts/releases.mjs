@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /**
  * Write releases.json from CHANGELOG.md: every numbered release, newest
- * first, with its summary, its items by kind (changed, added, removed, fixed,
+ * first, with its summary, its update type (breaking, feature, fix — from
+ * its "**Update:**" line), its items by kind (changed, added, removed, fixed,
  * available), the components each item names (matched against
  * registry/components.json), and its "Apps must" steps. Apps' jimbo-ui config
  * section reads it from GitHub to say a newer release is out and what it
@@ -45,6 +46,9 @@ function bullets(lines) {
   return out.map((t) => t.replace(/\[([^\]]+)\]\([^)]+\)/g, "$1"));
 }
 
+/** "**Update:** breaking — …" → "breaking". */
+export const updateType = (text) => /^\*\*Update:\*\*\s*(breaking|feature|fix|first)/im.exec(text)?.[1]?.toLowerCase() ?? null;
+
 export function buildReleases() {
   const index = componentIndex();
   const tiers = new Map([...index.values()].map((c) => [c.id, c.tier]));
@@ -63,9 +67,10 @@ export function buildReleases() {
     const [heading, ...rest] = block.split("\n");
     const m = /^(\d+\.\d+\.\d+)(?:\s+—\s+(\S+))?/.exec(heading);
     if (!m) continue; // Unreleased
-    const release = { version: m[1], date: m[2] ?? null, summary: "", items: [], appsMust: [] };
-    const sections = rest.join("\n").split(/^### /m);
-    const intro = sections.shift().split("\n").find((l) => l.trim() && !l.startsWith("-"));
+    const body = rest.join("\n");
+    const release = { version: m[1], date: m[2] ?? null, type: updateType(body.split(/^### /m)[0]), summary: "", items: [], appsMust: [] };
+    const sections = body.split(/^### /m);
+    const intro = sections.shift().split("\n").find((l) => l.trim() && !l.startsWith("-") && !l.startsWith("**Update:**"));
     release.summary = intro?.trim() ?? "";
     for (const section of sections) {
       const [title, ...body] = section.split("\n");

@@ -205,11 +205,29 @@ app's equivalent, if it has one.
 
 ### Versions
 
-jimbo.ui is a work in progress, so it's on **0.x**: a release that asks apps
-to change their own code bumps the minor (0.6.0 → 0.7.0); fixes and small
-additions bump the patch (0.6.0 → 0.6.1). 1.0.0 comes when it's called
-stable. Work collects under "Unreleased" in `CHANGELOG.md` and is numbered
-only when a release is asked for, not per change. Releases tagged
+Numbering follows [Semantic Versioning](https://semver.org/), and **the
+number says what an update takes.** jimbo.ui is a work in progress, so it's
+on **0.x**, read the way npm and Cargo read 0.x versions: the MINOR is the
+breaking digit. Each release has an **Update** type on its changelog entry:
+
+| Update | What updating takes | 0.x (now) | From 1.0.0 |
+| --- | --- | --- | --- |
+| **breaking** | The app changes its own code — any Apps must step beyond copying the foundation files, or anything apps use removed or renamed | 0.11.0 → 0.12.0 | 1.4.2 → 2.0.0 |
+| **feature** | Drop-in: copy the foundation files; new pieces to adopt when wanted | 0.11.0 → 0.11.1 | 1.4.2 → 1.5.0 |
+| **fix** | Drop-in: copy the foundation files | 0.11.0 → 0.11.1 | 1.4.2 → 1.4.3 |
+
+So an app on 0.11.0 can take any 0.11.x without touching its own code,
+and 0.12.0 tells it before it starts that code will change. The changelog
+follows Keep a Changelog (Added, Changed, Deprecated, Removed, Fixed,
+Security); something to be removed is marked Deprecated in an earlier
+release where possible. A released number never changes (0.8.1, 0.8.2 and
+0.8.4 were breaking but went out as patches, before the rule was checked).
+`node scripts/versions.mjs --next` gives the number Unreleased needs, and
+`versions.mjs` fails a release numbered too low for its type; `releases.json`,
+the session-start check and the config section's About tab all show each
+release's type. 1.0.0 comes when it's called stable. Work collects under
+"Unreleased" in `CHANGELOG.md` and is numbered only when a release is asked
+for, not per change. Releases tagged
 1.0.0–3.1.0 before the renumbering are 0.1.0–0.5.0; an app still on an old
 number is on the matching 0.x release. The version is stated in the plugin
 manifests, the skill (`This is jimbo.ui X`) and the newest `CHANGELOG.md`
@@ -1054,7 +1072,7 @@ that cover differences between apps).
 3. **Promotion:** a component moves into the kit when two or more apps need
    it, or at once if it's clearly generic. Promotion means a generic rewrite
    with neutral names, plus the kit, this guide, the showcase and the Style
-   guide panel, released as a minor version with "Apps must: Nothing" and an
+   guide panel, released as a feature (a 0.x.PATCH, drop-in) with "Apps must: Nothing" and an
    **Available** list. Apps adopt it when they consolidate.
 4. **Domain components stay in the app.** They're listed in its
    `jimbo-ui.json` so nobody rebuilds them as something generic by mistake,
@@ -1193,3 +1211,9 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   domain entries). `inventory.mjs` reads the apps' pushed `jimbo-ui.json`
   with `gh`, flags stale checkouts, and `--json` prints the assembled
   registry. App sessions no longer commit to jimbo-ui.
+- **Unreleased** — The number says what an update takes: Semantic
+  Versioning read for 0.x (breaking → 0.MINOR, feature or fix →
+  0.x.PATCH; MAJOR / MINOR / PATCH from 1.0.0). Every changelog entry has an
+  **Update:** line; `versions.mjs` enforces it and `--next` gives the
+  number; the session-start check and the About tab show each release's
+  type, and the update workflow takes a drop-in update straight through.

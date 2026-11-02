@@ -68,7 +68,7 @@ dot in the accent; the favicon is the only graphic.
 - Contrast: `node scripts/contrast.mjs --check` must pass for every template
   after any change to `theme.ts` or `themes.ts`.
 - Plugin manifests: `claude plugin validate --strict .`
-- Versions: `node scripts/versions.mjs` (manifests, `foundation/src/lib/jimbo.ts`, SKILL.md, CHANGELOG agree; `releases.json` current — `node scripts/releases.mjs` rewrites it)
+- Versions: `node scripts/versions.mjs` (manifests, `foundation/src/lib/jimbo.ts`, SKILL.md, CHANGELOG agree; each release's number fits its **Update** type; `releases.json` current — `node scripts/releases.mjs` rewrites it). `--next` gives the next version.
 - Registry: `node scripts/inventory.mjs` (each app's pushed `jimbo-ui.json` via `gh`, checkouts in `~/Development` or `JIMBO_APPS_DIRS` for code checks; `--json` for the assembled registry)
 - Check UI at phone width (375 px) in a dark, a mid and a light template.
 
@@ -78,11 +78,14 @@ Follow "change and release the guidelines" in `skills/jimbo-ui/SKILL.md`. In sho
 
 1. Update `skills/jimbo-ui/guide.md` (and its "Change log of this guide") and
    `SKILL.md` if a rule or workflow changed.
-2. Add a `CHANGELOG.md` entry with Changed / Added / Removed and **Apps must**.
-   jimbo.ui is WIP, so 0.x: minor = apps must change their own code, patch =
-   fixes and small additions; 1.0.0 only when Ryan calls it stable. Record
+2. Add a `CHANGELOG.md` entry (Keep a Changelog sections and **Apps must**)
+   with an **Update:** line — breaking, feature or fix. The number follows
+   Semantic Versioning read for 0.x and says what an update takes:
+   breaking (apps change their own code) = next 0.MINOR, feature or fix
+   (drop-in) = next 0.x.PATCH; `node scripts/versions.mjs --next` gives it.
+   1.0.0 only when Ryan calls it stable (then MAJOR / MINOR / PATCH). Record
    work under "Unreleased" as you go; don't number or tag anything until
-   Ryan asks for a release.
+   Ryan asks for a release, and never change a released number.
 3. Bump `version` in both `.claude-plugin` files, `foundation/src/lib/jimbo.ts` and the "This is jimbo.ui"
    line in `SKILL.md`. Start the changelog entry with a one-line summary (the
    session-start check shows it to apps).

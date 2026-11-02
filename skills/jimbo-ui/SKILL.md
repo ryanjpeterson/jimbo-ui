@@ -7,9 +7,13 @@ description: Ryan's shared brand and UI system, jimbo.ui (repo and plugin jimbo-
 
 **This is jimbo.ui 0.11.0.** (Kept in step with the plugin version and the
 newest numbered `CHANGELOG.md` entry; `scripts/versions.mjs` checks.)
-jimbo.ui is a work in progress, so it's on 0.x: work collects under
-"Unreleased" in the changelog and is numbered only when Ryan asks for a
-release. Old tags 1.0.0–3.1.0 are now 0.1.0–0.5.0; an app still on an old
+jimbo.ui is a work in progress, so it's on 0.x. **The number says what an
+update takes** (Semantic Versioning, read for 0.x — guide section 1,
+Versions): a new 0.MINOR (0.11 → 0.12) is **breaking** — the app changes
+its own code; a 0.x.PATCH (0.11.0 → 0.11.1) is **feature** or **fix** —
+drop-in, copy the foundation files. Each changelog entry says which on its
+**Update:** line. Work collects under "Unreleased" in the changelog and is
+numbered only when Ryan asks for a release. Old tags 1.0.0–3.1.0 are now 0.1.0–0.5.0; an app still on an old
 number is on the matching 0.x release (1.0.0 → 0.1.0, 1.1.0 → 0.2.0,
 2.0.0 → 0.3.0, 3.0.0 → 0.4.0, 3.1.0 → 0.5.0).
 
@@ -111,7 +115,8 @@ this check, then the preview workflow if they want detail.
   component. A component moves into the kit when two or more apps need it
   (or at once when it's clearly generic): a generic rewrite with neutral
   names, plus the kit, guide, showcase and Style guide panel, released as a
-  minor version with "Apps must: Nothing" and an "Available" list. Domain
+  feature release (drop-in, a 0.x.PATCH) with "Apps must: Nothing" and an
+  "Available" list. Domain
   components stay in their app — listed in its `jimbo-ui.json`, never in
   jimbo-ui. **An app's facts live only in its own `jimbo-ui.json`:** an app
   session never writes them into jimbo-ui. jimbo-ui changes only when an app
@@ -289,7 +294,13 @@ update", or before updating if the user wants to look first.
 1. Read the app's `jimbo-ui.json`. Fetch tags; if the app is already on the
    latest version, say so and stop.
 2. Read every `CHANGELOG.md` entry after the app's version, oldest first, and
-   tell the user briefly what's coming.
+   tell the user briefly what's coming — and **what it takes, from the
+   numbers**: staying within the app's 0.MINOR (0.11.0 → 0.11.3), or only
+   feature and fix releases, is **drop-in** — copy the foundation files
+   (step 3), port any reference fixes, set the version, typecheck, commit.
+   Crossing a 0.MINOR (0.10.x → 0.11.0) means a **breaking** release: say
+   which, list its Apps must steps, and preview them before changing the
+   app's own code. Going up a minor at a time keeps each step small.
 3. Export the app's current version and the latest one. For each foundation
    file, compare the app's copy with the *old* release's copy: if the app
    changed it locally, show the user and fold the change into jimbo-ui or
@@ -390,11 +401,24 @@ To release one:
    must pass. If the shell or kit changed, keep `showcase/src/Shell.tsx` and
    the demo pages in step.
 3. While working, record changes under **Unreleased** in `CHANGELOG.md`
-   (Changed / Added / Removed and **Apps must**, or "Nothing — copy the
-   foundation files") and don't bump anything. Only when Ryan asks for a
-   release: turn Unreleased into the new version's entry and leave an empty
-   Unreleased above it. Versions (jimbo.ui is a work in progress, so 0.x): minor (0.6 → 0.7) when
-   apps must change their own code, patch for fixes and small additions.
+   (Keep a Changelog: Added / Changed / Deprecated / Removed / Fixed /
+   Security, and **Apps must**, or "Nothing — copy the foundation files"),
+   with an **Update:** line saying what updating takes, and don't bump
+   anything. Classify the whole of Unreleased by its biggest change:
+   - **breaking** — any Apps must step beyond copying the foundation files
+     (porting reference code, editing app code, `index.html`, its
+     `jimbo-ui.json` or `CLAUDE.md`), or anything removed or renamed that
+     apps use. Deprecate first where you can: mark it **Deprecated** in a
+     feature release, remove it in a later breaking one.
+   - **feature** — something new apps can adopt when they want; updating
+     is still drop-in.
+   - **fix** — only fixes that arrive with the foundation files.
+   Only when Ryan asks for a release: `node scripts/versions.mjs --next`
+   gives the number (breaking → next 0.MINOR, feature or fix → next
+   0.x.PATCH; from 1.0.0, MAJOR / MINOR / PATCH), turn Unreleased into that
+   version's entry and leave an empty Unreleased above it. Don't pick a
+   number by feel, and never change a released one — `versions.mjs` fails a
+   release numbered too low for its type.
 4. Bump `version` in `.claude-plugin/plugin.json`,
    `.claude-plugin/marketplace.json`, `foundation/src/lib/jimbo.ts` and the
    "This is jimbo.ui" line at the top of this file; run `node scripts/releases.mjs`
