@@ -34,6 +34,26 @@ the matching 0.x release.
 
 ## Unreleased
 
+Three components from jimbo-theory join the kit, and EntityRow can show a code in its avatar.
+
+**Update:** feature — drop-in; nothing to change in apps.
+
+### Added
+
+- **`ToggleGrid`** (kit): several picks from a small fixed set as a wrapping grid of 44 px toggle buttons (`columns`, `smColumns`), picked ones a flat accent fill with `aria-pressed`.
+- **`LinkChips`** (kit): related things as a wrapping row of linked chips, each with an optional muted second label and an 8 px dot in a theme colour.
+- **`FloatingBar`** (kit): a status line and its actions floating above the dock, with an optional pulsing `live` dot. The theme save bar now uses it.
+- **`EntityRow avatarText`**: the placeholder avatar shows a short code or number instead of the name's initials.
+- Guide: section 8 rows for the three, and "Picking several" and "Related things" in the component menu. The Style guide panel shows them.
+
+### Available
+
+- `ToggleGrid`, `LinkChips`, `FloatingBar`, `EntityRow avatarText`
+
+### Apps must
+
+- Nothing — copy the foundation files. Apps that want them port them from `reference/web/src/components/ui/kit.tsx` (jimbo-theory has its own copies of ToggleGrid and LinkChips and an equivalent practice bar to swap for these).
+
 ## 0.11.1 — 2026-11-02
 
 The version number now says what an update takes: a new 0.MINOR needs code changes, a 0.x.PATCH is drop-in.

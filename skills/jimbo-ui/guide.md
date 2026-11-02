@@ -832,7 +832,7 @@ and body fonts.
 | `List` + `ListGroupLabel` | A card of rows, optionally grouped (by month: a wrapper that starts with a `ListGroupLabel`); group labels are support text with an 8 px support dot, on a support wash fading right. `layout="tiles"` shows the same children as a grid of cards (one column on phones, two or three wider); `bare` drops the card for use inside `Section flush` |
 | `LayoutSwitch` + `useListLayout` | Lets people pick rows or tiles for a `List` (small `Tabs` in the section's action slot); the choice is remembered per list in the browser |
 | `EventRow` | A dated item. `DateBlock` on the left, a `status` dot (`{ tone, label, live? }` — `live` pulses); `to` to go somewhere or `onOpen` to open something in place (a log in a `Sheet`); `selected`/`onSelect` for select mode |
-| `EntityRow` | A named thing with an avatar (a person, a place) |
+| `EntityRow` | A named thing with an avatar (a person, a place); `avatarText` puts a short code or number in the placeholder avatar instead of initials |
 | `DateBlock` | A tear-off calendar ticket (52 px wide, 12 px radius, `surface-2`): the month on a solid highlight band, the day big below, then the year or weekday |
 | `MediaCard` | Image-led grid card (`aspect="portrait"` for posters) |
 | `LinkCard` | A card that navigates (eyebrow / title / sub); `accent` for the one to notice |
@@ -858,6 +858,9 @@ and body fonts.
 | `KeyValue` | A read-only label and value: `inline` (settings, a job's details) or `stacked` (a detail page's facts). Several in a `List` or `Section flush` |
 | `SwitchRow` | One setting on or off: the whole row is the switch (`role="switch"`), a label and a hint |
 | `Autocomplete` | Pick an existing record as you type, or `onCreate` a new one: a field with matches under it (arrow keys, Enter, Escape). For several, keep picks as chips above it |
+| `ToggleGrid` | Several picks from a small fixed set (days, tags, notes) as a wrapping grid of 44 px toggle buttons, picked ones a flat accent fill with `aria-pressed`; `columns` on phones, `smColumns` wider. For one pick use `Tabs` |
+| `LinkChips` | Related things to go to, as a wrapping row of 44 px linked chips: a label, an optional muted second label and an optional 8 px dot (`tone`). See-also links, neighbours, tags that navigate |
+| `FloatingBar` | A status line and its actions floating above the dock (`--above-dock`): the save bar, a select-mode action bar, Start/Stop for something running (`live` pulses its dot). Pad the page bottom (`pb-20`) so it never covers the last section |
 | `LIVE` | Add to a status dot to pulse it while something is happening; `RowStatus.live` and `Badge live` use it |
 | `ThemeScope` | Part of the page in another theme — colours, type and backdrop (`themeVars`, `.theme-scope`) — without touching the rest: carousels of looks, previews |
 | `MapView` (`components/MapView.tsx`) | **Every map.** Places as flat highlight pins (`markerIcon`) on the theme's map style (`mapStyles`: the page colour for land, accent-tinted roads, no POIs or transit); `size` `compact` (160 px, inline, no gestures), `full` (320 px), `fill` (a map page). With no Maps key it draws a themed preview with the same pins |
@@ -893,6 +896,8 @@ one here fits.
 | **Calls to action** | primary `Button` · `LinkCard` with `accent` · `FullBleed` band in a brand colour · `HeroSection` actions |
 | **Switching views** | `Tabs` (2–4, segmented) · `PillTabs` (wrapping filters) · `ViewSwitch` (list ⇄ map) · `SelectField` (many options on phones) |
 | **Finding things** | `SearchField` · `PillTabs` filters · `SelectField` sort · `Autocomplete` (pick or add a record) |
+| **Picking several** | `ToggleGrid` (a small fixed set) · `Autocomplete` with chips (many records) · `SwitchRow`s (named on/off settings) |
+| **Related things** | `LinkChips` (a wrapping row) · `LinkCard` stack (a few, with a line each) · `List` + `EntityRow` |
 | **Empty or loading** | `EmptyState` (with `ThemeDots`) · `Loading` skeleton |
 | **Status** | `Badge` (detail pages) · status dot on rows · `DateBlock` ticket |
 | **Settings** | `SwitchRow` (on/off), `KeyValue` (read-only), `.field`, `SelectField`, `RangeField`, `Tabs`, `Section` cards |
@@ -1217,3 +1222,8 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   **Update:** line; `versions.mjs` enforces it and `--next` gives the
   number; the session-start check and the About tab show each release's
   type, and the update workflow takes a drop-in update straight through.
+- **Unreleased** — Three kit components from jimbo-theory: `ToggleGrid`
+  (several picks from a small set), `LinkChips` (related things to go to)
+  and `FloatingBar` (a status and its actions above the dock; the save bar
+  uses it). `EntityRow avatarText` shows a code or number in the avatar.
+  The component menu gains Picking several and Related things.

@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { HeaderTitle } from "@/components/HeaderTitle";
 import { ColorPicker } from "@/components/ColorPicker";
 import {
-  Autocomplete, Badge, BarChart, DateBlock, KeyValue, LayoutSwitch, SwitchRow, EmptyState, EntityRow, EventRow, LinkCard, List, ListGroupLabel, Loading, MediaCard, PageHeader, Pager,
+  Autocomplete, FloatingBar, LinkChips, ToggleGrid, Badge, BarChart, DateBlock, KeyValue, LayoutSwitch, SwitchRow, EmptyState, EntityRow, EventRow, LinkCard, List, ListGroupLabel, Loading, MediaCard, PageHeader, Pager,
   PillTabs, RankedList, SearchField, Section, SelectField, Sheet, Sparkline, StatGrid, StatTile, Tabs, ThemeDots, TrendChart, useListLayout, ViewSwitch, type Tone,
 } from "@/components/ui/kit";
 import { FONTS, THEME_KEYS, themeHex } from "@/lib/theme";
@@ -83,6 +83,8 @@ export function StyleGuidePanel() {
   const [colour, setColour] = useState("#A8FF3E");
   const [ac, setAc] = useState("");
   const [on, setOn] = useState(true);
+  const [days, setDays] = useState<string[]>(["Mon", "Wed"]);
+  const [bar, setBar] = useState(false);
 
   return (
     <div className="space-y-10">
@@ -268,6 +270,7 @@ export function StyleGuidePanel() {
           <EventRow onOpen={() => setSheet(true)} date="2026-04-02" title="EventRow that opens a sheet" subtitle="onOpen; a live status pulses" status={{ tone: "yellow", label: "Running", live: true }} />
           <EventRow to="/jimbo-ui?tab=style" date="2026-07-12" title="EventRow in select mode" subtitle="Tap to tick" selected={picked} onSelect={() => setPicked((p) => !p)} />
           <EntityRow to="/jimbo-ui?tab=style" name="EntityRow — a person or place" sub="4 items" round />
+          <EntityRow to="/jimbo-ui?tab=style" name="EntityRow with avatarText" sub="The avatar shows a code or number instead of initials" avatarText="12" />
         </List>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           <MediaCard to="/jimbo-ui?tab=style" name="MediaCard" sub="Image card" meta="3 items" />
@@ -288,6 +291,25 @@ export function StyleGuidePanel() {
           <DateBlock date="2026-10-23" showYear />
           <p className="meta">DateBlock — the ticket-style date on every dated row.</p>
         </div>
+      </Block>
+
+      <Block title="Picks, related links and the floating bar" note="ToggleGrid for several picks from a small set; LinkChips for related things to go to; FloatingBar for a status and its actions above the dock.">
+        <Section title="ToggleGrid">
+          <ToggleGrid columns={4} smColumns={7} selected={days} onToggle={(d) => setDays((xs) => (xs.includes(d) ? xs.filter((x) => x !== d) : [...xs, d]))}
+            options={["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => ({ value: d, label: d }))} />
+        </Section>
+        <Section title="LinkChips">
+          <LinkChips items={[
+            { to: "/jimbo-ui?tab=style", label: "Main hall", sub: "next door", tone: "highlight" },
+            { to: "/jimbo-ui?tab=style", label: "Studio B", sub: "same floor" },
+            { to: "/jimbo-ui?tab=style", label: "Rooftop", sub: "3 events", tone: "support" },
+          ]} />
+        </Section>
+        <div className="card flex flex-wrap items-center gap-3 p-5">
+          <Button variant="secondary" onClick={() => setBar((b) => !b)}>{bar ? "Hide" : "Show"} a FloatingBar</Button>
+          <p className="meta">Floats above the dock; the save bar uses it too.</p>
+        </div>
+        {bar && <FloatingBar live actions={<Button size="sm" onClick={() => setBar(false)}>Stop</Button>}>Running · 2 of 5</FloatingBar>}
       </Block>
 
       <Block title="States and overlays">

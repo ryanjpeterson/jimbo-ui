@@ -24,7 +24,7 @@ import { BRAND } from "@/lib/brand.config";
 import { useBrand } from "@/lib/useBrand";
 import { Button } from "@/components/ui/button";
 import { ColorPicker } from "@/components/ColorPicker";
-import { PillTabs, RangeField, SearchField, Sheet, Tabs } from "@/components/ui/kit";
+import { FloatingBar, PillTabs, RangeField, SearchField, Sheet, Tabs } from "@/components/ui/kit";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Templates
@@ -419,19 +419,16 @@ export function ThemeSaveBar({ d }: { d: ThemeDraft }) {
   const { dirty, note, saving, save, undo, setNote } = d;
   if (!dirty && !note) return null;
   return (
-    <div className="fixed inset-x-0 z-40 flex justify-center px-3 bottom-[var(--above-dock)]">
-      <div className="flex w-full max-w-md items-center gap-2 rounded-2xl border border-border bg-surface/95 p-2 pl-4 shadow-2xl shadow-black/50 backdrop-blur-xl">
-        <p className="min-w-0 flex-1 truncate text-sm font-semibold">{dirty ? "Unsaved look" : note}</p>
-        {dirty ? (
-          <>
-            <Button size="sm" variant="ghost" onClick={undo}>Undo</Button>
-            <Button size="sm" disabled={saving} onClick={() => void save()}>{saving ? "Saving…" : "Save"}</Button>
-          </>
-        ) : (
-          <Button size="sm" variant="ghost" onClick={() => setNote(null)}>OK</Button>
-        )}
-      </div>
-    </div>
+    <FloatingBar actions={dirty ? (
+      <>
+        <Button size="sm" variant="ghost" onClick={undo}>Undo</Button>
+        <Button size="sm" disabled={saving} onClick={() => void save()}>{saving ? "Saving…" : "Save"}</Button>
+      </>
+    ) : (
+      <Button size="sm" variant="ghost" onClick={() => setNote(null)}>OK</Button>
+    )}>
+      {dirty ? "Unsaved look" : note}
+    </FloatingBar>
   );
 }
 
