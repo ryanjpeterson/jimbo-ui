@@ -34,6 +34,30 @@ the matching 0.x release.
 
 ## Unreleased
 
+## 0.11.4 — 2026-11-02
+
+Solid fills with no outline, glass on anything over the backdrop, Style guide sections, and a showcase where random looks take turns over every component.
+
+**Update:** feature — drop-in; nothing to change in apps.
+
+### Added
+
+- **Style guide sections** (reference `StyleGuidePanel`): the blocks sit in five sections — Brand and type, Controls, Numbers and charts, Lists, States — with toggles at the top, one shown at a time instead of one long page. An app adds its own domain components as extra sections with `more={[{ value, label, content }]}`.
+
+### Changed
+
+- **Solid fills, no outlines:** `.lit-*` and `.btn-primary` drop their darker inner outline — one flat colour. Selected `PillTabs`, `ToggleGrid` picks, `SwitchRow` switches and row ticks are the solid fill with no coloured border, and the dock's active tab is a solid accent fill instead of a tint with an outline.
+- **Glass on the backdrop:** unselected `PillTabs` are `.glass` (frosted, blurred) instead of a bare outline, so their text keeps its contrast over any backdrop pattern. Guide: anything sitting straight on the backdrop is `.glass`.
+- Showcase: Home has it all now. Ten looks picked at random on each load (a random tone, fonts and backdrop for each) take turns on the whole page — colours, type, backdrop, the hero and the map — every 15 seconds, fading slowly (1.2 s) from the last. A small control sits top right above the hero and sticks under the bar as the page scrolls (on phones as a full-width frosted strip, so it never covers content): the look's name and a countdown to the next, arrows to step (← → keys too) that pause the timer, play / pause, and *Use* to keep one. It's a preview until then, and leaving Home puts the saved look back. Below it, every component in the section toggles, plus Maps and Release updates. The Components tab is gone (its old link lands on Home).
+
+### Available
+
+- `StyleGuidePanel` sections and its `more` prop
+
+### Apps must
+
+- Nothing — copy the foundation files (the flat `.lit-*` and `.btn-primary` come with them). Apps that want the sections, the glass pills and the solid selected states port `StyleGuidePanel.tsx`, and the `PillTabs`, `ToggleGrid`, `SwitchRow`, row-tick and dock-tab classes from `kit.tsx` and `AppShell.tsx` in `reference/web/src/`.
+
 ## 0.11.3 — 2026-11-02
 
 The showcase steps through its looks with Previous and Next, each fading slowly into the next.

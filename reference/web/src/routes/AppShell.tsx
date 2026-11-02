@@ -96,7 +96,7 @@ export function AppShell({ tabs, actions, onRefresh, width = "column", children 
                 }}
                 className={cn(
                   "relative flex h-14 flex-col items-center justify-center gap-0.5 rounded-[14px] transition-[background-color,color,transform] duration-200 active:scale-[0.92]",
-                  active ? "bg-accent/15 text-accent shadow-[inset_0_0_0_1px_rgb(var(--c-accent)/0.3)]" : "text-text-muted active:bg-white/5",
+                  active ? "lit-accent" : "text-text-muted active:bg-surface-2",
                 )}>
                 <DockIcon active={active}>{t.icon}</DockIcon>
                 <span className={cn("text-10.5 tracking-wide", active ? "font-bold" : "font-semibold")}>{t.label}</span>

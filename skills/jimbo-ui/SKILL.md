@@ -5,7 +5,7 @@ description: Ryan's shared brand and UI system, jimbo.ui (repo and plugin jimbo-
 
 # jimbo.ui
 
-**This is jimbo.ui 0.11.3.** (Kept in step with the plugin version and the
+**This is jimbo.ui 0.11.4.** (Kept in step with the plugin version and the
 newest numbered `CHANGELOG.md` entry; `scripts/versions.mjs` checks.)
 jimbo.ui is a work in progress, so it's on 0.x. **The number says what an
 update takes** (Semantic Versioning, read for 0.x — guide section 1,
@@ -67,9 +67,12 @@ this check, then the preview workflow if they want detail.
   (`.fade-both` when something sits above) — never a hard bottom edge, a
   border under them, or a fade to solid `bg` (the page's backdrop makes
   that a line).
-- Coloured shapes are flat (`.lit-*`, `.btn-primary`, `.dot-*`) — no gloss,
-  gradients or glows; depth comes from layers, borders and shadows, lightly frosted `.glass` (mostly solid, never
-  see-through). Softly rounded corners, not pills (`rounded-control` for
+- Coloured shapes are one solid colour (`.lit-*`, `.btn-primary`, `.dot-*`)
+  — no outline, no tint-plus-border, no gloss, gradients or glows; a selected
+  pill or tab is the solid fill with `border-transparent`. Depth comes from
+  layers, borders and shadows. Anything sitting straight on the backdrop
+  (floating controls, unselected pills, tabs, the pager) is `.glass` — mostly
+  solid with a blur, never a bare outline or see-through. Softly rounded corners, not pills (`rounded-control` for
   buttons and pills); full circles only for the motif.
 - Type: the theme picks a font for headings and one for body (`FONTS`:
   sans, serif, mono, and decorative for headings only) with weight and

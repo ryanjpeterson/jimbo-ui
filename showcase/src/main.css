@@ -4,3 +4,9 @@
 @layer base {
   body { @apply bg-bg font-body text-text-base antialiased; }
 }
+
+/* Stepping through looks on Home: the whole page fades slowly from one look to the next. */
+::view-transition-old(root),
+::view-transition-new(root) { animation-duration: 1.2s; animation-timing-function: ease-in-out; }
+/* Taps go through the fade to the page, so Next can be pressed again mid-fade. */
+::view-transition { pointer-events: none; }

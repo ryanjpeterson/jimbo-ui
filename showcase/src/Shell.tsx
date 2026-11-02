@@ -1,4 +1,4 @@
-/** The showcase app: the reference AppShell with four tabs, two top-bar actions, the demo routes and the jimbo-ui config section under Settings. */
+/** The showcase app: the reference AppShell with three tabs, two top-bar actions, the demo routes and the jimbo-ui config section under Settings. */
 
 import { useState } from "react";
 import { Route, Routes } from "react-router-dom";
@@ -11,11 +11,10 @@ import { CatalogueRoutes } from "@/archetypes/catalogue";
 import { DashboardPage } from "@/archetypes/dashboard";
 import { StatusPage } from "@/archetypes/status";
 import { HomeDemo } from "./Home";
-import { ArchetypesPage, CatalogueNav, ComponentsPage, SettingsPage } from "./pages";
+import { ArchetypesPage, CatalogueNav, SettingsPage } from "./pages";
 
 const TABS: ShellTab[] = [
   { to: "/", label: "Home", icon: <path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z" /> },
-  { to: "/components", label: "Components", icon: <><rect x="3" y="3" width="7.5" height="7.5" rx="1.5" /><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5" /><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5" /><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5" /></> },
   { to: "/archetypes", label: "Archetypes", icon: <><rect x="3" y="4" width="18" height="16" rx="2" /><path d="M3 9h18M9 9v11" /></> },
   { to: "/settings", label: "Settings", also: ["/jimbo-ui"], icon: <><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1" /><circle cx="15" cy="6" r="2" /><circle cx="9" cy="12" r="2" /><circle cx="17" cy="18" r="2" /></> },
 ];
@@ -36,7 +35,8 @@ export function Shell() {
     </>}>
       <Routes>
         <Route path="/" element={<HomeDemo />} />
-        <Route path="/components" element={<ComponentsPage />} />
+        {/* The components live on Home now; old links land there. */}
+        <Route path="/components" element={<HomeDemo />} />
         <Route path="/archetypes" element={<ArchetypesPage />} />
         <Route path="/archetypes/catalogue/*" element={<CatalogueRoutes base="/archetypes/catalogue" nav={(current) => <CatalogueNav current={current} />} />} />
         <Route path="/archetypes/dashboard" element={<DashboardPage />} />

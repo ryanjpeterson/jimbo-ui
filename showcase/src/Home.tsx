@@ -1,155 +1,215 @@
 /**
- * The showcase's front page: a hero with looks to step through (Previous /
- * Next), each fading slowly into the next. Each look shows a different piece
- * of the kit in a different theme, font and backdrop — all inside
- * ThemeScope, so the rest of the page keeps its own.
+ * The showcase's front page: a hero and every kit component, a section at a
+ * time, while ten looks picked at random on each load take turns on the whole
+ * page — colours, type and backdrop — every 15 seconds, fading slowly from
+ * the last. A floating control top right steps, pauses and keeps one.
  */
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import { Link } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
-import {
-  Badge, EventRow, HeroSection, LinkCard, List, StatGrid, StatTile, ThemeDots, ThemeScope, Tabs,
-} from "@/components/ui/kit";
+import { HeroSection, LinkCard } from "@/components/ui/kit";
 import { Button } from "@/components/ui/button";
-import { HeaderTitle } from "@/components/HeaderTitle";
 import { MapView } from "@/components/MapView";
-import { api } from "@/lib/api";
-import { BACKDROPS, FONTS, type PageTone, type Theme } from "@/lib/theme";
-import { ALL_FAMILIES, familyLook } from "@/lib/themes";
 import { cn } from "@/lib/cn";
+import { StyleGuidePanel } from "@/routes/config/StyleGuidePanel";
+import { api } from "@/lib/api";
+import { applyTheme, BACKDROPS, FONTS, fullTheme, loadFonts, type PageTone, type Theme } from "@/lib/theme";
+import { ALL_FAMILIES, familyLook } from "@/lib/themes";
+import type { Brand } from "@/lib/useBrand";
+import { UpdatesDemo } from "./pages";
 
-type Slide = { template: string; tone: PageTone; headings: string; body: string; backdrop: string; base: "solid" | "gradient" | "glow"; show: string; Render: (p: { theme: Theme }) => ReactNode };
+type Look = { name: string; tone: PageTone; headings: string; body: string; backdrop: string; base: string; theme: Theme };
+
+const LOOK_COUNT = 10;
+const TONES: PageTone[] = ["light", "mid", "dark"];
+const BASES = ["solid", "gradient", "glow"] as const;
+const pick = <T,>(xs: readonly T[]): T => xs[Math.floor(Math.random() * xs.length)]!;
+
+/** Ten different looks, each in a random tone with random fonts and backdrop. Decorative faces only head. */
+function randomLooks(n: number): Look[] {
+  const families = [...ALL_FAMILIES];
+  for (let k = families.length - 1; k > 0; k--) {
+    const j = Math.floor(Math.random() * (k + 1));
+    [families[k], families[j]] = [families[j]!, families[k]!];
+  }
+  const fonts = Object.keys(FONTS);
+  const bodyFonts = fonts.filter((k) => FONTS[k]!.group !== "Decorative");
+  const patterns = BACKDROPS.filter((b) => b.key !== "none");
+  return families.slice(0, n).map((f) => {
+    const tone = pick(TONES), headings = pick(fonts), body = pick(bodyFonts), backdrop = pick(patterns), base = pick(BASES);
+    const theme = { ...familyLook(f, tone).template.theme, fonts: { headings, body }, backdrop: { pattern: backdrop.key, base } };
+    return { name: f.name, tone, headings, body, backdrop: backdrop.label, base, theme };
+  });
+}
+
+// Picked once per page load.
+const LOOKS = randomLooks(LOOK_COUNT);
 
 const PINS = [
   { id: "a", label: "North", lat: 43.67, lng: -79.39 }, { id: "b", label: "Harbour", lat: 43.64, lng: -79.38 },
   { id: "c", label: "West", lat: 43.65, lng: -79.42 }, { id: "d", label: "East", lat: 43.66, lng: -79.35 },
 ];
 
-function Stats() {
+function Maps() {
   return (
-    <StatGrid>
-      <StatTile label="Done" value={128} accent="accent" />
-      <StatTile label="People" value={342} accent="support" />
-      <StatTile label="Places" value={27} accent="highlight" />
-      <StatTile label="This year" value={41} />
-    </StatGrid>
-  );
-}
-
-function Rows() {
-  return (
-    <List>
-      <EventRow to="/archetypes/catalogue/entries/1" date="2026-11-14" title="Winter planning day" subtitle="Main hall" status={{ tone: "yellow", label: "Going" }} />
-      <EventRow to="/archetypes/catalogue/entries/2" date="2026-10-19" title="Design review" subtitle="Studio B" status={{ tone: "accent", label: "Done" }} />
-    </List>
-  );
-}
-
-function Controls() {
-  const [tab, setTab] = useState<"list" | "grid">("list");
-  return (
-    <div className="card space-y-4 p-5">
-      <Tabs value={tab} onChange={setTab} options={[{ value: "list", label: "List" }, { value: "grid", label: "Grid" }]} />
-      <div className="flex flex-wrap gap-2">
-        <Badge tone="accent">Done</Badge><Badge tone="yellow">Going</Badge><Badge tone="purple">Maybe</Badge><Badge tone="red">Missed</Badge>
+    <>
+      <div className="px-0.5">
+        <h2 className="h-section">MapView</h2>
+        <p className="meta mt-1">The theme's own map style and flat highlight pins; MapPinCard for the chosen place.</p>
       </div>
-      <div className="flex flex-wrap gap-2"><Button size="sm">Save</Button><Button size="sm" variant="secondary">Share</Button><Button size="sm" variant="ghost">Undo</Button></div>
-    </div>
+      <MapView pins={PINS} selected="b" size="full" />
+    </>
   );
 }
 
-function Brand() {
-  return (
-    <div className="card space-y-4 p-6">
-      <HeaderTitle size="lg" />
-      <p className="font-display text-2xl leading-tight">The name is the brand.</p>
-      <ThemeDots size={16} />
-    </div>
-  );
+type Settled = { then: (done: () => void, failed: () => void) => unknown };
+type ViewTransitionDoc = Document & { startViewTransition?: (update: () => void) => { ready: Settled; finished: Settled } };
+
+// While a fade runs the browser sends every tap to the page root, not the button under it.
+let fading = false;
+let fades = 0;
+
+/** Runs `update`, fading slowly from the old page to the new where the browser can (view transitions). */
+function fadeTo(update: () => void) {
+  const doc = document as ViewTransitionDoc;
+  if (!doc.startViewTransition || matchMedia("(prefers-reduced-motion: reduce)").matches) return update();
+  // A quick second tap skips the fade in progress; that's fine, not an error.
+  const t = doc.startViewTransition(update);
+  const id = ++fades;
+  fading = true;
+  // A fade cut short by the next one ends too, but the page is still fading.
+  const done = () => { if (id === fades) fading = false; };
+  t.ready.then(() => {}, done);
+  t.finished.then(done, done);
 }
 
-function Form() {
-  return (
-    <div className="card space-y-3 p-5">
-      <p className="font-display text-xl">Add an entry</p>
-      <label className="label" htmlFor="slide-title">Title</label>
-      <input id="slide-title" className="field h-12 w-full" defaultValue="Saturday swim" readOnly />
-      <Button className="w-full">Add entry</Button>
-    </div>
-  );
-}
+const LOOK_SECONDS = 15;
 
-function MapSlide({ theme }: { theme: Theme }) {
-  return <MapView pins={PINS} selected="b" size="full" theme={theme} />;
-}
-
-const SLIDES: Slide[] = [
-  { template: "Pilot", tone: "dark", headings: "archivo", body: "inter", backdrop: "ripples", base: "glow", show: "Headline numbers", Render: Stats },
-  { template: "Breath of the Wild", tone: "dark", headings: "marcellus", body: "manrope", backdrop: "hexagons", base: "gradient", show: "Dated lists", Render: Rows },
-  { template: "Halloween", tone: "dark", headings: "old-english", body: "space-grotesk", backdrop: "burst", base: "glow", show: "Tabs, badges, buttons", Render: Controls },
-  { template: "Gig poster", tone: "light", headings: "work-sans", body: "dm-sans", backdrop: "halftone", base: "solid", show: "The name as the brand", Render: Brand },
-  { template: "The Wind Waker", tone: "mid", headings: "playfair", body: "manrope", backdrop: "stripes", base: "gradient", show: "Forms and fields", Render: Form },
-  { template: "Sage", tone: "mid", headings: "space-mono", body: "ibm-plex-mono", backdrop: "contours", base: "solid", show: "Maps in the theme", Render: MapSlide },
-  { template: "Majora's Mask", tone: "light", headings: "libre-baskerville", body: "lora", backdrop: "deco", base: "gradient", show: "Dated lists, light", Render: Rows },
-  { template: "Dusk", tone: "dark", headings: "fraunces", body: "eb-garamond", backdrop: "grain", base: "glow", show: "Headline numbers, serif", Render: Stats },
-  { template: "Canada", tone: "light", headings: "dm-serif", body: "source-serif", backdrop: "paper", base: "solid", show: "Tabs, badges, buttons", Render: Controls },
-];
-
-const themeOf = (s: Slide): Theme => {
-  const f = ALL_FAMILIES.find((x) => x.name === s.template) ?? ALL_FAMILIES[0]!;
-  return { ...familyLook(f, s.tone).template.theme, fonts: { headings: s.headings, body: s.body }, backdrop: { pattern: s.backdrop as never, base: s.base } };
-};
-
+/**
+ * The look control, top right. It sits in the page above the hero, so it
+ * covers nothing, then sticks under the top bar as the page scrolls — on
+ * phones as a full-width frosted strip, like the bar, so content slides
+ * under it rather than into it. Every 15 seconds the next look goes on the whole page as a
+ * preview — nothing is saved until "Use". The arrows (buttons or ← → keys)
+ * step by hand and pause the timer; play starts it again. The preview goes
+ * in as the brand everything reads (the hero, the map, the colour values),
+ * so every part follows; leaving the page fetches the saved look back.
+ */
 function LookStepper() {
-  const [i, setI] = useState(0);
-  const [prev, setPrev] = useState<number | null>(null);
+  // null is the saved look the page opened in.
+  const [i, setI] = useState<number | null>(null);
+  const [playing, setPlaying] = useState(true);
+  const [left, setLeft] = useState(LOOK_SECONDS);
   const [applied, setApplied] = useState(false);
   const qc = useQueryClient();
-  const s = SLIDES[i]!;
-  const go = (step: number) => {
-    setPrev(i);
-    setI((i + step + SLIDES.length) % SLIDES.length);
+  const prevBtn = useRef<HTMLButtonElement>(null);
+  const nextBtn = useRef<HTMLButtonElement>(null);
+  const goRef = useRef<(step: number, byHand?: boolean) => void>(() => {});
+  const bar = useRef<HTMLDivElement>(null);
+  const [stuck, setStuck] = useState(false);
+  useEffect(() => {
+    const check = () => {
+      const el = bar.current;
+      if (el) setStuck(el.getBoundingClientRect().top <= parseFloat(getComputedStyle(el).top) + 1);
+    };
+    check();
+    addEventListener("scroll", check, { passive: true, capture: true });
+    addEventListener("resize", check);
+    return () => { removeEventListener("scroll", check, { capture: true }); removeEventListener("resize", check); };
+  }, []);
+  useEffect(() => {
+    // A tap on an arrow mid-fade lands on the page root; send it on to the button it was on.
+    const onTap = (e: MouseEvent) => {
+      if (!fading || e.target !== document.documentElement) return;
+      const on = (b: HTMLButtonElement | null) => {
+        const r = b?.getBoundingClientRect();
+        return !!r && e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+      };
+      if (on(nextBtn.current)) goRef.current(1);
+      else if (on(prevBtn.current)) goRef.current(-1);
+    };
+    // ← → step through the looks, unless someone is typing.
+    const onKey = (e: KeyboardEvent) => {
+      if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+      const el = e.target as HTMLElement;
+      if (el.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(el.tagName)) return;
+      if (e.key === "ArrowRight") goRef.current(1);
+      else if (e.key === "ArrowLeft") goRef.current(-1);
+    };
+    document.addEventListener("click", onTap);
+    document.addEventListener("keydown", onKey);
+    return () => { document.removeEventListener("click", onTap); document.removeEventListener("keydown", onKey); };
+  }, []);
+  useEffect(() => {
+    loadFonts(LOOKS.flatMap((x) => [x.headings, x.body]));
+    return () => void qc.invalidateQueries({ queryKey: ["brand"] });
+  }, [qc]);
+  useEffect(() => {
+    if (!playing) return;
+    const t = setInterval(() => setLeft((n) => n - 1), 1000);
+    return () => clearInterval(t);
+  }, [playing]);
+  useEffect(() => { if (playing && left <= 0) goRef.current(1, false); }, [playing, left]);
+
+  const go = (step: number, byHand = true) => {
+    const n = i === null ? (step > 0 ? 0 : LOOKS.length - 1) : (i + step + LOOKS.length) % LOOKS.length;
+    const { theme } = LOOKS[n]!;
+    setI(n);
+    setLeft(LOOK_SECONDS);
+    if (byHand) setPlaying(false);
     setApplied(false);
+    fadeTo(() => {
+      flushSync(() => qc.setQueryData<Brand>(["brand"], (b) => ({ theme, colors: fullTheme(theme), faviconUrl: b?.faviconUrl ?? null })));
+      applyTheme(theme);
+    });
   };
+  goRef.current = go;
   const useIt = async () => {
-    await api.setTheme(themeOf(s));
+    if (i === null) return;
+    await api.setTheme(LOOKS[i]!.theme);
     await qc.invalidateQueries({ queryKey: ["brand"] });
     setApplied(true);
+    setPlaying(false);
   };
+  const s = i === null ? null : LOOKS[i]!;
+  const arrow = "flex h-11 w-11 shrink-0 items-center justify-center rounded-control text-text-muted transition-colors hover:bg-surface-2 hover:text-text-base";
 
   return (
-    <div className="space-y-3">
-      {/* Every look sits in the same cell, so the box is always the tallest one's height. The new
-          look fades in slowly over the one before it; the rest stay hidden underneath. */}
-      <div className="grid overflow-hidden rounded-2xl border border-border">
-        {SLIDES.map((x, n) => {
-          const theme = themeOf(x);
-          return (
-            <ThemeScope key={n} theme={theme}
-              className={cn("p-4 sm:p-6 [grid-area:1/1]",
-                n === i ? "z-20 opacity-100 transition-opacity duration-[1200ms] ease-in-out motion-reduce:transition-none"
-                  : n === prev ? "z-10 opacity-100" : "invisible opacity-0")}>
-              <div aria-hidden={n !== i}>
-                <div className="mb-4 flex h-8 items-baseline justify-between gap-3 overflow-hidden">
-                  <p className="font-display text-2xl leading-none text-text-base">{x.template} <span className="font-body text-sm font-semibold capitalize text-text-subtle">{x.tone}</span></p>
-                  <p className="truncate text-xs text-text-subtle">{x.show}</p>
-                </div>
-                <x.Render theme={theme} />
-                <p className="mt-4 line-clamp-2 min-h-[2lh] text-xs text-text-muted">
-                  {FONTS[x.headings]?.label ?? x.headings} headings · {FONTS[x.body]?.label ?? x.body} body · {BACKDROPS.find((b) => b.key === x.backdrop)?.label ?? x.backdrop} on {x.base}
-                </p>
-              </div>
-            </ThemeScope>
-          );
-        })}
+    // Same size stuck or not (only the strip's paint changes), so sticking never moves the page.
+    <div ref={bar} className={cn(
+      "sticky top-[calc(var(--safe-top)+3.5rem)] z-30 ml-[calc(50%-50vw)] flex w-screen justify-end border-b px-3 py-1.5 transition-colors",
+      "sm:top-[calc(var(--safe-top)+4.75rem)] sm:ml-0 sm:w-auto sm:border-0 sm:p-0",
+      stuck ? "border-border bg-bg/90 backdrop-blur-md sm:bg-transparent sm:backdrop-blur-none" : "border-transparent",
+    )}>
+    <div role="group" aria-label="Looks"
+      className="glass flex max-w-full items-center gap-0.5 rounded-control p-0.5 shadow-lg">
+      <button ref={prevBtn} type="button" className={arrow} onClick={() => go(-1)} aria-label="Previous look">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
+      </button>
+      <div className="min-w-0 px-1 leading-tight" title={s ? `${FONTS[s.headings]?.label ?? s.headings} headings · ${FONTS[s.body]?.label ?? s.body} body · ${s.backdrop} on ${s.base}` : undefined}>
+        <p className="max-w-[9rem] truncate text-sm font-semibold sm:max-w-[12rem]" aria-live="polite">{s ? s.name : "Your look"}</p>
+        <p className="text-xs tabular-nums text-text-subtle">
+          {s && <span className="capitalize">{s.tone} · </span>}
+          {i !== null && `${i + 1}/${LOOKS.length} · `}{playing ? `next in ${left}s` : "paused"}
+        </p>
       </div>
-      <div className="flex flex-wrap items-center gap-3">
-        <Button size="sm" variant="secondary" onClick={() => go(-1)} aria-label="Previous look">← Previous</Button>
-        <span className="meta tabular-nums" aria-live="polite">{i + 1} of {SLIDES.length}</span>
-        <Button size="sm" variant="secondary" onClick={() => go(1)} aria-label="Next look">Next →</Button>
-        <Button size="sm" variant="ghost" className="ml-auto" onClick={() => void useIt()}>{applied ? "Using it — undo in config" : "Use this look"}</Button>
-      </div>
+      <button ref={nextBtn} type="button" className={arrow} onClick={() => go(1)} aria-label="Next look">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg>
+      </button>
+      <button type="button" className={arrow} onClick={() => { setPlaying((p) => !p); setLeft(LOOK_SECONDS); }} aria-label={playing ? "Pause looks" : "Play looks"}>
+        {playing
+          ? <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1" /><rect x="14" y="5" width="4" height="14" rx="1" /></svg>
+          : <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 5.5v13a1 1 0 0 0 1.5.86l11-6.5a1 1 0 0 0 0-1.72l-11-6.5A1 1 0 0 0 7 5.5z" /></svg>}
+      </button>
+      {s && (
+        <button type="button" onClick={() => void useIt()} aria-label="Use this look"
+          className="h-11 shrink-0 rounded-control px-3 text-sm font-semibold text-accent transition-colors hover:bg-surface-2">
+          {applied ? "Using" : "Use"}
+        </button>
+      )}
+    </div>
     </div>
   );
 }
@@ -157,16 +217,24 @@ function LookStepper() {
 export function HomeDemo() {
   return (
     <div className="space-y-8">
-      <HeroSection eyebrow={`jimbo.ui ${__JIMBO_VERSION__} · showcase`} title="One kit, any look" pattern="none"
+      <LookStepper />
+
+      <HeroSection pullUp={false} eyebrow={`jimbo.ui ${__JIMBO_VERSION__} · showcase`} title="One kit, any look" pattern="none"
         actions={<>
-          <Link to="/components" className="btn btn-primary">See every component</Link>
+          <button type="button" className="btn btn-primary" onClick={() => document.getElementById("kit")?.scrollIntoView({ behavior: "smooth" })}>See every component</button>
           <Link to="/jimbo-ui" className="btn btn-secondary">Make a look</Link>
         </>}>
-        The same components in {ALL_FAMILIES.length} looks — each light, mid or dark — {Object.keys(FONTS).length} typefaces and {BACKDROPS.length - 1} backdrops. Every look below is
-        the real code; tap <em>Use this look</em> to wear it across the showcase.
+        The same components in {ALL_FAMILIES.length} looks — each light, mid or dark — {Object.keys(FONTS).length} typefaces and {BACKDROPS.length - 1} backdrops. Ten of them take
+        turns on the whole page, a new one every {LOOK_SECONDS} seconds — the arrows top right (or ← →) step by hand; <em>Use</em> keeps one.
       </HeroSection>
 
-      <LookStepper />
+      <section id="kit" className="scroll-mt-20 space-y-4">
+        <h2 className="h-page px-0.5">Every component</h2>
+        <StyleGuidePanel more={[
+          { value: "maps", label: "Maps", content: <Maps /> },
+          { value: "updates", label: "Release updates", content: <UpdatesDemo /> },
+        ]} />
+      </section>
 
       <section className="space-y-3">
         <h2 className="h-section px-0.5">Start an app from an archetype</h2>

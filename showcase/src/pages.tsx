@@ -1,5 +1,5 @@
 /**
- * Showcase pages besides Home: the components, the archetypes (mounted from
+ * Showcase pages besides Home: the release-updates demo Home shows, the archetypes (mounted from
  * reference/archetypes), and a settings page that leads to the jimbo-ui
  * config section, the way every app reaches it.
  */
@@ -7,28 +7,17 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { LinkCard, PageHeader, Section, SwitchRow, Tabs, ViewSwitch } from "@/components/ui/kit";
-import { StyleGuidePanel } from "@/routes/config/StyleGuidePanel";
 import { JimboUpdates } from "@/routes/config/UpdatesPanel";
 import type { Releases } from "@/lib/jimbo";
 import releasesJson from "@/releases.json";
 import { JimboConfigLink } from "@/routes/JimboConfigPage";
-
-export function ComponentsPage() {
-  return (
-    <div className="space-y-6">
-      <PageHeader eyebrow="Kit" title="Components" />
-      <StyleGuidePanel />
-      <UpdatesDemo />
-    </div>
-  );
-}
 
 const RELEASES = releasesJson as Releases;
 /** A sample app's kit components, so the demo can tell "yours" from the rest. */
 const SAMPLE_USES = ["banner", "hero", "page-header", "list", "list-group-label", "section", "tabs", "badge", "stat-tile", "event-row", "app-shell"];
 
 /** The About tab's update check, for an app that's current, one release behind and several behind. */
-function UpdatesDemo() {
+export function UpdatesDemo() {
   const versions = RELEASES.releases.map((r) => r.version);
   const [at, setAt] = useState<"current" | "one" | "several">("one");
   const current = at === "current" ? versions[0]! : at === "one" ? (versions[1] ?? versions[0]!) : (versions[4] ?? versions.at(-1)!);

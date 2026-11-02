@@ -207,7 +207,7 @@
   }
   /* Flat accent fill with a slight outline in the accent's darker shade. */
   .btn-primary {
-    @apply bg-accent text-on-accent shadow-[inset_0_0_0_1px_rgb(var(--c-accent-darker)/0.55)] hover:bg-accent-hover;
+    @apply bg-accent text-on-accent hover:bg-accent-hover;
   }
   .btn-secondary {
     @apply border border-border bg-surface-2 text-text-base hover:border-text-subtle;
@@ -235,11 +235,12 @@
     box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.05);
   }
   /* A solid brand fill for small shapes (active tabs and pills, count badges,
-     date bands): flat colour with a slight outline in its darker shade, and
-     its on- colour for text. (Named "lit" before they went flat; kept.) */
-  .lit-accent    { @apply bg-accent text-on-accent shadow-[inset_0_0_0_1px_rgb(var(--c-accent-darker)/0.55)]; }
-  .lit-highlight { @apply bg-highlight text-on-highlight shadow-[inset_0_0_0_1px_rgb(var(--c-highlight-darker)/0.55)]; }
-  .lit-support   { @apply bg-support text-on-support shadow-[inset_0_0_0_1px_rgb(var(--c-support-darker)/0.55)]; }
+     date bands): one flat colour, no outline, and its on- colour for text.
+     Pair with border-transparent where the shape has a border. (Named "lit"
+     before they went flat; kept.) */
+  .lit-accent    { @apply bg-accent text-on-accent; }
+  .lit-highlight { @apply bg-highlight text-on-highlight; }
+  .lit-support   { @apply bg-support text-on-support; }
   /* Inline text action ("Edit", "Remove", "+ Add"). */
   .link-action {
     @apply text-sm font-semibold text-text-muted transition-colors hover:text-accent;

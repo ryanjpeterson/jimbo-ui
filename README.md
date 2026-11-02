@@ -24,8 +24,8 @@ docker compose up --build
 ```
 
 (http://localhost:4460; `docker compose --profile dev up` for live reload on
-4461). It opens on looks to step through, each fading into the next — the kit in different themes, fonts
-and backdrops — with Components, Archetypes and Settings tabs. It's also a
+4461). It opens on every component, a section at a time, while ten looks picked
+at random take turns on the whole page every 15 seconds — with Archetypes and Settings tabs. It's also a
 **playground**: design a theme in Settings → jimbo-ui config, then
 *Share this look* exports a theme file to import into an app's config section, or
 the `brand.config.ts` line and `tokens.css` to paste into the app.

@@ -501,7 +501,7 @@ export function EventRow({ to, onOpen, date, title, subtitle, meta, imageUrl, st
         className={cn(rowBase, "w-full text-left", selected && "bg-accent/10")}>
         <span className={cn(
           "flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 transition-colors",
-          selected ? "lit-accent border-accent" : "border-border",
+          selected ? "lit-accent border-transparent" : "border-border",
         )}>
           {selected && (
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7" /></svg>
@@ -568,7 +568,7 @@ export function SwitchRow({ label, hint, checked, onChange, disabled }: {
         <span className="block text-15 font-semibold">{label}</span>
         {hint && <span className="block text-sm text-text-muted">{hint}</span>}
       </span>
-      <span className={cn("relative h-7 w-12 shrink-0 rounded-full border transition-colors", checked ? "lit-accent border-accent" : "border-border bg-surface-2")}>
+      <span className={cn("relative h-7 w-12 shrink-0 rounded-full border transition-colors", checked ? "lit-accent border-transparent" : "border-border bg-surface-2")}>
         <span className={cn("absolute top-0.5 h-[22px] w-[22px] rounded-full shadow-sm transition-[left]", checked ? "left-[22px] bg-on-accent" : "left-0.5 bg-text-subtle")} />
       </span>
     </button>
@@ -1217,7 +1217,7 @@ export function PillTabs<T extends string>({ value, onChange, options, scroll = 
           <button key={o.value} type="button" aria-pressed={active} onClick={() => onChange(o.value)}
             className={cn(
               "h-10 shrink-0 rounded-control border px-4 text-sm font-semibold transition-colors",
-              active ? (o.activeClass ?? "lit-accent border-accent") : "border-border text-text-muted hover:border-text-subtle hover:text-text-base",
+              active ? cn("border-transparent", o.activeClass ?? "lit-accent") : "glass text-text-muted hover:border-text-subtle hover:text-text-base",
             )}>
             {o.label}
           </button>
@@ -1291,7 +1291,7 @@ export function ToggleGrid<T extends string | number>({ options, selected, onTog
           <button key={String(o.value)} type="button" aria-pressed={on} aria-label={o.ariaLabel} onClick={() => onToggle(o.value)}
             className={cn(
               "flex min-h-11 flex-col items-center justify-center rounded-control border px-1 py-1.5 text-15 font-semibold leading-tight transition-[color,background-color,border-color,transform] active:scale-95",
-              on ? "lit-accent border-accent" : "border-border bg-surface-2 text-text-muted hover:border-text-subtle hover:text-text-base",
+              on ? "lit-accent border-transparent" : "border-border bg-surface-2 text-text-muted hover:border-text-subtle hover:text-text-base",
             )}>
             <span>{o.label}</span>
             {o.sub && <span className={cn("text-11 font-medium", on ? "text-on-accent/80" : "text-text-subtle")}>{o.sub}</span>}

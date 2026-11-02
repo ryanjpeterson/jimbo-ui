@@ -5,10 +5,14 @@
  * theme. The written rules live in the jimbo-ui guide; this page is the living
  * picture of them, so it changes whenever the kit does.
  *
- * jimbo-ui reference: an app adds its own domain components here too.
+ * The blocks sit in sections, one shown at a time (toggles at the top), so
+ * it isn't one long wall.
+ *
+ * jimbo-ui reference: an app adds its own domain components as `more`
+ * sections.
  */
 
-import { useState } from "react";
+import { createContext, useContext, useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { HeaderTitle } from "@/components/HeaderTitle";
 import { ColorPicker } from "@/components/ColorPicker";
@@ -57,7 +61,20 @@ const TONE_EXAMPLES: { tone: Tone; label: string }[] = [
   { tone: "muted", label: "Cancelled" },
 ];
 
-function Block({ title, note, children }: { title: string; note?: string; children: React.ReactNode }) {
+const SECTIONS = [
+  { value: "brand", label: "Brand and type" },
+  { value: "controls", label: "Controls" },
+  { value: "numbers", label: "Numbers and charts" },
+  { value: "lists", label: "Lists" },
+  { value: "states", label: "States" },
+] as const;
+type SectionId = (typeof SECTIONS)[number]["value"];
+
+/** The section on show; a Block outside it renders nothing. */
+const Showing = createContext<string>("brand");
+
+function Block({ title, note, section, children }: { title: string; note?: string; section: SectionId; children: React.ReactNode }) {
+  if (useContext(Showing) !== section) return null;
   return (
     <section className="space-y-3">
       <div className="px-0.5">
@@ -69,7 +86,8 @@ function Block({ title, note, children }: { title: string; note?: string; childr
   );
 }
 
-export function StyleGuidePanel() {
+/** `more`: the app's own sections (its domain components), after the kit's. */
+export function StyleGuidePanel({ more = [] }: { more?: { value: string; label: string; content: ReactNode }[] }) {
   const { theme: own, colors: theme } = useBrand();
   const hex = themeHex(theme);
   const [tab, setTab] = useState<"one" | "two">("one");
@@ -85,12 +103,18 @@ export function StyleGuidePanel() {
   const [on, setOn] = useState(true);
   const [days, setDays] = useState<string[]>(["Mon", "Wed"]);
   const [bar, setBar] = useState(false);
+  const [showing, setShowing] = useState<string>("brand");
+  const extra = more.find((m) => m.value === showing);
 
   return (
+    <Showing.Provider value={showing}>
     <div className="space-y-10">
-      <p className="meta max-w-xl">The shared building blocks, live in the current theme (including a look you haven't saved yet). The rules are in the jimbo-ui guide.</p>
+      <div className="space-y-3">
+        <p className="meta max-w-xl">The shared building blocks, live in the current theme (including a look you haven't saved yet). The rules are in the jimbo-ui guide.</p>
+        <PillTabs value={showing} onChange={setShowing} options={[...SECTIONS, ...more.map(({ value, label }) => ({ value, label }))]} />
+      </div>
 
-      <Block title="Brand" note="The app's name as header text (a dot takes the accent) and its colours as flat circles — two to four; a faded one is inferred.">
+      <Block section="brand" title="Brand" note="The app's name as header text (a dot takes the accent) and its colours as flat circles — two to four; a faded one is inferred.">
         <div className="card flex flex-wrap items-center gap-6 p-5">
           <HeaderTitle size="lg" />
           <div className="flex flex-wrap gap-3">
@@ -106,7 +130,7 @@ export function StyleGuidePanel() {
         </div>
       </Block>
 
-      <Block title="Shades and depth" note="Each brand colour comes lighter and darker, as a solid fill and as washes. Use them for depth, never as new colours.">
+      <Block section="brand" title="Shades and depth" note="Each brand colour comes lighter and darker, as a solid fill and as washes. Use them for depth, never as new colours.">
         <div className="card space-y-4 p-5">
           {(["accent", "highlight", "support"] as const).map((k) => (
             <div key={k} className="flex items-center gap-3">
@@ -123,7 +147,7 @@ export function StyleGuidePanel() {
         </div>
       </Block>
 
-      <Block title="Circles" note="Always one flat fill — no gradient, outline, ring, glow or shadow. Side by side, never overlapping. 8 px inline, 10 px status, 16 px swatches, 40–48 px editor swatches and avatars.">
+      <Block section="brand" title="Circles" note="Always one flat fill — no gradient, outline, ring, glow or shadow. Side by side, never overlapping. 8 px inline, 10 px status, 16 px swatches, 40–48 px editor swatches and avatars.">
         <div className="card space-y-4 p-5">
           <div className="flex flex-wrap items-center gap-6">
             <span className="flex items-center gap-2 text-sm"><ThemeDots /> ThemeDots (8 px)</span>
@@ -142,7 +166,7 @@ export function StyleGuidePanel() {
         </div>
       </Block>
 
-      <Block title="Colour tokens" note="Derived from the brand colours. Use these classes, never raw hex (bg-surface, text-text-muted, bg-accent/15 …).">
+      <Block section="brand" title="Colour tokens" note="Derived from the brand colours. Use these classes, never raw hex (bg-surface, text-text-muted, bg-accent/15 …).">
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {TOKENS.map((t) => (
             <div key={t.name} className="flex items-center gap-3 rounded-xl border border-border bg-surface p-2.5">
@@ -156,7 +180,7 @@ export function StyleGuidePanel() {
         </div>
       </Block>
 
-      <Block title="Type" note={`Headings in ${FONTS[theme.fonts.headings!]!.label} (${theme.fonts.headingsWeight}), body in ${FONTS[theme.fonts.body!]!.label} (${theme.fonts.bodyWeight}) — the theme picks the fonts, weights and spacing. Tabular figures throughout.`}>
+      <Block section="brand" title="Type" note={`Headings in ${FONTS[theme.fonts.headings!]!.label} (${theme.fonts.headingsWeight}), body in ${FONTS[theme.fonts.body!]!.label} (${theme.fonts.bodyWeight}) — the theme picks the fonts, weights and spacing. Tabular figures throughout.`}>
         <div className="card space-y-3 p-5">
           <p className="eyebrow">.eyebrow — label above a title</p>
           <p className="h-page">.h-page — Page title</p>
@@ -167,7 +191,7 @@ export function StyleGuidePanel() {
         </div>
       </Block>
 
-      <Block title="Buttons" note="Pill-shaped. One primary action per view; secondary and ghost for the rest.">
+      <Block section="controls" title="Buttons" note="Pill-shaped. One primary action per view; secondary and ghost for the rest.">
         <div className="card flex flex-wrap items-center gap-2 p-5">
           <Button>Primary</Button>
           <Button variant="secondary">Secondary</Button>
@@ -179,7 +203,7 @@ export function StyleGuidePanel() {
         </div>
       </Block>
 
-      <Block title="Fields and filters">
+      <Block section="controls" title="Fields and filters">
         <div className="card space-y-3 p-5">
           <SearchField value={q} onChange={setQ} placeholder="SearchField" />
           <input className="field h-12 w-full sm:h-11" placeholder=".field text input" />
@@ -194,7 +218,7 @@ export function StyleGuidePanel() {
         </div>
       </Block>
 
-      <Block title="Settings rows" note="KeyValue for read-only facts (inline, or stacked on detail pages); SwitchRow for on/off settings.">
+      <Block section="controls" title="Settings rows" note="KeyValue for read-only facts (inline, or stacked on detail pages); SwitchRow for on/off settings.">
         <div className="card divide-etched overflow-hidden">
           <KeyValue label="KeyValue">Inline — label left, value right</KeyValue>
           <KeyValue label="Stacked" layout="stacked">A small label above the value</KeyValue>
@@ -202,13 +226,13 @@ export function StyleGuidePanel() {
         </div>
       </Block>
 
-      <Block title="ColorPicker" note="Inline and touch-friendly — never the native colour input.">
+      <Block section="controls" title="ColorPicker" note="Inline and touch-friendly — never the native colour input.">
         <div className="card max-w-md p-5">
           <ColorPicker value={colour} onChange={setColour} swatches={["#A8FF3E", "#2EF2FF", "#F5FF2E", "#FF8A3D", "#B48CFF", "#3DFFC5", "#F2F2F2", "#FF3D6E"]} />
         </div>
       </Block>
 
-      <Block title="Tones" note="Fixed colours for states that carry meaning; the done state uses the accent. Apps map their own statuses onto them.">
+      <Block section="numbers" title="Tones" note="Fixed colours for states that carry meaning; the done state uses the accent. Apps map their own statuses onto them.">
         <div className="card flex flex-wrap gap-2 p-5">
           {TONE_EXAMPLES.map((t) => <Badge key={t.tone} tone={t.tone}>{t.label}</Badge>)}
           <Badge tone="accent" dot>With a dot</Badge>
@@ -216,7 +240,7 @@ export function StyleGuidePanel() {
         </div>
       </Block>
 
-      <Block title="Numbers">
+      <Block section="numbers" title="Numbers">
         <StatGrid>
           <StatTile label="StatTile · accent" value={128} accent="accent" />
           <StatTile label="StatTile · highlight" value={42} accent="highlight" />
@@ -225,7 +249,7 @@ export function StyleGuidePanel() {
         </StatGrid>
       </Block>
 
-      <Block title="Charts" note="Series take accent, support, highlight in that order, three at most. Tap, hover or arrow-key a chart to read a value; one series has no legend, more get named in the readout.">
+      <Block section="numbers" title="Charts" note="Series take accent, support, highlight in that order, three at most. Tap, hover or arrow-key a chart to read a value; one series has no legend, more get named in the readout.">
         <StatGrid>
           <StatTile label="StatTile · trend" value="1.2K" accent="accent" trend={[620, 700, 810, 760, 940, 1100, 1210]} sub="A Sparkline under it" />
           <StatTile label="Sparkline · support" value={38} accent="support" trend={[44, 40, 41, 37, 39, 36, 38]} />
@@ -256,7 +280,7 @@ export function StyleGuidePanel() {
         </div>
       </Block>
 
-      <Block title="Lists and cards" note={'Lists sit in one card; rows are at least 64px tall for thumbs. The same List shows as tiles with layout="tiles".'}>
+      <Block section="lists" title="Lists and cards" note={'Lists sit in one card; rows are at least 64px tall for thumbs. The same List shows as tiles with layout="tiles".'}>
         <Section title="List · rows or tiles" action={<LayoutSwitch value={layout} onChange={setLayout} />} plain>
           <List layout={layout}>
             <EventRow onOpen={() => setSheet(true)} date="2026-05-04" title="The same item" subtitle="As a row, or as a tile" status={{ tone: "accent", label: "Done" }} />
@@ -293,7 +317,7 @@ export function StyleGuidePanel() {
         </div>
       </Block>
 
-      <Block title="Picks, related links and the floating bar" note="ToggleGrid for several picks from a small set; LinkChips for related things to go to; FloatingBar for a status and its actions above the dock.">
+      <Block section="controls" title="Picks, related links and the floating bar" note="ToggleGrid for several picks from a small set; LinkChips for related things to go to; FloatingBar for a status and its actions above the dock.">
         <Section title="ToggleGrid">
           <ToggleGrid columns={4} smColumns={7} selected={days} onToggle={(d) => setDays((xs) => (xs.includes(d) ? xs.filter((x) => x !== d) : [...xs, d]))}
             options={["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => ({ value: d, label: d }))} />
@@ -312,7 +336,7 @@ export function StyleGuidePanel() {
         {bar && <FloatingBar live actions={<Button size="sm" onClick={() => setBar(false)}>Stop</Button>}>Running · 2 of 5</FloatingBar>}
       </Block>
 
-      <Block title="States and overlays">
+      <Block section="states" title="States and overlays">
         <EmptyState title="EmptyState" body="Says what's missing and what to do about it." action={<Button size="sm">An action</Button>} />
         <div className="card overflow-hidden px-4"><Loading label="Loading — a skeleton shaped like the page" /></div>
         <div className="card flex flex-wrap items-center gap-3 p-5">
@@ -321,6 +345,8 @@ export function StyleGuidePanel() {
         </div>
         <Pager page={page} totalPages={5} total={120} pageSize={24} onPage={setPage} />
       </Block>
+
+      {extra && <section className="space-y-3">{extra.content}</section>}
 
       {sheet && (
         <Sheet title="Sheet" subtitle="Title, optional subtitle, scrolling body." onClose={() => setSheet(false)}>
@@ -331,5 +357,6 @@ export function StyleGuidePanel() {
         </Sheet>
       )}
     </div>
+    </Showing.Provider>
   );
 }

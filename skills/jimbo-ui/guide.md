@@ -9,7 +9,7 @@ implementations of everything below are in the repo's `reference/` folder.
   `CHANGELOG.md` for what changed in each version and what apps must do.
 - **The living picture:** the Style guide tab of each app's **jimbo-ui
   config** section (`/jimbo-ui`) renders every shared component in that
-  app's current theme; the showcase's Components tab does the same.
+  app's current theme, a section at a time; the showcase's Home does the same.
 - **The library:** `registry/` lists the apps on jimbo-ui and its catalogue
   of shared components; each app's `jimbo-ui.json` says what it uses and
   what it has built, so nothing is built twice (section 13).
@@ -63,8 +63,8 @@ The stack is React + TypeScript + Vite + Tailwind CSS 3 (with `clsx` and
 **Showcase:** `showcase/` is a small app built only from a release's code
 (reference, then foundation and starter, then stand-ins for the server parts
 in `showcase/overrides/`). It runs the real jimbo-ui config section and kit,
-a Home page with looks to step through (each a piece of the kit in its
-own theme, font and backdrop, via `ThemeScope`), a Components tab, and the
+a Home page where ten random looks take turns on the whole page (theme,
+font and backdrop, every 15 seconds, or by arrow) over every component, and the
 Archetypes, with the theme saved in the browser.
 `npm --prefix showcase run dev` runs it locally, or with Docker:
 `docker compose up --build` serves the built app on http://localhost:4460
@@ -133,7 +133,9 @@ can theme any:
      contrast and saturation.
   5. **Brand** — the name as header text at each size, and the favicon.
   6. **Style guide** — every shared component in the current theme
-     (including an unsaved look), plus the app's own.
+     (including an unsaved look), in sections with toggles (Brand and
+     type, Controls, Numbers and charts, Lists, States), plus the app's
+     own as extra sections (`more`).
   7. **About** — the jimbo-ui version, the app's registry status (from its
      `jimbo-ui.json`, passed in as `__JIMBO_APP__` by Vite's `define`) and a
      link to the showcase. When a newer release is out it says so first
@@ -327,12 +329,15 @@ text colour, and the page goes flat.
 
 **Depth from layers, flat colour.** Each brand colour comes with lighter and darker
 shades (section 3). Coloured shapes — buttons, active tabs and pills, date
-bands, avatars, swatches, dots — are **flat with a slight outline**: the
-colour, plus a 1 px inner line of its darker shade. No gloss, gradients or
-glows on them. Depth comes from layers (cards, borders, shadows under
-floating things), not shading. Floating things are **lightly
-frosted**: mostly solid, a soft blur and a crisp border — never
-see-through glass. Corners are **softly rounded, not pills**: circles are
+bands, avatars, swatches, dots — are **one solid colour**: no outline, no
+tinted fill with a coloured border, no gloss, gradients or glows. A selected
+pill, tab, switch or tick is the solid fill with `border-transparent`.
+Depth comes from layers (cards, borders, shadows under
+floating things), not shading. **Anything that would let the backdrop show
+through is `.glass`** — floating things, and controls sitting straight on
+the page (unselected pills, tabs, pager buttons): mostly solid, a soft blur
+and a crisp border, so text keeps its contrast over any pattern. Never a
+bare outline over the backdrop, never see-through. Corners are **softly rounded, not pills**: circles are
 kept for the motif (avatars, dots, swatches, round icon buttons). Cards carry a breath of the accent (top left)
 and support (bottom right).
 
@@ -793,14 +798,14 @@ and body fonts.
 | Thing | Recipe |
 | --- | --- |
 | `.card` | 14 px radius, `border-border` (full strength), gradient `surface → bg-deep` top to bottom at 97%, under a 9% accent glow from the top left and a 9% support glow from the bottom right; inner top highlight `inset 0 1px 0 rgba(255,255,255,.06)`, soft drop `0 12px 32px -16px rgba(0,0,0,.7)` |
-| `.glass` / `.card-glass` | Lightly frosted: `bg-surface/90`, `backdrop-blur-md`, `border-border`, soft drop. For tabs, the secondary top-bar buttons, the pager and anything over a banner |
+| `.glass` / `.card-glass` | Lightly frosted: `bg-surface/90`, `backdrop-blur-md`, `border-border`, soft drop. For tabs, unselected pills, the secondary top-bar buttons, the pager, floating controls and anything over a banner — anything that sits straight on the backdrop |
 | `.dot-accent/highlight/support` | A brand colour as a **flat circle**: one solid fill, nothing else (see Circles in section 2). Size it with utilities. `.orb-*` are older names for the same thing |
 | `.divide-etched` | Lines between stacked items, on the parent like `divide-y`: a full-strength `border` line with a faint light line under it (`inset 0 1px 0 rgba(255,255,255,.05)`). It also reaches one level down, so rows grouped in wrappers (a month's label and rows) are divided too. Lists, ranked lists |
 | `.fade-out` (`.fade-both`) | **How a full-width opener ends.** A banner, a hero, a photo or gradient header never stops on a hard edge, a border, or a fade to solid `bg` — the page behind has its backdrop (pattern and glow), so any of those shows as a line. Put the opener's background (blurred photo, dim, gradient, pattern) in its own layer behind the content and mask that layer out to transparent: `.fade-out` fades the bottom 45%; add `.fade-both` to fade the top too when something sits above it. Mask the background, never the text. `Banner`, `Hero` and `HeroSection` do this |
-| `.lit-accent/highlight/support` | A solid brand fill: flat colour, `inset 0 0 0 1px` of its darker shade at 55%, `on-c` text. Active tabs and pills, select ticks, the date band, count badges (the name is from when they were shaded) |
+| `.lit-accent/highlight/support` | A solid brand fill: one flat colour, no outline, `on-c` text (with `border-transparent` on a bordered shape). Active tabs and pills, select ticks, the date band, count badges (the name is from when they were shaded) |
 | `.field` | 11 px radius, `bg-surface-2`, `border-border`, 15 px text, `px-4`; focus = accent border + 2 px accent ring at 20% |
 | `.btn` | 10 px radius (`rounded-control`), 44 px tall on phones (40 px desktop), `px-5`, 15 px semibold; `.btn-sm` 36 px (32 px desktop); `lg` 48 px |
-| `.btn-primary` | Flat accent fill with a slight outline (`inset 0 0 0 1px accent-darker/55%`), on-accent text, `accent-hover` on hover |
+| `.btn-primary` | Solid accent fill, no outline, on-accent text, `accent-hover` on hover |
 | `.btn-secondary` | `bg-surface-2`, border, border lightens on hover |
 | `.btn-ghost` | Muted text, `surface-2` on hover |
 | `.btn-danger` | Muted text, red wash and highlight text on hover |
@@ -862,7 +867,7 @@ and body fonts.
 | `LinkChips` | Related things to go to, as a wrapping row of 44 px linked chips: a label, an optional muted second label and an optional 8 px dot (`tone`). See-also links, neighbours, tags that navigate |
 | `FloatingBar` | A status line and its actions floating above the dock (`--above-dock`): the save bar, a select-mode action bar, Start/Stop for something running (`live` pulses its dot). Pad the page bottom (`pb-20`) so it never covers the last section |
 | `LIVE` | Add to a status dot to pulse it while something is happening; `RowStatus.live` and `Badge live` use it |
-| `ThemeScope` | Part of the page in another theme — colours, type and backdrop (`themeVars`, `.theme-scope`) — without touching the rest: looks to step through, previews |
+| `ThemeScope` | Part of the page in another theme — colours, type and backdrop (`themeVars`, `.theme-scope`) — without touching the rest: previews, looks side by side |
 | `MapView` (`components/MapView.tsx`) | **Every map.** Places as flat highlight pins (`markerIcon`) on the theme's map style (`mapStyles`: the page colour for land, accent-tinted roads, no POIs or transit); `size` `compact` (160 px, inline, no gestures), `full` (320 px), `fill` (a map page). With no Maps key it draws a themed preview with the same pins |
 | `MapPinCard` (`components/MapView.tsx`) | The chosen place on a map page, floating above the dock: name, a line, what's there |
 | `JimboConfigPage` / `JimboConfigLink` (`routes/JimboConfigPage.tsx`) | The jimbo-ui config section (section 1) and its one link in settings |
@@ -1227,3 +1232,11 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   and `FloatingBar` (a status and its actions above the dock; the save bar
   uses it). `EntityRow avatarText` shows a code or number in the avatar.
   The component menu gains Picking several and Related things.
+- **0.11.3** — The showcase steps through its looks with Previous and Next.
+- **0.11.4** — Coloured shapes are one solid colour: `.lit-*` and
+  `.btn-primary` lose their darker outline, and selected pills, tabs,
+  switches, ticks and the dock's active tab are the solid fill with no
+  coloured border. Anything sitting straight on the backdrop is `.glass`
+  (unselected pills included). The Style guide shows its blocks in sections
+  with toggles (`more` adds an app's own). The showcase's Home holds every
+  component while ten random looks take turns every 15 seconds.
