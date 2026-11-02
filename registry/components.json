@@ -926,6 +926,36 @@
         "Recent checks"
       ],
       "variants": {}
+    },
+    {
+      "id": "toggle-grid",
+      "name": "ToggleGrid",
+      "purpose": "Picks several options from a small fixed set, as a wrapping grid of toggle buttons.",
+      "tier": "candidate",
+      "aliases": [
+        "MultiToggle",
+        "ChipPicker",
+        "NotePicker",
+        "Toggle buttons"
+      ],
+      "variants": {
+        "columns": "Columns on phones",
+        "smColumns": "Columns from sm: up"
+      }
+    },
+    {
+      "id": "link-chips",
+      "name": "LinkChips",
+      "purpose": "Links to related things as a wrapping row of chips, each with an optional colour dot and short second label.",
+      "tier": "candidate",
+      "aliases": [
+        "RelatedLinks",
+        "Tag links",
+        "Chip links"
+      ],
+      "variants": {
+        "tone": "accent | highlight | support dot"
+      }
     }
   ]
 }
