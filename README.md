@@ -2,10 +2,10 @@
 
 Ryan's shared brand and UI system for web apps (repo and plugin name:
 `jimbo-ui`): a theme engine
-that turns two to four colours into a full palette with shades, 237 looks — each in light, mid and dark — (everyday, holidays,
-countries, provinces, sports teams and Zelda games), 48 backdrops, frosted glass and a circle motif, Tailwind tokens, a UI kit, a phone-first, full-screen app shell with a
+that turns two to four colours into a full palette with shades, 265 looks — each in light, mid and dark — (everyday, holidays,
+countries, provinces, sports teams and games: Zelda, Mario, Donkey Kong, more Nintendo, Sly Cooper and Tony Hawk's Underground), 48 backdrops that can move slowly, frosted glass and a motif of circles (or a triforce, sparkles, stars and more), Tailwind tokens, a UI kit, a phone-first, full-screen app shell with a
 floating tab dock, maps in the theme, three app archetypes to copy, the
-patterns that make the apps feel alike, and a **registry** — the apps on
+patterns that make the apps feel alike (the URL always holds the view), and a **registry** — the apps on
 jimbo-ui and a catalogue of shared components, with each app describing
 itself in its own `jimbo-ui.json` — so nothing gets built twice. It's
 generic on purpose: no app's code, names or artwork live here.
@@ -25,7 +25,7 @@ docker compose up --build
 
 (http://localhost:4460; `docker compose --profile dev up` for live reload on
 4461). It opens on every component, a section at a time, while ten looks picked
-at random take turns on the whole page every 15 seconds — with Archetypes and Settings tabs. It's also a
+at random take turns on the whole page every 15 seconds — with a Settings tab, and the route in the URL. It's also a
 **playground**: design a theme in Settings → jimbo-ui config, then
 *Share this look* exports a theme file to import into an app's config section, or
 the `brand.config.ts` line and `tokens.css` to paste into the app.

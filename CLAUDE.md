@@ -45,7 +45,9 @@ shades; coloured shapes flat with a slight outline (no gloss or glows), depth
 from layers (lightly frosted solid surfaces, borders, the backdrop); circles
 always flat, side by side, at fixed sizes — no orbs; softly rounded corners, not pills; sans, mono or serif type
 for headings and body;
-circles of the theme colours as a motif; each look once, in light, mid and
+circles of the theme colours as a motif (or another flat shape the theme
+picks: triforce, sparkles, stars…); backdrops still or slowly moving; the
+URL holds the view (route plus tabs, filters and searches as params); each look once, in light, mid and
 dark (made from its own colours where it wasn't written); templates in
 Everyday, Holidays, Countries, Provinces, Games, Brands and Sports categories
 (team, flag, game and company themes from real colours, via `scripts/template-from-colours.mjs`);
@@ -57,7 +59,7 @@ dot in the accent; the favicon is the only graphic.
 
 - Showcase: `npm --prefix showcase install` once, then the **jimbo-ui-showcase**
   launch config (port 4455) or `npm --prefix showcase run dev`. It has Home (looks to
-  step through and every component), Archetypes and Settings tabs, with the
+  step through and every component) and Settings tabs, with the
   jimbo-ui config section under Settings; theme changes are saved in the browser. With
   Docker: `docker compose up --build` (built app, port 4460) or
   `docker compose --profile dev up` (live reload, port 4461). It doubles as a

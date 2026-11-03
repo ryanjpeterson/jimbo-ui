@@ -1,16 +1,17 @@
 /**
- * Showcase pages besides Home: the release-updates demo Home shows, the archetypes (mounted from
- * reference/archetypes), and a settings page that leads to the jimbo-ui
- * config section, the way every app reaches it.
+ * Showcase pages besides Home: the release-updates demo Home shows, and a
+ * settings page that leads to the jimbo-ui config section, the way every app
+ * reaches it.
  */
 
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { LinkCard, PageHeader, Section, SwitchRow, Tabs, ViewSwitch } from "@/components/ui/kit";
+import { useLocation } from "react-router-dom";
+import { PageHeader, Section, SwitchRow, Tabs } from "@/components/ui/kit";
 import { JimboUpdates } from "@/routes/config/UpdatesPanel";
 import type { Releases } from "@/lib/jimbo";
 import releasesJson from "@/releases.json";
 import { JimboConfigLink } from "@/routes/JimboConfigPage";
+import { useUrlState } from "@/lib/useUrlState";
 
 const RELEASES = releasesJson as Releases;
 /** A sample app's kit components, so the demo can tell "yours" from the rest. */
@@ -19,7 +20,7 @@ const SAMPLE_USES = ["banner", "hero", "page-header", "list", "list-group-label"
 /** The About tab's update check, for an app that's current, one release behind and several behind. */
 export function UpdatesDemo() {
   const versions = RELEASES.releases.map((r) => r.version);
-  const [at, setAt] = useState<"current" | "one" | "several">("one");
+  const [at, setAt] = useUrlState("behind", "one", ["current", "one", "several"] as const);
   const current = at === "current" ? versions[0]! : at === "one" ? (versions[1] ?? versions[0]!) : (versions[4] ?? versions.at(-1)!);
   return (
     <section className="space-y-3">
@@ -30,35 +31,6 @@ export function UpdatesDemo() {
       <Tabs value={at} onChange={setAt} options={[{ value: "current", label: "Up to date" }, { value: "one", label: "1 behind" }, { value: "several", label: "4 behind" }]} />
       <JimboUpdates releases={RELEASES} current={current} uses={SAMPLE_USES} />
     </section>
-  );
-}
-
-export function ArchetypesPage() {
-  return (
-    <div className="space-y-6">
-      <PageHeader eyebrow="Start here" title="Archetypes" />
-      <p className="meta -mt-3 max-w-xl">Ready-made app shapes to copy and remix. Each one is real pages built from the kit, with neutral example content.</p>
-      <div className="grid gap-3 sm:grid-cols-2">
-        <LinkCard to="/archetypes/catalogue" eyebrow="Catalogue" title="A log of things, people and places" sub="Home · Entries · People · Places, with a map" accent />
-        <LinkCard to="/archetypes/dashboard" eyebrow="Single-page dashboard" title="Is everything fine?" sub="Jobs as rows or tiles, charts, recent runs, settings" />
-        <LinkCard to="/archetypes/status" eyebrow="Status monitor" title="Is every service up?" sub="Connection, services with recent checks, history" />
-      </div>
-      <p className="meta">The guide lists the rest (Tracker, Collection, Directory, Planner, Showcase, Tool) by their shape.</p>
-    </div>
-  );
-}
-
-/** The catalogue's own tabs, shown in the page since the showcase's dock is taken. */
-export function CatalogueNav({ current }: { current: string }) {
-  const base = "/archetypes/catalogue";
-  const at = (p: string) => (p === "/" ? base : `${base}${p}`);
-  return (
-    <div className="mb-5 space-y-2">
-      <Link to="/archetypes" className="link-action">‹ Archetypes</Link>
-      <ViewSwitch current={at(current)} options={[
-        { to: at("/"), label: "Home" }, { to: at("/entries"), label: "Entries" }, { to: at("/people"), label: "People" }, { to: at("/places"), label: "Places" },
-      ]} />
-    </div>
   );
 }
 

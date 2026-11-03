@@ -20,8 +20,9 @@ import {
   Autocomplete, FloatingBar, LinkChips, ToggleGrid, Badge, BarChart, DateBlock, KeyValue, LayoutSwitch, SwitchRow, EmptyState, EntityRow, EventRow, LinkCard, List, ListGroupLabel, Loading, MediaCard, PageHeader, Pager,
   PillTabs, RankedList, SearchField, Section, SelectField, Sheet, Sparkline, StatGrid, StatTile, Tabs, ThemeDots, TrendChart, useListLayout, ViewSwitch, type Tone,
 } from "@/components/ui/kit";
-import { FONTS, THEME_KEYS, themeHex } from "@/lib/theme";
+import { FONTS, MOTIFS, THEME_KEYS, themeHex } from "@/lib/theme";
 import { useBrand } from "@/lib/useBrand";
+import { useUrlState } from "@/lib/useUrlState";
 
 const PLACES = ["Main hall", "Studio B", "Rooftop", "Riverside park", "Workshop room"];
 
@@ -103,7 +104,8 @@ export function StyleGuidePanel({ more = [] }: { more?: { value: string; label: 
   const [on, setOn] = useState(true);
   const [days, setDays] = useState<string[]>(["Mon", "Wed"]);
   const [bar, setBar] = useState(false);
-  const [showing, setShowing] = useState<string>("brand");
+  // The section shown is in the URL (?section=), so a refresh or a shared link opens it.
+  const [showing, setShowing] = useUrlState<string>("section", "brand", [...SECTIONS.map((s) => s.value), ...more.map((m) => m.value)]);
   const extra = more.find((m) => m.value === showing);
 
   return (
@@ -163,6 +165,14 @@ export function StyleGuidePanel({ more = [] }: { more?: { value: string; label: 
             <span className="dot-support flex h-10 w-10 items-center justify-center font-display text-on-support">A</span>
             <p className="text-sm font-semibold">An avatar on .glass</p>
           </div>
+        </div>
+      </Block>
+
+      <Block section="brand" title="Motif" note={`ThemeDots in the theme's motif — ${MOTIFS.find((m) => m.key === theme.motif)?.label ?? "Circles"} here; pick another on the Brand tab. Flat shapes side by side at the same fixed sizes as circles; empty states and brand moments only. Status dots and avatars stay circles.`}>
+        <div className="card flex flex-wrap items-center gap-6 p-5">
+          {[8, 12, 16, 24].map((size) => (
+            <span key={size} className="flex items-center gap-2 text-sm"><ThemeDots size={size} /> {size} px</span>
+          ))}
         </div>
       </Block>
 

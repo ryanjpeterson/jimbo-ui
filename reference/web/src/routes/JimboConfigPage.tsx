@@ -2,27 +2,28 @@
  * jimbo-ui config — /jimbo-ui
  *
  * The one place for every brand, theme and style guide option, the same in
- * every app: Looks, Colours, Type, Backdrop, Brand, Style guide, About, and an
+ * every app: Looks, Colours, Type, Backdrop, Brand (name, motif, favicon), Style guide, About, and an
  * optional App tab for the app's own additions. Reached from the app's settings or admin area, never a
  * dock tab. The app passes `canConfigure`: its admin check when it has auth
  * (the server checks admin on every save too), or `true` when it has none.
  * Without it the section redirects home and its link doesn't render.
  *
  * All panels stay mounted and share one draft, so an unsaved look follows you
- * from Looks through Colours, Type and Backdrop into the Style guide; the save
+ * from Looks through Colours, Type, Backdrop and the motif into the Style guide; the save
  * bar floats over every tab.
  */
 
 import { useState, type ReactNode } from "react";
-import { Navigate, useSearchParams } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { BRAND } from "@/lib/brand.config";
 import { JIMBO_APP, JIMBO_UI } from "@/lib/jimbo";
 import { useBrand } from "@/lib/useBrand";
+import { useUrlState } from "@/lib/useUrlState";
 import { HeaderTitle } from "@/components/HeaderTitle";
 import { Badge, LinkCard, PageHeader, PillTabs } from "@/components/ui/kit";
-import { BackdropPanel, ColoursPanel, LooksPanel, ThemeSaveBar, TypePanel, useThemeDraft } from "./config/ThemePanel";
+import { BackdropPanel, ColoursPanel, LooksPanel, MotifPanel, ThemeSaveBar, TypePanel, useThemeDraft, type ThemeDraft } from "./config/ThemePanel";
 import { StyleGuidePanel } from "./config/StyleGuidePanel";
 import { JimboUpdates, useJimboUpdates } from "./config/UpdatesPanel";
 
@@ -34,23 +35,23 @@ export function JimboConfigPage({ canConfigure, app }: { canConfigure: boolean; 
 }
 
 function ConfigSection({ app }: { app?: { label?: string; content: ReactNode } }) {
-  const [params, setParams] = useSearchParams();
   const draft = useThemeDraft();
   const tabs: { value: Tab; label: string }[] = [
     { value: "theme", label: "Looks" }, { value: "colours", label: "Colours" }, { value: "type", label: "Type" }, { value: "backdrop", label: "Backdrop" },
     { value: "brand", label: "Brand" }, { value: "style", label: "Style guide" }, { value: "about", label: "About" },
     ...(app ? [{ value: "app" as const, label: app.label ?? "App" }] : []),
   ];
-  const tab = (tabs.find((t) => t.value === params.get("tab"))?.value ?? "theme") as Tab;
+  // The tab (and each tab's own choices) live in the URL, so a refresh or a link opens the same view.
+  const [tab, setTab] = useUrlState<Tab>("tab", "theme", tabs.map((t) => t.value));
   return (
     <div className="mx-auto max-w-3xl space-y-6 pb-24">
       <PageHeader eyebrow="Settings" title="jimbo-ui config" />
-      <PillTabs scroll value={tab} onChange={(v) => setParams({ tab: v }, { replace: true })} options={tabs} />
+      <PillTabs scroll value={tab} onChange={setTab} options={tabs} />
       <div hidden={tab !== "theme"}><LooksPanel d={draft} /></div>
       <div hidden={tab !== "colours"}><ColoursPanel d={draft} /></div>
       <div hidden={tab !== "type"}><TypePanel d={draft} /></div>
       <div hidden={tab !== "backdrop"}><BackdropPanel d={draft} /></div>
-      <div hidden={tab !== "brand"}><BrandPanel /></div>
+      <div hidden={tab !== "brand"}><BrandPanel d={draft} /></div>
       <div hidden={tab !== "style"}><StyleGuidePanel /></div>
       <div hidden={tab !== "about"}><AboutPanel /></div>
       {app && <div hidden={tab !== "app"}>{app.content}</div>}
@@ -72,7 +73,8 @@ export function JimboConfigLink({ canConfigure }: { canConfigure: boolean }) {
   );
 }
 
-function BrandPanel() {
+/** Brand: the name as header text, the motif (part of the theme draft, so the save bar covers it) and the favicon. */
+function BrandPanel({ d }: { d: ThemeDraft }) {
   const brand = useBrand();
   const qc = useQueryClient();
   return (
@@ -87,6 +89,7 @@ function BrandPanel() {
           <p className="meta">{BRAND.name}</p>
         </div>
       </section>
+      <MotifPanel d={d} />
       <FaviconUpload faviconUrl={brand.faviconUrl} onChange={() => qc.invalidateQueries({ queryKey: ["brand"] })} />
     </div>
   );

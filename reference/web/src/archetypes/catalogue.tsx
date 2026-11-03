@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/kit";
 import { Button } from "@/components/ui/button";
 import { MapPinCard, MapView, type MapPin } from "@/components/MapView";
+import { useUrlNumber, useUrlState } from "@/lib/useUrlState";
 
 // Example statuses, mapped onto the kit's tones. An app maps its own.
 const DONE: RowStatus = { tone: "accent", label: "Done" };
@@ -108,11 +109,12 @@ function CatalogueHome({ at, pullUp }: At) {
 }
 
 function Entries({ at }: At) {
-  const [q, setQ] = useState("");
-  const [filter, setFilter] = useState<"all" | "done" | "upcoming">("all");
+  // Search, filter and page are in the URL; a selection in progress isn't.
+  const [q, setQ] = useUrlState("q", "");
+  const [filter, setFilter] = useUrlState("filter", "all", ["all", "done", "upcoming"] as const);
   const [selecting, setSelecting] = useState(false);
   const [picked, setPicked] = useState<Set<string>>(new Set());
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useUrlNumber("page", 1);
 
   const rows = useMemo(() => ENTRIES.filter((s) =>
     (filter === "all" || (filter === "done" ? s.status === DONE : s.status === GOING || s.status === MAYBE))
@@ -196,7 +198,7 @@ function EntryPage({ at, pullUp }: At) {
 }
 
 function People({ at }: At) {
-  const [q, setQ] = useState("");
+  const [q, setQ] = useUrlState("q", "");
   const counts = countBy(ENTRIES.flatMap((e) => e.people), (p) => p);
   const shown = PEOPLE.filter((p) => p.toLowerCase().includes(q.trim().toLowerCase()));
   return (
@@ -225,7 +227,10 @@ function Places({ at }: At) {
 
 /** The map page: the map fills the page, the switch floats, the chosen place in a card above the dock. */
 function PlacesMap({ at }: At) {
-  const [selected, setSelected] = useState<Place | null>(null);
+  // The chosen place is in the URL (?place=), so Back closes its card.
+  const [placeId, setPlaceId] = useUrlState("place", "");
+  const selected = PLACES.find((p) => p.id === placeId) ?? null;
+  const setSelected = (p: Place | null) => setPlaceId(p?.id ?? "");
   const here = selected ? ENTRIES.filter((e) => e.place === selected.id) : [];
   return (
     <div className="relative -mx-4 h-[calc(100dvh-10rem)] overflow-hidden sm:mx-0 sm:rounded-2xl">

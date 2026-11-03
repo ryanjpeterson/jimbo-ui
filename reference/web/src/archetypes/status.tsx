@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/kit";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
+import { useUrlState } from "@/lib/useUrlState";
 
 type Service = { id: string; name: string; what: string; port: number; via: "tunnel" | "direct"; status: "up" | "slow" | "down"; ms?: number; seen: (0 | 1)[]; uptime: number };
 const STATUS: Record<Service["status"], { tone: Tone; label: string }> = {
@@ -45,7 +46,7 @@ const HISTORY: Record<(typeof RANGES)[number]["value"], { labels: string[]; upti
 
 export function StatusPage() {
   const [layout, setLayout] = useListLayout("status-services");
-  const [range, setRange] = useState<(typeof RANGES)[number]["value"]>("week");
+  const [range, setRange] = useUrlState<(typeof RANGES)[number]["value"]>("range", "week", RANGES.map((r) => r.value));
   const up = SERVICES.filter((s) => s.status !== "down");
   const answered = up.filter((s) => s.ms != null);
   const avg = Math.round(answered.reduce((n, s) => n + s.ms!, 0) / answered.length);

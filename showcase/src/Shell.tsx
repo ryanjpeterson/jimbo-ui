@@ -1,21 +1,17 @@
-/** The showcase app: the reference AppShell with three tabs, two top-bar actions, the demo routes and the jimbo-ui config section under Settings. */
+/** The showcase app: the reference AppShell with two tabs (Home holds every component), two top-bar actions and the jimbo-ui config section under Settings. */
 
 import { useState } from "react";
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import { AppShell, TopBarButton, type ShellTab } from "@/routes/AppShell";
 import { Sheet, SearchField } from "@/components/ui/kit";
 import { Button } from "@/components/ui/button";
 import { useApplyBrand } from "@/lib/useBrand";
 import { JimboConfigPage } from "@/routes/JimboConfigPage";
-import { CatalogueRoutes } from "@/archetypes/catalogue";
-import { DashboardPage } from "@/archetypes/dashboard";
-import { StatusPage } from "@/archetypes/status";
 import { HomeDemo } from "./Home";
-import { ArchetypesPage, CatalogueNav, SettingsPage } from "./pages";
+import { SettingsPage } from "./pages";
 
 const TABS: ShellTab[] = [
   { to: "/", label: "Home", icon: <path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z" /> },
-  { to: "/archetypes", label: "Archetypes", icon: <><rect x="3" y="4" width="18" height="16" rx="2" /><path d="M3 9h18M9 9v11" /></> },
   { to: "/settings", label: "Settings", also: ["/jimbo-ui"], icon: <><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1" /><circle cx="15" cy="6" r="2" /><circle cx="9" cy="12" r="2" /><circle cx="17" cy="18" r="2" /></> },
 ];
 
@@ -35,16 +31,11 @@ export function Shell() {
     </>}>
       <Routes>
         <Route path="/" element={<HomeDemo />} />
-        {/* The components live on Home now; old links land there. */}
-        <Route path="/components" element={<HomeDemo />} />
-        <Route path="/archetypes" element={<ArchetypesPage />} />
-        <Route path="/archetypes/catalogue/*" element={<CatalogueRoutes base="/archetypes/catalogue" nav={(current) => <CatalogueNav current={current} />} />} />
-        <Route path="/archetypes/dashboard" element={<DashboardPage />} />
-        <Route path="/archetypes/status" element={<StatusPage />} />
         <Route path="/settings" element={<SettingsPage />} />
         {/* No sign-in here, so like an app with auth "none" the section is open. */}
         <Route path="/jimbo-ui" element={<JimboConfigPage canConfigure />} />
-        <Route path="*" element={<HomeDemo />} />
+        {/* Anything else (old /components and /archetypes links too) goes home, and the URL says so. */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 
       {sheet === "search" && (

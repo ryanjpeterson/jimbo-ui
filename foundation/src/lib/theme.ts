@@ -55,6 +55,8 @@ export interface Theme {
   contrast?: number;
   /** The page's backdrop: an abstract pattern over a base, in the theme's colours (`BACKDROPS`). */
   backdrop?: Backdrop;
+  /** The brand motif: the flat shape `ThemeDots` draws in the theme's colours (`MOTIFS`; default circles). */
+  motif?: MotifKey;
   /**
    * How missing colours are inferred: `contrast` (the default) picks new hues
    * that stand apart; `tonal` uses lighter and darker versions of the accent,
@@ -65,14 +67,15 @@ export interface Theme {
 
 /** A theme as a server or cache returns it: anything may be missing or null. */
 export type SavedTheme = { [K in "accent" | "background" | "highlight" | "support"]?: string | null }
-  & { fonts?: Theme["fonts"] | null; infer?: Theme["infer"] | null; vibrancy?: number | null; contrast?: number | null; backdrop?: Backdrop | null };
+  & { fonts?: Theme["fonts"] | null; infer?: Theme["infer"] | null; vibrancy?: number | null; contrast?: number | null; backdrop?: Backdrop | null; motif?: MotifKey | null };
 
 /**
  * The fonts a theme can use. `css` is the font stack; `google` the Google Fonts
  * family query that loads it (Archivo, Inter and JetBrains Mono are in
  * index.html); `weights` the range it has; `body: false` marks display faces
- * that are for headings only (blackletter, uncial, old print — unreadable as text).
- * Nine per group; decorative faces stay dark and old-world rather than novelty.
+ * that are for headings only (blackletter, old print, poster faces — wrong for running text).
+ * Nine per group; decorative faces are blackletter and old print, plus a few
+ * modern poster faces (Bebas Neue, Unbounded, Syne) — no novelty.
  */
 export type FontDef = { label: string; group: "Sans" | "Serif" | "Mono" | "Decorative"; css: string; google: string | null; weights: [number, number]; body?: false };
 export const FONTS: Record<string, FontDef> = {
@@ -81,18 +84,18 @@ export const FONTS: Record<string, FontDef> = {
   "space-grotesk":{ label: "Space Grotesk", group: "Sans", css: "'Space Grotesk', ui-sans-serif, system-ui, sans-serif", google: "family=Space+Grotesk:wght@300..700", weights: [300, 700] },
   "dm-sans":      { label: "DM Sans", group: "Sans", css: "'DM Sans', ui-sans-serif, system-ui, sans-serif", google: "family=DM+Sans:opsz,wght@9..40,300..900", weights: [300, 900] },
   manrope:        { label: "Manrope", group: "Sans", css: "'Manrope', ui-sans-serif, system-ui, sans-serif", google: "family=Manrope:wght@300..800", weights: [300, 800] },
-  "ibm-plex-sans":{ label: "IBM Plex Sans", group: "Sans", css: "'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif", google: "family=IBM+Plex+Sans:wght@300;400;500;600;700", weights: [300, 700] },
-  "work-sans":    { label: "Work Sans", group: "Sans", css: "'Work Sans', ui-sans-serif, system-ui, sans-serif", google: "family=Work+Sans:wght@300..900", weights: [300, 900] },
+  geist:          { label: "Geist", group: "Sans", css: "'Geist', ui-sans-serif, system-ui, sans-serif", google: "family=Geist:wght@300..900", weights: [300, 900] },
+  "plus-jakarta": { label: "Plus Jakarta", group: "Sans", css: "'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif", google: "family=Plus+Jakarta+Sans:wght@300..800", weights: [300, 800] },
   // Avenir Next / Avenir where the device has them (Apple), Nunito Sans (the nearest Google font) elsewhere.
   avenir:         { label: "Avenir", group: "Sans", css: "'Avenir Next', 'Avenir', 'Nunito Sans', ui-sans-serif, system-ui, sans-serif", google: "family=Nunito+Sans:wght@300..900", weights: [300, 900] },
   figtree:        { label: "Figtree", group: "Sans", css: "'Figtree', ui-sans-serif, system-ui, sans-serif", google: "family=Figtree:wght@300..900", weights: [300, 900] },
-  fraunces:       { label: "Fraunces", group: "Serif", css: "'Fraunces', ui-serif, Georgia, serif", google: "family=Fraunces:opsz,wght@9..144,300..900", weights: [300, 900] },
+  newsreader:     { label: "Newsreader", group: "Serif", css: "'Newsreader', ui-serif, Georgia, serif", google: "family=Newsreader:opsz,wght@6..72,300..800", weights: [300, 800] },
   "source-serif": { label: "Source Serif", group: "Serif", css: "'Source Serif 4', ui-serif, Georgia, serif", google: "family=Source+Serif+4:opsz,wght@8..60,300..900", weights: [300, 900] },
   playfair:       { label: "Playfair", group: "Serif", css: "'Playfair Display', ui-serif, Georgia, serif", google: "family=Playfair+Display:wght@400..900", weights: [400, 900] },
   "eb-garamond":  { label: "EB Garamond", group: "Serif", css: "'EB Garamond', ui-serif, Georgia, serif", google: "family=EB+Garamond:wght@400..800", weights: [400, 800] },
-  marcellus:      { label: "Marcellus", group: "Serif", css: "'Marcellus', ui-serif, Georgia, serif", google: "family=Marcellus", weights: [400, 400] },
+  literata:       { label: "Literata", group: "Serif", css: "'Literata', ui-serif, Georgia, serif", google: "family=Literata:opsz,wght@7..72,300..900", weights: [300, 900] },
   "libre-baskerville": { label: "Baskerville", group: "Serif", css: "'Libre Baskerville', ui-serif, Georgia, serif", google: "family=Libre+Baskerville:wght@400;700", weights: [400, 700] },
-  cormorant:      { label: "Cormorant", group: "Serif", css: "'Cormorant Garamond', ui-serif, Georgia, serif", google: "family=Cormorant+Garamond:wght@300;400;500;600;700", weights: [300, 700] },
+  "instrument-serif": { label: "Instrument Serif", group: "Serif", css: "'Instrument Serif', ui-serif, Georgia, serif", google: "family=Instrument+Serif", weights: [400, 400], body: false },
   lora:           { label: "Lora", group: "Serif", css: "'Lora', ui-serif, Georgia, serif", google: "family=Lora:wght@400..700", weights: [400, 700] },
   "dm-serif":     { label: "DM Serif", group: "Serif", css: "'DM Serif Display', ui-serif, Georgia, serif", google: "family=DM+Serif+Display", weights: [400, 400], body: false },
   "jetbrains-mono": { label: "JetBrains Mono", group: "Mono", css: "'JetBrains Mono', ui-monospace, SFMono-Regular, monospace", google: "family=JetBrains+Mono:wght@300..800", weights: [300, 800] },
@@ -108,18 +111,24 @@ export const FONTS: Record<string, FontDef> = {
   "old-german":   { label: "Old German", group: "Decorative", css: "'UnifrakturMaguntia', serif", google: "family=UnifrakturMaguntia", weights: [400, 400], body: false },
   gothic:         { label: "Gothic", group: "Decorative", css: "'Grenze Gotisch', serif", google: "family=Grenze+Gotisch:wght@300..900", weights: [300, 900], body: false },
   pirate:         { label: "Pirate", group: "Decorative", css: "'Pirata One', serif", google: "family=Pirata+One", weights: [400, 400], body: false },
-  rocker:         { label: "Rocker", group: "Decorative", css: "'New Rocker', serif", google: "family=New+Rocker", weights: [400, 400], body: false },
+  bebas:          { label: "Bebas Neue", group: "Decorative", css: "'Bebas Neue', ui-sans-serif, system-ui, sans-serif", google: "family=Bebas+Neue", weights: [400, 400], body: false },
   typewriter:     { label: "Typewriter", group: "Decorative", css: "'Special Elite', ui-monospace, monospace", google: "family=Special+Elite", weights: [400, 400], body: false },
   "old-print":    { label: "Old print", group: "Decorative", css: "'IM Fell English', ui-serif, Georgia, serif", google: "family=IM+Fell+English", weights: [400, 400], body: false },
-  uncial:         { label: "Uncial", group: "Decorative", css: "'Uncial Antiqua', ui-serif, Georgia, serif", google: "family=Uncial+Antiqua", weights: [400, 400], body: false },
-  carved:         { label: "Carved caps", group: "Decorative", css: "'Cinzel', ui-serif, Georgia, serif", google: "family=Cinzel:wght@400..900", weights: [400, 900], body: false },
+  unbounded:      { label: "Unbounded", group: "Decorative", css: "'Unbounded', ui-sans-serif, system-ui, sans-serif", google: "family=Unbounded:wght@300..900", weights: [300, 900], body: false },
+  syne:           { label: "Syne", group: "Decorative", css: "'Syne', ui-sans-serif, system-ui, sans-serif", google: "family=Syne:wght@400..800", weights: [400, 800], body: false },
 };
 export const FONT_GROUPS = ["Sans", "Serif", "Mono", "Decorative"] as const;
 
+/** Fonts taken out of `FONTS`, and the nearest one still in it, so a saved theme keeps a similar face. */
+export const RETIRED_FONTS: Record<string, FontKey> = {
+  "ibm-plex-sans": "geist", "work-sans": "plus-jakarta", fraunces: "newsreader", marcellus: "literata", cormorant: "eb-garamond",
+  rocker: "gothic", uncial: "old-print", carved: "instrument-serif",
+};
+
 /** A font key, with the older style names ("sans", "mono", "serif") turned into fonts. */
 export function fontFor(key: FontKey | undefined, part: "headings" | "body"): string {
-  const legacy: Record<string, [string, string]> = { sans: ["archivo", "inter"], mono: ["jetbrains-mono", "jetbrains-mono"], serif: ["fraunces", "source-serif"] };
-  const k = key && legacy[key] ? legacy[key]![part === "headings" ? 0 : 1] : key;
+  const legacy: Record<string, [string, string]> = { sans: ["archivo", "inter"], mono: ["jetbrains-mono", "jetbrains-mono"], serif: ["newsreader", "source-serif"] };
+  const k = key && legacy[key] ? legacy[key]![part === "headings" ? 0 : 1] : key && RETIRED_FONTS[key] ? RETIRED_FONTS[key] : key;
   if (k && FONTS[k] && (part === "headings" || FONTS[k]!.body !== false)) return k;
   return part === "headings" ? "archivo" : "inter";
 }
@@ -148,7 +157,59 @@ export type Backdrop = {
   contrast?: number;
   /** 0–1.6, default 1: the pattern's and base's colour — 0 is greys, above 1 more vivid. */
   saturation?: number;
+  /** How the backdrop moves (`BACKDROP_MOTIONS`): none (the default), or a slow drift, breathe, sway or pulse. Off when the device asks for reduced motion. */
+  motion?: BackdropMotion;
+  /** 0.5–2, default 1: how fast it moves. */
+  speed?: number;
 };
+export type BackdropMotion = "none" | "drift" | "breathe" | "sway" | "pulse";
+/** Backdrop motions: a keyframe set in globals.css (`jimbo-bg-<key>`) and how long one cycle takes at speed 1. Always slow. */
+export const BACKDROP_MOTIONS: { key: BackdropMotion; label: string; hint: string; seconds: number }[] = [
+  { key: "none", label: "Still", hint: "No movement", seconds: 0 },
+  { key: "drift", label: "Drift", hint: "Glides slowly from corner to corner", seconds: 48 },
+  { key: "breathe", label: "Breathe", hint: "Slowly grows and settles", seconds: 22 },
+  { key: "sway", label: "Sway", hint: "Turns gently back and forth", seconds: 36 },
+  { key: "pulse", label: "Pulse", hint: "Fades a little and back", seconds: 10 },
+];
+
+/** The CSS animation for a theme's backdrop motion, or "none". */
+export function backdropAnimation(theme: Theme): string {
+  const b = fullTheme(theme).backdrop;
+  const m = BACKDROP_MOTIONS.find((x) => x.key === b.motion);
+  if (!m || !m.seconds || b.pattern === "none" && b.base === "solid") return "none";
+  const s = Math.round((m.seconds / Math.max(0.5, Math.min(2, b.speed!))) * 10) / 10;
+  return `jimbo-bg-${m.key} ${s}s ease-in-out infinite alternate`;
+}
+
+/**
+ * The brand motif: flat shapes side by side in the accent, highlight and
+ * support (`ThemeDots`). `path` is the shape in a 24 × 24 box, drawn as a
+ * mask (black = shape); circles need none. Flat fills only, no outlines or
+ * gloss, at fixed sizes like the circles they replace.
+ */
+export type MotifKey = "dots" | "triforce" | "sparkles" | "stars" | "hearts" | "diamonds" | "triangles" | "squares" | "crosses" | "bolts" | "flowers" | "moons" | "squiggles";
+export const MOTIFS: { key: MotifKey; label: string; path: string | null }[] = [
+  { key: "dots", label: "Circles", path: null },
+  { key: "triforce", label: "Triforce", path: "<path d='M12 1.5 18 11.9H6zM6 12.1 12 22.5H0zM18 12.1 24 22.5H12z'/>" },
+  { key: "sparkles", label: "Sparkles", path: "<path d='M12 0c.9 7.6 3.6 10.9 12 12-8.4 1.1-11.1 4.4-12 12-.9-7.6-3.6-10.9-12-12 8.4-1.1 11.1-4.4 12-12z'/>" },
+  { key: "stars", label: "Stars", path: "<path d='m12 1 3.2 7 7.6.8-5.7 5.1 1.6 7.5L12 17.6l-6.7 3.8 1.6-7.5-5.7-5.1 7.6-.8z'/>" },
+  { key: "hearts", label: "Hearts", path: "<path d='M12 22 2.6 12.9A5.9 5.9 0 0 1 12 5.4a5.9 5.9 0 0 1 9.4 7.5z'/>" },
+  { key: "diamonds", label: "Diamonds", path: "<path d='M12 0 22 12 12 24 2 12z'/>" },
+  { key: "triangles", label: "Triangles", path: "<path d='M12 2.5 23 21.5H1z'/>" },
+  { key: "squares", label: "Squares", path: "<rect x='2' y='2' width='20' height='20' rx='5'/>" },
+  { key: "crosses", label: "Crosses", path: "<path d='M8.5 1h7v7.5H23v7h-7.5V23h-7v-7.5H1v-7h7.5z'/>" },
+  { key: "bolts", label: "Bolts", path: "<path d='M14.5 0 3 13.5h7.5L8.5 24 21 9.5h-7.5z'/>" },
+  { key: "flowers", label: "Flowers", path: "<circle cx='12' cy='6' r='5.5'/><circle cx='18' cy='12' r='5.5'/><circle cx='12' cy='18' r='5.5'/><circle cx='6' cy='12' r='5.5'/>" },
+  { key: "moons", label: "Moons", path: "<path d='M15.5 1A11 11 0 1 0 23 17.6 9 9 0 0 1 15.5 1z'/>" },
+  { key: "squiggles", label: "Squiggles", path: "<path d='M1 15c3-8 6-8 7.5 0s5 8 7.5 0 5-8 7 0' fill='none' stroke='black' stroke-width='4' stroke-linecap='round'/>" },
+];
+
+/** The motif's mask (a CSS url) or "none" for circles. */
+export function motifMask(theme: Theme): string {
+  const m = MOTIFS.find((x) => x.key === theme.motif);
+  if (!m?.path) return "none";
+  return `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'>${m.path}</svg>`)}")`;
+}
 export type BackdropPattern =
   | "none" | "ripples" | "waves" | "contours" | "shapes" | "blobs" | "flow" | "confetti" | "burst"
   | "swirl" | "ribbons" | "scribble" | "rain"
@@ -393,7 +454,8 @@ export function fullTheme(theme: Theme): FullTheme {
     vibrancy: theme.vibrancy ?? 1,
     contrast: theme.contrast ?? 1,
     backdrop: { pattern: theme.backdrop?.pattern ?? "none", base: theme.backdrop?.base ?? "glow", intensity: theme.backdrop?.intensity ?? 0.5, scale: theme.backdrop?.scale ?? 1,
-      contrast: theme.backdrop?.contrast ?? 1, saturation: theme.backdrop?.saturation ?? 1 },
+      contrast: theme.backdrop?.contrast ?? 1, saturation: theme.backdrop?.saturation ?? 1, motion: theme.backdrop?.motion ?? "none", speed: theme.backdrop?.speed ?? 1 },
+    motif: MOTIFS.some((m) => m.key === theme.motif) ? theme.motif! : "dots",
     infer: theme.infer ?? "contrast",
   };
 }
@@ -408,6 +470,8 @@ function ownBackdrop(b: Backdrop | undefined): Backdrop | undefined {
     ...(b.scale !== undefined && b.scale !== 1 ? { scale: b.scale } : {}),
     ...(b.contrast !== undefined && b.contrast !== 1 ? { contrast: b.contrast } : {}),
     ...(b.saturation !== undefined && b.saturation !== 1 ? { saturation: b.saturation } : {}),
+    ...(b.motion && b.motion !== "none" ? { motion: b.motion } : {}),
+    ...(b.speed !== undefined && b.speed !== 1 ? { speed: b.speed } : {}),
   };
   return Object.keys(out).length ? out : undefined;
 }
@@ -434,6 +498,7 @@ export function ownColours(theme: Theme): Theme {
     ...(theme.vibrancy !== undefined && theme.vibrancy !== 1 ? { vibrancy: theme.vibrancy } : {}),
     ...(theme.contrast !== undefined && theme.contrast !== 1 ? { contrast: theme.contrast } : {}),
     ...(ownBackdrop(theme.backdrop) ? { backdrop: ownBackdrop(theme.backdrop) } : {}),
+    ...(theme.motif && theme.motif !== "dots" && MOTIFS.some((m) => m.key === theme.motif) ? { motif: theme.motif } : {}),
   };
 }
 
@@ -945,6 +1010,7 @@ export function tokensCss(theme: Theme): string {
   if (f.bodyTracking !== 0) lines.push(`  --font-body-tracking: ${f.bodyTracking}em;`);
   if (f.headingsSize !== 1) lines.push(`  --font-display-size: ${f.headingsSize};`);
   if (f.bodySize !== 1) lines.push(`  --font-body-size: ${f.bodySize};`);
+  if (motifMask(theme) !== "none") lines.push(`  --motif-mask: ${motifMask(theme)};`, "  --motif-radius: 0px;");
   return [
     `/* This app's default theme tokens ("R G B" channels), so the page looks right`,
     `   before any script runs. Owned by the app; generate from BRAND.defaultTheme`,
@@ -1004,8 +1070,10 @@ export function importTheme(text: string): { theme: Theme; name?: string } {
       const bd = (raw.backdrop ?? {}) as Record<string, unknown>;
       const pattern = BACKDROPS.find((x) => x.key === bd.pattern)?.key;
       const base = BACKDROP_BASES.find((x) => x === bd.base);
-      return { pattern, base, intensity: num(bd.intensity, 0, 1), scale: num(bd.scale, 0.5, 2), contrast: num(bd.contrast, 0.3, 2), saturation: num(bd.saturation, 0, 1.6) };
+      const motion = BACKDROP_MOTIONS.find((x) => x.key === bd.motion)?.key;
+      return { pattern, base, intensity: num(bd.intensity, 0, 1), scale: num(bd.scale, 0.5, 2), contrast: num(bd.contrast, 0.3, 2), saturation: num(bd.saturation, 0, 1.6), motion, speed: num(bd.speed, 0.5, 2) };
     })(),
+    motif: MOTIFS.find((x) => x.key === raw.motif)?.key,
   };
   const name = typeof obj.name === "string" ? obj.name.slice(0, 80) : undefined;
   return { theme: ownColours(theme), ...(name ? { name } : {}) };
@@ -1032,6 +1100,9 @@ export function themeVars(theme: Theme): Record<string, string> {
   vars["--bg-size"] = bd.size;
   vars["--bg-position"] = bd.position;
   vars["--bg-repeat"] = bd.repeat;
+  vars["--bg-animation"] = backdropAnimation(theme);
+  vars["--motif-mask"] = motifMask(theme);
+  vars["--motif-radius"] = motifMask(theme) === "none" ? "9999px" : "0px";
   return vars;
 }
 

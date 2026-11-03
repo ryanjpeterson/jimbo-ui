@@ -9,25 +9,25 @@ import { useEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { Link } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
-import { HeroSection, LinkCard } from "@/components/ui/kit";
+import { HeroSection } from "@/components/ui/kit";
 import { Button } from "@/components/ui/button";
 import { MapView } from "@/components/MapView";
 import { cn } from "@/lib/cn";
 import { StyleGuidePanel } from "@/routes/config/StyleGuidePanel";
 import { api } from "@/lib/api";
-import { applyTheme, BACKDROPS, FONTS, fullTheme, loadFonts, type PageTone, type Theme } from "@/lib/theme";
+import { applyTheme, BACKDROPS, FONTS, fullTheme, loadFonts, MOTIFS, type PageTone, type Theme } from "@/lib/theme";
 import { ALL_FAMILIES, familyLook } from "@/lib/themes";
 import type { Brand } from "@/lib/useBrand";
 import { UpdatesDemo } from "./pages";
 
-type Look = { name: string; tone: PageTone; headings: string; body: string; backdrop: string; base: string; theme: Theme };
+type Look = { name: string; tone: PageTone; headings: string; body: string; backdrop: string; base: string; motif: string; theme: Theme };
 
 const LOOK_COUNT = 10;
 const TONES: PageTone[] = ["light", "mid", "dark"];
 const BASES = ["solid", "gradient", "glow"] as const;
 const pick = <T,>(xs: readonly T[]): T => xs[Math.floor(Math.random() * xs.length)]!;
 
-/** Ten different looks, each in a random tone with random fonts and backdrop. Decorative faces only head. */
+/** Ten different looks, each in a random tone with random fonts, backdrop and motif. Decorative faces only head. */
 function randomLooks(n: number): Look[] {
   const families = [...ALL_FAMILIES];
   for (let k = families.length - 1; k > 0; k--) {
@@ -38,9 +38,9 @@ function randomLooks(n: number): Look[] {
   const bodyFonts = fonts.filter((k) => FONTS[k]!.group !== "Decorative");
   const patterns = BACKDROPS.filter((b) => b.key !== "none");
   return families.slice(0, n).map((f) => {
-    const tone = pick(TONES), headings = pick(fonts), body = pick(bodyFonts), backdrop = pick(patterns), base = pick(BASES);
-    const theme = { ...familyLook(f, tone).template.theme, fonts: { headings, body }, backdrop: { pattern: backdrop.key, base } };
-    return { name: f.name, tone, headings, body, backdrop: backdrop.label, base, theme };
+    const tone = pick(TONES), headings = pick(fonts), body = pick(bodyFonts), backdrop = pick(patterns), base = pick(BASES), motif = pick(MOTIFS);
+    const theme: Theme = { ...familyLook(f, tone).template.theme, fonts: { headings, body }, backdrop: { pattern: backdrop.key, base }, motif: motif.key };
+    return { name: f.name, tone, headings, body, backdrop: backdrop.label, base, motif: motif.label, theme };
   });
 }
 
@@ -188,7 +188,7 @@ function LookStepper() {
       <button ref={prevBtn} type="button" className={arrow} onClick={() => go(-1)} aria-label="Previous look">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
       </button>
-      <div className="min-w-0 px-1 leading-tight" title={s ? `${FONTS[s.headings]?.label ?? s.headings} headings · ${FONTS[s.body]?.label ?? s.body} body · ${s.backdrop} on ${s.base}` : undefined}>
+      <div className="min-w-0 px-1 leading-tight" title={s ? `${FONTS[s.headings]?.label ?? s.headings} headings · ${FONTS[s.body]?.label ?? s.body} body · ${s.backdrop} on ${s.base} · ${s.motif}` : undefined}>
         <p className="max-w-[9rem] truncate text-sm font-semibold sm:max-w-[12rem]" aria-live="polite">{s ? s.name : "Your look"}</p>
         <p className="text-xs tabular-nums text-text-subtle">
           {s && <span className="capitalize">{s.tone} · </span>}
@@ -224,7 +224,8 @@ export function HomeDemo() {
           <button type="button" className="btn btn-primary" onClick={() => document.getElementById("kit")?.scrollIntoView({ behavior: "smooth" })}>See every component</button>
           <Link to="/jimbo-ui" className="btn btn-secondary">Make a look</Link>
         </>}>
-        The same components in {ALL_FAMILIES.length} looks — each light, mid or dark — {Object.keys(FONTS).length} typefaces and {BACKDROPS.length - 1} backdrops. Ten of them take
+        The same components in {ALL_FAMILIES.length} looks — each light, mid or dark — {Object.keys(FONTS).length} typefaces, {BACKDROPS.length - 1} backdrops
+        and {MOTIFS.length} motifs. Ten of them take
         turns on the whole page, a new one every {LOOK_SECONDS} seconds — the arrows top right (or ← →) step by hand; <em>Use</em> keeps one.
       </HeroSection>
 
@@ -234,15 +235,6 @@ export function HomeDemo() {
           { value: "maps", label: "Maps", content: <Maps /> },
           { value: "updates", label: "Release updates", content: <UpdatesDemo /> },
         ]} />
-      </section>
-
-      <section className="space-y-3">
-        <h2 className="h-section px-0.5">Start an app from an archetype</h2>
-        <div className="grid gap-3 sm:grid-cols-2">
-          <LinkCard to="/archetypes/catalogue" eyebrow="Archetype" title="Catalogue" sub="Entries, people, places, numbers — with a map" accent />
-          <LinkCard to="/archetypes/dashboard" eyebrow="Archetype" title="Single-page dashboard" sub="Is everything fine? Jobs, runs, settings" />
-          <LinkCard to="/archetypes/status" eyebrow="Archetype" title="Status monitor" sub="Is every service up? Checks, response, history" />
-        </div>
       </section>
     </div>
   );

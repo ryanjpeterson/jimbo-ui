@@ -257,14 +257,15 @@
     {
       "id": "theme-dots",
       "name": "ThemeDots",
-      "purpose": "Shows the theme's colours as the circle motif.",
+      "purpose": "Shows the theme's colours as the motif: circles, or the theme's motif shape.",
       "tier": "kit",
       "aliases": [
         "Swatches",
         "ColourDots"
       ],
       "variants": {
-        "size": "8 | 12 | 16"
+        "size": "8 | 12 | 16 | 24",
+        "motif": "theme.motif (dots | triforce | sparkles | stars | \u2026)"
       },
       "source": "reference/web/src/components/ui/kit.tsx#ThemeDots"
     },
@@ -693,6 +694,18 @@
         "floating": "boolean"
       },
       "source": "reference/web/src/components/ui/kit.tsx#ViewSwitch"
+    },
+    {
+      "id": "url-state",
+      "name": "useUrlState",
+      "purpose": "Keeps a view's tab, filter, search or page in the URL, so refresh, Back and links land on the same view.",
+      "tier": "kit",
+      "aliases": [
+        "useSearchParam",
+        "useQueryState",
+        "useParamState"
+      ],
+      "source": "reference/web/src/lib/useUrlState.ts"
     },
     {
       "id": "save-bar",

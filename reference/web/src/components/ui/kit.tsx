@@ -92,18 +92,19 @@ export function Chevron({ dir = "right", className }: { dir?: "left" | "right" |
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Theme dots — the circle motif
+// Theme dots — the motif
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * The theme's colours (accent, highlight, support) as flat dots side by side —
- * jimbo.ui's motif. In empty states and brand moments only; never above a page
- * title. Decorative; follows the live theme.
+ * The theme's colours (accent, highlight, support) as flat shapes side by side —
+ * jimbo.ui's motif: circles, or the shape the theme picks (`theme.motif`:
+ * triforce, sparkles, stars…). In empty states and brand moments only; never
+ * above a page title. Decorative; follows the live theme.
  */
 export function ThemeDots({ size = 8, className }: { size?: number; className?: string }) {
   return (
     <span aria-hidden="true" className={cn("inline-flex shrink-0 items-center", className)} style={{ gap: size >= 16 ? 6 : 4 }}>
-      {(["dot-accent", "dot-highlight", "dot-support"] as const).map((dot) => (
+      {(["motif-accent", "motif-highlight", "motif-support"] as const).map((dot) => (
         <span key={dot} className={dot} style={{ width: size, height: size }} />
       ))}
     </span>

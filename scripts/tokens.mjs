@@ -8,7 +8,7 @@
  *   node scripts/tokens.mjs '#A8FF3E' '#FF3D6E' '#141416' '#2EC5FF' > <app>/src/styles/tokens.css
  *                            accent    highlight  background support
  *   node scripts/tokens.mjs '#9DB2FF' - '#101418'      (two colours: the rest inferred)
- *   … --headings=fraunces --body=inter                 (fonts: keys of FONTS in theme.ts)
+ *   … --headings=newsreader --body=inter                 (fonts: keys of FONTS in theme.ts)
  */
 import { mkdtempSync, copyFileSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";

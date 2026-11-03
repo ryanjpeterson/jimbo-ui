@@ -94,7 +94,7 @@ this check, then the preview workflow if they want detail.
   look wasn't written in are made from its own colours (`atTone`,
   `FAMILY_SETS`, `familyLook`), and every look in every tone passes the
   checks. Six categories: **Everyday**, **Holidays**, **Countries** (by
-  region), **Provinces**, **Games** (The Legend of Zelda) and **Sports**
+  region), **Provinces**, **Games** (sub-tabs: The Legend of Zelda, Super Mario, Donkey Kong, More Nintendo, Sly Cooper, Tony Hawk's Underground) and **Sports**
   (every NHL, NBA, MLB and NFL team, plus Toronto, Ottawa and Chicago tabs),
   with a search box. New team, country, place or game looks come from their
   real colours via `scripts/template-from-colours.mjs`.
@@ -146,8 +146,16 @@ this check, then the preview workflow if they want detail.
 - Backdrops and width: the theme's backdrop (`Theme.backdrop` — 21
   patterns in four groups, **Abstract**, **Geo**, **Vintage** and
   **Texture**, over a solid, gradient or glow base, with strength, size,
-  contrast and saturation sliders) is behind every page; full-width sections use
+  contrast and saturation sliders, still or slowly moving — drift, breathe,
+  sway or pulse, off for reduced motion) is behind every page; full-width sections use
   `FullBleed` and `HeroSection`, and `AppShell width` sets the page width.
+- **The URL holds the view** (guide section 6): `BrowserRouter`, never
+  `MemoryRouter`; tabs, sub-tabs, filters, searches, page numbers and an
+  open item are search parameters via `useUrlState` / `useUrlNumber`
+  (`lib/useUrlState.ts`), so refresh, Back and links land on the same view.
+- **The motif** is `ThemeDots`: circles, or the theme's `motif` shape
+  (triforce, sparkles, stars…), picked on the Brand tab. Status dots and
+  avatars stay circles.
 - **One jimbo-ui config section per app** (guide section 1). Every brand,
   theme and style guide option lives there and nowhere else — no separate
   Brand pages, theme pickers in settings, or standalone Style guide pages.
@@ -155,7 +163,7 @@ this check, then the preview workflow if they want detail.
   reached from the app's settings or admin area (never a dock tab), with
   tabs **Looks** (templates, share a look), **Colours** (the picker,
   inference, readability checks), **Type**, **Backdrop** — one unsaved look
-  and one save bar across the four — **Brand** (name and header text preview, favicon),
+  and one save bar across them and the motif — **Brand** (name and header text preview, motif, favicon),
   **Style guide** (the live kit plus the app's components) and **About**
   (jimbo-ui version, registry status, the showcase link). App-specific
   additions go in its **App** tab, nowhere else. The theme set there is the

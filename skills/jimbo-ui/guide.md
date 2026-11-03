@@ -20,10 +20,14 @@ implementations of everything below are in the repo's `reference/` folder.
   jimbo-ui config section.
 - **Look:** flat colour on coloured shapes, depth from layers — solid
   surfaces with a light frost, softly rounded corners (not pills), a
-  backdrop behind the page, and flat circles of the theme's colours as a
-  recurring motif (no orbs).
+  backdrop behind the page (still, or moving slowly), and flat circles of
+  the theme's colours as a recurring motif (no orbs) — or another flat shape
+  the theme picks (triforce, sparkles, stars…).
 - **Type:** sans (Archivo and Inter), mono (JetBrains Mono) or serif
-  (Fraunces and Source Serif 4), chosen separately for headings and body.
+  (Newsreader and Source Serif 4), chosen separately for headings and body.
+- **The URL holds the view:** the route and its tab, sub-tab, filter, search
+  and page are in the URL, so a refresh, Back or a shared link lands on the
+  same view.
 
 **Contents:** 1 How apps use jimbo-ui · 2 Brand · 3 Theme engine · 4 Theme
 templates · 5 Typography · 6 Layout and shell · 7 Surfaces, depth and motion ·
@@ -64,8 +68,10 @@ The stack is React + TypeScript + Vite + Tailwind CSS 3 (with `clsx` and
 (reference, then foundation and starter, then stand-ins for the server parts
 in `showcase/overrides/`). It runs the real jimbo-ui config section and kit,
 a Home page where ten random looks take turns on the whole page (theme,
-font and backdrop, every 15 seconds, or by arrow) over every component, and the
-Archetypes, with the theme saved in the browser.
+font, backdrop and motif, every 15 seconds, or by arrow) over every component, and
+Settings, with the theme saved in the browser. Its route is in the URL
+(`#/jimbo-ui?tab=type`), so a refresh keeps the view. The archetypes aren't
+mounted in it; they're templates in `reference/web/src/archetypes/`.
 `npm --prefix showcase run dev` runs it locally, or with Docker:
 `docker compose up --build` serves the built app on http://localhost:4460
 (`JIMBO_PORT`), and `docker compose --profile dev up` a live-reloading dev
@@ -130,8 +136,9 @@ can theme any:
      *Contrast* sliders, readability warnings.
   3. **Type** — headings and body fonts with weight and spacing.
   4. **Backdrop** — the pattern by group, its base, strength, size,
-     contrast and saturation.
-  5. **Brand** — the name as header text at each size, and the favicon.
+     contrast and saturation, and its motion (still, drift, breathe, sway
+     or pulse) and speed.
+  5. **Brand** — the name as header text at each size, the motif, and the favicon.
   6. **Style guide** — every shared component in the current theme
      (including an unsaved look), in sections with toggles (Brand and
      type, Controls, Numbers and charts, Lists, States), plus the app's
@@ -148,7 +155,11 @@ can theme any:
      configure, and shows nothing extra when it can't be reached. An app
      never updates itself.
   8. **App** (optional) — anything app-specific. Nothing goes anywhere else.
-- **One look is edited across the Looks, Colours, Type and Backdrop tabs**
+- **Every choice is in the URL** — the tab (`?tab=`), the Looks category,
+  sub-tab, tone and search (`set`, `group`, `tone`, `q`), the backdrop group
+  (`patterns`), the font groups (`headings-fonts`, `body-fonts`) and the
+  Style guide section (`section`) — so a link opens exactly that view.
+- **One look is edited across the Looks, Colours, Type, Backdrop and Brand (motif) tabs**
   (`useThemeDraft`): it previews live across the app, one save bar
   (*Undo* / *Save*) floats over every tab while it's unsaved, and leaving
   the section without saving puts the saved look back.
@@ -317,9 +328,19 @@ support) or glow (soft colour glows, the default). Four sliders tune it:
 **strength** (0–1, pattern and base together), **size** (0.5–2),
 **contrast** (0.3–2, how far the pattern stands out; the base stays) and
 **saturation** (0–1.6, the pattern's and base's colour: 0 is greys). Patterns are inline SVG or
-gradients, static (no motion), fixed to the screen, and set as `--bg-image` /
+gradients, fixed to the screen, and set as `--bg-image` /
 `--bg-size` / `--bg-position` / `--bg-repeat` so the pre-paint script applies
-them too. Cards stay solid, so text never sits on the pattern; page titles
+them too.
+
+**Backdrop motion** (`backdrop.motion`, `BACKDROP_MOTIONS`) is off by
+default. It moves the whole backdrop layer, slowly, back and forth:
+**drift** (glides corner to corner, 48 s), **breathe** (grows and settles,
+22 s), **sway** (turns a few degrees, 36 s) or **pulse** (fades a little,
+10 s), with **speed** 0.5–2. It's a CSS animation on the backdrop layer
+(`--bg-animation`, keyframes `jimbo-bg-*` in `globals.css`), which is
+scaled up a little so its edges never show; content never moves. Devices
+set to reduce motion get it still. Keep it slow: motion is atmosphere, not
+an effect, and nothing on the page moves with it. Cards stay solid, so text never sits on the pattern; page titles
 and labels do, so keep the strength moderate.
 
 **Spread the colours.** A page should show more than the accent: the accent
@@ -347,6 +368,15 @@ pink over green) — that's what makes a theme look flat. Put brand colour on
 solid, lit things instead: the date ticket's month band, lit avatars and
 pills, status dots, flat colour circles, coloured text. Washes are for tinting the
 same hue family (done chips, warnings), not for adding colour.
+
+**The motif.** The theme's colours turn up here and there as three flat
+shapes side by side — circles by default, or another shape the theme picks
+(`Theme.motif`, `MOTIFS`): triforce, sparkles, stars, hearts, diamonds,
+triangles, squares, crosses, bolts, flowers, moons or squiggles. Only
+`ThemeDots` (`.motif-accent/highlight/support`, a mask from `--motif-mask`)
+takes the shape; status dots, avatars, swatches and label dots stay
+circles. A motif shape follows the circle rules below: flat, side by side,
+the same fixed sizes, the same places.
 
 **Circles — the motif, and its rules.** The theme's colours as circles
 turn up here and there. Every circle follows these rules:
@@ -534,7 +564,7 @@ Home and Away looks are now its dark (or mid) and light tones.
 | **Holidays** | Through the year, Lunar new year to New year's eve | One group |
 | **Countries** | Flags by region: Americas, Europe, Asia and Pacific, Africa | Stacked groups |
 | **Provinces** | Canada's 13 provinces and territories, each on its flag's field colour | One group |
-| **Games** | **The Legend of Zelda**: twelve games' palettes, from the 1986 original to Echoes of Wisdom (colours only, no artwork) | One group |
+| **Games** | **The Legend of Zelda** (twelve games' palettes, from the 1986 original to Echoes of Wisdom), **Super Mario** (Mario, Luigi, Peach, Bowser, Toad, Wario, Yoshi, Yoshi's Island), **Donkey Kong** (DK, Diddy, Country, the 1981 arcade), **More Nintendo** (Kirby, Metroid, Star Fox, Pikmin, Splatoon), **Sly Cooper** (Sly, Bentley, Murray, Carmelita, Thievius Raccoonus) and **Tony Hawk's Underground** (its menu themes: T.H.U.G., Cloudbuster, Retro Hawk, Chilled, Skullz 'N Stuff). Colours only, no artwork | Sub-tabs, one per series |
 | **Sports** | NHL, NBA, MLB, NFL (every team; some Toronto and Ottawa teams have a **Retro** look too), then **Toronto**, **Ottawa** and **Chicago** (every team from the city, across leagues — MLS, CFL, WNBA, PWHL, NWSL, CPL, NLL, AHL, OHL too) | Sub-tabs (`tabs: true`), one at a time |
 
 Each template is drawn as a miniature of the app with its colours as
@@ -668,14 +698,17 @@ Archivo 800 at −0.015em and Inter 400 at 0). They're set as `--font-display`,
 
 | Group | Fonts |
 | --- | --- |
-| Sans | **Archivo** (default headings), **Inter** (default body), Space Grotesk, DM Sans, Manrope, IBM Plex Sans, Work Sans, **Avenir** (Avenir Next or Avenir on Apple devices, Nunito Sans elsewhere), Figtree |
-| Serif | Fraunces, Source Serif, Playfair, EB Garamond, **Marcellus** (the closest free match to Friz Quadrata), Baskerville, Cormorant, Lora, DM Serif (headings only) |
+| Sans | **Archivo** (default headings), **Inter** (default body), Space Grotesk, DM Sans, Manrope, Geist, Plus Jakarta, **Avenir** (Avenir Next or Avenir on Apple devices, Nunito Sans elsewhere), Figtree |
+| Serif | Newsreader, Source Serif, Playfair, EB Garamond, Literata, Baskerville, Instrument Serif (headings only), Lora, DM Serif (headings only) |
 | Mono | JetBrains Mono, IBM Plex Mono, Space Mono, Fira Code, Roboto Mono, Source Code, DM Mono, Red Hat Mono, Inconsolata |
-| Decorative (headings only) | Old English, Old German, Gothic (blackletter), Pirate, Rocker, Typewriter, Old print, Uncial, Carved caps |
+| Decorative (headings only) | Old English, Old German, Gothic (blackletter), Pirate, Bebas Neue, Typewriter, Old print, Unbounded, Syne |
 
-Nine per group. Decorative faces are for headings only — they're unreadable
-as body text — and stay dark and old-world rather than novelty (no pixel,
-neon, script or rounded display faces).
+Nine per group. Decorative faces are for headings only — wrong for running
+text: blackletter and old print, plus a few modern poster faces (Bebas Neue,
+Unbounded, Syne). No novelty (no pixel, neon, script or rounded display
+faces). Fonts taken out (IBM Plex Sans, Work Sans, Fraunces, Marcellus,
+Cormorant, Rocker, Uncial, Carved caps) map to the nearest one left
+(`RETIRED_FONTS`), so a saved theme keeps a similar face.
 
 **Size.** Headings and body text each have a size (`headingsSize`,
 `bodySize`: 0.8–1.3, shown on the Type tab as ± em; +0.10 em is 10% bigger
@@ -749,6 +782,17 @@ and body fonts.
     the bottom by `--safe-bottom`; left and right by `--safe-left`/`-right`.
   - Content is full width on phones: the page frame's `px-4` is the only
     side margin; no app wraps pages in a narrower box at phone width.
+- **The URL holds the view.** Every page is a route (`BrowserRouter` in
+  apps; never `MemoryRouter`), and whatever picks what the page shows — a
+  tab, sub-tab, segmented control, filter, sort, search, page number, the
+  open item or sheet — is a search parameter on that route, read and set
+  with `useUrlState` / `useUrlNumber` (`lib/useUrlState.ts`; a sheet or
+  detail that Back should close, like a run's log, too). So a refresh, Back
+  and a shared link all land on the same view. Parameters replace the
+  history entry (tapping tabs doesn't fill Back) and drop out at their
+  default. Only passing state stays in React: a selection in progress, a
+  half-typed form, hover. Preferences that belong to the person, not the
+  view (list or grid layout), stay in local storage.
 - **Top bar:** sticky, 56 px (64 px on desktop) plus `--safe-top` (0 under
   a solid status bar; in a browser with a notch in landscape or any page
   drawn under the status bar, its content still starts below it),
@@ -800,6 +844,7 @@ and body fonts.
 | `.card` | 14 px radius, `border-border` (full strength), gradient `surface → bg-deep` top to bottom at 97%, under a 9% accent glow from the top left and a 9% support glow from the bottom right; inner top highlight `inset 0 1px 0 rgba(255,255,255,.06)`, soft drop `0 12px 32px -16px rgba(0,0,0,.7)` |
 | `.glass` / `.card-glass` | Lightly frosted: `bg-surface/90`, `backdrop-blur-md`, `border-border`, soft drop. For tabs, unselected pills, the secondary top-bar buttons, the pager, floating controls and anything over a banner — anything that sits straight on the backdrop |
 | `.dot-accent/highlight/support` | A brand colour as a **flat circle**: one solid fill, nothing else (see Circles in section 2). Size it with utilities. `.orb-*` are older names for the same thing |
+| `.motif-accent/highlight/support` | A brand colour in the theme's motif shape (circle unless `Theme.motif` says otherwise), for `ThemeDots` only |
 | `.divide-etched` | Lines between stacked items, on the parent like `divide-y`: a full-strength `border` line with a faint light line under it (`inset 0 1px 0 rgba(255,255,255,.05)`). It also reaches one level down, so rows grouped in wrappers (a month's label and rows) are divided too. Lists, ranked lists |
 | `.fade-out` (`.fade-both`) | **How a full-width opener ends.** A banner, a hero, a photo or gradient header never stops on a hard edge, a border, or a fade to solid `bg` — the page behind has its backdrop (pattern and glow), so any of those shows as a line. Put the opener's background (blurred photo, dim, gradient, pattern) in its own layer behind the content and mask that layer out to transparent: `.fade-out` fades the bottom 45%; add `.fade-both` to fade the top too when something sits above it. Mask the background, never the text. `Banner`, `Hero` and `HeroSection` do this |
 | `.lit-accent/highlight/support` | A solid brand fill: one flat colour, no outline, `on-c` text (with `border-transparent` on a bordered shape). Active tabs and pills, select ticks, the date band, count badges (the name is from when they were shaded) |
@@ -845,7 +890,7 @@ and body fonts.
 | `Sparkline` | A small trend with no axes: a 2 px line in the subtle text colour, the latest point as a dot in the tone |
 | `TrendChart` | Change over time: one to three lines over the same labels, one y-axis. One series gets a 10% wash; tap, drag, hover or arrow-key to move the crosshair, and the readout above shows the values there (latest by default) and names each series |
 | `BarChart` | Comparing a few amounts in one tone: `horizontal` rows (label, bar, value at the tip; `to` links each) or `vertical` columns over a short run (tap a column to read it; the largest shows until you do) |
-| `ThemeDots` | The circle motif: the theme's three colours as flat 8 px dots side by side (4 px apart). In empty states and brand moments — never above a page title |
+| `ThemeDots` | The motif: the theme's three colours as flat 8 px shapes side by side (4 px apart) — circles, or the theme's `motif` shape. In empty states and brand moments — never above a page title |
 | `RankedList` | Top-N lists with counts |
 | `SearchField`, `SelectField` | Search and single-choice filters (select on phones) |
 | `Tabs` | 2–4 mutually exclusive views (segmented); `size="sm"` is a compact inline switch for a section's action slot |
@@ -1242,3 +1287,13 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   component while ten random looks take turns every 15 seconds.
 - **0.11.5** — Paper backdrop from two offset noise layers, so it doesn't
   repeat in a grid; `HeroSection pattern="none"` draws no layer of its own.
+- **Unreleased** — The URL holds the view: routes, plus tabs, filters,
+  searches and pages as search parameters (`useUrlState`). Motif shapes
+  (`Theme.motif`: circles, triforce, sparkles, stars and more) for
+  `ThemeDots`. Slow backdrop motion (drift, breathe, sway, pulse), off for
+  reduced motion. Games gets sub-tabs with Super Mario, Donkey Kong, more
+  Nintendo, Sly Cooper and Tony Hawk's Underground looks. Calmer fonts:
+  Geist, Plus Jakarta, Newsreader, Literata, Instrument Serif, Bebas Neue,
+  Unbounded and Syne replace IBM Plex Sans, Work Sans, Fraunces, Marcellus,
+  Cormorant, Rocker, Uncial and Carved caps. The showcase drops its
+  Archetypes tab.
