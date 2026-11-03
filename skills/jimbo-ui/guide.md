@@ -1315,7 +1315,7 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   Unbounded and Syne replace IBM Plex Sans, Work Sans, Fraunces, Marcellus,
   Cormorant, Rocker, Uncial and Carved caps. The showcase drops its
   Archetypes tab.
-- **Unreleased** — The motif saves (`withDefaults` passes every saved field
+- **0.13.0** — The motif saves (`withDefaults` passes every saved field
   through; the server stores the theme as sent). Alive backdrop motion:
   each pattern's lines and shapes move on their own; pulse is per element
   too. The favicon is the motif (`motifFavicon`). Brands use only their

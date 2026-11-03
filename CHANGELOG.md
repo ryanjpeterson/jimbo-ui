@@ -34,6 +34,8 @@ the matching 0.x release.
 
 ## Unreleased
 
+## 0.13.0 — 2026-11-02
+
 The motif saves, backdrop patterns move line by line, the favicon is the motif, and Marcone and mSupply are separate looks in their own colours.
 
 **Update:** breaking — apps port `withDefaults` in `useBrand.ts` and store the whole theme on the server.
