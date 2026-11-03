@@ -1376,3 +1376,8 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   (`DataTable`, `Accordion`). Layers at 45 (overlays) and 60 (toasts).
   Screenshot checks of every Style guide section in a light, mid and dark
   look (`npm --prefix showcase run test:screens`).
+- **0.14.1** — Games gets a Consoles sub-tab: eleven consoles' hardware
+  and menu colours, each with a menu font, backdrop and motif
+  (`Template.style`), which picking the look applies. A Panels backdrop
+  joins Abstract. `.font-display` is a Tailwind `@utility`, so `.h-page` and
+  `.h-section` keep the heading weight, tracking and size.

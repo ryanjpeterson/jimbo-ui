@@ -34,6 +34,8 @@ the matching 0.x release.
 
 ## Unreleased
 
+## 0.14.1 — 2026-11-03
+
 Retro console looks: eleven consoles' menus in colour, pattern and type.
 
 **Update:** feature — drop-in; the console looks and the heading fix arrive with the foundation files.

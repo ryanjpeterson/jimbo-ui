@@ -1,7 +1,41 @@
 {
   "$comment": "Generated from CHANGELOG.md by scripts/releases.mjs — don't edit. Apps' jimbo-ui config section reads it to show what a newer release changes.",
-  "latest": "0.14.0",
+  "latest": "0.14.1",
   "releases": [
+    {
+      "version": "0.14.1",
+      "date": "2026-11-03",
+      "type": "feature",
+      "summary": "Retro console looks: eleven consoles' menus in colour, pattern and type.",
+      "items": [
+        {
+          "kind": "added",
+          "text": "**Consoles** sub-tab under Games on the Looks tab: PlayStation, Nintendo 64, Dreamcast, PlayStation 2, Xbox, GameCube, Game Boy Advance, PSP, Xbox 360, Wii and PlayStation 3, each from its hardware and menu colours (and shades of them), in light, mid and dark.",
+          "affects": []
+        },
+        {
+          "kind": "added",
+          "text": "Looks can carry a **style** (`Template.style`, `TemplateStyle`: fonts, backdrop, motif). Each console look has one that calls up its menu — the PS2's drifting specks on blue-black, the GameCube's drifting cubes on indigo, the Xbox 360's slanted panels, the PS3's flowing lines — from jimbo-ui's own options, with no logos or system artwork. `TemplateFamily.style` and `familyAt` pass it on.",
+          "affects": []
+        },
+        {
+          "kind": "added",
+          "text": "**Panels** backdrop (Abstract): tall slanted panels side by side; alive, each panel and its edge sway together.",
+          "affects": []
+        },
+        {
+          "kind": "added",
+          "text": "Reference `ThemePanel`: picking a look with a style brings its font, backdrop and motif (a look without one keeps yours), and its card shows the backdrop and heading font. Optional to port — without it, console looks bring their colours only.",
+          "affects": []
+        },
+        {
+          "kind": "fixed",
+          "text": "Page and section titles keep the heading weight, tracking and size again: `.font-display` is now a Tailwind `@utility`, so `@apply font-display` in `.h-page` and `.h-section` brings all three (under Tailwind 4 it copied only the font family). **Apps must:** Nothing — copy the foundation files.",
+          "affects": []
+        }
+      ],
+      "appsMust": []
+    },
     {
       "version": "0.14.0",
       "date": "2026-11-03",
