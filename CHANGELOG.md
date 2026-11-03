@@ -34,6 +34,23 @@ the matching 0.x release.
 
 ## Unreleased
 
+Retro console looks: eleven consoles' menus in colour, pattern and type.
+
+**Update:** feature — drop-in; the console looks and the heading fix arrive with the foundation files.
+
+### Added
+
+- **Consoles** sub-tab under Games on the Looks tab: PlayStation, Nintendo 64, Dreamcast, PlayStation 2, Xbox, GameCube, Game Boy Advance, PSP, Xbox 360, Wii and PlayStation 3, each from its hardware and menu colours (and shades of them), in light, mid and dark.
+- Looks can carry a **style** (`Template.style`, `TemplateStyle`: fonts, backdrop, motif). Each console look has one that calls up its menu — the PS2's drifting specks on blue-black, the GameCube's drifting cubes on indigo, the Xbox 360's slanted panels, the PS3's flowing lines — from jimbo-ui's own options, with no logos or system artwork. `TemplateFamily.style` and `familyAt` pass it on.
+- **Panels** backdrop (Abstract): tall slanted panels side by side; alive, each panel and its edge sway together.
+- Reference `ThemePanel`: picking a look with a style brings its font, backdrop and motif (a look without one keeps yours), and its card shows the backdrop and heading font. Optional to port — without it, console looks bring their colours only.
+
+### Fixed
+
+- Page and section titles keep the heading weight, tracking and size again: `.font-display` is now a Tailwind `@utility`, so `@apply font-display` in `.h-page` and `.h-section` brings all three (under Tailwind 4 it copied only the font family).
+
+**Apps must:** Nothing — copy the foundation files.
+
 ## 0.14.0 — 2026-11-03
 
 Tailwind 4, and a round of new kit pieces: fields, menus, toasts, confirm, tables, steps and more.

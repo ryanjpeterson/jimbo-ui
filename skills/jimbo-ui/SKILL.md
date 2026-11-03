@@ -93,7 +93,7 @@ this check, then the preview workflow if they want detail.
   look wasn't written in are made from its own colours (`atTone`,
   `FAMILY_SETS`, `familyLook`), and every look in every tone passes the
   checks. Six categories: **Everyday**, **Holidays**, **Countries** (by
-  region), **Provinces**, **Games** (sub-tabs: The Legend of Zelda, Super Mario, Donkey Kong, More Nintendo, Sly Cooper, Tony Hawk's Underground) and **Sports**
+  region), **Provinces**, **Games** (sub-tabs: The Legend of Zelda, Super Mario, Donkey Kong, More Nintendo, Sly Cooper, Tony Hawk's Underground, Consoles) and **Sports**
   (every NHL, NBA, MLB and NFL team, plus Toronto, Ottawa and Chicago tabs),
   with a search box. New team, country, place or game looks come from their
   real colours via `scripts/template-from-colours.mjs`.
@@ -142,7 +142,7 @@ this check, then the preview workflow if they want detail.
 - **New apps start from an archetype** (Tracker, Collection, Dashboard,
   Directory, Planner, Showcase, Tool — guide section 9): ask which fits
   before building.
-- Backdrops and width: the theme's backdrop (`Theme.backdrop` — 21
+- Backdrops and width: the theme's backdrop (`Theme.backdrop` — 49
   patterns in four groups, **Abstract**, **Geo**, **Vintage** and
   **Texture**, over a solid, gradient or glow base, with strength, size,
   contrast and saturation sliders, still or slowly moving — drift, breathe,

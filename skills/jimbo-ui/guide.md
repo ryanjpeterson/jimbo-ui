@@ -321,11 +321,11 @@ the page. The Colours tab warns if a setting costs readability.
 
 **Backdrop.** Behind every page sits a backdrop in the theme's colours
 (`Theme.backdrop`, `backdropCss`): a **pattern** from four groups
-(`BACKDROP_GROUPS`, `BACKDROPS`, twelve each), or none —
+(`BACKDROP_GROUPS`, `BACKDROPS`, twelve or thirteen each), or none —
 
 | Group | Patterns |
 | --- | --- |
-| **Abstract** | ripples (rings from two corners), waves (layered along the bottom), contours (topographic lines), shapes (scattered circles, triangles, squiggles), blobs (three soft organic shapes), flow (lines across the page), confetti (small dashes), light burst (rays from the top), swirl (a spiral from a corner), ribbons (three broad bands), scribble (looping lines), rain (slanted strokes) |
+| **Abstract** | ripples (rings from two corners), waves (layered along the bottom), contours (topographic lines), shapes (scattered circles, triangles, squiggles), blobs (three soft organic shapes), flow (lines across the page), confetti (small dashes), light burst (rays from the top), swirl (a spiral from a corner), ribbons (three broad bands), scribble (looping lines), rain (slanted strokes), panels (tall slanted panels side by side) |
 | **Geo** | triangles, hexagons (a honeycomb), diamonds (harlequin), grid (graph paper), arrows (chevrons), squares (nested), zigzag, rings, crosses, scales (fish scales), cubes (isometric), checks (a faint checkerboard) |
 | **Vintage** | halftone (print dots fading from a corner), retro stripes (three bands round a corner), sunburst (wide rays from the bottom), deco fans (art deco scallops), pinstripe, gingham, polka, plaid, argyle, racing stripes (across a corner), trellis (a studded lattice), bauhaus (quarter circles and blocks) |
 | **Texture** | dot grid, grain (fine film grain), paper (soft mottle), linen (a fine crosshatch), concrete, brushed (horizontal streaks), sand (coarse grain), speckle, crosshatch, twill (a diagonal weave), carbon (a tiny check), ribbed |
@@ -589,12 +589,21 @@ Home and Away looks are now its dark (or mid) and light tones.
 | **Holidays** | Through the year, Lunar new year to New year's eve | One group |
 | **Countries** | Flags by region: Americas, Europe, Asia and Pacific, Africa | Stacked groups |
 | **Provinces** | Canada's 13 provinces and territories, each on its flag's field colour | One group |
-| **Games** | **The Legend of Zelda** (twelve games' palettes, from the 1986 original to Echoes of Wisdom), **Super Mario** (Mario, Luigi, Peach, Bowser, Toad, Wario, Yoshi, Yoshi's Island), **Donkey Kong** (DK, Diddy, Country, the 1981 arcade), **More Nintendo** (Kirby, Metroid, Star Fox, Pikmin, Splatoon), **Sly Cooper** (Sly, Bentley, Murray, Carmelita, Thievius Raccoonus) and **Tony Hawk's Underground** (its menu themes: T.H.U.G., Cloudbuster, Retro Hawk, Chilled, Skullz 'N Stuff). Colours only, no artwork | Sub-tabs, one per series |
+| **Games** | **The Legend of Zelda** (twelve games' palettes, from the 1986 original to Echoes of Wisdom), **Super Mario** (Mario, Luigi, Peach, Bowser, Toad, Wario, Yoshi, Yoshi's Island), **Donkey Kong** (DK, Diddy, Country, the 1981 arcade), **More Nintendo** (Kirby, Metroid, Star Fox, Pikmin, Splatoon), **Sly Cooper** (Sly, Bentley, Murray, Carmelita, Thievius Raccoonus), **Tony Hawk's Underground** (its menu themes: T.H.U.G., Cloudbuster, Retro Hawk, Chilled, Skullz 'N Stuff) and **Consoles** (PlayStation, Nintendo 64, Dreamcast, PlayStation 2, Xbox, GameCube, Game Boy Advance, PSP, Xbox 360, Wii, PlayStation 3 — hardware and menu colours, each with a menu font, backdrop and motif). Colours, pattern and type only, no artwork | Sub-tabs, one per series |
 | **Sports** | NHL, NBA, MLB, NFL (every team; some Toronto and Ottawa teams have a **Retro** look too), then **Toronto**, **Ottawa** and **Chicago** (every team from the city, across leagues — MLS, CFL, WNBA, PWHL, NWSL, CPL, NLL, AHL, OHL too) | Sub-tabs (`tabs: true`), one at a time |
 
 Each template is drawn as a miniature of the app with its colours as
 circles. Every one passes the readability checks. An app whose default isn't
 one of them gets it as an extra "Yours" card at the front of Everyday.
+
+A template may also carry a **style** (`Template.style`, `TemplateStyle`:
+`fonts`, `backdrop`, `motif`) — the console looks do, to call up each
+console's menu (the PS2's drifting specks on blue-black, the GameCube's
+drifting cubes on indigo, the Xbox 360's slanted panels, the PS3's flowing
+lines). Picking such a look brings its style with the colours; a look
+without one keeps the type, backdrop and motif already chosen. Its card
+shows the backdrop and heading font. Styles use only the options anyone can
+pick — never a logo, system artwork or copied menu asset.
 `FAMILY_SETS` has the categories as looks; `ALL_FAMILIES` every look once;
 `familyAt(f, tone)` a look in a tone (or null), `familyLook(f, tone)` what a
 tile shows (that tone or the nearest), `familyTones(f)` the tones it comes
