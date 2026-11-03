@@ -361,10 +361,17 @@ export function BackdropPanel({ d }: { d: ThemeDraft }) {
         </div>
         {/* Motion: the backdrop moves slowly behind the page; devices set to reduce motion keep it still. */}
         <div className="space-y-2 border-t border-border pt-4">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <p className="text-sm text-text-muted">Motion</p>
-            <Tabs size="sm" value={shown.backdrop.motion!} onChange={(v) => setBackdrop({ motion: v })}
-              options={BACKDROP_MOTIONS.map((m) => ({ value: m.key, label: m.label }))} />
+          <p className="text-sm text-text-muted">Motion</p>
+          <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Backdrop motion">
+            {BACKDROP_MOTIONS.map((m) => {
+              const active = shown.backdrop.motion === m.key;
+              return (
+                <button key={m.key} type="button" role="radio" aria-checked={active} title={m.hint} onClick={() => setBackdrop({ motion: m.key })}
+                  className={`h-11 rounded-control border text-sm font-semibold transition-colors ${active ? "lit-accent border-transparent" : "glass text-text-muted hover:text-text-base"}`}>
+                  {m.label}
+                </button>
+              );
+            })}
           </div>
           <p className="text-xs text-text-subtle">{BACKDROP_MOTIONS.find((m) => m.key === shown.backdrop.motion)?.hint}. Off on devices set to reduce motion.</p>
           {shown.backdrop.motion !== "none" && (

@@ -60,9 +60,9 @@ The stack is React + TypeScript + Vite + Tailwind CSS 3 (with `clsx` and
 - `src/styles/tokens.css` — the default tokens; generate it with
   `node scripts/tokens.mjs <accent> <highlight|-> <background> [support|-]`
   (`-` = inferred).
-- `public/favicon.svg` — three overlapping circles. Keep `#0B0B0C` for the
-  background, `#A8FF3E`, `#FF3D6E` and `#2EC5FF` for the accent, highlight
-  and support so `applyFavicon` can recolour it.
+- `public/favicon.svg` — one accent circle on the page colour, shown only
+  until the theme loads; then `applyFavicon` draws it from the theme
+  (`motifFavicon`). Set its two colours to the app's default theme.
 
 **Showcase:** `showcase/` is a small app built only from a release's code
 (reference, then foundation and starter, then stand-ins for the server parts
@@ -100,12 +100,14 @@ config section (`JimboConfigPage.tsx` with `config/ThemePanel.tsx` and
 
 **Server side (optional):** an app that lets admins change the theme stores
 the colours and any uploaded favicon, and serves them:
-`GET /public/theme` → `{ theme: { accent, highlight, background, support,
-fonts } (null = default; `highlight`, `support` and `fonts` may be missing —
-inferred or sans), faviconUrl }`; admin-only `PUT /admin/theme` (accent and
-background as `#RRGGBB`, plus optional `highlight`, `support` and `fonts:
-{ headings?, body? }` — store what's sent, and leave missing ones missing so
-they stay inferred), `DELETE /admin/theme` (back to defaults), and
+`GET /public/theme` → `{ theme (null = default), faviconUrl }`; admin-only
+`PUT /admin/theme` with the theme as `ownColours` gives it: accent and
+background as `#RRGGBB`, plus whatever else it sets — `highlight`,
+`support`, `fonts`, `infer`, `vibrancy`, `contrast`, `backdrop`, `motif`.
+**Store the whole object as sent** (one JSON column), never a list of known
+fields, so new theme options save without a server change; check the
+colours are hex and the size is sane, and leave missing keys missing so they
+stay inferred or default. `GET` returns it as stored; `DELETE /admin/theme` (back to defaults), and
 `POST`/`DELETE /admin/theme/favicon` (SVG, PNG, WebP or
 JPEG ≤ 1 MB; refuse SVGs with scripts, event handlers or foreign objects).
 The app's API client exposes these as `getTheme`, `setTheme`, `resetTheme`,
@@ -136,8 +138,8 @@ can theme any:
      *Contrast* sliders, readability warnings.
   3. **Type** — headings and body fonts with weight and spacing.
   4. **Backdrop** — the pattern by group, its base, strength, size,
-     contrast and saturation, and its motion (still, drift, breathe, sway
-     or pulse) and speed.
+     contrast and saturation, and its motion (still, alive, pulse, drift,
+     breathe or sway) and speed.
   5. **Brand** — the name as header text at each size, the motif, and the favicon.
   6. **Style guide** — every shared component in the current theme
      (including an unsaved look), in sections with toggles (Brand and
@@ -287,8 +289,9 @@ component and pattern rules (sections 8–9).
 - Sizes: 22 px in the top bar (`sm`), 30 px (`md`), 44 px (`lg`) for brand
   moments like a sign-in screen or the Style guide.
 - It follows the theme everywhere: top bar, sign-in, theme miniatures.
-- The **favicon** is the one graphic: the theme's colours as overlapping
-  circles on the background, recoloured with the theme; an uploaded favicon (SVG, PNG,
+- The **favicon** is the one graphic: one of the theme's motif shape (a
+  circle unless the theme picks another) in the accent on the page colour,
+  softly rounded, drawn from the theme so it follows every change; an uploaded favicon (SVG, PNG,
   WebP or JPEG ≤ 1 MB) replaces it and can be reset to the built-in one.
 
 ### Colour — two to four source colours
@@ -333,13 +336,24 @@ gradients, fixed to the screen, and set as `--bg-image` /
 them too.
 
 **Backdrop motion** (`backdrop.motion`, `BACKDROP_MOTIONS`) is off by
-default. It moves the whole backdrop layer, slowly, back and forth:
-**drift** (glides corner to corner, 48 s), **breathe** (grows and settles,
-22 s), **sway** (turns a few degrees, 36 s) or **pulse** (fades a little,
-10 s), with **speed** 0.5–2. It's a CSS animation on the backdrop layer
-(`--bg-animation`, keyframes `jimbo-bg-*` in `globals.css`), which is
-scaled up a little so its edges never show; content never moves. Devices
-set to reduce motion get it still. Keep it slow: motion is atmosphere, not
+default, with **speed** 0.5–2. Two kinds:
+
+- **The pattern's own lines and shapes**, each on its own timing, as SMIL
+  animation inside the pattern's SVG (`animatePattern`; it runs in a CSS
+  background image without script). **Alive**: each pattern its own way —
+  rain falls, confetti drifts down, arrows rise, stripes slide (tiles move
+  a whole tile, so the loop never jumps), ripples spread, and every other
+  line or shape sways a little on its own path; the rest twinkle.
+  **Pulse**: every line and shape fades and returns on its own beat. Busy
+  patterns move every nth element (at most about 220), to stay smooth.
+- **The whole layer**: **drift** (glides corner to corner, 48 s),
+  **breathe** (grows and settles, 22 s) or **sway** (turns a few degrees,
+  36 s) — a CSS animation on the backdrop layer (`--bg-animation`,
+  keyframes `jimbo-bg-*` in `globals.css`), scaled up a little so its
+  edges never show.
+
+Content never moves. Devices set to reduce motion get it still (the
+pattern is drawn without its animation, and the layer's is off). Keep it slow: motion is atmosphere, not
 an effect, and nothing on the page moves with it. Cards stay solid, so text never sits on the pattern; page titles
 and labels do, so keep the strength moderate.
 
@@ -493,9 +507,10 @@ family of tokens:
   shape Google Maps' `styles` option takes, no Maps types needed) tinting the
   map from bg → accent; pins are round,
   highlight-filled with a lighter ring (`markerIcon`).
-- **Favicon:** `applyFavicon` swaps the template's `#0B0B0C` → background,
-  `#A8FF3E` → accent, `#FF3D6E` → highlight and `#2EC5FF` → support
-  (`themedFavicon`).
+- **Favicon:** `applyFavicon` draws the motif shape in the accent on the
+  page colour (`motifFavicon`, an SVG data URL — no file to fetch, so it
+  works at any path) and adds the `<link rel="icon">` if the page has none.
+  `themedFavicon` (recolouring an old template) is deprecated.
 - **iOS home-screen icon:** `applyFavicon` also draws that icon (or an
   uploaded one) as a 180 px PNG, full-bleed on the theme's background
   (`iconPng`), and points `<link rel="apple-touch-icon">` at it, so adding
@@ -541,8 +556,11 @@ most: keep them dark enough (luminance under about 0.07) for 7:1.
 ## 4. Theme templates
 
 The Looks tab offers these (`foundation/src/lib/themes.ts`) in seven
-categories (Brands: companies' own palettes, colours only — Marcone's
-Pantone 1795 red with its parent mSupply's navy), chosen with wrapping pills, plus a search box across all of them
+categories (Brands: companies' own palettes, colours only, and only the
+colours on the brand's own website — each brand its own look, never mixed;
+a one-colour brand stays one colour, its shades filling the rest with
+`infer: "tonal"`. Marcone: logo red on white or black. mSupply: navy on
+white), chosen with wrapping pills, plus a search box across all of them
 (name, vibe, category and tab; accents ignored, so "quebec" finds Québec).
 
 **Each look comes once, in three page tones.** A **Light / Mid / Dark**
@@ -1297,3 +1315,9 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   Unbounded and Syne replace IBM Plex Sans, Work Sans, Fraunces, Marcellus,
   Cormorant, Rocker, Uncial and Carved caps. The showcase drops its
   Archetypes tab.
+- **Unreleased** — The motif saves (`withDefaults` passes every saved field
+  through; the server stores the theme as sent). Alive backdrop motion:
+  each pattern's lines and shapes move on their own; pulse is per element
+  too. The favicon is the motif (`motifFavicon`). Brands use only their
+  own site's colours, each its own look, fewer than four when that's all
+  they have.

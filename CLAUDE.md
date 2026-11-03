@@ -53,7 +53,9 @@ Everyday, Holidays, Countries, Provinces, Games, Brands and Sports categories
 (team, flag, game and company themes from real colours, via `scripts/template-from-colours.mjs`);
 backdrops in Abstract, Geo, Vintage and Texture groups; no brand colour white or grey;
 no logo — the brand is the app's name as header text (`HeaderTitle`), with a
-dot in the accent; the favicon is the only graphic.
+dot in the accent; the favicon is the only graphic (one motif shape in the
+accent on the page colour); a theme has up to four colours, often fewer —
+brand looks use only the colours on that brand's own site.
 
 ## Running and checking
 

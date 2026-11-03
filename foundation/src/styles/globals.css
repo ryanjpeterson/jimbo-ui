@@ -86,9 +86,10 @@
     background-size: var(--bg-size, 100% 100%);
     background-position: var(--bg-position, 0 0);
     background-repeat: var(--bg-repeat, no-repeat);
-    /* Backdrop motion (theme backdrop.motion): a slow transform of this layer,
-       set by theme.ts as --bg-animation; scaled up a little first so its
-       edges never show. Off when the device asks for reduced motion. */
+    /* Backdrop motion (theme backdrop.motion) drift, breathe or sway: a slow
+       transform of this layer, set by theme.ts as --bg-animation; scaled up a
+       little first so its edges never show. Off when the device asks for
+       reduced motion. (Alive and pulse animate inside the pattern instead.) */
     animation: var(--bg-animation, none);
     transform-origin: 50% 50%;
   }
@@ -281,8 +282,10 @@
   }
 }
 
-/* Backdrop motions (theme backdrop.motion; theme.ts BACKDROP_MOTIONS). Each
-   runs alternate, so it eases back the way it came — no jump at the loop. */
+/* Backdrop motions that move the whole layer (theme backdrop.motion; theme.ts
+   BACKDROP_MOTIONS). Each runs alternate, so it eases back the way it came —
+   no jump at the loop. Alive and pulse move the pattern's own lines and
+   shapes instead, inside its SVG (theme.ts animatePattern). */
 @keyframes jimbo-bg-drift {
   from { transform: scale(1.14) translate(-3.5%, -2.5%); }
   to   { transform: scale(1.14) translate(3.5%, 2.5%); }
@@ -294,8 +297,4 @@
 @keyframes jimbo-bg-sway {
   from { transform: scale(1.18) rotate(-2.5deg); }
   to   { transform: scale(1.18) rotate(2.5deg); }
-}
-@keyframes jimbo-bg-pulse {
-  from { opacity: 1; }
-  to   { opacity: 0.5; }
 }

@@ -34,6 +34,36 @@ the matching 0.x release.
 
 ## Unreleased
 
+The motif saves, backdrop patterns move line by line, the favicon is the motif, and Marcone and mSupply are separate looks in their own colours.
+
+**Update:** breaking — apps port `withDefaults` in `useBrand.ts` and store the whole theme on the server.
+
+### Added
+
+- **Alive** backdrop motion: each pattern moves its own way, line by line. Rain falls, confetti drifts down, arrows rise, stripes slide (a tile at a time, so the loop never jumps), ripples spread, and every other line or shape sways on its own path and timing. It's SMIL inside the pattern's SVG (`animatePattern`), drawn still for people who ask for reduced motion.
+- `motifFavicon`: the built-in favicon is one of the theme's motif shape in the accent on the page colour, drawn from the theme.
+
+### Changed
+
+- **Pulse** fades each line and shape on its own beat instead of the whole backdrop together. Motion options are a grid (Still, Alive, Pulse, Drift, Breathe, Sway) so they fit on phones.
+- **Brands:** Marcone and mSupply are separate looks, using only colours from their own websites. Marcone is logo red `#D22630` on white or black. mSupply is navy `#1B365D` on white. Missing roles are shades of the accent (`infer: "tonal"`), not new hues. Guide: a theme has up to four colours, and a brand with one stays one.
+- Guide: the server stores the theme object as sent, not a list of known fields.
+
+### Deprecated
+
+- `themedFavicon`: the built-in favicon is `motifFavicon` now.
+
+### Fixed
+
+- **The motif didn't save:** `withDefaults` (reference `useBrand.ts`) rebuilt the saved theme field by field and dropped `motif`. It now passes every saved field through, so new theme options save too.
+- **Favicon broken** where `/favicon.svg` isn't at the site root (the showcase page): `applyFavicon` no longer fetches a file, and adds the icon link if the page has none.
+
+### Apps must
+
+- Copy the foundation files.
+- Port `withDefaults` from `reference/web/src/lib/useBrand.ts`, and make the server store and return the whole theme object (`PUT /admin/theme`), so the motif and backdrop motion save.
+- Replace `public/favicon.svg` with the starter's (one accent circle on the page colour, in the app's default colours). Port the Backdrop tab's motion grid from `config/ThemePanel.tsx`.
+
 ## 0.12.0 — 2026-11-02
 
 Nintendo, Sly Cooper and Tony Hawk's Underground looks, motif shapes (a triforce among them), slow backdrop motion, calmer fonts, and the view kept in the URL.

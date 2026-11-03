@@ -149,14 +149,14 @@ function FaviconUpload({ faviconUrl, onChange }: { faviconUrl: string | null; on
     <section className="space-y-3">
       <div className="px-0.5">
         <h2 className="h-section">Favicon</h2>
-        <p className="meta mt-1">The built-in one follows your colours. Upload an SVG, PNG or WebP under 1 MB to replace it.</p>
+        <p className="meta mt-1">The built-in one is your motif in the accent, on your page colour. Upload an SVG, PNG or WebP under 1 MB to replace it.</p>
       </div>
       <div className="card flex items-center gap-4 p-4 sm:p-5">
         <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl border border-border bg-surface-2">
           <img src={faviconUrl ?? (document.querySelector<HTMLLinkElement>('link[rel="icon"]')?.href ?? "/favicon.svg")} alt="" className="h-10 w-10" />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-xs text-text-subtle">{faviconUrl ? "Custom upload" : "Built-in — recoloured from the theme"}</p>
+          <p className="text-xs text-text-subtle">{faviconUrl ? "Custom upload" : "Built-in — your motif in the accent"}</p>
           <div className="mt-2 flex flex-wrap gap-2">
             <label className={`btn btn-sm btn-secondary cursor-pointer ${busy ? "pointer-events-none opacity-50" : ""}`}>
               {busy ? "Uploading…" : faviconUrl ? "Replace" : "Upload"}

@@ -500,11 +500,14 @@ const SETS: TemplateSet[] = [
     ] },
   ] },
   { label: "Brands", groups: [
-    // Companies' own palettes — colours only, no logos.
+    // Companies' own palettes — colours only, no logos. Only the colours on a brand's own
+    // site; a brand with one colour stays one colour (tonal: shades of it fill the rest).
     { label: "Brands", templates: [
-      // Marcone (Pantone 1795 red, black wordmark) with mSupply, its parent's navy.
-      t("Marcone", "Parts red and mSupply navy", "#D22630", "#1B365D", "#FBF7F6", "#A71E26"),
-      t("Marcone", "Parts red and mSupply navy", "#D22630", "#DF4C55", "#101F35", null, { infer: "tonal" }),
+      // marcone.com: logo red (Pantone 1795) and black, on white.
+      t("Marcone", "Logo red and black", "#D22630", null, "#FFFFFF", null, { infer: "tonal" }),
+      t("Marcone", "Logo red and black", "#D22630", null, "#000000", null, { infer: "tonal" }),
+      // msupply.com: navy (Pantone 534) on white — its only colour.
+      t("mSupply", "Navy on white", "#1B365D", null, "#FFFFFF", null, { infer: "tonal" }),
     ] },
   ] },
   { label: "Sports", tabs: true, groups: [
