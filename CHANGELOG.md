@@ -34,6 +34,8 @@ the matching 0.x release.
 
 ## Unreleased
 
+## 0.14.0 — 2026-11-03
+
 Tailwind 4, and a round of new kit pieces: fields, menus, toasts, confirm, tables, steps and more.
 
 **Update:** breaking — apps move to Tailwind 4 (new packages, Vite plugin, no `tailwind.config.js`) and rename a few utilities in their own code.

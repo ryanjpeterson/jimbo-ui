@@ -1,7 +1,109 @@
 {
   "$comment": "Generated from CHANGELOG.md by scripts/releases.mjs — don't edit. Apps' jimbo-ui config section reads it to show what a newer release changes.",
-  "latest": "0.13.0",
+  "latest": "0.14.0",
   "releases": [
+    {
+      "version": "0.14.0",
+      "date": "2026-11-03",
+      "type": "breaking",
+      "summary": "Tailwind 4, and a round of new kit pieces: fields, menus, toasts, confirm, tables, steps and more.",
+      "items": [
+        {
+          "kind": "added",
+          "text": "**Forms** (`components/ui/forms.tsx`): `TextField` and `TextArea` (label, hint, inline error in the highlight colour; the area grows and counts down to a limit), `DateField` (the platform's own date and time pickers), `FileDrop` (pick or drop files; wrong types and sizes turned away with a reason).",
+          "affects": [
+            "text-field",
+            "text-area",
+            "date-field",
+            "file-drop"
+          ]
+        },
+        {
+          "kind": "added",
+          "text": "**Overlays** (`components/ui/overlays.tsx`): `Menu` with the ⋯ `MoreButton` (full keyboard support), `Popover`, `Tooltip` (hover or keyboard focus only, never the only label), and `CommandPalette` + `useCommandPalette` (⌘K / Ctrl+K).",
+          "affects": [
+            "menu",
+            "popover",
+            "tooltip",
+            "command-palette"
+          ]
+        },
+        {
+          "kind": "added",
+          "text": "**Feedback** (`components/ui/feedback.tsx`): `toast()` + `Toaster` (above the dock; done, info, error; one action such as Undo), `ConfirmSheet` / `useConfirm` (one `await`), `ProgressBar` (promoted from candidate; also indeterminate), `Stepper`, `OfflineBanner` (the offline pattern as a component, with `useOnline`) and `UpdateBanner`.",
+          "affects": [
+            "toast",
+            "confirm-sheet",
+            "progress-bar",
+            "stepper",
+            "offline-banner",
+            "update-banner"
+          ]
+        },
+        {
+          "kind": "added",
+          "text": "**Data** (`components/ui/data.tsx`): `DataTable` (sortable on desktop, a row per record on phones, sort kept in the URL) and `Accordion` (native `<details>`).",
+          "affects": [
+            "data-table",
+            "accordion"
+          ]
+        },
+        {
+          "kind": "added",
+          "text": "Reference `AppShell` renders the `Toaster`. Layers 45 (menus, popovers, tooltips) and 60 (toasts).",
+          "affects": [
+            "app-shell"
+          ]
+        },
+        {
+          "kind": "added",
+          "text": "The Style guide gets Forms, Menus and overlays, Feedback, and Tables and steps sections; the showcase opens the command palette from its search button and ⌘K.",
+          "affects": []
+        },
+        {
+          "kind": "added",
+          "text": "Screenshot checks: `npm --prefix showcase run test:screens` captures every Style guide section at 375 px in a light, a mid and a dark look with Playwright and compares it with local baselines.",
+          "affects": []
+        },
+        {
+          "kind": "changed",
+          "text": "**Tailwind 4.** The theme moves from `tailwind.config.js` into `globals.css` (`@import \"tailwindcss\"` and `@theme inline`), so every colour and size utility follows the variables where it's used (a `ThemeScope`, a heading's `--fs`). It builds through `@tailwindcss/vite`, with no PostCSS. `tailwind-merge` goes to 3.",
+          "affects": [
+            "theme-scope"
+          ]
+        },
+        {
+          "kind": "changed",
+          "text": "A bare `border` is the theme's line colour (Tailwind 4 would draw it in the text colour); buttons keep the pointer cursor.",
+          "affects": []
+        },
+        {
+          "kind": "changed",
+          "text": "`glass` is a Tailwind utility (`@utility`), so other classes can `@apply` it and it takes variants (`sm:glass`).",
+          "affects": []
+        },
+        {
+          "kind": "changed",
+          "text": "Kit utilities renamed for Tailwind 4: `outline-hidden`, `shadow-xs`, `backdrop-blur-xs`, `bg-linear-to-*`.",
+          "affects": []
+        },
+        {
+          "kind": "removed",
+          "text": "`foundation/tailwind.config.js`.",
+          "affects": [],
+          "foundation": true
+        },
+        {
+          "kind": "removed",
+          "text": "The legacy colour names from before 0.3: `accent-lime`, `accent-lime-hover`, `accent-pink`, `accent-pink-hover`, `accent-cyan`, `accent-cyan-hover`, `accent-orange`, `lime-700/900/950` and `rose-800/900/950`. **Apps must:** 1. Before copying anything, run `npx @tailwindcss/upgrade` in the web root. It renames utilities in the app's own code: `shadow-sm` → `shadow-xs`, `shadow` → `shadow-sm`, `blur-sm` → `blur-xs`, `outline-none` → `outline-hidden`, `ring` → `ring-3`, `bg-gradient-to-*` → `bg-linear-to-*`, and so on. 2. Install `tailwindcss@4`, `@tailwindcss/vite` and `tailwind-merge@3`; uninstall `autoprefixer` (and `postcss` if nothing else uses it). Delete `tailwind.config.js` and `postcss.config.js`, then add `tailwindcss()` from `@tailwindcss/vite` to the Vite plugins. 3. Copy the foundation files. The app's CSS entry keeps importing `globals.css`, which now brings in Tailwind. If the app keeps components in a folder git ignores, add `@source \"<path>\";` after that import. 4. Rename any legacy colour names: `accent-lime` → `accent`, `accent-pink` → `highlight`, `lime-*` → `accent-*`, `rose-*` → `highlight-*`. Replace `accent-cyan` / `accent-orange` with a theme colour. 5. In the app's own CSS, `@apply` works only on utilities now. Replace `@apply card` (or another kit component class) with the class in markup. A CSS file that uses `@apply` without importing `globals.css` needs `@reference \"<path to globals.css>\";` at the top. 6. Optional: copy `forms.tsx`, `overlays.tsx`, `feedback.tsx` and `data.tsx` into `components/ui/`, and add `<Toaster />` to the app shell (reference `AppShell.tsx`) before using `toast()`. 7. Typecheck, build, and check pages at 375 px in a dark, a mid and a light look.",
+          "affects": [
+            "app-shell",
+            "toast"
+          ]
+        }
+      ],
+      "appsMust": []
+    },
     {
       "version": "0.13.0",
       "date": "2026-11-02",

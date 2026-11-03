@@ -1356,7 +1356,7 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   too. The favicon is the motif (`motifFavicon`). Brands use only their
   own site's colours, each its own look, fewer than four when that's all
   they have.
-- **Unreleased** — Tailwind 4: the theme moves from `tailwind.config.js` into
+- **0.14.0** — Tailwind 4: the theme moves from `tailwind.config.js` into
   `globals.css` (`@theme inline`, so utilities follow a `ThemeScope`), through
   `@tailwindcss/vite` with no PostCSS; a bare `border` is the theme's line
   colour; `glass` is a utility; legacy colour names removed. New kit files:
