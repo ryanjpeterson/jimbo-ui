@@ -5,7 +5,7 @@ description: Ryan's shared brand and UI system, jimbo.ui (repo and plugin jimbo-
 
 # jimbo.ui
 
-**This is jimbo.ui 0.14.1.** (Kept in step with the plugin version and the
+**This is jimbo.ui 0.14.2.** (Kept in step with the plugin version and the
 newest numbered `CHANGELOG.md` entry; `scripts/versions.mjs` checks.)
 jimbo.ui is a work in progress, so it's on 0.x. **The number says what an
 update takes** (Semantic Versioning, read for 0.x — guide section 1,
@@ -92,8 +92,8 @@ this check, then the preview workflow if they want detail.
   Light / Mid / Dark switch sets the page tone every tile shows; tones a
   look wasn't written in are made from its own colours (`atTone`,
   `FAMILY_SETS`, `familyLook`), and every look in every tone passes the
-  checks. Six categories: **Everyday**, **Holidays**, **Countries** (by
-  region), **Provinces**, **Games** (sub-tabs: The Legend of Zelda, Super Mario, Donkey Kong, More Nintendo, Sly Cooper, Tony Hawk's Underground, Consoles) and **Sports**
+  checks. Categories: **Everyday**, **Holidays**, **Countries** (by
+  region), **Provinces**, **Games** (sub-tabs: The Legend of Zelda, Super Mario, Donkey Kong, More Nintendo, Sly Cooper, Tony Hawk's Underground, Consoles), **Apocalypse** (sub-tabs: Nuclear, Undead, Wasteland, Cosmic, Collapse), **Brands** and **Sports**
   (every NHL, NBA, MLB and NFL team, plus Toronto, Ottawa and Chicago tabs),
   with a search box. New team, country, place or game looks come from their
   real colours via `scripts/template-from-colours.mjs`.
@@ -142,9 +142,9 @@ this check, then the preview workflow if they want detail.
 - **New apps start from an archetype** (Tracker, Collection, Dashboard,
   Directory, Planner, Showcase, Tool — guide section 9): ask which fits
   before building.
-- Backdrops and width: the theme's backdrop (`Theme.backdrop` — 49
-  patterns in four groups, **Abstract**, **Geo**, **Vintage** and
-  **Texture**, over a solid, gradient or glow base, with strength, size,
+- Backdrops and width: the theme's backdrop (`Theme.backdrop` — 59
+  patterns in five groups, **Abstract**, **Geo**, **Vintage**,
+  **Texture** and **Ruin**, over a solid, gradient or glow base, with strength, size,
   contrast and saturation sliders, still or slowly moving — drift, breathe,
   sway or pulse, off for reduced motion) is behind every page; full-width sections use
   `FullBleed` and `HeroSection`, and `AppShell width` sets the page width.
@@ -153,7 +153,7 @@ this check, then the preview workflow if they want detail.
   open item are search parameters via `useUrlState` / `useUrlNumber`
   (`lib/useUrlState.ts`), so refresh, Back and links land on the same view.
 - **The motif** is `ThemeDots`: circles, or the theme's `motif` shape
-  (triforce, sparkles, stars…), picked on the Brand tab. Status dots and
+  (triforce, sparkles, stars, skulls…), picked on the Brand tab. Status dots and
   avatars stay circles.
 - **One jimbo-ui config section per app** (guide section 1). Every brand,
   theme and style guide option lives there and nowhere else — no separate

@@ -34,6 +34,22 @@ the matching 0.x release.
 
 ## Unreleased
 
+## 0.14.2 — 2026-11-03
+
+The end of the world: apocalypse looks, a Ruin backdrop group and four new motifs.
+
+**Update:** feature — drop-in; everything arrives with the foundation files.
+
+### Added
+
+- **Apocalypse** category on the Looks tab, with sub-tabs **Nuclear** (Fallout shelter, Half-life, Nuclear winter), **Undead** (Outbreak, Dead of night, Quarantine), **Wasteland** (Dust bowl, Scorched earth, Rust belt), **Cosmic** (Last light, Impact, Judgement day) and **Collapse** (Drowned world, Wildfire smoke, Signal lost) — invented palettes, each in light, mid and dark, each with a style (heading font, backdrop, motif). All pass `contrast.mjs --check`.
+- **Ruin** backdrop group (fifth, after Texture): Embers (sparks rising when alive), Ash (flakes drifting down), Cracks, Hazard (caution stripes along the bottom), Skyline (a broken city), Fallout (scattered trefoils), Smog, Barbed (wire that slides along when alive), Static (scan lines over noise, rolling when alive) and Shockwave (broken rings that spread like Ripples).
+- Motifs: **Skulls**, **Trefoils**, **Flames** and **Hazards** — flat shapes like the rest.
+
+### Apps must
+
+Nothing — copy the foundation files. The reference config section reads `BACKDROP_GROUPS`, `MOTIFS` and `FAMILY_SETS`, so the new tab, group and motifs show up on their own.
+
 ## 0.14.1 — 2026-11-03
 
 Retro console looks: eleven consoles' menus in colour, pattern and type.
