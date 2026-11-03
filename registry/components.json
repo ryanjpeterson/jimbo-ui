@@ -721,14 +721,17 @@
     },
     {
       "id": "offline-banner",
-      "name": "Offline banner",
+      "name": "OfflineBanner",
       "purpose": "Says the app is offline and how many changes are waiting.",
-      "tier": "pattern",
+      "tier": "kit",
       "aliases": [
         "OfflineBanner",
         "Pending banner"
       ],
-      "variants": {}
+      "variants": {
+        "pending": "changes waiting to send"
+      },
+      "source": "reference/web/src/components/ui/feedback.tsx#OfflineBanner"
     },
     {
       "id": "background-work",
@@ -801,14 +804,16 @@
       "id": "progress-bar",
       "name": "ProgressBar",
       "purpose": "Shows how far along a known-length job is.",
-      "tier": "candidate",
+      "tier": "kit",
       "aliases": [
         "Progress",
         "Meter"
       ],
       "variants": {
-        "tone": "Tone"
-      }
+        "tone": "accent | support | highlight",
+        "value": "omitted = length unknown"
+      },
+      "source": "reference/web/src/components/ui/feedback.tsx#ProgressBar"
     },
     {
       "id": "bar-chart",
@@ -991,6 +996,226 @@
         "live": "Pulsing accent dot while something runs"
       },
       "source": "reference/web/src/components/ui/kit.tsx#FloatingBar"
+    },
+    {
+      "id": "text-field",
+      "name": "TextField",
+      "purpose": "Takes one line of typed input with its label, hint and inline error.",
+      "tier": "kit",
+      "aliases": [
+        "Input",
+        "FormField",
+        "LabeledInput"
+      ],
+      "variants": {
+        "prefix": "inside, before",
+        "suffix": "inside, after",
+        "optional": "marked beside the label"
+      },
+      "source": "reference/web/src/components/ui/forms.tsx#TextField"
+    },
+    {
+      "id": "text-area",
+      "name": "TextArea",
+      "purpose": "Takes several lines of typed input, growing with the text.",
+      "tier": "kit",
+      "aliases": [
+        "Textarea",
+        "Multiline",
+        "NotesField"
+      ],
+      "variants": {
+        "maxLength": "counts down near the limit",
+        "maxRows": "how tall it grows"
+      },
+      "source": "reference/web/src/components/ui/forms.tsx#TextArea"
+    },
+    {
+      "id": "date-field",
+      "name": "DateField",
+      "purpose": "Picks a date, a time or both with the platform's own picker.",
+      "tier": "kit",
+      "aliases": [
+        "DatePicker",
+        "TimePicker",
+        "DateInput"
+      ],
+      "variants": {
+        "type": "date | time | datetime-local"
+      },
+      "source": "reference/web/src/components/ui/forms.tsx#DateField"
+    },
+    {
+      "id": "file-drop",
+      "name": "FileDrop",
+      "purpose": "Picks or takes dropped files, checking type and size.",
+      "tier": "kit",
+      "aliases": [
+        "Dropzone",
+        "FileUpload",
+        "Uploader",
+        "FileInput"
+      ],
+      "variants": {
+        "multiple": "several files",
+        "accept": "allowed types",
+        "maxSize": "largest file"
+      },
+      "source": "reference/web/src/components/ui/forms.tsx#FileDrop"
+    },
+    {
+      "id": "menu",
+      "name": "Menu",
+      "purpose": "Offers a short list of actions on one thing from a button.",
+      "tier": "kit",
+      "aliases": [
+        "DropdownMenu",
+        "ContextMenu",
+        "KebabMenu",
+        "ActionsMenu",
+        "MoreButton"
+      ],
+      "variants": {
+        "trigger": "the \u22ef MoreButton or any button",
+        "align": "start | end"
+      },
+      "source": "reference/web/src/components/ui/overlays.tsx#Menu"
+    },
+    {
+      "id": "popover",
+      "name": "Popover",
+      "purpose": "Shows a few controls by their button without leaving the page.",
+      "tier": "kit",
+      "aliases": [
+        "Flyout",
+        "Dropdown panel",
+        "FilterPopover"
+      ],
+      "variants": {
+        "align": "start | end | center"
+      },
+      "source": "reference/web/src/components/ui/overlays.tsx#Popover"
+    },
+    {
+      "id": "tooltip",
+      "name": "Tooltip",
+      "purpose": "Labels an icon-only control on hover or keyboard focus.",
+      "tier": "kit",
+      "aliases": [
+        "Hint",
+        "Title tooltip"
+      ],
+      "variants": {},
+      "source": "reference/web/src/components/ui/overlays.tsx#Tooltip"
+    },
+    {
+      "id": "command-palette",
+      "name": "CommandPalette",
+      "purpose": "Goes to a page or runs an action by typing (\u2318K).",
+      "tier": "kit",
+      "aliases": [
+        "CommandMenu",
+        "Spotlight",
+        "QuickSwitcher",
+        "Cmd+K"
+      ],
+      "variants": {},
+      "source": "reference/web/src/components/ui/overlays.tsx#CommandPalette"
+    },
+    {
+      "id": "toast",
+      "name": "Toast",
+      "purpose": "Says briefly that something happened, with one action at most.",
+      "tier": "kit",
+      "aliases": [
+        "Toaster",
+        "Snackbar",
+        "Notification",
+        "Flash message"
+      ],
+      "variants": {
+        "tone": "done | info | error",
+        "action": "one, usually Undo"
+      },
+      "source": "reference/web/src/components/ui/feedback.tsx#toast"
+    },
+    {
+      "id": "confirm-sheet",
+      "name": "ConfirmSheet",
+      "purpose": "Asks before a destructive or surprising action, saying what survives.",
+      "tier": "kit",
+      "aliases": [
+        "ConfirmDialog",
+        "AlertDialog",
+        "useConfirm",
+        "Are you sure"
+      ],
+      "variants": {
+        "danger": "destructive: highlight fill, Cancel focused"
+      },
+      "source": "reference/web/src/components/ui/feedback.tsx#ConfirmSheet"
+    },
+    {
+      "id": "stepper",
+      "name": "Stepper",
+      "purpose": "Shows where you are in a flow of a few steps.",
+      "tier": "kit",
+      "aliases": [
+        "Steps",
+        "Wizard progress",
+        "Breadcrumb steps"
+      ],
+      "variants": {
+        "onStep": "go back to a done step"
+      },
+      "source": "reference/web/src/components/ui/feedback.tsx#Stepper"
+    },
+    {
+      "id": "update-banner",
+      "name": "UpdateBanner",
+      "purpose": "Says a new version is ready and offers to reload.",
+      "tier": "kit",
+      "aliases": [
+        "NewVersionBanner",
+        "SW update prompt",
+        "RefreshBanner"
+      ],
+      "variants": {
+        "onDismiss": "Later"
+      },
+      "source": "reference/web/src/components/ui/feedback.tsx#UpdateBanner"
+    },
+    {
+      "id": "data-table",
+      "name": "DataTable",
+      "purpose": "Shows many records with several facts each, sortable, as rows on phones.",
+      "tier": "kit",
+      "aliases": [
+        "Table",
+        "DataGrid",
+        "SortableTable"
+      ],
+      "variants": {
+        "rowTo": "rows link",
+        "sort": "controlled (URL) or its own"
+      },
+      "source": "reference/web/src/components/ui/data.tsx#DataTable"
+    },
+    {
+      "id": "accordion",
+      "name": "Accordion",
+      "purpose": "Folds away sections most people won't need.",
+      "tier": "kit",
+      "aliases": [
+        "Collapsible",
+        "Disclosure",
+        "Expander",
+        "FAQ"
+      ],
+      "variants": {
+        "multiple": "several open at once"
+      },
+      "source": "reference/web/src/components/ui/data.tsx#Accordion"
     }
   ]
 }

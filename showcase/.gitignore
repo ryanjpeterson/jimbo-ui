@@ -1,3 +1,6 @@
 node_modules/
 dist/
 .jimbo/
+tests/__screens__/
+test-results/
+playwright-report/

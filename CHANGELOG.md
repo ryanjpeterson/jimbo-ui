@@ -34,6 +34,42 @@ the matching 0.x release.
 
 ## Unreleased
 
+Tailwind 4, and a round of new kit pieces: fields, menus, toasts, confirm, tables, steps and more.
+
+**Update:** breaking — apps move to Tailwind 4 (new packages, Vite plugin, no `tailwind.config.js`) and rename a few utilities in their own code.
+
+### Added
+
+- **Forms** (`components/ui/forms.tsx`): `TextField` and `TextArea` (label, hint, inline error in the highlight colour; the area grows and counts down to a limit), `DateField` (the platform's own date and time pickers), `FileDrop` (pick or drop files; wrong types and sizes turned away with a reason).
+- **Overlays** (`components/ui/overlays.tsx`): `Menu` with the ⋯ `MoreButton` (full keyboard support), `Popover`, `Tooltip` (hover or keyboard focus only, never the only label), and `CommandPalette` + `useCommandPalette` (⌘K / Ctrl+K).
+- **Feedback** (`components/ui/feedback.tsx`): `toast()` + `Toaster` (above the dock; done, info, error; one action such as Undo), `ConfirmSheet` / `useConfirm` (one `await`), `ProgressBar` (promoted from candidate; also indeterminate), `Stepper`, `OfflineBanner` (the offline pattern as a component, with `useOnline`) and `UpdateBanner`.
+- **Data** (`components/ui/data.tsx`): `DataTable` (sortable on desktop, a row per record on phones, sort kept in the URL) and `Accordion` (native `<details>`).
+- Reference `AppShell` renders the `Toaster`. Layers 45 (menus, popovers, tooltips) and 60 (toasts).
+- The Style guide gets Forms, Menus and overlays, Feedback, and Tables and steps sections; the showcase opens the command palette from its search button and ⌘K.
+- Screenshot checks: `npm --prefix showcase run test:screens` captures every Style guide section at 375 px in a light, a mid and a dark look with Playwright and compares it with local baselines.
+
+### Changed
+
+- **Tailwind 4.** The theme moves from `tailwind.config.js` into `globals.css` (`@import "tailwindcss"` and `@theme inline`), so every colour and size utility follows the variables where it's used (a `ThemeScope`, a heading's `--fs`). It builds through `@tailwindcss/vite`, with no PostCSS. `tailwind-merge` goes to 3.
+- A bare `border` is the theme's line colour (Tailwind 4 would draw it in the text colour); buttons keep the pointer cursor.
+- `glass` is a Tailwind utility (`@utility`), so other classes can `@apply` it and it takes variants (`sm:glass`).
+- Kit utilities renamed for Tailwind 4: `outline-hidden`, `shadow-xs`, `backdrop-blur-xs`, `bg-linear-to-*`.
+
+### Removed
+
+- `foundation/tailwind.config.js`.
+- The legacy colour names from before 0.3: `accent-lime`, `accent-lime-hover`, `accent-pink`, `accent-pink-hover`, `accent-cyan`, `accent-cyan-hover`, `accent-orange`, `lime-700/900/950` and `rose-800/900/950`.
+
+**Apps must:**
+
+1. Before copying anything, run `npx @tailwindcss/upgrade` in the web root. It renames utilities in the app's own code: `shadow-sm` → `shadow-xs`, `shadow` → `shadow-sm`, `blur-sm` → `blur-xs`, `outline-none` → `outline-hidden`, `ring` → `ring-3`, `bg-gradient-to-*` → `bg-linear-to-*`, and so on.
+2. Install `tailwindcss@4`, `@tailwindcss/vite` and `tailwind-merge@3`; uninstall `autoprefixer` (and `postcss` if nothing else uses it). Delete `tailwind.config.js` and `postcss.config.js`, then add `tailwindcss()` from `@tailwindcss/vite` to the Vite plugins.
+3. Copy the foundation files. The app's CSS entry keeps importing `globals.css`, which now brings in Tailwind. If the app keeps components in a folder git ignores, add `@source "<path>";` after that import.
+4. Rename any legacy colour names: `accent-lime` → `accent`, `accent-pink` → `highlight`, `lime-*` → `accent-*`, `rose-*` → `highlight-*`. Replace `accent-cyan` / `accent-orange` with a theme colour.
+5. In the app's own CSS, `@apply` works only on utilities now. Replace `@apply card` (or another kit component class) with the class in markup. A CSS file that uses `@apply` without importing `globals.css` needs `@reference "<path to globals.css>";` at the top.
+6. Optional: copy `forms.tsx`, `overlays.tsx`, `feedback.tsx` and `data.tsx` into `components/ui/`, and add `<Toaster />` to the app shell (reference `AppShell.tsx`) before using `toast()`.
+7. Typecheck, build, and check pages at 375 px in a dark, a mid and a light look.
+
 ## 0.13.0 — 2026-11-02
 
 The motif saves, backdrop patterns move line by line, the favicon is the motif, and Marcone and mSupply are separate looks in their own colours.

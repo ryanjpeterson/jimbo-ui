@@ -6,7 +6,9 @@
     "assemble": "node scripts/assemble.mjs",
     "dev": "npm run assemble && vite --host 0.0.0.0 --port 4455",
     "build": "npm run assemble && tsc --noEmit && vite build && node scripts/artifact.mjs",
-    "typecheck": "npm run assemble && tsc --noEmit"
+    "typecheck": "npm run assemble && tsc --noEmit",
+    "test:screens": "playwright test",
+    "test:screens:update": "playwright test --update-snapshots"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.62.0",
@@ -15,15 +17,15 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.28.0",
-    "tailwind-merge": "^2.5.5"
+    "tailwind-merge": "^3.7.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@tailwindcss/vite": "^4.3.4",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.4",
-    "autoprefixer": "^10.4.20",
-    "postcss": "^8.4.49",
-    "tailwindcss": "^3.4.15",
+    "tailwindcss": "^4.3.4",
     "typescript": "^5.6.3",
     "vite": "^5.4.11"
   }

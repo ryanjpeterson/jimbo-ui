@@ -38,8 +38,10 @@ templates · 5 Typography · 6 Layout and shell · 7 Surfaces, depth and motion 
 
 ## 1. How apps use jimbo-ui
 
-The stack is React + TypeScript + Vite + Tailwind CSS 3 (with `clsx` and
-`tailwind-merge`). Paths below are relative to the app's web root.
+The stack is React + TypeScript + Vite + Tailwind CSS 4 (through
+`@tailwindcss/vite`, with `clsx` and `tailwind-merge` 3). Tailwind's theme
+lives in `globals.css` (`@theme`); there's no `tailwind.config.js` or
+PostCSS config. Paths below are relative to the app's web root.
 
 ### Three kinds of file
 
@@ -52,7 +54,7 @@ The stack is React + TypeScript + Vite + Tailwind CSS 3 (with `clsx` and
 **Foundation:** `src/lib/theme.ts` (theme engine), `src/lib/themes.ts`
 (templates), `src/lib/jimbo.ts` (the release's version and links), `src/lib/cn.ts`, `src/lib/gestures.ts`,
 `src/components/ui/button.tsx`, `src/components/ColorPicker.tsx`,
-`src/styles/globals.css`, `tailwind.config.js`.
+`src/styles/globals.css` (the Tailwind theme too).
 
 **Starter (app-owned):**
 - `src/lib/brand.config.ts` — the app's name, default theme and localStorage
@@ -91,7 +93,9 @@ file, a bare theme or anything with a `theme` / `defaultTheme`; drops
 unknown fields, clamps numbers), `brandConfigLine`, `tokensCss` (what
 `scripts/tokens.mjs` prints).
 
-**Reference (adapt to the app):** the UI kit (`kit.tsx`), the app shell
+**Reference (adapt to the app):** the UI kit (`kit.tsx`, with
+`forms.tsx`, `overlays.tsx`, `feedback.tsx` and `data.tsx` beside it in
+`components/ui/`), the app shell
 (`AppShell.tsx`: pass tabs, top-bar actions and routes), the jimbo-ui
 config section (`JimboConfigPage.tsx` with `config/ThemePanel.tsx` and
 `config/StyleGuidePanel.tsx`), `MapView.tsx`, the archetypes
@@ -433,8 +437,11 @@ The offline banner is fixed yellow (`bg-yellow-950/95 text-yellow-200`).
 
 Two to four colours in, every token out (`deriveColors()` in `src/lib/theme.ts`).
 Tokens are CSS variables holding `R G B` channels (`--c-surface: 28 28 30`),
-and Tailwind colours are `rgb(var(--c-name) / <alpha-value>)`, so opacity
-modifiers work on every token (`bg-accent/15`, `border-border/60`).
+and Tailwind colours are `rgb(var(--c-name))` in an `@theme inline` block
+(`globals.css`), so opacity modifiers work on every token (`bg-accent/15`,
+`border-border/60` — Tailwind mixes them with `color-mix`), and every
+utility follows the variables where it's used (a `ThemeScope`, a heading's
+type size).
 
 **Never write a hex value in a component.** Use the token classes.
 
@@ -490,9 +497,9 @@ family of tokens:
 | *c*`-top` → *c*`-bottom` | `from-c-top to-c-bottom` | dark on-text: mix(c, white, 0.30) → c; white on-text: c → mix(c, black, 0.28) | A two-stop version of the colour, if an app needs one; the kit no longer uses it (fills are flat) |
 | *c*`-950/900/800/700` | `*-c-950…700` | mix(bg, c, 0.10 / 0.28 / 0.40 / 0.50) | Washes: done chip, warnings, banner glows |
 
-**Legacy class names:** apps from before 0.3 may use `accent-lime`,
-`accent-pink`, `lime-950/900/700` and `rose-950/900/800`; they still work
-(same tokens). New code uses `accent`, `highlight` and their `-950…` washes.
+**Legacy class names** (`accent-lime`, `accent-pink`, `accent-cyan`,
+`accent-orange`, `lime-*`, `rose-*`) were removed with Tailwind 4. Use
+`accent`, `highlight` and their `-950…` washes.
 
 ### Where else the theme goes
 - **Page background:** the backdrop (above). Its default glow base is three
@@ -848,9 +855,11 @@ and body fonts.
 | z | What |
 | --- | --- |
 | 0 | The backdrop layer (`body::before`); `#root` stacks above it |
-| 30 | Pull-to-refresh spinner, dock fade, sticky sub-bars (offline banner) |
+| 30 | Pull-to-refresh spinner, dock fade, sticky sub-bars (`OfflineBanner`, `UpdateBanner`) |
 | 40 | Top bar, tab dock, floating save/action bars |
-| 50 | Sheets (with a `bg-black/70` blurred backdrop) |
+| 45 | Menus, popovers and tooltips |
+| 50 | Sheets (with a `bg-black/70` blurred backdrop), the command palette |
+| 60 | Toasts (over sheets, so one from inside a sheet is seen) |
 | 100 | Full-screen image viewer (`bg-black/90`) |
 
 ---
@@ -935,6 +944,21 @@ and body fonts.
 | `MapPinCard` (`components/MapView.tsx`) | The chosen place on a map page, floating above the dock: name, a line, what's there |
 | `JimboConfigPage` / `JimboConfigLink` (`routes/JimboConfigPage.tsx`) | The jimbo-ui config section (section 1) and its one link in settings |
 | `Button` (`ui/button.tsx`) | `primary` (one per view), `secondary`, `ghost`, `danger`; `sm`/`md`/`lg` |
+| `TextField` (`ui/forms.tsx`) | One line of text with its label, a hint, and an inline error in the highlight colour once there is one (say what to do); `prefix` / `suffix` inside the field; `optional` marks it beside the label |
+| `TextArea` (`ui/forms.tsx`) | Several lines; grows with its text up to `maxRows`; with `maxLength` it counts what's left once close |
+| `DateField` (`ui/forms.tsx`) | A date, time or both (`type`) with the platform's own picker, in the page's light or dark scheme; `min` / `max` |
+| `FileDrop` (`ui/forms.tsx`) | Pick or drop files: a dashed area that is the button, then the files with sizes and Remove; turns away wrong types and files over `maxSize`, saying why |
+| `Menu` + `MoreButton` (`ui/overlays.tsx`) | Actions on one thing from the ⋯ button (or any `trigger`): arrow keys, Home / End, a letter; `danger` items last after a `"divider"`, in the highlight colour, confirmed |
+| `Popover` (`ui/overlays.tsx`) | A few controls by their button (filters, a quick setting), open while you use them; anything that saves is a `Sheet` |
+| `Tooltip` (`ui/overlays.tsx`) | A label for an icon-only control on hover or keyboard focus. Never the only place something's said — touch screens don't show it |
+| `CommandPalette` + `useCommandPalette` (`ui/overlays.tsx`) | ⌘K / Ctrl+K: go to a page or run an action by typing, grouped commands; a top-bar search button opens it on phones |
+| `toast()` + `Toaster` (`ui/feedback.tsx`) | A short note after an action, above the dock: done (accent dot), info (support), error (highlight, stays until closed); one `action` (Undo); three at most. `Toaster` sits in the shell once; `toast()` works from anywhere |
+| `ConfirmSheet` / `useConfirm` (`ui/feedback.tsx`) | Asks before something destructive or surprising: the question, what survives, Cancel and the action in its own words (`danger`: a highlight fill, Cancel focused). `useConfirm` makes it one `await` |
+| `ProgressBar` (`ui/feedback.tsx`) | How far along a job of known length is (`value` / `max`, `format`); no `value` is a slow sweep while the length is unknown |
+| `Stepper` (`ui/feedback.tsx`) | Where you are in two to five steps: numbered circles joined by a line, done ones ticked (`onStep` goes back), "Step 2 of 4 · Details" on phones |
+| `OfflineBanner` / `UpdateBanner` (`ui/feedback.tsx`) | Slim bars stuck under the top bar, first thing on the page: offline with changes waiting (fixed yellow; `useOnline`), or a new version ready (Reload / Later) |
+| `DataTable` (`ui/data.tsx`) | Many records with several facts: a sortable table on desktop (`sortValue` per column; `aria-sort`), a row per record on phones with the `primary` column as its title — never a sideways-scrolling table. Keep `sort` in the URL |
+| `Accordion` (`ui/data.tsx`) | Sections that fold (FAQs, advanced settings), one open at a time unless `multiple`; native `<details>` in one card |
 
 CSS classes for plain elements: `.card`, `.field`, `.btn …`, `.chip`,
 `.link-action`, `.eyebrow`, `.meta`, `.label`, `.h-page`, `.h-section`.
@@ -968,6 +992,11 @@ one here fits.
 | **Related things** | `LinkChips` (a wrapping row) · `LinkCard` stack (a few, with a line each) · `List` + `EntityRow` |
 | **Empty or loading** | `EmptyState` (with `ThemeDots`) · `Loading` skeleton |
 | **Status** | `Badge` (detail pages) · status dot on rows · `DateBlock` ticket |
+| **Taking input** | `TextField` · `TextArea` · `DateField` · `FileDrop` · `SelectField` · `RangeField` · `SwitchRow` |
+| **Actions on one thing** | `Menu` (⋯) · `Popover` (a few controls) · `Tooltip` on icon buttons · `CommandPalette` (⌘K, app-wide) |
+| **After an action** | `toast()` (done, Undo) · `ConfirmSheet` (before a destructive one) · inline `TextField` errors |
+| **Work in progress** | `ProgressBar` (known length) · `Stepper` (a flow of steps) · `FloatingBar` (running now) · `OfflineBanner` / `UpdateBanner` |
+| **Many records** | `DataTable` (several facts each, sortable) · `List` + rows (one or two facts) · `Accordion` (content to fold away) |
 | **Settings** | `SwitchRow` (on/off), `KeyValue` (read-only), `.field`, `SelectField`, `RangeField`, `Tabs`, `Section` cards |
 | **Page width** | column (default) · wide · full (`AppShell width`) |
 | **Places** | `MapView` (`compact` inline, `full` in a section, `fill` as a map page) + `MapPinCard` · `List` + `EntityRow` with `ViewSwitch` list ⇄ map |
@@ -1019,8 +1048,13 @@ archetype only sets the starting shape.
   onSelect`); a floating action bar above the dock shows the count and action.
 - **Sheets for choices**, not new pages, when the user comes straight back
   (pickers, add flows, search).
-- **Confirm before destructive or surprising actions**, in plain words; say
-  what survives ("Its events stay in your list").
+- **Confirm before destructive or surprising actions** (`ConfirmSheet` /
+  `useConfirm`), in plain words; say what survives ("Its events stay in
+  your list"), and name the action on its button ("Delete list", never
+  "OK"). After it, a toast with Undo where the action can be undone.
+- **Toasts** (`toast()`) say that something happened, briefly, and offer one
+  action at most. Never for errors that need fixing in a form (those are
+  inline) or anything that must be read.
 - **Background work** (uploads, syncing) shows as a small progress ring in a
   corner: never block the
   screen; allow pause/cancel; warn before closing with work pending.
@@ -1047,7 +1081,8 @@ archetype only sets the starting shape.
 - **Counts on tabs:** a small highlight badge with on-highlight text.
 - **Errors:** inline, near what failed, in the highlight colour; keep the
   user's input.
-- **Offline / pending:** a slim yellow banner under the top bar.
+- **Offline / pending:** a slim yellow banner under the top bar
+  (`OfflineBanner`); a waiting service worker shows `UpdateBanner`.
 - **Maps:** always `MapView`, in the theme's map style with flat highlight
   pins. A map page fills the page under the top bar, with `ViewSwitch`
   (List | Map) floating top-left and `MapPinCard` for the chosen place above
@@ -1321,3 +1356,14 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   too. The favicon is the motif (`motifFavicon`). Brands use only their
   own site's colours, each its own look, fewer than four when that's all
   they have.
+- **Unreleased** — Tailwind 4: the theme moves from `tailwind.config.js` into
+  `globals.css` (`@theme inline`, so utilities follow a `ThemeScope`), through
+  `@tailwindcss/vite` with no PostCSS; a bare `border` is the theme's line
+  colour; `glass` is a utility; legacy colour names removed. New kit files:
+  `forms.tsx` (`TextField`, `TextArea`, `DateField`, `FileDrop`),
+  `overlays.tsx` (`Menu`, `Popover`, `Tooltip`, `CommandPalette`),
+  `feedback.tsx` (`toast` / `Toaster`, `ConfirmSheet` / `useConfirm`,
+  `ProgressBar`, `Stepper`, `OfflineBanner`, `UpdateBanner`) and `data.tsx`
+  (`DataTable`, `Accordion`). Layers at 45 (overlays) and 60 (toasts).
+  Screenshot checks of every Style guide section in a light, mid and dark
+  look (`npm --prefix showcase run test:screens`).

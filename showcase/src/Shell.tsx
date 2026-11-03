@@ -1,10 +1,12 @@
-/** The showcase app: the reference AppShell with two tabs (Home holds every component), two top-bar actions and the jimbo-ui config section under Settings. */
+/** The showcase app: the reference AppShell with two tabs (Home holds every component), two top-bar actions, a ⌘K command palette and the jimbo-ui config section under Settings. */
 
 import { useState } from "react";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import { AppShell, TopBarButton, type ShellTab } from "@/routes/AppShell";
-import { Sheet, SearchField } from "@/components/ui/kit";
+import { Sheet } from "@/components/ui/kit";
 import { Button } from "@/components/ui/button";
+import { CommandPalette, useCommandPalette, type Command } from "@/components/ui/overlays";
+import { toast } from "@/components/ui/feedback";
 import { useApplyBrand } from "@/lib/useBrand";
 import { JimboConfigPage } from "@/routes/JimboConfigPage";
 import { HomeDemo } from "./Home";
@@ -15,14 +17,26 @@ const TABS: ShellTab[] = [
   { to: "/settings", label: "Settings", also: ["/jimbo-ui"], icon: <><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1" /><circle cx="15" cy="6" r="2" /><circle cx="9" cy="12" r="2" /><circle cx="17" cy="18" r="2" /></> },
 ];
 
+const CONFIG_TABS = [["theme", "Looks"], ["colours", "Colours"], ["type", "Type"], ["backdrop", "Backdrop"], ["brand", "Brand"], ["style", "Style guide"], ["about", "About"]] as const;
+const KIT_SECTIONS = [["brand", "Brand and type"], ["controls", "Controls"], ["forms", "Forms"], ["overlays", "Menus and overlays"], ["feedback", "Feedback"], ["data", "Tables and steps"], ["lists", "Lists"], ["numbers", "Numbers and charts"], ["states", "States"]] as const;
+
 export function Shell() {
   useApplyBrand();
-  const [sheet, setSheet] = useState<"search" | "add" | null>(null);
-  const [q, setQ] = useState("");
+  const [sheet, setSheet] = useState<"add" | null>(null);
+  const [palette, setPalette] = useCommandPalette();
+  const navigate = useNavigate();
+  const commands: Command[] = [
+    { id: "home", group: "Go to", label: "Home", run: () => navigate("/") },
+    { id: "settings", group: "Go to", label: "Settings", run: () => navigate("/settings") },
+    ...CONFIG_TABS.map(([tab, label]): Command => ({ id: `cfg-${tab}`, group: "jimbo-ui config", label, keywords: ["theme", "look"], run: () => navigate(`/jimbo-ui?tab=${tab}`) })),
+    ...KIT_SECTIONS.map(([section, label]): Command => ({ id: `kit-${section}`, group: "Components", label, keywords: ["kit", "style guide"], run: () => navigate(`/?section=${section}`) })),
+    { id: "toast", group: "Actions", label: "Show a toast", run: () => toast("Hello from the palette") },
+    { id: "add", group: "Actions", label: "Add an entry", hint: "+", run: () => setSheet("add") },
+  ];
 
   return (
     <AppShell tabs={TABS} onRefresh={() => new Promise((r) => setTimeout(r, 700))} actions={<>
-      <TopBarButton label="Search" onClick={() => setSheet("search")}>
+      <TopBarButton label="Search" onClick={() => setPalette(true)}>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
       </TopBarButton>
       <TopBarButton label="Add" primary onClick={() => setSheet("add")}>
@@ -38,14 +52,7 @@ export function Shell() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 
-      {sheet === "search" && (
-        <Sheet title="Search" subtitle="One field; results appear as you type." onClose={() => setSheet(null)}>
-          <div className="space-y-3 p-5">
-            <SearchField value={q} onChange={setQ} placeholder="Search everything" />
-            <p className="meta">{q ? `Nothing matches “${q}” in the showcase.` : "Start typing."}</p>
-          </div>
-        </Sheet>
-      )}
+      <CommandPalette open={palette} onClose={() => setPalette(false)} commands={commands} />
       {sheet === "add" && (
         <Sheet title="Add an entry" subtitle="The + button opens the app's main add flow in a sheet." onClose={() => setSheet(null)}>
           <div className="space-y-3 p-5">

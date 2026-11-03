@@ -1,7 +1,7 @@
 /**
  * The app shell: a sticky, frosted top bar (the app's name, tabs as text links on
- * desktop, round action buttons), the page frame, pull to refresh, and the
- * floating tab dock on phones.
+ * desktop, round action buttons), the page frame, pull to refresh, the
+ * floating tab dock on phones, and where toasts appear (Toaster).
  *
  * jimbo-ui reference: an app passes its tabs (five at most), its top-bar
  * actions and its routes as children.
@@ -10,6 +10,7 @@
 import type { ReactNode } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { HeaderTitle } from "@/components/HeaderTitle";
+import { Toaster } from "@/components/ui/feedback";
 import { usePullToRefresh } from "@/lib/gestures";
 import { cn } from "@/lib/cn";
 
@@ -82,7 +83,7 @@ export function AppShell({ tabs, actions, onRefresh, width = "column", children 
       <main className={cn("mx-auto px-4 pt-6 pb-[var(--dock-space)] sm:px-6 sm:pt-8", WIDTHS[width])}>{children}</main>
 
       {/* Phones: a floating, frosted dock above the home indicator; content fades out behind it. */}
-      <div aria-hidden className="pointer-events-none fixed inset-x-0 bottom-0 z-30 h-[calc(6rem+var(--safe-bottom))] bg-gradient-to-t from-bg via-bg/70 to-transparent sm:hidden" />
+      <div aria-hidden className="pointer-events-none fixed inset-x-0 bottom-0 z-30 h-[calc(6rem+var(--safe-bottom))] bg-linear-to-t from-bg via-bg/70 to-transparent sm:hidden" />
       <nav aria-label="Main" className="pointer-events-none fixed inset-x-0 bottom-0 z-40 select-none pb-[calc(0.75rem+var(--safe-bottom))] pl-[calc(0.75rem+var(--safe-left))] pr-[calc(0.75rem+var(--safe-right))] sm:hidden">
         <div className="pointer-events-auto mx-auto grid max-w-md gap-1 rounded-[20px] border border-border bg-surface/95 p-1.5 shadow-[0_10px_40px_-8px_rgba(0,0,0,0.75)] ring-1 ring-black/30 backdrop-blur-md"
           style={{ gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))` }}>
@@ -105,6 +106,8 @@ export function AppShell({ tabs, actions, onRefresh, width = "column", children 
           })}
         </div>
       </nav>
+
+      <Toaster />
     </div>
   );
 }

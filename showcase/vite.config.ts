@@ -1,5 +1,6 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import tailwindcss from "@tailwindcss/vite";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 
@@ -12,7 +13,7 @@ export default defineConfig({
     // What an app passes from its jimbo-ui.json, for the config section's About tab.
     __JIMBO_APP__: JSON.stringify({ name: "showcase", version, auth: "none" }),
   },
-  plugins: [react()],
+  plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, ".jimbo"),

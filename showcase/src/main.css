@@ -1,4 +1,6 @@
 @import "../.jimbo/styles/globals.css";
+/* Tailwind 4 finds classes in the files git tracks; .jimbo/ is assembled and ignored, so name it. */
+@source "../.jimbo";
 
 /* What an app's index.html puts on <body>; the published page has no body tag of its own. */
 @layer base {

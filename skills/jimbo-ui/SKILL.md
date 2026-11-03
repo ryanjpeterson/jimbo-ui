@@ -50,8 +50,7 @@ this check, then the preview workflow if they want detail.
   `border-border`, `text-text-base/muted/subtle`, `*-accent`, `*-highlight`,
   `*-support`, `text-on-accent`, `text-on-highlight`, `text-on-support`,
   each brand colour's shades (`-lighter`, `-light`, `-dark`, `-darker`),
-  solid fill (`.lit-*`) and washes (`-950/900/800/700`) (older apps may use the legacy `accent-lime`,
-  `accent-pink`, `lime-*`, `rose-*` names — same tokens). Never raw hex or Tailwind palette
+  solid fill (`.lit-*`) and washes (`-950/900/800/700`). Never raw hex or Tailwind palette
   colours on brand surfaces; never `text-white` on an accent/highlight fill.
 - No logo: the brand is the app's name as header text (`HeaderTitle`, display
   face, text colour, a dot in the accent — "jimbo.ui").
@@ -243,7 +242,9 @@ explains all of this.
    or section (the component menu).
 1. Export the latest release (highest `jimbo-ui--v*` tag).
 2. Copy `foundation/` and `starter/` into the app's web root. Install
-   `clsx` and `tailwind-merge`; Tailwind 3 with PostCSS; the `@/` alias to `src/`.
+   `clsx`, `tailwind-merge` 3, `tailwindcss` 4 and `@tailwindcss/vite` (add
+   `tailwindcss()` to the Vite plugins; no PostCSS or `tailwind.config.js` —
+   the theme is in `globals.css`); the `@/` alias to `src/`.
 3. Set `src/lib/brand.config.ts` (name, default theme — a template from guide
    section 4 or new colours that pass the readability checks — storage
    prefix), then regenerate `src/styles/tokens.css` with `scripts/tokens.mjs`.

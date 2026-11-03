@@ -29,9 +29,9 @@ repos only, never code), so the scan skips it.
 
 | Path | What | Rule |
 | --- | --- | --- |
-| `foundation/` | Theme engine, templates, `globals.css`, Tailwind config, `Button`, `ColorPicker`, `cn`, gestures | Copied verbatim into apps on every update — never holds app values |
+| `foundation/` | Theme engine, templates, `globals.css` (with the Tailwind 4 theme), `Button`, `ColorPicker`, `cn`, gestures | Copied verbatim into apps on every update — never holds app values |
 | `starter/` | `brand.config.ts`, `tokens.css`, `favicon.svg` | Copied once into a new app, then app-owned |
-| `reference/` | Generic kit, `AppShell`, `HeaderTitle`, `MapView`, the jimbo-ui config section (`JimboConfigPage` + `routes/config/`), the archetypes (`archetypes/catalogue.tsx`, `dashboard.tsx`, `status.tsx`), `useBrand`, `index.html` | Apps adapt and extend them |
+| `reference/` | Generic kit (`kit.tsx` plus `forms`, `overlays`, `feedback`, `data`), `AppShell`, `HeaderTitle`, `MapView`, the jimbo-ui config section (`JimboConfigPage` + `routes/config/`), the archetypes (`archetypes/catalogue.tsx`, `dashboard.tsx`, `status.tsx`), `useBrand`, `index.html` | Apps adapt and extend them |
 | `registry/` | `apps.json` (the apps: name, repo, registered) and `components.json` (jimbo-ui's catalogue: shared components and generic candidates) | An app's details live only in its own `jimbo-ui.json`; `scripts/inventory.mjs` puts them together |
 | `showcase/` | Demo app assembled from reference → foundation → starter → `showcase/overrides/` | Published as a private page each release |
 | `scripts/` | `inventory.mjs` (registry report), `tokens.mjs` (an app's `tokens.css`), `contrast.mjs` (template contrast report), `versions.mjs` (versions agree), `releases.mjs` (`releases.json` from the changelog), `build-zip.sh` (claude.ai upload) | |
@@ -67,6 +67,11 @@ brand looks use only the colours on that brand's own site.
   `docker compose --profile dev up` (live reload, port 4461). It doubles as a
   playground: Settings → jimbo-ui config → Theme → *Share this look* exports a theme file, brand.config
   line or tokens.css for an app.
+- Screens: `npm --prefix showcase run test:screens` (Playwright: every Style
+  guide section at 375 px in a light, a mid and a dark look; the first run
+  writes local baselines in `showcase/tests/__screens__/`, not committed —
+  run on main first, then on a change, to see what moved). `npx playwright
+  install chromium` once.
 - Typecheck: `npm --prefix showcase run typecheck` (assembles `.jimbo/` and
   checks the showcase plus all reference and foundation code).
 - Contrast: `node scripts/contrast.mjs --check` must pass for every template
