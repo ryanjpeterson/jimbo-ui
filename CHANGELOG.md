@@ -34,6 +34,8 @@ the matching 0.x release.
 
 ## Unreleased
 
+## 0.12.0 — 2026-11-02
+
 Nintendo, Sly Cooper and Tony Hawk's Underground looks, motif shapes (a triforce among them), slow backdrop motion, calmer fonts, and the view kept in the URL.
 
 **Update:** breaking — apps keep their view state in the URL; fonts removed (saved themes fall back to the nearest).

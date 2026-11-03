@@ -1,7 +1,72 @@
 {
   "$comment": "Generated from CHANGELOG.md by scripts/releases.mjs — don't edit. Apps' jimbo-ui config section reads it to show what a newer release changes.",
-  "latest": "0.11.5",
+  "latest": "0.12.0",
   "releases": [
+    {
+      "version": "0.12.0",
+      "date": "2026-11-02",
+      "type": "breaking",
+      "summary": "Nintendo, Sly Cooper and Tony Hawk's Underground looks, motif shapes (a triforce among them), slow backdrop motion, calmer fonts, and the view kept in the URL.",
+      "items": [
+        {
+          "kind": "added",
+          "text": "**Game looks:** the Games category gets sub-tabs, one per series. New: **Super Mario** (Mario, Luigi, Princess Peach, Bowser, Toad, Wario, Yoshi, Yoshi's Island), **Donkey Kong** (Donkey Kong, Diddy Kong, Donkey Kong Country, the 1981 arcade), **More Nintendo** (Kirby, Metroid, Star Fox, Pikmin, Splatoon), **Sly Cooper** (Sly Cooper, Bentley, Murray, Carmelita Fox, Thievius Raccoonus) and **Tony Hawk's Underground**, its menu themes (T.H.U.G., Cloudbuster, Retro Hawk, Chilled, Skullz 'N Stuff). Colours only, made with `template-from-colours.mjs`; every one passes the contrast check in light, mid and dark.",
+          "affects": []
+        },
+        {
+          "kind": "added",
+          "text": "**Motif shapes** (`Theme.motif`, `MOTIFS`, `motifMask`): `ThemeDots` draws the theme's colours as circles (the default) or as triforces, sparkles, stars, hearts, diamonds, triangles, squares, crosses, bolts, flowers, moons or squiggles, using `.motif-accent/highlight/support` and the `--motif-mask` CSS variable. Flat, side by side, at the circles' fixed sizes. Status dots, avatars and swatches stay circles. It's picked on the config section's Brand tab and is part of the theme draft, its export and `tokens.css`.",
+          "affects": [
+            "theme-dots"
+          ]
+        },
+        {
+          "kind": "added",
+          "text": "**Backdrop motion** (`backdrop.motion`, `backdrop.speed`, `BACKDROP_MOTIONS`, `backdropAnimation`): still (the default), drift, breathe, sway or pulse, slowly, at 0.5–2× speed. It's a CSS animation of the backdrop layer (`--bg-animation`, keyframes `jimbo-bg-*` in `globals.css`), and it's off for people who ask for reduced motion. It's on the Backdrop tab.",
+          "affects": [],
+          "foundation": true
+        },
+        {
+          "kind": "added",
+          "text": "**`useUrlState` / `useUrlNumber` / `setUrlParams`** (reference `lib/useUrlState.ts`): view state as a search parameter that replaces the history entry and drops out at its default.",
+          "affects": [
+            "url-state"
+          ]
+        },
+        {
+          "kind": "added",
+          "text": "**Fonts:** Geist and Plus Jakarta (sans), Newsreader, Literata and Instrument Serif (serif), Bebas Neue, Unbounded and Syne (decorative).",
+          "affects": []
+        },
+        {
+          "kind": "changed",
+          "text": "**The URL holds the view** (guide section 6): routes in the URL, and tabs, sub-tabs, filters, searches, pages and an open item as search parameters. The reference config section keeps its tab, the Looks category, sub-tab, tone and search, the backdrop group, the font groups and the Style guide section in the URL. The catalogue archetype keeps its search, filter, page and chosen place there, and the status archetype its range.",
+          "affects": []
+        },
+        {
+          "kind": "changed",
+          "text": "Showcase: the Archetypes tab is gone, and Home is the hero plus every component. The route is in the URL (`#/jimbo-ui?tab=type`, `HashRouter` instead of `MemoryRouter`), so a refresh or Back keeps the view, and an unknown route goes home. Random looks take a random motif too.",
+          "affects": []
+        },
+        {
+          "kind": "removed",
+          "text": "**Fonts:** IBM Plex Sans, Work Sans, Fraunces, Marcellus, Cormorant, Rocker, Uncial and Carved caps (Cinzel). A saved theme that used one gets the nearest that's left (`RETIRED_FONTS`: Geist, Plus Jakarta, Newsreader, Literata, EB Garamond, Gothic, Old print, Instrument Serif). The old `serif` style name now means Newsreader headings.",
+          "affects": []
+        },
+        {
+          "kind": "available",
+          "text": "`Theme.motif`, `.motif-*`, `MotifPanel`; `backdrop.motion` and `speed`; `useUrlState`",
+          "affects": [
+            "url-state"
+          ]
+        }
+      ],
+      "appsMust": [
+        "Use `BrowserRouter` (never `MemoryRouter`) and move view state into the URL with `useUrlState` / `useUrlNumber`: tabs, sub-tabs, segmented controls, filters, sorts, searches, page numbers and an open item or sheet. Copy `reference/web/src/lib/useUrlState.ts`, then port `JimboConfigPage.tsx`, `config/ThemePanel.tsx` and `config/StyleGuidePanel.tsx` (the motif picker and motion controls come with them).",
+        "Copy the foundation files. If `index.html` or `tokens.css` names a removed font, switch it to its replacement (above) and regenerate `tokens.css` with `scripts/tokens.mjs`.",
+        "Use `ThemeDots` for the motif rather than hand-made rows of `.dot-*` circles, so the theme's shape shows."
+      ]
+    },
     {
       "version": "0.11.5",
       "date": "2026-11-02",

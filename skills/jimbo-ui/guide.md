@@ -1287,7 +1287,7 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   component while ten random looks take turns every 15 seconds.
 - **0.11.5** — Paper backdrop from two offset noise layers, so it doesn't
   repeat in a grid; `HeroSection pattern="none"` draws no layer of its own.
-- **Unreleased** — The URL holds the view: routes, plus tabs, filters,
+- **0.12.0** — The URL holds the view: routes, plus tabs, filters,
   searches and pages as search parameters (`useUrlState`). Motif shapes
   (`Theme.motif`: circles, triforce, sparkles, stars and more) for
   `ThemeDots`. Slow backdrop motion (drift, breathe, sway, pulse), off for
