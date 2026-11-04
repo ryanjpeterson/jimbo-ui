@@ -792,7 +792,15 @@ and body fonts.
 - **Installed-app feel:** `apple-mobile-web-app-capable`, a solid status bar
   (`apple-mobile-web-app-status-bar-style` `default`, coloured by
   `theme-color`), no tap highlight, `overscroll-behavior-y: contain` (own pull to
-  refresh), smooth scrolling, pinch-zoom allowed.
+  refresh), smooth scrolling.
+- **No zoom in the installed app.** From the Home Screen an app doesn't
+  pinch-zoom or double-tap zoom, like a native app; `applyTheme` sets it up
+  (`viewport.ts`: the viewport meta, `touch-action` via `html[data-installed]`
+  and iOS's gesture events), so apps add nothing. In a browser tab pinch-zoom
+  stays (it's a web page there) and double-tap zoom is off. The type size
+  setting is how people make text bigger. Anything that zooms its own
+  content (a map, an image viewer) does its pinch in JS on an element with
+  `touch-action: none`; `isInstalledApp()` tells code which mode it's in.
 - **Full screen on phones.** Every app fills the whole screen, edge to edge
   and top to bottom, and nothing sits under the status bar or the home
   indicator:
@@ -1401,3 +1409,6 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   breathing, twinkling, flickering, orbiting. Twelve motifs: planets,
   comets, suns, rockets, spirals, bats, pumpkins, ghosts, fangs, coffins,
   spiders, drops.
+- **Unreleased** — No zoom in the installed app: pinch-zoom and double-tap
+  zoom are off from the Home Screen, like a native app; browser tabs keep
+  pinch-zoom. `isInstalledApp()` in `viewport.ts`.

@@ -34,6 +34,28 @@ the matching 0.x release.
 
 ## Unreleased
 
+**Update:** feature
+
+### Added
+
+- No zoom in the installed app, like a native app: from the Home Screen,
+  pinch-zoom and double-tap zoom are off. `foundation/src/lib/viewport.ts`
+  (run by `applyTheme`) adds `maximum-scale=1, user-scalable=no` to the
+  viewport meta, sets `html[data-installed]` (`touch-action: pan-x pan-y` in
+  `globals.css`) and cancels iOS's pinch gesture events. Browser tabs keep
+  pinch-zoom. `isInstalledApp()` says which mode the app is in.
+
+### Changed
+
+- Double-tap zoom is off everywhere (`touch-action: manipulation` on `html`),
+  so taps are instant.
+
+### Apps must
+
+- Nothing beyond copying the foundation files. A map or image viewer that
+  relied on the page's own pinch-zoom does its pinch in JS with
+  `touch-action: none` on itself.
+
 ## 0.14.3 — 2026-11-04
 
 Space and Halloween: looks, two backdrop groups that keep moving on their own, and twelve motifs.
