@@ -34,6 +34,23 @@ the matching 0.x release.
 
 ## Unreleased
 
+Space and Halloween: looks, two backdrop groups that keep moving on their own, and twelve motifs.
+
+**Update:** feature — drop-in; everything arrives with the foundation files.
+
+### Added
+
+- **Space** category on the Looks tab, with sub-tabs **Nebulae** (Stellar nursery, Pillars of dust, Veil), **Stars** (Red giant, Blue supergiant, White dwarf), **Planets** (Gas giant, Ringed world, Ice giant, Pale blue dot), **Deep sky** (Event horizon, Galaxy core, Launch window) and **Aurora** (Aurora, Solar wind, Midnight sun) — invented palettes, each with a style whose backdrop moves on its own.
+- **Halloween** category, with sub-tabs **Vampire** (Velvet coffin, Blood moon, Count's court, Crypt, Daybreak), **Haunted** (Haunted manor, Séance, Ectoplasm), **Witching** (Witching hour, Cauldron, Hex), **Graveyard** (Graveyard, Moonlit mist) and **Harvest** (Jack-o'-lantern, Candy corn, Harvest moon). The Holidays look stays. All 324 looks pass `contrast.mjs --check`.
+- **Cosmos** backdrop group: Starfield (twinkling), Nebula (clouds that swell and settle), Galaxy (a tilted spiral turning about its core), Orbits (planets going round a corner sun, each at its own pace), Aurora (curtains that fold and unfold), Comets (crossing on a diagonal), Constellations, Eclipse (a breathing, turning corona), Milky Way and Planetrise.
+- **Haunt** backdrop group: Bats (wings beating, drifting up), Webs (a spider riding its thread), Moonlit (clouds passing a full moon), Graveyard (fog drifting past headstones), Mist, Candles (flames flickering), Damask, Drips (now and then a drop falls), Briars (thorny vines swaying from the root) and Arches (pointed windows).
+- Motifs: **Planets**, **Comets**, **Suns**, **Rockets**, **Spirals**, **Bats**, **Pumpkins**, **Ghosts**, **Fangs**, **Coffins**, **Spiders** and **Drops**.
+- Alive motion can now be a pattern's own: a slow turn, a breath, a drift, a flicker or a planet's orbit, written into the pattern (`animatePattern` leaves open-and-closed elements alone). Some patterns twinkle instead of swaying (`TWINKLE`), some hold their shapes still and move only those parts (`HELD`). Corner art (a moon, a web, a sun) is sized to show whole on a phone and in a small tile.
+
+### Apps must
+
+Nothing — copy the foundation files. The reference config section reads `BACKDROP_GROUPS`, `MOTIFS` and `FAMILY_SETS`, so the new categories, groups and motifs show up on their own.
+
 ## 0.14.2 — 2026-11-03
 
 The end of the world: apocalypse looks, a Ruin backdrop group and four new motifs.

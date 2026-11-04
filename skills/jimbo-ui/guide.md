@@ -320,7 +320,7 @@ white). Four is the most, and a theme needn't be four different hues.
 the page. The Colours tab warns if a setting costs readability.
 
 **Backdrop.** Behind every page sits a backdrop in the theme's colours
-(`Theme.backdrop`, `backdropCss`): a **pattern** from five groups
+(`Theme.backdrop`, `backdropCss`): a **pattern** from seven groups
 (`BACKDROP_GROUPS`, `BACKDROPS`, ten to thirteen each), or none —
 
 | Group | Patterns |
@@ -330,6 +330,8 @@ the page. The Colours tab warns if a setting costs readability.
 | **Vintage** | halftone (print dots fading from a corner), retro stripes (three bands round a corner), sunburst (wide rays from the bottom), deco fans (art deco scallops), pinstripe, gingham, polka, plaid, argyle, racing stripes (across a corner), trellis (a studded lattice), bauhaus (quarter circles and blocks) |
 | **Texture** | dot grid, grain (fine film grain), paper (soft mottle), linen (a fine crosshatch), concrete, brushed (horizontal streaks), sand (coarse grain), speckle, crosshatch, twill (a diagonal weave), carbon (a tiny check), ribbed |
 | **Ruin** | embers (sparks rising), ash (flakes drifting down), cracks (fractures from three points), hazard (caution stripes along the bottom), skyline (a broken city along the bottom), fallout (scattered trefoils), smog (banks of smoke), barbed (rows of barbed wire), static (scan lines over noise), shockwave (broken rings from a blast below) |
+| **Cosmos** | starfield (twinkling stars), nebula (clouds that swell and settle), galaxy (a tilted spiral turning about its core), orbits (planets round a corner sun), aurora (curtains that fold and unfold), comets (on a long diagonal), constellations, eclipse (a breathing corona), milky way, planetrise (a ringed planet along the bottom) |
+| **Haunt** | bats (wings beating), webs (in two corners, a spider on its thread), moonlit (clouds passing a full moon), graveyard (headstones, a bare tree, fog), mist, candles (flickering), damask, drips (from the top; a drop falls now and then), briars (thorny vines from two corners), arches (pointed windows) |
 
 — over a **base**: solid (the page colour), gradient (a sweep of accent and
 support) or glow (soft colour glows, the default). Four sliders tune it:
@@ -392,7 +394,8 @@ same hue family (done chips, warnings), not for adding colour.
 shapes side by side — circles by default, or another shape the theme picks
 (`Theme.motif`, `MOTIFS`): triforce, sparkles, stars, hearts, diamonds,
 triangles, squares, crosses, bolts, flowers, moons, squiggles, skulls,
-trefoils, flames or hazards. Only
+trefoils, flames, hazards, planets, comets, suns, rockets, spirals, bats,
+pumpkins, ghosts, fangs, coffins, spiders or drops. Only
 `ThemeDots` (`.motif-accent/highlight/support`, a mask from `--motif-mask`)
 takes the shape; status dots, avatars, swatches and label dots stay
 circles. A motif shape follows the circle rules below: flat, side by side,
@@ -564,7 +567,7 @@ most: keep them dark enough (luminance under about 0.07) for 7:1.
 
 ## 4. Theme templates
 
-The Looks tab offers these (`foundation/src/lib/themes.ts`) in eight
+The Looks tab offers these (`foundation/src/lib/themes.ts`) in ten
 categories (Brands: companies' own palettes, colours only, and only the
 colours on the brand's own website — each brand its own look, never mixed;
 a one-colour brand stays one colour, its shades filling the rest with
@@ -593,6 +596,8 @@ Home and Away looks are now its dark (or mid) and light tones.
 | **Provinces** | Canada's 13 provinces and territories, each on its flag's field colour | One group |
 | **Games** | **The Legend of Zelda** (twelve games' palettes, from the 1986 original to Echoes of Wisdom), **Super Mario** (Mario, Luigi, Peach, Bowser, Toad, Wario, Yoshi, Yoshi's Island), **Donkey Kong** (DK, Diddy, Country, the 1981 arcade), **More Nintendo** (Kirby, Metroid, Star Fox, Pikmin, Splatoon), **Sly Cooper** (Sly, Bentley, Murray, Carmelita, Thievius Raccoonus), **Tony Hawk's Underground** (its menu themes: T.H.U.G., Cloudbuster, Retro Hawk, Chilled, Skullz 'N Stuff) and **Consoles** (PlayStation, Nintendo 64, Dreamcast, PlayStation 2, Xbox, GameCube, Game Boy Advance, PSP, Xbox 360, Wii, PlayStation 3 — hardware and menu colours, each with a menu font, backdrop and motif). Colours, pattern and type only, no artwork | Sub-tabs, one per series |
 | **Apocalypse** | **Nuclear** (Fallout shelter, Half-life, Nuclear winter), **Undead** (Outbreak, Dead of night, Quarantine), **Wasteland** (Dust bowl, Scorched earth, Rust belt), **Cosmic** (Last light, Impact, Judgement day) and **Collapse** (Drowned world, Wildfire smoke, Signal lost). Invented palettes, not taken from any film or game; each has a style — a Ruin backdrop, a motif (skulls, trefoils, flames, hazards…) and a heading font | Sub-tabs, one per ending |
+| **Space** | **Nebulae** (Stellar nursery, Pillars of dust, Veil), **Stars** (Red giant, Blue supergiant, White dwarf), **Planets** (Gas giant, Ringed world, Ice giant, Pale blue dot), **Deep sky** (Event horizon, Galaxy core, Launch window) and **Aurora** (Aurora, Solar wind, Midnight sun). Invented palettes; each style has a Cosmos backdrop that moves on its own, a motif and a heading font | Sub-tabs |
+| **Halloween** | **Vampire** (Velvet coffin, Blood moon, Count's court, Crypt, Daybreak), **Haunted** (Haunted manor, Séance, Ectoplasm), **Witching** (Witching hour, Cauldron, Hex), **Graveyard** (Graveyard, Moonlit mist) and **Harvest** (Jack-o'-lantern, Candy corn, Harvest moon). Invented palettes, each with a Haunt backdrop, a motif (bats, fangs, ghosts…) and a heading font | Sub-tabs |
 | **Sports** | NHL, NBA, MLB, NFL (every team; some Toronto and Ottawa teams have a **Retro** look too), then **Toronto**, **Ottawa** and **Chicago** (every team from the city, across leagues — MLS, CFL, WNBA, PWHL, NWSL, CPL, NLL, AHL, OHL too) | Sub-tabs (`tabs: true`), one at a time |
 
 Each template is drawn as a miniature of the app with its colours as
@@ -1388,3 +1393,11 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   Wasteland, Cosmic, Collapse), each with a style. A fifth backdrop group,
   **Ruin**: embers, ash, cracks, hazard, skyline, fallout, smog, barbed,
   static and shockwave. Four motifs: skulls, trefoils, flames, hazards.
+- **Unreleased** — Space and Halloween categories of looks, each with a
+  style. Two backdrop groups, **Cosmos** (starfield, nebula, galaxy, orbits,
+  aurora, comets, constellations, eclipse, milky way, planetrise) and
+  **Haunt** (bats, webs, moonlit, graveyard, mist, candles, damask, drips,
+  briars, arches); when alive, many move their own way — turning,
+  breathing, twinkling, flickering, orbiting. Twelve motifs: planets,
+  comets, suns, rockets, spirals, bats, pumpkins, ghosts, fangs, coffins,
+  spiders, drops.

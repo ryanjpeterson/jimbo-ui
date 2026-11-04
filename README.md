@@ -2,8 +2,8 @@
 
 Ryan's shared brand and UI system for web apps (repo and plugin name:
 `jimbo-ui`): a theme engine
-that turns two to four colours into a full palette with shades, 292 looks — each in light, mid and dark — (everyday, holidays,
-countries, provinces, sports teams and games: Zelda, Mario, Donkey Kong, more Nintendo, Sly Cooper, Tony Hawk's Underground and retro consoles — and the end of the world), 59 backdrops that can move slowly, frosted glass and a motif of circles (or a triforce, sparkles, stars, skulls and more), Tailwind 4 tokens, a UI kit (fields, menus, toasts, tables and more), a phone-first, full-screen app shell with a
+that turns two to four colours into a full palette with shades, 324 looks — each in light, mid and dark — (everyday, holidays,
+countries, provinces, sports teams and games: Zelda, Mario, Donkey Kong, more Nintendo, Sly Cooper, Tony Hawk's Underground and retro consoles — the end of the world, space and Halloween), 79 backdrops that can move slowly (or keep turning, breathing and twinkling), frosted glass and a motif of circles (or a triforce, sparkles, stars, skulls, planets, bats and more), Tailwind 4 tokens, a UI kit (fields, menus, toasts, tables and more), a phone-first, full-screen app shell with a
 floating tab dock, maps in the theme, three app archetypes to copy, the
 patterns that make the apps feel alike (the URL always holds the view), and a **registry** — the apps on
 jimbo-ui and a catalogue of shared components, with each app describing
