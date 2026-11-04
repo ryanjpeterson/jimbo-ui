@@ -800,7 +800,8 @@ and body fonts.
   stays (it's a web page there) and double-tap zoom is off. The type size
   setting is how people make text bigger. Anything that zooms its own
   content (a map, an image viewer) does its pinch in JS on an element with
-  `touch-action: none`; `isInstalledApp()` tells code which mode it's in.
+  `touch-action: none`; `isInstalledApp()` tells code which mode it's in
+  (jimbo-deploy's iOS shell counts as installed).
 - **Full screen on phones.** Every app fills the whole screen, edge to edge
   and top to bottom, and nothing sits under the status bar or the home
   indicator:

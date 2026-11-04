@@ -42,13 +42,18 @@ export function ensureFullScreenViewport(): void {
   }
 }
 
-/** True when running from the Home Screen (or as an installed desktop app). */
+/**
+ * True when running from the Home Screen, as an installed desktop app, or
+ * inside the iOS shell (jimbo-deploy's Capacitor wrapper, which adds
+ * "JimboShell" to the user agent).
+ */
 export function isInstalledApp(): boolean {
   if (typeof window === "undefined") return false;
   return (
     window.matchMedia?.("(display-mode: standalone)").matches ||
     window.matchMedia?.("(display-mode: fullscreen)").matches ||
-    (navigator as Navigator & { standalone?: boolean }).standalone === true
+    (navigator as Navigator & { standalone?: boolean }).standalone === true ||
+    /JimboShell/.test(navigator.userAgent)
   );
 }
 

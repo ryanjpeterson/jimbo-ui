@@ -43,7 +43,8 @@ the matching 0.x release.
   (run by `applyTheme`) adds `maximum-scale=1, user-scalable=no` to the
   viewport meta, sets `html[data-installed]` (`touch-action: pan-x pan-y` in
   `globals.css`) and cancels iOS's pinch gesture events. Browser tabs keep
-  pinch-zoom. `isInstalledApp()` says which mode the app is in.
+  pinch-zoom. `isInstalledApp()` says which mode the app is in, and counts
+  jimbo-deploy's iOS shell (`JimboShell` in the user agent) as installed.
 
 ### Changed
 
