@@ -34,6 +34,8 @@ the matching 0.x release.
 
 ## Unreleased
 
+## 0.14.3 — 2026-11-04
+
 Space and Halloween: looks, two backdrop groups that keep moving on their own, and twelve motifs.
 
 **Update:** feature — drop-in; everything arrives with the foundation files.

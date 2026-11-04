@@ -1393,7 +1393,7 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   Wasteland, Cosmic, Collapse), each with a style. A fifth backdrop group,
   **Ruin**: embers, ash, cracks, hazard, skyline, fallout, smog, barbed,
   static and shockwave. Four motifs: skulls, trefoils, flames, hazards.
-- **Unreleased** — Space and Halloween categories of looks, each with a
+- **0.14.3** — Space and Halloween categories of looks, each with a
   style. Two backdrop groups, **Cosmos** (starfield, nebula, galaxy, orbits,
   aurora, comets, constellations, eclipse, milky way, planetrise) and
   **Haunt** (bats, webs, moonlit, graveyard, mist, candles, damask, drips,
