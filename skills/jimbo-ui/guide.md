@@ -977,7 +977,8 @@ and body fonts.
 | `Menu` + `MoreButton` (`ui/overlays.tsx`) | Actions on one thing from the ⋯ button (or any `trigger`): arrow keys, Home / End, a letter; `danger` items last after a `"divider"`, in the highlight colour, confirmed |
 | `Popover` (`ui/overlays.tsx`) | A few controls by their button (filters, a quick setting), open while you use them; anything that saves is a `Sheet` |
 | `Tooltip` (`ui/overlays.tsx`) | A label for an icon-only control on hover or keyboard focus. Never the only place something's said — touch screens don't show it |
-| `CommandPalette` + `useCommandPalette` (`ui/overlays.tsx`) | ⌘K / Ctrl+K: go to a page or run an action by typing, grouped commands; a top-bar search button opens it on phones |
+| `CommandPalette` + `useSpotlight` (`ui/overlays.tsx`) | **App-wide search** (Spotlight), on ⌘K / Ctrl+K and a top-bar search button on phones: live results from the app's `providers`, grouped, with thumbnails and a preview pane on wide screens; `facets` turn `key:value` tokens into chips; recent picks and `suggestions` while empty; `commands` (go to a page, run an action) after the results. `useSpotlight` keeps it in the URL (`?find=`); `useCommandPalette` is the older local-state hook. See section 9, *App-wide search* |
+| `SearchTrigger` / `SearchIcon` (`ui/overlays.tsx`) | A button that looks like a search field and opens the palette (an explore page's search bar), and the magnifier for the top-bar `TopBarButton` |
 | `toast()` + `Toaster` (`ui/feedback.tsx`) | A short note after an action, above the dock: done (accent dot), info (support), error (highlight, stays until closed); one `action` (Undo); three at most. `Toaster` sits in the shell once; `toast()` works from anywhere |
 | `ConfirmSheet` / `useConfirm` (`ui/feedback.tsx`) | Asks before something destructive or surprising: the question, what survives, Cancel and the action in its own words (`danger`: a highlight fill, Cancel focused). `useConfirm` makes it one `await` |
 | `ProgressBar` (`ui/feedback.tsx`) | How far along a job of known length is (`value` / `max`, `format`); no `value` is a slow sweep while the length is unknown |
@@ -1013,7 +1014,7 @@ one here fits.
 | **A block of content** | `Section` (titled card) · plain `.card` · `FullBleed` band (`surface`, or a brand colour) · `Sheet` (when it's a choice or a short flow) |
 | **Calls to action** | primary `Button` · `LinkCard` with `accent` · `FullBleed` band in a brand colour · `HeroSection` actions |
 | **Switching views** | `Tabs` (2–4, segmented) · `PillTabs` (wrapping filters) · `ViewSwitch` (list ⇄ map) · `SelectField` (many options on phones) |
-| **Finding things** | `SearchField` · `PillTabs` filters · `SelectField` sort · `Autocomplete` (pick or add a record) |
+| **Finding things** | `SearchField` (one list) · `CommandPalette` with providers (app-wide, Spotlight) · `SearchTrigger` (a page's search bar that opens it) · `PillTabs` filters · `SelectField` sort · `Autocomplete` (pick or add a record) |
 | **Picking several** | `ToggleGrid` (a small fixed set) · `Autocomplete` with chips (many records) · `SwitchRow`s (named on/off settings) |
 | **Related things** | `LinkChips` (a wrapping row) · `LinkCard` stack (a few, with a line each) · `List` + `EntityRow` |
 | **Empty or loading** | `EmptyState` (with `ThemeDots`) · `Loading` skeleton |
@@ -1030,6 +1031,41 @@ one here fits.
 Ask with the options as choices (Claude Code's question tool where it's
 available), one question per feature or section, recommending one. Then
 build with that component and its variants, adapted to the app's content.
+
+### App-wide search (Spotlight)
+
+One search for the whole app: `CommandPalette` with `providers`, opened by
+⌘K / Ctrl+K, a top-bar search button (`TopBarButton` + `SearchIcon`; phones
+have no ⌘K) and, on a page that's mostly searching, a `SearchTrigger`.
+
+- **Providers** are the app's: `{ id, label, search(query, signal), pick,
+  preview?, more?, limit?, debounce? }`. `search` gets `{ text, filters }`
+  and an `AbortSignal` (pass it to `fetch`); it runs after `debounce` ms
+  (120) and is aborted when the query moves on. Each provider is a group,
+  in the order given, `limit` rows (5) and *See all* (`more`) to a results
+  page that holds the query in its URL. A provider returns nothing for a
+  filter it doesn't know.
+- **Results** are plain data (`SpotlightItem`: `id`, `title`, `subtitle`,
+  `meta`, `image`, `round`, `data`), kept as recent picks. `image: null`
+  draws the theme's motif in the thumbnail; leave `image` out for none.
+- **Filters** are `key:value` tokens for the `facets` the app declares
+  (`{ key, label, values?, hint? }`): finished ones become chips (tap to
+  take off, Backspace in an empty field takes the last), `values` are
+  offered as you type, ranges are the app's to read (`size:2-4`).
+  `parseQuery` / `formatQuery` read and write the same text.
+- **Empty**, it shows recent picks (under the app's storage prefix,
+  `recentKey`; *Clear* empties them), `suggestions` (searches to try) and
+  the facets, then the commands.
+- **Preview**: a provider's `preview(item)` fills a pane beside the results
+  at 768 px and up; phones don't show it, so a result's row says enough on
+  its own.
+- **Keys**: arrows move, Tab / Shift+Tab jump between groups, Enter opens,
+  Escape closes. Every row is 44 px or more, rows with a thumbnail 56 px.
+- **URL**: `useSpotlight()` keeps the query in `?find=` (replacing the
+  entry), so a refresh or a shared link reopens the same search. Spread its
+  `bind` into the palette. Picking closes it, then calls `pick`.
+- **Commands** still work as before (`commands`), listed after the results
+  and hidden while a filter is set.
 
 ### App archetypes — ask before starting an app
 
@@ -1413,3 +1449,8 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
 - **Unreleased** — No zoom in the installed app: pinch-zoom and double-tap
   zoom are off from the Home Screen, like a native app; browser tabs keep
   pinch-zoom. `isInstalledApp()` in `viewport.ts`.
+  App-wide search: `CommandPalette` becomes Spotlight for the app — the
+  app's search providers (debounced, cancellable, grouped, thumbnails, a
+  preview pane on wide screens), `key:value` facet chips with value
+  completion, recent picks and suggestions; `useSpotlight` keeps it in the
+  URL; `SearchTrigger` and `SearchIcon`. Commands work as before.

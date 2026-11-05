@@ -36,7 +36,34 @@ the matching 0.x release.
 
 **Update:** feature
 
+App-wide search: the ⌘K palette becomes Spotlight for the app, and no zoom in the installed app.
+
 ### Added
+
+- **App-wide search (Spotlight)** in `components/ui/overlays.tsx`.
+  `CommandPalette` takes the app's search `providers` (`SearchProvider`:
+  `id`, `label`, `search(query, signal)`, `pick`, optional `preview`,
+  `more`, `limit`, `debounce`): results come live, debounced and cancelled
+  when the query moves on, grouped by provider with a loading row, an
+  error line and an empty state. Rows have an optional 40 px thumbnail (an
+  image, or the theme's motif for `image: null`), title, subtitle and meta.
+  A preview pane shows the highlighted result at 768 px and up. `facets`
+  (`Facet`: `key`, `label`, `values`, `hint`) turn `key:value` tokens into
+  removable chips and offer their values as you type; providers get
+  `{ text, filters }`. While the query is empty it shows recent picks
+  (kept under the app's storage prefix), `suggestions` and the facets.
+  Arrow keys, Tab between groups, Enter, Escape, Backspace to take off a
+  chip; every row 44 px or more.
+- `useSpotlight()`: the palette's open state and query in the URL
+  (`?find=`), with ⌘K / Ctrl+K; spread its `bind` into `CommandPalette`.
+- `SearchTrigger` (a search-field-looking button that opens the palette)
+  and `SearchIcon` (for the top-bar `TopBarButton` on phones).
+- `parseQuery` / `formatQuery`, and the types `SpotlightItem`,
+  `SpotlightQuery`, `SpotlightFilter`, `SearchProvider`, `Facet`,
+  `Suggestion`.
+- Guide section 9, *App-wide search*. The Style guide's CommandPalette
+  block opens it from a `SearchTrigger`; the showcase searches its looks
+  and backdrops (facets `set`, `tone`, `colours`, `group`).
 
 - No zoom in the installed app, like a native app: from the Home Screen,
   pinch-zoom and double-tap zoom are off. `foundation/src/lib/viewport.ts`
@@ -50,6 +77,15 @@ the matching 0.x release.
 
 - Double-tap zoom is off everywhere (`touch-action: manipulation` on `html`),
   so taps are instant.
+- `CommandPalette` with only `commands` works as before; results now show
+  each row's title in the body colour while highlighted, and a footer of
+  key hints on wide screens.
+
+### Available
+
+- `CommandPalette` `providers`, `facets`, `suggestions`, `recentKey`,
+  `query` / `onQueryChange`; `useSpotlight`, `SearchTrigger`, `SearchIcon`,
+  `parseQuery`, `formatQuery` (reference: copy `overlays.tsx` to adopt).
 
 ### Apps must
 

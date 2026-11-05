@@ -1,16 +1,17 @@
-/** The showcase app: the reference AppShell with two tabs (Home holds every component), two top-bar actions, a ⌘K command palette and the jimbo-ui config section under Settings. */
+/** The showcase app: the reference AppShell with two tabs (Home holds every component), two top-bar actions, a ⌘K search palette (looks and backdrops, in the URL as ?find=) and the jimbo-ui config section under Settings. */
 
 import { useState } from "react";
 import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import { AppShell, TopBarButton, type ShellTab } from "@/routes/AppShell";
 import { Sheet } from "@/components/ui/kit";
 import { Button } from "@/components/ui/button";
-import { CommandPalette, useCommandPalette, type Command } from "@/components/ui/overlays";
+import { CommandPalette, SearchIcon, useSpotlight, type Command } from "@/components/ui/overlays";
 import { toast } from "@/components/ui/feedback";
 import { useApplyBrand } from "@/lib/useBrand";
 import { JimboConfigPage } from "@/routes/JimboConfigPage";
 import { HomeDemo } from "./Home";
 import { SettingsPage } from "./pages";
+import { useShowcaseSearch } from "./search";
 
 const TABS: ShellTab[] = [
   { to: "/", label: "Home", icon: <path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z" /> },
@@ -23,7 +24,8 @@ const KIT_SECTIONS = [["brand", "Brand and type"], ["controls", "Controls"], ["f
 export function Shell() {
   useApplyBrand();
   const [sheet, setSheet] = useState<"add" | null>(null);
-  const [palette, setPalette] = useCommandPalette();
+  const spotlight = useSpotlight();
+  const search = useShowcaseSearch();
   const navigate = useNavigate();
   const commands: Command[] = [
     { id: "home", group: "Go to", label: "Home", run: () => navigate("/") },
@@ -36,9 +38,7 @@ export function Shell() {
 
   return (
     <AppShell tabs={TABS} onRefresh={() => new Promise((r) => setTimeout(r, 700))} actions={<>
-      <TopBarButton label="Search" onClick={() => setPalette(true)}>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
-      </TopBarButton>
+      <TopBarButton label="Search" onClick={() => spotlight.setOpen(true)}><SearchIcon /></TopBarButton>
       <TopBarButton label="Add" primary onClick={() => setSheet("add")}>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.75" strokeLinecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
       </TopBarButton>
@@ -52,7 +52,7 @@ export function Shell() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 
-      <CommandPalette open={palette} onClose={() => setPalette(false)} commands={commands} />
+      <CommandPalette {...spotlight.bind} commands={commands} {...search} />
       {sheet === "add" && (
         <Sheet title="Add an entry" subtitle="The + button opens the app's main add flow in a sheet." onClose={() => setSheet(null)}>
           <div className="space-y-3 p-5">

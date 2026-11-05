@@ -1111,16 +1111,38 @@
     {
       "id": "command-palette",
       "name": "CommandPalette",
-      "purpose": "Goes to a page or runs an action by typing (\u2318K).",
+      "purpose": "App-wide search (Spotlight, \u2318K): live results from the app's search providers with thumbnails, a preview pane, facet:value filter chips, recent picks and suggestions; commands go to a page or run an action.",
       "tier": "kit",
       "aliases": [
         "CommandMenu",
         "Spotlight",
         "QuickSwitcher",
-        "Cmd+K"
+        "Cmd+K",
+        "GlobalSearch",
+        "SearchBar",
+        "Omnibox"
+      ],
+      "variants": {
+        "providers": "SearchProvider[] (async, grouped, preview)",
+        "facets": "Facet[] (key:value chips)",
+        "suggestions": "Suggestion[]",
+        "commands": "Command[]",
+        "url": "useSpotlight (?find=)"
+      },
+      "source": "reference/web/src/components/ui/overlays.tsx#CommandPalette"
+    },
+    {
+      "id": "search-trigger",
+      "name": "SearchTrigger",
+      "purpose": "A button that looks like a search field and opens the app-wide search (an explore page's search bar).",
+      "tier": "kit",
+      "aliases": [
+        "SearchButton",
+        "FakeSearchField",
+        "SearchIcon"
       ],
       "variants": {},
-      "source": "reference/web/src/components/ui/overlays.tsx#CommandPalette"
+      "source": "reference/web/src/components/ui/overlays.tsx#SearchTrigger"
     },
     {
       "id": "toast",
