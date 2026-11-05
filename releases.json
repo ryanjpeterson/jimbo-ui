@@ -1,7 +1,78 @@
 {
   "$comment": "Generated from CHANGELOG.md by scripts/releases.mjs — don't edit. Apps' jimbo-ui config section reads it to show what a newer release changes.",
-  "latest": "0.14.3",
+  "latest": "0.14.4",
   "releases": [
+    {
+      "version": "0.14.4",
+      "date": "2026-11-05",
+      "type": "feature",
+      "summary": "App-wide search: the ⌘K palette becomes Spotlight for the app, and no zoom in the installed app.",
+      "items": [
+        {
+          "kind": "added",
+          "text": "**App-wide search (Spotlight)** in `components/ui/overlays.tsx`. `CommandPalette` takes the app's search `providers` (`SearchProvider`: `id`, `label`, `search(query, signal)`, `pick`, optional `preview`, `more`, `limit`, `debounce`): results come live, debounced and cancelled when the query moves on, grouped by provider with a loading row, an error line and an empty state. Rows have an optional 40 px thumbnail (an image, or the theme's motif for `image: null`), title, subtitle and meta. A preview pane shows the highlighted result at 768 px and up. `facets` (`Facet`: `key`, `label`, `values`, `hint`) turn `key:value` tokens into removable chips and offer their values as you type; providers get `{ text, filters }`. While the query is empty it shows recent picks (kept under the app's storage prefix), `suggestions` and the facets. Arrow keys, Tab between groups, Enter, Escape, Backspace to take off a chip; every row 44 px or more.",
+          "affects": [
+            "command-palette",
+            "label"
+          ]
+        },
+        {
+          "kind": "added",
+          "text": "`useSpotlight()`: the palette's open state and query in the URL (`?find=`), with ⌘K / Ctrl+K; spread its `bind` into `CommandPalette`.",
+          "affects": [
+            "command-palette"
+          ]
+        },
+        {
+          "kind": "added",
+          "text": "`SearchTrigger` (a search-field-looking button that opens the palette) and `SearchIcon` (for the top-bar `TopBarButton` on phones).",
+          "affects": [
+            "search-trigger",
+            "top-bar-button"
+          ]
+        },
+        {
+          "kind": "added",
+          "text": "`parseQuery` / `formatQuery`, and the types `SpotlightItem`, `SpotlightQuery`, `SpotlightFilter`, `SearchProvider`, `Facet`, `Suggestion`.",
+          "affects": []
+        },
+        {
+          "kind": "added",
+          "text": "Guide section 9, *App-wide search*. The Style guide's CommandPalette block opens it from a `SearchTrigger`; the showcase searches its looks and backdrops (facets `set`, `tone`, `colours`, `group`).",
+          "affects": [
+            "search-trigger",
+            "tones"
+          ]
+        },
+        {
+          "kind": "added",
+          "text": "No zoom in the installed app, like a native app: from the Home Screen, pinch-zoom and double-tap zoom are off. `foundation/src/lib/viewport.ts` (run by `applyTheme`) adds `maximum-scale=1, user-scalable=no` to the viewport meta, sets `html[data-installed]` (`touch-action: pan-x pan-y` in `globals.css`) and cancels iOS's pinch gesture events. Browser tabs keep pinch-zoom. `isInstalledApp()` says which mode the app is in, and counts jimbo-deploy's iOS shell (`JimboShell` in the user agent) as installed.",
+          "affects": [],
+          "foundation": true
+        },
+        {
+          "kind": "changed",
+          "text": "Double-tap zoom is off everywhere (`touch-action: manipulation` on `html`), so taps are instant.",
+          "affects": []
+        },
+        {
+          "kind": "changed",
+          "text": "`CommandPalette` with only `commands` works as before; results now show each row's title in the body colour while highlighted, and a footer of key hints on wide screens.",
+          "affects": [
+            "command-palette"
+          ]
+        },
+        {
+          "kind": "available",
+          "text": "`CommandPalette` `providers`, `facets`, `suggestions`, `recentKey`, `query` / `onQueryChange`; `useSpotlight`, `SearchTrigger`, `SearchIcon`, `parseQuery`, `formatQuery` (reference: copy `overlays.tsx` to adopt).",
+          "affects": [
+            "command-palette",
+            "search-trigger"
+          ]
+        }
+      ],
+      "appsMust": []
+    },
     {
       "version": "0.14.3",
       "date": "2026-11-04",

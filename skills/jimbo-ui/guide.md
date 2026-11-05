@@ -1446,7 +1446,7 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   breathing, twinkling, flickering, orbiting. Twelve motifs: planets,
   comets, suns, rockets, spirals, bats, pumpkins, ghosts, fangs, coffins,
   spiders, drops.
-- **Unreleased** — No zoom in the installed app: pinch-zoom and double-tap
+- **0.14.4** — No zoom in the installed app: pinch-zoom and double-tap
   zoom are off from the Home Screen, like a native app; browser tabs keep
   pinch-zoom. `isInstalledApp()` in `viewport.ts`.
   App-wide search: `CommandPalette` becomes Spotlight for the app — the

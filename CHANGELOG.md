@@ -34,6 +34,8 @@ the matching 0.x release.
 
 ## Unreleased
 
+## 0.14.4 — 2026-11-05
+
 **Update:** feature
 
 App-wide search: the ⌘K palette becomes Spotlight for the app, and no zoom in the installed app.
