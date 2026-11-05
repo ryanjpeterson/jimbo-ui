@@ -10,9 +10,9 @@
  * domain pieces (statuses, rows, switches) built from the same tokens.
  */
 
-import { Children, useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode, type RefObject } from "react";
+import { Children, createContext, useContext, useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode, type RefObject } from "react";
 import { createPortal } from "react-dom";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/cn";
 import { backdropCss, fullTheme, loadFonts, themeVars, type BackdropPattern, type Theme } from "@/lib/theme";
 import { useBrand } from "@/lib/useBrand";
@@ -67,9 +67,9 @@ export const LIVE = "animate-pulse";
 /** A status as a labelled chip — for detail pages, headers and settings. `dot`: a status dot before the label (`live` pulses it). */
 export function Badge({ tone, children, dot = false, live = false, className }: { tone: Tone; children: ReactNode; dot?: boolean; live?: boolean; className?: string }) {
   return (
-    <span className={cn("inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-11 font-semibold", TONES[tone].chip, className)}>
+    <span className={cn("inline-flex min-w-0 max-w-full items-center gap-1.5 rounded-md border px-2 py-0.5 text-11 font-semibold", TONES[tone].chip, className)}>
       {dot && <span aria-hidden="true" className={cn("h-2 w-2 shrink-0 rounded-full", TONES[tone].dot, live && LIVE)} />}
-      {children}
+      <span className="min-w-0 truncate">{children}</span>
     </span>
   );
 }
@@ -186,7 +186,7 @@ export function HeroSection({ eyebrow, title, children, actions, pattern = "ripp
       )}
       <div className={cn("flex flex-col justify-end gap-3 py-10 sm:py-14", size === "lg" ? "min-h-[62dvh]" : "min-h-[34dvh]", align === "center" && "items-center text-center")}>
         {eyebrow && <p className="eyebrow text-support">{eyebrow}</p>}
-        <h1 className="font-display text-40 leading-[1.02] text-text-base sm:text-6xl">{title}</h1>
+        <h1 className="line-clamp-3 break-words font-display text-40 leading-[1.02] text-text-base sm:text-6xl">{title}</h1>
         {children && <div className={cn("max-w-xl text-17 text-text-muted", align === "center" && "mx-auto")}>{children}</div>}
         {actions && <div className="mt-2 flex flex-wrap gap-2">{actions}</div>}
       </div>
@@ -209,7 +209,7 @@ export function PageHeader({ eyebrow, title, count, actions, className }: {
     <header className={cn("mb-5 sm:mb-6", className)}>
       {eyebrow && <p className="eyebrow mb-1 text-support">{eyebrow}</p>}
       <div className="flex items-end justify-between gap-3">
-        <h1 className="h-page min-w-0">
+        <h1 className="h-page min-w-0 line-clamp-2 break-words">
           {title}
           {count != null && count > 0 && (
             <span className="ml-2 align-middle text-base font-body font-medium text-text-subtle">{count.toLocaleString()}</span>
@@ -376,8 +376,8 @@ export function Hero({ imageUrl, imageAlt, eyebrow, title, children, actions, ba
         </div>
         <div className="min-w-0 flex-1">
           {eyebrow && <p className="eyebrow mb-1.5 text-text-muted">{eyebrow}</p>}
-          <h1 className="font-display text-28 leading-[1.05] text-white break-words sm:text-6xl">{title}</h1>
-          {children && <div className="mt-2 space-y-0.5 text-15 text-text-muted sm:mt-3 sm:text-lg">{children}</div>}
+          <h1 className="line-clamp-3 font-display text-28 leading-[1.05] text-white break-words sm:text-6xl">{title}</h1>
+          {children && <div className="mt-2 line-clamp-3 space-y-0.5 break-words text-15 text-text-muted sm:mt-3 sm:text-lg">{children}</div>}
         </div>
       </div>
       {actions && <div className="flex flex-wrap gap-2 pb-6 sm:pb-8">{actions}</div>}
@@ -404,7 +404,7 @@ export function Section({ title, count, action, children, flush = false, plain =
       {(title || action) && (
         <div className="flex items-end justify-between gap-3 px-0.5">
           {title && (
-            <h2 className="h-section">
+            <h2 className="h-section min-w-0 truncate">
               {title}
               {count != null && <span className="ml-2 text-sm font-body font-medium text-text-subtle">{count.toLocaleString()}</span>}
             </h2>
@@ -550,13 +550,13 @@ export function EventRow({ to, onOpen, date, title, subtitle, meta, imageUrl, st
 export function KeyValue({ label, children, layout = "inline" }: { label: ReactNode; children: ReactNode; layout?: "inline" | "stacked" }) {
   return layout === "inline" ? (
     <div className="flex min-h-[56px] items-center justify-between gap-4 px-4 py-3">
-      <span className="text-15 font-semibold text-text-base">{label}</span>
-      <span className="min-w-0 text-right text-sm text-text-muted">{children}</span>
+      <span className="min-w-0 truncate text-15 font-semibold text-text-base">{label}</span>
+      <span className="min-w-0 max-w-[65%] shrink-0 truncate whitespace-nowrap text-right text-sm text-text-muted">{children}</span>
     </div>
   ) : (
     <div className="px-4 py-3">
-      <p className="text-xs font-semibold text-text-subtle">{label}</p>
-      <div className="mt-0.5 text-15 text-text-base">{children}</div>
+      <p className="truncate text-xs font-semibold text-text-subtle">{label}</p>
+      <div className="mt-0.5 line-clamp-3 break-words text-15 text-text-base">{children}</div>
     </div>
   );
 }
@@ -569,8 +569,8 @@ export function SwitchRow({ label, hint, checked, onChange, disabled }: {
     <button type="button" role="switch" aria-checked={checked} disabled={disabled} onClick={() => onChange(!checked)}
       className="flex min-h-[60px] w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-surface-2/60 disabled:opacity-60">
       <span className="min-w-0 flex-1">
-        <span className="block text-15 font-semibold">{label}</span>
-        {hint && <span className="block text-sm text-text-muted">{hint}</span>}
+        <span className="block truncate text-15 font-semibold">{label}</span>
+        {hint && <span className="line-clamp-2 block text-sm text-text-muted">{hint}</span>}
       </span>
       <span className={cn("relative h-7 w-12 shrink-0 rounded-full border transition-colors", checked ? "lit-accent border-transparent" : "border-border bg-surface-2")}>
         <span className={cn("absolute top-0.5 h-[22px] w-[22px] rounded-full shadow-xs transition-[left]", checked ? "left-[22px] bg-on-accent" : "left-0.5 bg-text-subtle")} />
@@ -668,13 +668,36 @@ export function EntityRow({ to, name, imageUrl, sub, meta, round = false, avatar
         <p className="truncate text-15 font-semibold text-text-base group-hover:text-accent sm:text-base">{name}</p>
         {sub && <p className="mt-0.5 truncate text-sm text-text-muted">{sub}</p>}
       </div>
-      {meta && <span className="shrink-0 text-sm font-medium text-text-subtle">{meta}</span>}
+      {meta && <span className="max-w-[40%] shrink-0 truncate text-sm font-medium text-text-subtle">{meta}</span>}
       <Chevron className="text-text-subtle group-hover:text-accent" />
     </Link>
   );
 }
 
-/** Image-led card for grids. */
+export type MediaSize = "sm" | "md" | "lg";
+const MediaSizeContext = createContext<MediaSize>("md");
+const MEDIA_COLS: Record<MediaSize, string> = {
+  sm: "grid-cols-3 gap-2 sm:grid-cols-4 sm:gap-3 md:grid-cols-5 lg:grid-cols-6",
+  md: "grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4",
+  lg: "grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3",
+};
+
+/**
+ * The grid for `MediaCard`s. `size` sets how big each card is: `sm` (three
+ * across on phones, up to six wide — covers, a big collection to scan),
+ * `md` (two, up to four — the default) or `lg` (one, up to three — a few
+ * things to feature). Cards inside take the size: smaller type and padding
+ * at `sm`. Never a sideways scroll strip.
+ */
+export function MediaGrid({ size = "md", children, className }: { size?: MediaSize; children: ReactNode; className?: string }) {
+  return (
+    <MediaSizeContext.Provider value={size}>
+      <div className={cn("grid", MEDIA_COLS[size], className)}>{children}</div>
+    </MediaSizeContext.Provider>
+  );
+}
+
+/** Image-led card for grids — put it in a `MediaGrid`, which sets its size. */
 export function MediaCard({ to, name, imageUrl, sub, meta, aspect = "video", contain = false, badge }: {
   to: string;
   name: string;
@@ -687,6 +710,7 @@ export function MediaCard({ to, name, imageUrl, sub, meta, aspect = "video", con
   badge?: ReactNode;
 }) {
   const aspectCls = aspect === "square" ? "aspect-square" : aspect === "portrait" ? "aspect-[3/4]" : "aspect-video";
+  const small = useContext(MediaSizeContext) === "sm";
   return (
     <Link to={to} className="group card flex flex-col overflow-hidden transition-colors hover:border-accent/60">
       <div className={cn("relative overflow-hidden bg-surface-2", aspectCls)}>
@@ -701,15 +725,15 @@ export function MediaCard({ to, name, imageUrl, sub, meta, aspect = "video", con
           )
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-linear-to-br from-surface-2 to-surface">
-            <span className="font-display text-3xl text-text-subtle/50">{initials(name)}</span>
+            <span className={cn("font-display text-text-subtle/50", small ? "text-xl" : "text-3xl")}>{initials(name)}</span>
           </div>
         )}
         {badge && <div className="absolute left-2 top-2">{badge}</div>}
       </div>
-      <div className="flex flex-1 flex-col gap-0.5 p-3">
-        <p className="line-clamp-2 text-15 font-semibold leading-snug text-text-base group-hover:text-accent">{name}</p>
-        {sub && <p className="truncate text-sm text-text-muted">{sub}</p>}
-        {meta && <p className="mt-auto truncate pt-1 text-xs font-medium text-text-subtle">{meta}</p>}
+      <div className={cn("flex flex-1 flex-col gap-0.5", small ? "p-2 sm:p-2.5" : "p-3")}>
+        <p className={cn("line-clamp-2 font-semibold leading-snug text-text-base group-hover:text-accent", small ? "text-sm" : "text-15")}>{name}</p>
+        {sub && <p className={cn("truncate text-text-muted", small ? "text-xs" : "text-sm")}>{sub}</p>}
+        {meta && <p className={cn("mt-auto truncate pt-1 font-medium text-text-subtle", small ? "text-11" : "text-xs")}>{meta}</p>}
       </div>
     </Link>
   );
@@ -763,15 +787,15 @@ export function StatTile({ label, value, sub, accent = "muted", trend }: {
   const col = { accent: "text-accent", highlight: "text-highlight", support: "text-support", muted: "text-text-base" }[accent];
   return (
     <div className={cn("card relative overflow-hidden p-4 sm:p-5", accent !== "muted" && GLOW[accent])}>
-      <p className="eyebrow mb-1 flex items-center gap-1.5">
-        {accent !== "muted" && <span aria-hidden="true" className={cn(DOT[accent], "h-2 w-2")} />}
-        {label}
+      <p className="eyebrow mb-1 flex min-w-0 items-center gap-1.5">
+        {accent !== "muted" && <span aria-hidden="true" className={cn(DOT[accent], "h-2 w-2 shrink-0")} />}
+        <span className="min-w-0 truncate">{label}</span>
       </p>
-      <p className={cn("font-display text-32 leading-none sm:text-4xl", col)}>
+      <p className={cn("truncate font-display text-32 leading-tight sm:text-4xl", col)}>
         {typeof value === "number" ? value.toLocaleString() : value}
       </p>
       {trend && trend.length > 1 && <Sparkline values={trend} tone={accent === "muted" ? "accent" : accent} className="mt-3" />}
-      {sub && <p className="mt-1.5 text-sm text-text-subtle">{sub}</p>}
+      {sub && <p className="mt-1.5 line-clamp-2 text-sm text-text-subtle">{sub}</p>}
     </div>
   );
 }
@@ -965,7 +989,9 @@ export type BarItem = { id: string; label: string; value: number; to?: string };
  * a row each, label left, the value at the bar's tip — good for long names
  * and lists that link (`to`). `vertical`: columns over a short run (days,
  * months); tap or hover a column, or tab to it, to read its value above the
- * chart (the largest shows until you do).
+ * chart (the largest shows until you do). Columns with a `to` go there on a
+ * click or Enter; on touch the first tap reads the value and a second tap on
+ * the same column goes, and the readout carries a link either way.
  */
 export function BarChart({ items, direction = "horizontal", tone = "accent", format = compactNumber, height = 160, title }: {
   items: BarItem[];
@@ -979,6 +1005,10 @@ export function BarChart({ items, direction = "horizontal", tone = "accent", for
   const max = Math.max(...items.map((i) => i.value), 0) || 1;
   const biggest = items.reduce((b, it, i) => (it.value > (items[b]?.value ?? -Infinity) ? i : b), 0);
   const [active, setActive] = useState<number | null>(null);
+  const navigate = useNavigate();
+  /** The last pointer that pressed a column, and the column a finger last read. */
+  const pointer = useRef<string>("mouse");
+  const read = useRef<number | null>(null);
   const table = <ChartTable caption={title ?? "Amounts"} columns={["", "Value"]} rows={items.map((i) => [i.label, format(i.value)])} />;
 
   if (direction === "horizontal") {
@@ -1009,16 +1039,28 @@ export function BarChart({ items, direction = "horizontal", tone = "accent", for
   const every = Math.ceil(items.length / 8);
   return (
     <div className="space-y-3">
-      <p className="flex items-baseline gap-2" aria-live="polite">
+      <p className="flex min-h-7 items-baseline gap-2" aria-live="polite">
         <span className="text-lg font-semibold tabular-nums">{items[shown] ? format(items[shown]!.value) : "—"}</span>
-        <span className="text-sm text-text-muted">{items[shown]?.label}{active == null && items.length > 1 ? " · highest" : ""}</span>
+        <span className="min-w-0 truncate text-sm text-text-muted">{items[shown]?.label}{active == null && items.length > 1 ? " · highest" : ""}</span>
+        {items[shown]?.to && (
+          <Link to={items[shown]!.to!} className="-my-2 ml-auto inline-flex min-h-11 items-center gap-1 rounded-lg px-2 text-sm font-semibold text-accent hover:bg-surface-2/70">
+            Open <Chevron className="h-3.5 w-3.5" />
+          </Link>
+        )}
       </p>
       {/* A finger lifting also "leaves", so only a mouse moving away puts the readout back. */}
       <div className="flex border-b border-border" style={{ height }} onPointerLeave={(e) => { if (e.pointerType === "mouse") setActive(null); }} data-no-swipe>
         {items.map((it, i) => (
-          <button key={it.id} type="button" aria-label={`${it.label}: ${format(it.value)}`}
-            onPointerEnter={() => setActive(i)} onPointerDown={() => setActive(i)} onFocus={() => setActive(i)}
-            className="group flex h-full min-w-0 flex-1 items-end justify-center px-[1px] outline-hidden">
+          <button key={it.id} type="button" aria-label={`${it.label}: ${format(it.value)}${it.to ? ", open" : ""}`}
+            onPointerEnter={() => setActive(i)} onPointerDown={(e) => { pointer.current = e.pointerType; setActive(i); }} onFocus={() => setActive(i)}
+            onClick={() => {
+              const finger = pointer.current !== "mouse";
+              pointer.current = "mouse"; // Enter / Space on a focused column count as a click
+              if (!it.to) return;
+              if (finger && read.current !== i) { read.current = i; return; }
+              navigate(it.to);
+            }}
+            className={cn("group flex h-full min-w-0 flex-1 items-end justify-center px-[1px] outline-hidden", it.to && "cursor-pointer")}>
             <span className={cn("block w-full max-w-6 rounded-t-[4px] transition-opacity", KEY[tone],
               shown === i ? "opacity-100" : "opacity-70 group-hover:opacity-100", "group-focus-visible:ring-2 group-focus-visible:ring-text-base")}
               style={{ height: `${Math.max((it.value / max) * 100, it.value > 0 ? 2 : 0)}%` }} />
@@ -1115,7 +1157,7 @@ export function RangeField({ label, value, onChange, min, max, step, format = St
   return (
     <label className={cn("block", className)}>
       <span className="flex items-baseline justify-between gap-3">
-        <span className="text-sm font-semibold text-text-muted">{label}</span>
+        <span className="min-w-0 truncate text-sm font-semibold text-text-muted">{label}</span>
         <span className="font-mono text-xs text-text-subtle">{format(value)}</span>
       </span>
       <input type="range" min={min} max={max} step={step} value={value} onChange={(e) => onChange(Number(e.target.value))}
@@ -1326,10 +1368,10 @@ export function LinkChips({ items, className }: { items: LinkChip[]; className?:
     <div className={cn("flex flex-wrap gap-2", className)}>
       {items.map((c, i) => (
         <Link key={`${c.to}-${i}`} to={c.to}
-          className="chip inline-flex min-h-11 items-center gap-2 px-3 text-text-base transition-colors hover:border-accent hover:text-accent active:scale-95">
+          className="chip inline-flex min-h-11 min-w-0 max-w-full items-center gap-2 px-3 text-text-base transition-colors hover:border-accent hover:text-accent active:scale-95">
           {c.tone && <span aria-hidden="true" className={cn(CHIP_DOTS[c.tone], "h-2 w-2 shrink-0")} />}
-          <span className="font-semibold">{c.label}</span>
-          {c.sub && <span className="text-sm text-text-subtle">{c.sub}</span>}
+          <span className="min-w-0 truncate font-semibold">{c.label}</span>
+          {c.sub && <span className="shrink-0 text-sm text-text-subtle">{c.sub}</span>}
         </Link>
       ))}
     </div>
@@ -1390,8 +1432,8 @@ export function Sheet({ title, subtitle, onClose, children, wide = false }: {
         <div className="mx-auto mt-2.5 h-1.5 w-10 shrink-0 rounded-full bg-border sm:hidden" aria-hidden="true" />
         <header className="flex shrink-0 items-start justify-between gap-3 border-b border-border px-5 pb-4 pt-3 sm:pt-5">
           <div className="min-w-0">
-            <h2 className="h-section">{title}</h2>
-            {subtitle && <p className="meta mt-1">{subtitle}</p>}
+            <h2 className="h-section line-clamp-2 break-words">{title}</h2>
+            {subtitle && <p className="meta mt-1 line-clamp-2">{subtitle}</p>}
           </div>
           <button onClick={onClose} aria-label="Close"
             className="-mr-2 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-text-muted transition-colors hover:bg-surface-2 hover:text-text-base">

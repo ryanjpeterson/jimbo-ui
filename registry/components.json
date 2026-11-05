@@ -470,6 +470,20 @@
       "source": "reference/web/src/components/ui/kit.tsx#MediaCard"
     },
     {
+      "id": "media-grid",
+      "name": "MediaGrid",
+      "purpose": "Lays out MediaCards in a grid at a chosen card size.",
+      "tier": "kit",
+      "aliases": [
+        "CoverGrid",
+        "PosterGrid"
+      ],
+      "variants": {
+        "size": "sm | md | lg"
+      },
+      "source": "reference/web/src/components/ui/kit.tsx#MediaGrid"
+    },
+    {
       "id": "link-card",
       "name": "LinkCard",
       "purpose": "Navigates somewhere, as a card.",
@@ -829,7 +843,8 @@
       "variants": {
         "direction": "horizontal | vertical",
         "tone": "accent | support | highlight",
-        "split": "proposed: two-part bars"
+        "split": "proposed: two-part bars",
+        "to": "items link (horizontal rows, vertical columns)"
       },
       "source": "reference/web/src/components/ui/kit.tsx#BarChart"
     },

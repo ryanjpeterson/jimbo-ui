@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { HeaderTitle } from "@/components/HeaderTitle";
 import { ColorPicker } from "@/components/ColorPicker";
 import {
-  Autocomplete, Chevron, FloatingBar, LinkChips, ToggleGrid, Badge, BarChart, DateBlock, KeyValue, LayoutSwitch, SwitchRow, EmptyState, EntityRow, EventRow, LinkCard, List, ListGroupLabel, Loading, MediaCard, PageHeader, Pager,
+  Autocomplete, Chevron, FloatingBar, LinkChips, ToggleGrid, Badge, BarChart, DateBlock, KeyValue, LayoutSwitch, SwitchRow, EmptyState, EntityRow, EventRow, LinkCard, List, ListGroupLabel, Loading, MediaCard, MediaGrid, PageHeader, Pager,
   PillTabs, RankedList, SearchField, Section, SelectField, Sheet, Sparkline, StatGrid, StatTile, Tabs, ThemeDots, TrendChart, useListLayout, ViewSwitch, type Tone,
 } from "@/components/ui/kit";
 import { DateField, FileDrop, TextArea, TextField } from "@/components/ui/forms";
@@ -289,7 +289,7 @@ export function StyleGuidePanel({ more = [] }: { more?: { value: string; label: 
           </Section>
           <Section title="BarChart · vertical">
             <BarChart direction="vertical" tone="support" height={120}
-              items={["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"].map((m, i) => ({ id: String(i), label: m, value: [3, 5, 2, 6, 8, 4, 9, 7, 5, 6, 3, 4][i]! }))} />
+              items={["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"].map((m, i) => ({ id: String(i), label: m, value: [3, 5, 2, 6, 8, 4, 9, 7, 5, 6, 3, 4][i]!, to: `/jimbo-ui?tab=style&month=${i + 1}` }))} />
           </Section>
         </div>
         <div className="card flex items-center gap-4 p-4">
@@ -314,10 +314,15 @@ export function StyleGuidePanel({ more = [] }: { more?: { value: string; label: 
           <EntityRow to="/jimbo-ui?tab=style" name="EntityRow — a person or place" sub="4 items" round />
           <EntityRow to="/jimbo-ui?tab=style" name="EntityRow with avatarText" sub="The avatar shows a code or number instead of initials" avatarText="12" />
         </List>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        <MediaGrid>
           <MediaCard to="/jimbo-ui?tab=style" name="MediaCard" sub="Image card" meta="3 items" />
           <MediaCard to="/jimbo-ui?tab=style" name="Portrait" sub="For posters" aspect="portrait" />
-        </div>
+        </MediaGrid>
+        <MediaGrid size="sm">
+          {["Small", "MediaGrid", "size sm", "Covers", "To scan"].map((n) => (
+            <MediaCard key={n} to="/jimbo-ui?tab=style" name={n} sub="Three across on phones" meta="12 items" aspect="square" />
+          ))}
+        </MediaGrid>
         <LinkCard to="/jimbo-ui?tab=style" eyebrow="LinkCard" title="A card that goes somewhere" sub="Eyebrow, title, sub line" accent />
         <Section title="Section" count={3}>
           <p className="p-4 text-sm text-text-muted">A titled card for a block of related content.</p>

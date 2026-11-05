@@ -5,7 +5,7 @@ description: Ryan's shared brand and UI system, jimbo.ui (repo and plugin jimbo-
 
 # jimbo.ui
 
-**This is jimbo.ui 0.14.4.** (Kept in step with the plugin version and the
+**This is jimbo.ui 0.14.5.** (Kept in step with the plugin version and the
 newest numbered `CHANGELOG.md` entry; `scripts/versions.mjs` checks.)
 jimbo.ui is a work in progress, so it's on 0.x. **The number says what an
 update takes** (Semantic Versioning, read for 0.x — guide section 1,
@@ -100,6 +100,13 @@ this check, then the preview workflow if they want detail.
 - Phone first at 375 px; floating frosted tab dock (≤ 5 tabs); things pinned
   to the bottom sit above it; touch targets ≥ 44 px; no horizontal scroll
   strips; nothing hover-only.
+- **Text never overflows.** Every piece of text whose length you don't
+  control (names, titles, values, labels, chips, badges) is trimmed with an
+  ellipsis: one line (`truncate`, with `min-w-0` on its flex parent) for
+  rows, labels, values and chips; two or three (`line-clamp-2`/`-3` with
+  `break-words`) for titles, hints and descriptions. A value never wraps
+  mid-value ("125.2 / BPM"): give it `whitespace-nowrap` and its column room.
+  The kit's components already do this; app code does the same.
 - One modal style (`Sheet`); one primary button per view; sentence case;
   plain, short, slightly wry copy.
 - Use the kit (`.card`, `.btn`, `.field`, `.chip`, `.eyebrow`, `.meta`,

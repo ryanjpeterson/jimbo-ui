@@ -874,6 +874,16 @@ and body fonts.
   `gap-3` in grids, `p-4 sm:p-5` inside cards; grids are 2 columns on phones,
   3 from `sm:`.
 - **No horizontal scroll strips.** Wrap, use a select on phones, or a sheet.
+- **Text never overflows; it's trimmed.** Any text whose length you don't
+  control is cut with an ellipsis rather than pushing a layout wide or
+  running to many lines. One line (`truncate`, and `min-w-0` on the flex
+  child holding it) for row names and sub lines, labels, values, chips,
+  badges, section titles and stat tiles; a clamp (`line-clamp-2` or `-3`,
+  with `break-words` so one long word can't escape) for page, hero and sheet
+  titles, hints, descriptions and stacked values. Numbers with a unit never
+  wrap between them (`whitespace-nowrap`); give the column enough width
+  instead (`minmax(17rem,1fr)`). Meta at a row's end gets a cap
+  (`max-w-[40%]`) so it can't squeeze the name away.
 - **Touch targets ≥ 44 px** (`h-11`/`h-12` on phones), rows ≥ 76 px (`py-3.5`), each divided from the next by an etched line.
 
 ### Layers (z-index)
@@ -937,12 +947,12 @@ and body fonts.
 | `EventRow` | A dated item. `DateBlock` on the left, a `status` dot (`{ tone, label, live? }` — `live` pulses); `to` to go somewhere or `onOpen` to open something in place (a log in a `Sheet`); `selected`/`onSelect` for select mode |
 | `EntityRow` | A named thing with an avatar (a person, a place); `avatarText` puts a short code or number in the placeholder avatar instead of initials |
 | `DateBlock` | A tear-off calendar ticket (52 px wide, 12 px radius, `surface-2`): the month on a solid highlight band, the day big below, then the year or weekday |
-| `MediaCard` | Image-led grid card (`aspect="portrait"` for posters) |
+| `MediaCard` + `MediaGrid` | Image-led grid card (`aspect="portrait"` for posters), always in a `MediaGrid`, whose `size` sets the card size: `sm` (three across on phones, up to six wide, smaller type: covers, a big collection to scan), `md` (two, up to four; the default) or `lg` (one, up to three: a few things to feature) |
 | `LinkCard` | A card that navigates (eyebrow / title / sub); `accent` for the one to notice |
 | `StatTile` / `StatGrid` | Headline numbers (`accent="accent"` / `"highlight"` / `"support"`: the number in that colour, an 8 px dot by the label and a soft pool of it in the corner); `trend` adds a `Sparkline` of recent values under the number |
 | `Sparkline` | A small trend with no axes: a 2 px line in the subtle text colour, the latest point as a dot in the tone |
 | `TrendChart` | Change over time: one to three lines over the same labels, one y-axis. One series gets a 10% wash; tap, drag, hover or arrow-key to move the crosshair, and the readout above shows the values there (latest by default) and names each series |
-| `BarChart` | Comparing a few amounts in one tone: `horizontal` rows (label, bar, value at the tip; `to` links each) or `vertical` columns over a short run (tap a column to read it; the largest shows until you do) |
+| `BarChart` | Comparing a few amounts in one tone: `horizontal` rows (label, bar, value at the tip; `to` links each) or `vertical` columns over a short run (tap a column to read it; the largest shows until you do). Vertical columns with a `to` go there on a click or Enter; on touch the first tap reads and a second tap goes, and the readout gets an *Open* link |
 | `ThemeDots` | The motif: the theme's three colours as flat 8 px shapes side by side (4 px apart) — circles, or the theme's `motif` shape. In empty states and brand moments — never above a page title |
 | `RankedList` | Top-N lists with counts |
 | `SearchField`, `SelectField` | Search and single-choice filters (select on phones) |
@@ -1009,7 +1019,7 @@ one here fits.
 | For… | Options |
 | --- | --- |
 | **Opening a page** | `PageHeader` (title row) · `HeroSection` (full-width, pattern, no photo) · `Banner` / `Hero` (over a blurred photo) |
-| **A list of things** | `List` + `EventRow` (dated, with date tickets) · `List` + `EntityRow` (people, places, with avatars) · `RankedList` (top-N with counts) · `MediaCard` grid (image-led) · `LinkCard` stack (a few destinations) |
+| **A list of things** | `List` + `EventRow` (dated, with date tickets) · `List` + `EntityRow` (people, places, with avatars) · `RankedList` (top-N with counts) · `MediaGrid` of `MediaCard`s (image-led, three sizes) · `LinkCard` stack (a few destinations) |
 | **Numbers** | `StatGrid` + `StatTile` (headline numbers, coloured dots) · `RankedList` (counts in a list) · `Section` with big `font-display` numbers |
 | **A block of content** | `Section` (titled card) · plain `.card` · `FullBleed` band (`surface`, or a brand colour) · `Sheet` (when it's a choice or a short flow) |
 | **Calls to action** | primary `Button` · `LinkCard` with `accent` · `FullBleed` band in a brand colour · `HeroSection` actions |
@@ -1454,3 +1464,8 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   preview pane on wide screens), `key:value` facet chips with value
   completion, recent picks and suggestions; `useSpotlight` keeps it in the
   URL; `SearchTrigger` and `SearchIcon`. Commands work as before.
+- **0.14.5 (2026-11-05)** — `MediaGrid`: the grid for `MediaCard`s, in three sizes
+  (`sm`, `md`, `lg`); cards take smaller type at `sm`. Vertical `BarChart`
+  columns link (`to`), with an *Open* link in the readout. New rule: text
+  never overflows — the kit trims every text slot (one line or a 2–3 line
+  clamp), and apps do the same.

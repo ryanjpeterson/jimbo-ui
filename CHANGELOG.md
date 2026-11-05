@@ -34,6 +34,44 @@ the matching 0.x release.
 
 ## Unreleased
 
+## 0.14.5 — 2026-11-05
+
+**Update:** feature
+
+Card grids in three sizes, bar-chart columns that link, and text that never overflows.
+
+### Added
+
+- `MediaGrid` in the kit: the grid for `MediaCard`s, with `size` —
+  `sm` (three across on phones, four, five, then six wide; cards take
+  smaller type and padding), `md` (two, three, four; the default, as the
+  hand-written grids were) or `lg` (one, two, three). Cards read the size
+  from the grid, so `MediaCard` has no new prop.
+- Vertical `BarChart` columns with a `to` link: a click or Enter goes
+  there; on touch the first tap reads the value and a second tap on the
+  same column goes; the readout above gets an *Open* link either way.
+  Horizontal rows already linked.
+- The Style guide shows a small `MediaGrid` and linked vertical bars.
+
+### Changed
+
+- **New rule: text never overflows, it's trimmed** (guide section 6,
+  SKILL core rules). Every kit text slot now cuts with an ellipsis:
+  `KeyValue` label and value on one line (a value never wraps mid-value,
+  and takes up to 65% of the row); stacked values clamp at three lines;
+  `Section` titles, `StatTile` labels and values, `SwitchRow` labels,
+  `Badge`, `LinkChips` labels, `RangeField` labels, `BarChart`'s readout
+  and `EntityRow` meta (capped at 40%) truncate; `PageHeader` and `Sheet`
+  titles clamp at two lines, `HeroSection` and `Hero` titles and hero text
+  at three, `StatTile` sub lines and `SwitchRow` hints at two. `StatTile`
+  values use `leading-tight` so a truncated number keeps its descenders.
+
+**Available:** `MediaGrid`, `MediaSize`.
+
+**Apps must:** Nothing — copy the foundation files. Port the kit when you
+want the new pieces and the trimming, and trim text the same way in the
+app's own components.
+
 ## 0.14.4 — 2026-11-05
 
 **Update:** feature
