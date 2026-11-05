@@ -1481,6 +1481,60 @@ export function Loading({ label = "Loading…" }: { label?: string }) {
   );
 }
 
+/**
+ * The last value whose data arrived. Pass the view (a URL's search string, a
+ * sort) and whether its data is in; while a change is loading this still
+ * returns the old view, so Cancel can go back to it.
+ */
+export function useSettled<T>(value: T, settled: boolean): T {
+  const last = useRef(value);
+  if (settled) last.current = value;
+  return last.current;
+}
+
+/**
+ * Content being replaced because a control changed (a sort, a filter, a
+ * page): the old result stays, dimmed, under a glass bar saying what's
+ * happening. The bar shows after 150 ms, so fast answers don't flicker, and
+ * offers Cancel after a second. Cancel should abort the request and put the
+ * control back (`useSettled`). Never leave a control looking like it did
+ * nothing.
+ */
+export function Pending({ pending, label = "Loading…", onCancel, children, className }: {
+  pending: boolean;
+  label?: string;
+  onCancel?: () => void;
+  children: ReactNode;
+  className?: string;
+}) {
+  const [stage, setStage] = useState<0 | 1 | 2>(0);
+  useEffect(() => {
+    if (!pending) { setStage(0); return; }
+    const a = setTimeout(() => setStage(1), 150);
+    const b = setTimeout(() => setStage(2), 1000);
+    return () => { clearTimeout(a); clearTimeout(b); };
+  }, [pending]);
+  const shown = pending && stage > 0;
+  return (
+    <div aria-busy={pending} className={cn("relative", className)}>
+      {shown && (
+        <div className="pointer-events-none sticky top-3 z-10 -mb-14 flex h-14 justify-center">
+          <div role="status" className="glass pointer-events-auto flex h-11 items-center gap-3 rounded-control pl-4 pr-1.5 text-sm font-semibold shadow-lg">
+            <span className="flex gap-1" aria-hidden="true">
+              {[0, 1, 2].map((i) => <span key={i} className="h-2 w-2 animate-pulse rounded-full bg-accent" style={{ animationDelay: `${i * 150}ms` }} />)}
+            </span>
+            <span>{label}</span>
+            {onCancel && stage === 2
+              ? <button type="button" onClick={onCancel} className="h-8 rounded-lg px-3 text-text-muted hover:bg-surface-2 hover:text-text-base">Cancel</button>
+              : <span className="w-1.5" />}
+          </div>
+        </div>
+      )}
+      <div className={cn("transition-opacity duration-150", shown && "pointer-events-none opacity-40")}>{children}</div>
+    </div>
+  );
+}
+
 export function EmptyState({ title, body, action, tone = "muted" }: {
   title: string;
   body?: ReactNode;

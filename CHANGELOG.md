@@ -34,6 +34,29 @@ the matching 0.x release.
 
 ## Unreleased
 
+**Update:** feature
+
+Changes that load look like they're loading, and can be cancelled.
+
+### Added
+
+- `Pending` in the kit: wraps a result that's being replaced after a
+  control changed. The old result stays, dimmed, under a glass bar
+  ("Sorting…") after 150 ms, with Cancel after a second. `useSettled`
+  remembers the last view whose data arrived, so Cancel can abort the
+  request and put the control back. Guide section 7 makes it the rule:
+  nothing looks like it did nothing.
+
+### Fixed
+
+- `setUrlParams` (`lib/useUrlState.ts`) started from React Router 6's
+  updater argument, which holds the params from the last render, so two sets
+  in one handler (a sort, then its page back to 1) dropped the first. It
+  now starts from the live URL.
+
+**Apps must:** Nothing — copy `lib/useUrlState.ts` again. `Pending` is
+available to adopt.
+
 ## 0.14.5 — 2026-11-05
 
 **Update:** feature

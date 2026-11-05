@@ -29,8 +29,10 @@ export function useUrlNumber(key: string, fallback: number): [number, (v: number
 
 /** Set several parameters at once (null removes one) — for a change that resets another, like a category and its sub-tab. */
 export function setUrlParams(setParams: ReturnType<typeof useSearchParams>[1], patch: Record<string, string | null>) {
-  setParams((p) => {
-    const next = new URLSearchParams(p);
+  // Start from the live URL, not the updater's argument: React Router 6 hands that the params from the
+  // last render, so two sets in one handler (a sort, then its page back to 1) would drop the first.
+  setParams(() => {
+    const next = new URLSearchParams(window.location.search);
     for (const [k, v] of Object.entries(patch)) if (v === null || v === "") next.delete(k); else next.set(k, v);
     return next;
   }, { replace: true });

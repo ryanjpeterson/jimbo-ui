@@ -645,6 +645,19 @@
       "source": "reference/web/src/components/ui/kit.tsx#Loading"
     },
     {
+      "id": "pending",
+      "name": "Pending",
+      "purpose": "Dims a result being replaced after a control changed, says what's happening, and offers Cancel that reverts the control.",
+      "tier": "kit",
+      "aliases": [
+        "LoadingOverlay",
+        "Refetching",
+        "useSettled"
+      ],
+      "variants": {},
+      "source": "reference/web/src/components/ui/kit.tsx#Pending"
+    },
+    {
       "id": "empty-state",
       "name": "EmptyState",
       "purpose": "Says what's missing and offers the next step.",

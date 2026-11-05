@@ -928,6 +928,13 @@ and body fonts.
 - Colour changes: `transition-colors` (≈150 ms); dock tabs 200 ms.
 - Loading: skeletons pulse; spinners only inside small round buttons
   (pull to refresh, uploads).
+- **Nothing looks like it did nothing.** A control that changes what's on
+  screen (a sort, a filter, a page) wraps the result in `Pending`: the old
+  result stays, dimmed, under "Sorting…" within 150 ms, and Cancel after a
+  second aborts the request (pass the query's `signal` to `fetch`) and puts
+  the control back (`useSettled`). Long jobs show a live dot, the stage
+  they're on, a moving `ProgressBar` and a clock that ticks — never a
+  static "working…" line.
 - No page transitions, no parallax, no bouncing.
 
 ---
@@ -964,6 +971,7 @@ and body fonts.
 | `Badge` / `Tone` / `TONES` | A status as a chip, in one of the fixed tones; `dot` puts a status dot before the label (`live` pulses it) |
 | `EmptyState` | No data — `ThemeDots` above, say what's missing and offer the next step |
 | `Loading` | Skeleton shaped like a page (never a bare spinner) |
+| `Pending` / `useSettled` | A result being replaced after a control changed: dims it, says what's happening, offers Cancel that reverts the control |
 | `ViewSwitch` | Two or three views of one page as links (List ⇄ Map) |
 | `HeaderTitle` (`components/HeaderTitle.tsx`) | The app's name as header text — the brand; `sm`/`md`/`lg` (22/30/44 px) |
 | `ColorPicker` (`components/ColorPicker.tsx`) | Inline colour picker: saturation/brightness field, hue slider (28–36 px thumbs, drag anywhere), one row of 8 quick swatches, hex box with a preview chip. Never the native `<input type=color>` — it opens a different dialog on every platform |
