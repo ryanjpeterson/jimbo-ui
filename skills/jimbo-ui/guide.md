@@ -841,7 +841,14 @@ and body fonts.
   detail that Back should close, like a run's log, too). So a refresh, Back
   and a shared link all land on the same view. Parameters replace the
   history entry (tapping tabs doesn't fill Back) and drop out at their
-  default. Only passing state stays in React: a selection in progress, a
+  default.
+- **An item's page is a path.** A detail page lives at the singular kind
+  and the item's name or id — `/service/plex`, `/project/jimbos-servarr`,
+  `/entry/42` — under the plural list it comes from (`/services`). Never
+  `?id=` for a page of its own, and never the list's path with the item
+  after it (`/services/plex`). Old paths redirect to the new ones. A sheet
+  over the list (the item open without leaving it) stays a search
+  parameter. Only passing state stays in React: a selection in progress, a
   half-typed form, hover. Preferences that belong to the person, not the
   view (list or grid layout), stay in local storage.
 - **Top bar:** sticky, 56 px (64 px on desktop) plus `--safe-top` (0 under
@@ -857,6 +864,18 @@ and body fonts.
 - **Content:** the page width, `px-4` (`sm:px-6`), `pt-6`; bottom padding of
   `--dock-space` (6.5 rem + the bottom safe area on phones) so nothing hides
   under the dock.
+- **Pages fill the screen.** `AppShell`'s main is a column at least the
+  screen's height, and every page is a `Page` (the sections, `gap-6` apart,
+  taking all of it). A page low on content doesn't stop halfway with the
+  backdrop under it: its last `Section fill` (or `EmptyState fill`)
+  stretches down to the dock. Use it on the one block that's meant to grow
+  (a console, a list, an empty state), not on every section.
+- **Cards side by side are one size.** In a grid, every row is as tall as
+  the tallest card and every card fills its cell (`auto-rows-fr`, `h-full`:
+  `MediaGrid`, `List layout="tiles"` and `StatGrid` do it). A card low on
+  content keeps its neighbours' size, with its actions pinned to the bottom
+  (`mt-auto`); text that would make it taller is trimmed to a fixed number
+  of lines instead.
 - **Tab dock (phones):** floats 12 px above the bottom safe area, `max-w-md`,
   a 5-column grid in a 20 px-radius slab: `bg-surface/95`, `border-border`,
   `ring-1 ring-black/30`, `backdrop-blur-md`, deep
@@ -969,7 +988,8 @@ and body fonts.
 | `Sheet` | **The** modal: bottom sheet on phones, dialog on desktop |
 | `ImageViewer` | Full-screen image (tap or Escape to close) |
 | `Badge` / `Tone` / `TONES` | A status as a chip, in one of the fixed tones; `dot` puts a status dot before the label (`live` pulses it) |
-| `EmptyState` | No data — `ThemeDots` above, say what's missing and offer the next step |
+| `EmptyState` | No data — `ThemeDots` above, say what's missing and offer the next step; `fill` takes the rest of the page |
+| `Page` | Every page's frame: its sections `gap-6` apart, filling the screen's height so a short page's `Section fill` reaches the dock |
 | `Loading` | Skeleton shaped like a page (never a bare spinner) |
 | `Pending` / `useSettled` | A result being replaced after a control changed: dims it, says what's happening, offers Cancel that reverts the control |
 | `ViewSwitch` | Two or three views of one page as links (List ⇄ Map) |

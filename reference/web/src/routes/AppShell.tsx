@@ -42,7 +42,8 @@ export function AppShell({ tabs, actions, onRefresh, width = "column", children 
     [t.to, ...(t.also ?? [])].some((p) => (p === "/" ? location.pathname === "/" : location.pathname.startsWith(p)));
 
   return (
-    <div className="min-h-[100dvh] overflow-x-clip">
+    // A column at least the screen's height, so main (and a Page in it) can fill what's left
+    <div className="flex min-h-[100dvh] flex-col overflow-x-clip">
       {/* Top padding is --safe-top: 0 under the installed app's solid status bar, the notch
           wherever the page is drawn under it, so nothing sits under the status bar. */}
       <header className="sticky top-0 z-40 border-b border-border bg-bg/90 pt-[var(--safe-top)] backdrop-blur-md">
@@ -80,7 +81,7 @@ export function AppShell({ tabs, actions, onRefresh, width = "column", children 
         </div>
       )}
 
-      <main className={cn("mx-auto px-4 pt-6 pb-[var(--dock-space)] sm:px-6 sm:pt-8", WIDTHS[width])}>{children}</main>
+      <main className={cn("mx-auto flex w-full flex-1 flex-col px-4 pt-6 pb-[var(--dock-space)] sm:px-6 sm:pt-8", WIDTHS[width])}>{children}</main>
 
       {/* Phones: a floating, frosted dock above the home indicator; content fades out behind it. */}
       <div aria-hidden className="pointer-events-none fixed inset-x-0 bottom-0 z-30 h-[calc(6rem+var(--safe-bottom))] bg-linear-to-t from-bg via-bg/70 to-transparent sm:hidden" />

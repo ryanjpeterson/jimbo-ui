@@ -390,17 +390,19 @@ export function Hero({ imageUrl, imageAlt, eyebrow, title, children, actions, ba
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** Titled block. `flush` drops the inner padding for edge-to-edge lists; `plain` drops the card (for a grid of tiles under a title). */
-export function Section({ title, count, action, children, flush = false, plain = false, className }: {
+export function Section({ title, count, action, children, flush = false, plain = false, fill = false, className }: {
   title?: ReactNode;
   count?: number;
   action?: ReactNode;
   children: ReactNode;
   flush?: boolean;
   plain?: boolean;
+  /** Take the rest of the page's height (inside a `Page`), so a short last section reaches the dock instead of stopping halfway. */
+  fill?: boolean;
   className?: string;
 }) {
   return (
-    <section className={cn("space-y-3", className)}>
+    <section className={cn(fill ? "flex flex-1 flex-col gap-3" : "space-y-3", className)}>
       {(title || action) && (
         <div className="flex items-end justify-between gap-3 px-0.5">
           {title && (
@@ -412,7 +414,7 @@ export function Section({ title, count, action, children, flush = false, plain =
           {action}
         </div>
       )}
-      {plain ? children : <div className={cn("card", flush ? "overflow-hidden" : "p-4 sm:p-5")}>{children}</div>}
+      {plain ? children : <div className={cn("card", flush ? "overflow-hidden" : "p-4 sm:p-5", fill && "flex-1")}>{children}</div>}
     </section>
   );
 }
@@ -428,8 +430,8 @@ export type ListLayout = "rows" | "tiles";
 export function List({ children, layout = "rows", bare = false, className }: { children: ReactNode; layout?: ListLayout; bare?: boolean; className?: string }) {
   if (layout === "tiles") {
     return (
-      <div className={cn("grid gap-3 sm:grid-cols-2 lg:grid-cols-3", className)}>
-        {Children.toArray(children).map((child, i) => <div key={i} className="card overflow-hidden">{child}</div>)}
+      <div className={cn("grid auto-rows-fr gap-3 sm:grid-cols-2 lg:grid-cols-3", className)}>
+        {Children.toArray(children).map((child, i) => <div key={i} className="card h-full overflow-hidden">{child}</div>)}
       </div>
     );
   }
@@ -692,7 +694,8 @@ const MEDIA_COLS: Record<MediaSize, string> = {
 export function MediaGrid({ size = "md", children, className }: { size?: MediaSize; children: ReactNode; className?: string }) {
   return (
     <MediaSizeContext.Provider value={size}>
-      <div className={cn("grid", MEDIA_COLS[size], className)}>{children}</div>
+      {/* Every row as tall as the tallest and every card filling its cell: one size of card. */}
+      <div className={cn("grid auto-rows-fr [&>*]:h-full", MEDIA_COLS[size], className)}>{children}</div>
     </MediaSizeContext.Provider>
   );
 }
@@ -801,7 +804,17 @@ export function StatTile({ label, value, sub, accent = "muted", trend }: {
 }
 
 export function StatGrid({ children }: { children: ReactNode }) {
-  return <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">{children}</div>;
+  return <div className="grid auto-rows-fr grid-cols-2 gap-3 sm:grid-cols-4">{children}</div>;
+}
+
+/**
+ * A page's frame: its sections a gap apart, at least as tall as the screen
+ * between the top bar and the dock. A page low on content still fills it —
+ * its last `Section fill` or `EmptyState fill` stretches down — rather than
+ * stopping short with the backdrop showing under it.
+ */
+export function Page({ children, className }: { children: ReactNode; className?: string }) {
+  return <div className={cn("flex flex-1 flex-col gap-6", className)}>{children}</div>;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1535,14 +1548,16 @@ export function Pending({ pending, label = "Loading…", onCancel, children, cla
   );
 }
 
-export function EmptyState({ title, body, action, tone = "muted" }: {
+export function EmptyState({ title, body, action, tone = "muted", fill = false }: {
   title: string;
   body?: ReactNode;
   action?: ReactNode;
   tone?: "muted" | "error";
+  /** Take the rest of the page's height (inside a `Page`), centred. */
+  fill?: boolean;
 }) {
   return (
-    <div className="card px-6 py-14 text-center">
+    <div className={cn("card px-6 py-14 text-center", fill && "flex flex-1 flex-col items-center justify-center")}>
       <ThemeDots size={12} className="mb-4" />
       <p className={cn("text-lg font-semibold", tone === "error" ? "text-highlight" : "text-text-base")}>{title}</p>
       {body && <p className="mx-auto mt-1 max-w-sm text-sm text-text-muted">{body}</p>}

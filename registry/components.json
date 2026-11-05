@@ -303,6 +303,20 @@
       "source": "reference/web/src/components/ui/kit.tsx#HeroSection"
     },
     {
+      "id": "page",
+      "name": "Page",
+      "purpose": "Frames one page's sections and fills the screen's height.",
+      "tier": "kit",
+      "aliases": [
+        "PageFrame",
+        "PageBody",
+        "Screen",
+        "space-y-6 page wrapper"
+      ],
+      "variants": {},
+      "source": "reference/web/src/components/ui/kit.tsx#Page"
+    },
+    {
       "id": "page-header",
       "name": "PageHeader",
       "purpose": "Titles an index page.",
@@ -377,7 +391,8 @@
       "variants": {
         "flush": "boolean",
         "count": "number",
-        "plain": "no card (tiles under a title)"
+        "plain": "no card (tiles under a title)",
+        "fill": "takes the rest of the page's height"
       },
       "source": "reference/web/src/components/ui/kit.tsx#Section"
     },
@@ -666,7 +681,9 @@
         "NoData",
         "Placeholder"
       ],
-      "variants": {},
+      "variants": {
+        "fill": "takes the rest of the page's height, centred"
+      },
       "source": "reference/web/src/components/ui/kit.tsx#EmptyState"
     },
     {

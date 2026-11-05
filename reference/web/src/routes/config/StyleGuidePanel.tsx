@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { HeaderTitle } from "@/components/HeaderTitle";
 import { ColorPicker } from "@/components/ColorPicker";
 import {
-  Autocomplete, Chevron, FloatingBar, LinkChips, ToggleGrid, Badge, BarChart, DateBlock, KeyValue, LayoutSwitch, SwitchRow, EmptyState, EntityRow, EventRow, LinkCard, List, ListGroupLabel, Loading, MediaCard, MediaGrid, PageHeader, Pager,
+  Autocomplete, Chevron, FloatingBar, LinkChips, ToggleGrid, Badge, BarChart, DateBlock, KeyValue, LayoutSwitch, SwitchRow, EmptyState, EntityRow, EventRow, LinkCard, List, ListGroupLabel, Loading, MediaCard, MediaGrid, Page, PageHeader, Pager,
   PillTabs, RankedList, SearchField, Section, SelectField, Sheet, Sparkline, StatGrid, StatTile, Tabs, ThemeDots, TrendChart, useListLayout, ViewSwitch, type Tone,
 } from "@/components/ui/kit";
 import { DateField, FileDrop, TextArea, TextField } from "@/components/ui/forms";
@@ -361,6 +361,12 @@ export function StyleGuidePanel({ more = [] }: { more?: { value: string; label: 
 
       <Block section="states" title="States and overlays">
         <EmptyState title="EmptyState" body="Says what's missing and what to do about it." action={<Button size="sm">An action</Button>} />
+        <div className="flex h-72 flex-col rounded-2xl border border-dashed border-border p-3" aria-label="A short page in a Page frame">
+          <Page className="gap-3">
+            <p className="meta">Page · a short page still fills the screen: its last Section fill stretches down</p>
+            <Section title="Section fill" fill><p className="text-sm text-text-muted">Little in it, and it reaches the bottom anyway.</p></Section>
+          </Page>
+        </div>
         <div className="card overflow-hidden px-4"><Loading label="Loading — a skeleton shaped like the page" /></div>
         <div className="card flex flex-wrap items-center gap-3 p-5">
           <Button variant="secondary" onClick={() => setSheet(true)}>Open a Sheet</Button>

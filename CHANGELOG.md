@@ -40,6 +40,17 @@ Changes that load look like they're loading, and can be cancelled.
 
 ### Added
 
+- `Page` in the kit: every page's frame. `AppShell`'s main is now a
+  column at least the screen's height, and a `Page` takes all of it, so a
+  page low on content fills the screen: its `Section fill` or
+  `EmptyState fill` (new) stretches down to the dock. Guide section 6:
+  pages fill the screen.
+- Cards side by side are one size: `MediaGrid`, `List layout="tiles"` and
+  `StatGrid` make every row as tall as the tallest card, and each card
+  fills its cell. Guide section 6.
+- Guide section 6: an item's page is a path — the singular kind and its
+  name (`/service/plex`), never `?id=` or the list's path with the item
+  after it.
 - `Pending` in the kit: wraps a result that's being replaced after a
   control changed. The old result stays, dimmed, under a glass bar
   ("Sorting…") after 150 ms, with Cancel after a second. `useSettled`
@@ -54,8 +65,10 @@ Changes that load look like they're loading, and can be cancelled.
   in one handler (a sort, then its page back to 1) dropped the first. It
   now starts from the live URL.
 
-**Apps must:** Nothing — copy `lib/useUrlState.ts` again. `Pending` is
-available to adopt.
+**Apps must:** Nothing — copy `lib/useUrlState.ts` again. `Pending`,
+`Page` and the `fill` props are available to adopt: port `AppShell`'s
+main (a `flex flex-1 flex-col` column) and wrap pages in `Page` to have
+short pages fill the screen.
 
 ## 0.14.5 — 2026-11-05
 
