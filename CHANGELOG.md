@@ -34,6 +34,29 @@ the matching 0.x release.
 
 ## Unreleased
 
+**Update:** breaking
+
+Toasts are the standard pop-up notice: top right and timed.
+
+### Changed
+
+- `Toaster` shows toasts in the top right corner, just under the top bar
+  (full width on phones, a 384 px column from 640 px), newest on top,
+  dropping into place. They were above the dock.
+- Every toast is timed, errors included: 4 s, 6 s with an action, 8 s for
+  an error (`duration` still overrides). A thin line along the bottom shows
+  the time left; hovering or focusing holds it and picks up where it was.
+  Errors used to stay until closed.
+- Guide section 9: toasts are the one way to pop up a notice, including a
+  request that didn't go through ("Couldn't start a sync"); never a
+  floating card of the app's own.
+
+### Apps must
+
+1. Copy the foundation files (`globals.css` adds `animate-toast-timer`).
+2. Copy `components/ui/feedback.tsx` from the reference.
+3. Replace any pop-up notice the app draws itself with `toast()`.
+
 ## 0.14.7 — 2026-11-06
 
 **Update:** feature

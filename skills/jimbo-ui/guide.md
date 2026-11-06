@@ -956,7 +956,7 @@ and body fonts.
 | 40 | Top bar, tab dock, floating save/action bars |
 | 45 | Menus, popovers and tooltips |
 | 50 | Sheets (with a `bg-black/70` blurred backdrop), the command palette |
-| 60 | Toasts (over sheets, so one from inside a sheet is seen) |
+| 60 | Toasts, top right (over sheets, so one from inside a sheet is seen) |
 | 100 | Full-screen image viewer (`bg-black/90`) |
 
 ---
@@ -1067,7 +1067,7 @@ and body fonts.
 | `Tooltip` (`ui/overlays.tsx`) | A label for an icon-only control on hover or keyboard focus. Never the only place something's said — touch screens don't show it |
 | `CommandPalette` + `useSpotlight` (`ui/overlays.tsx`) | **App-wide search** (Spotlight), on ⌘K / Ctrl+K and a top-bar search button on phones: live results from the app's `providers`, grouped, with thumbnails and a preview pane on wide screens; `facets` turn `key:value` tokens into chips; recent picks and `suggestions` while empty; `commands` (go to a page, run an action) after the results. `useSpotlight` keeps it in the URL (`?find=`); `useCommandPalette` is the older local-state hook. See section 9, *App-wide search* |
 | `SearchTrigger` / `SearchIcon` (`ui/overlays.tsx`) | A button that looks like a search field and opens the palette (an explore page's search bar), and the magnifier for the top-bar `TopBarButton` |
-| `toast()` + `Toaster` (`ui/feedback.tsx`) | A short note after an action, above the dock: done (accent dot), info (support), error (highlight, stays until closed); one `action` (Undo); three at most. `Toaster` sits in the shell once; `toast()` works from anywhere |
+| `toast()` + `Toaster` (`ui/feedback.tsx`) | **Every pop-up notice.** A short, timed note in the top right, under the top bar (full width on phones), newest on top: done (accent dot), info (support), error (highlight). Each goes by itself — 4 s, 6 s with an `action`, 8 s for an error — with a thin line showing the time left; hovering or focusing holds it. One `action` (Undo, Retry); three at most. `Toaster` sits in the shell once; `toast()` works from anywhere |
 | `ConfirmSheet` / `useConfirm` (`ui/feedback.tsx`) | Asks before something destructive or surprising: the question, what survives, Cancel and the action in its own words (`danger`: a highlight fill, Cancel focused). `useConfirm` makes it one `await` |
 | `ProgressBar` (`ui/feedback.tsx`) | How far along a job of known length is (`value` / `max`, `format`); no `value` is a slow sweep while the length is unknown; `size="lg"` is the thick bar for the one job a tile is about |
 | `JobTile` (`ui/feedback.tsx`) | One job in a "running now" list, in `List layout="tiles"`: its name and a status `Badge`, then a large percentage with the count beside it ("57 of 3,384") and a thick bar, the item it's on in readable type on an accent wash (`current`, "Now"), a `note` line, and `facts` (speed, time left, updated) in a compact block at the bottom. `state` `done` / `failed` / `queued` is compact: name, badge (`stateLabel` for "Done 09:15"), note. Text wraps; nothing is cut short |
@@ -1204,8 +1204,12 @@ archetype only sets the starting shape.
   your list"), and name the action on its button ("Delete list", never
   "OK"). After it, a toast with Undo where the action can be undone.
 - **Toasts** (`toast()`) say that something happened, briefly, and offer one
-  action at most. Never for errors that need fixing in a form (those are
-  inline) or anything that must be read.
+  action at most. They're the one way to pop up a notice — a result after an
+  action ("Saved"), or a request that didn't go through ("Couldn't start a
+  sync · a sync is already running", tone `error`). Always the `Toaster`'s:
+  top right, timed, never a card of the app's own floating over the page.
+  Never for errors that need fixing in a form (those are inline) or
+  anything that must stay to be read (a banner or the page itself).
 - **Background work** (uploads, syncing) shows as a small progress ring in a
   corner: never block the
   screen; allow pause/cancel; warn before closing with work pending.

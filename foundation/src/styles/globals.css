@@ -126,8 +126,10 @@
   --radius-lg: 8px;
   --radius-md: 6px;
   --radius-sm: 4px;
-  /* Toasts slide up into place (Toaster). */
+  /* Toasts slide down into place in the top right (Toaster); the line
+     along a toast's bottom shrinks as its time runs out. */
   --animate-toast-in: jimbo-toast-in 180ms ease-out;
+  --animate-toast-timer: jimbo-toast-timer 4s linear forwards;
 }
 
 @layer base {
@@ -515,10 +517,15 @@
   to   { transform: scale(1.18) rotate(2.5deg); }
 }
 
-/* A toast rising into place above the dock (Toaster). */
+/* A toast dropping into place in the top right (Toaster). */
 @keyframes jimbo-toast-in {
-  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  from { opacity: 0; transform: translateY(-12px) scale(0.98); }
   to   { opacity: 1; transform: none; }
+}
+/* A toast's time left, shrinking to nothing (its duration is set inline). */
+@keyframes jimbo-toast-timer {
+  from { transform: scaleX(1); }
+  to   { transform: scaleX(0); }
 }
 /* An indeterminate ProgressBar: a third of the track sweeping across. */
 @keyframes jimbo-sweep {

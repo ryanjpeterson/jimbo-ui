@@ -1,8 +1,8 @@
 /**
  * Feedback: telling people what happened and what's happening.
  *
- * - `toast()` + `Toaster` — a short note after an action ("Saved", "Deleted ·
- *   Undo"), floating above the dock.
+ * - `toast()` + `Toaster` — a short, timed note ("Saved", "Deleted · Undo",
+ *   "Couldn't start a sync"), top right, under the top bar.
  * - `ConfirmSheet` / `useConfirm` — asks before something destructive or
  *   surprising, in plain words, saying what survives.
  * - `ProgressBar` — how far along a job of known length is.
@@ -30,11 +30,11 @@ export type ToastTone = "done" | "info" | "error";
 export type ToastInput = {
   title: string;
   body?: ReactNode;
-  /** done (accent dot, the default), info (support) or error (highlight; stays until closed). */
+  /** done (accent dot, the default), info (support) or error (highlight; stays longest). */
   tone?: ToastTone;
   /** One action — usually Undo. */
   action?: { label: string; onClick: () => void };
-  /** Milliseconds on screen; errors stay until closed. */
+  /** Milliseconds on screen. Defaults: 4 s, 6 s with an action, 8 s for an error. */
   duration?: number;
 };
 
@@ -63,18 +63,32 @@ const subscribe = (l: () => void) => { listeners.add(l); return () => { listener
 
 const TOAST_DOT: Record<ToastTone, string> = { done: "dot-accent", info: "dot-support", error: "dot-highlight" };
 
+const toastDuration = (t: ToastInput) =>
+  t.duration ?? (t.tone === "error" ? 8000 : t.action ? 6000 : 4000);
+
+/**
+ * One toast. Every toast is timed — errors too, just longer — and a thin line
+ * along the bottom shows the time left. Hovering or focusing it holds the
+ * timer (and the line) until the pointer or focus leaves.
+ */
 function ToastCard({ t }: { t: ToastItem }) {
   const tone = t.tone ?? "done";
+  const duration = toastDuration(t);
   const [paused, setPaused] = useState(false);
+  const left = useRef(duration);
   useEffect(() => {
-    if (tone === "error" || paused) return;
-    const timer = setTimeout(() => dismissToast(t.id), t.duration ?? (t.action ? 6000 : 4000));
-    return () => clearTimeout(timer);
-  }, [t.id, t.duration, t.action, tone, paused]);
+    if (paused) return;
+    const started = Date.now();
+    const timer = setTimeout(() => dismissToast(t.id), left.current);
+    return () => { clearTimeout(timer); left.current -= Date.now() - started; };
+  }, [t.id, paused]);
   return (
     <div role={tone === "error" ? "alert" : "status"} onPointerEnter={() => setPaused(true)} onPointerLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)} onBlur={() => setPaused(false)}
-      className="pointer-events-auto flex w-full items-start gap-3 rounded-2xl border border-border bg-surface/95 py-2 pl-4 pr-2 shadow-2xl shadow-black/50 backdrop-blur-xl motion-safe:animate-toast-in">
+      className="pointer-events-auto relative flex w-full items-start gap-3 overflow-hidden rounded-2xl border border-border bg-surface/95 py-2 pl-4 pr-2 shadow-2xl shadow-black/50 backdrop-blur-xl motion-safe:animate-toast-in">
+      <span aria-hidden="true" style={{ animationDuration: `${duration}ms`, animationPlayState: paused ? "paused" : "running" }}
+        className={cn("absolute inset-x-0 bottom-0 h-0.5 origin-left animate-toast-timer opacity-60",
+          tone === "error" ? "bg-highlight" : tone === "info" ? "bg-support" : "bg-accent")} />
       <span aria-hidden="true" className={cn(TOAST_DOT[tone], "mt-[15px] h-2.5 w-2.5 shrink-0")} />
       <div className="min-w-0 flex-1 py-2">
         <p className="text-15 font-semibold leading-snug">{t.title}</p>
@@ -95,17 +109,18 @@ function ToastCard({ t }: { t: ToastItem }) {
 }
 
 /**
- * Where toasts appear: above the dock on phones (`--above-dock`), bottom
- * centre on desktop, newest at the bottom. Put it in the app shell once.
- * Over sheets too (z 60), so a toast from inside one is seen.
+ * Where toasts appear: the top right corner, just under the top bar
+ * (`--top-bar`), so they never cover the dock, a pinned save bar or the
+ * thing just tapped. Full width on phones, a narrow column from 640 px.
+ * Newest on top. Put it in the app shell once. Over sheets too (z 60), so a
+ * toast from inside one is seen.
  */
 export function Toaster() {
   const list = useSyncExternalStore(subscribe, () => toasts, () => toasts);
   return createPortal(
-    <div aria-live="polite" className="pointer-events-none fixed inset-x-0 bottom-[var(--above-dock)] z-[60] flex flex-col items-center gap-2 px-3">
-      <div className="flex w-full max-w-md flex-col gap-2">
-        {list.map((t) => <ToastCard key={t.id} t={t} />)}
-      </div>
+    <div aria-live="polite"
+      className="pointer-events-none fixed left-[calc(0.75rem+var(--safe-left))] right-[calc(0.75rem+var(--safe-right))] top-[calc(var(--top-bar)+0.5rem)] z-[60] flex flex-col gap-2 sm:left-auto sm:right-[calc(1rem+var(--safe-right))] sm:w-96">
+      {[...list].reverse().map((t) => <ToastCard key={t.id} t={t} />)}
     </div>,
     document.body,
   );

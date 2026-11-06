@@ -556,7 +556,7 @@ function FeedbackBlocks() {
   const [progress, setProgress] = useState(64);
   return (
     <>
-      <Block section="feedback" title="Toasts" note="A short note after an action, above the dock. Done and info go after a few seconds (longer with an action); errors stay until closed. Three at most.">
+      <Block section="feedback" title="Toasts" note="Every pop-up notice: top right, under the top bar. Each goes by itself — a few seconds, longer with an action, longest for an error — and hovering holds it. Three at most, newest on top.">
         <div className="card flex flex-wrap gap-2 p-5">
           <Button variant="secondary" onClick={() => toast("Saved")}>Done</Button>
           <Button variant="secondary" onClick={() => toast({ title: "3 items moved", body: "To the archive.", action: { label: "Undo", onClick: () => toast("Moved back") } })}>With Undo</Button>
