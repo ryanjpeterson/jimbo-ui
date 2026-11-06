@@ -1570,3 +1570,7 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   (`PageHeader back`, `useRememberPages`, `parentPath`). `ShareSliders`
   for shares of one total. Lists with more than a name per item
   offer rows or tiles (`LayoutSwitch`).
+- **0.15.0 (2026-11-06)** — Toasts are the one way to pop up a notice,
+  failed requests included: top right under the top bar (full width on
+  phones), newest on top, and every one timed — 4 s, 6 s with an action,
+  8 s for an error — with a line showing the time left; hover holds it.

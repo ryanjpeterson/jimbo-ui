@@ -34,6 +34,8 @@ the matching 0.x release.
 
 ## Unreleased
 
+## 0.15.0 — 2026-11-06
+
 **Update:** breaking
 
 Toasts are the standard pop-up notice: top right and timed.
