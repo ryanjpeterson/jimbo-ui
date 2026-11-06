@@ -7,18 +7,22 @@
  * plus the jimbo-ui config section under Settings.
  *   A verdict line (accent when fine, highlight when something needs a look)
  *   StatGrid of the headline numbers, each with a Sparkline of its recent values
+ *   Running now — JobTile in List layout="tiles": progress and the item it's
+ *     on up front, speed / time left / updated below; finished ones compact
  *   Section of jobs — as rows or tiles (LayoutSwitch, remembered): status dot
  *     (pulsing while running), last run, Run button, errors inline
- *   Charts: runs per day (BarChart, vertical) and how long runs took (TrendChart)
+ *   Charts side by side in Columns (one size per row): runs per day
+ *     (BarChart, vertical, with a line under it) and how long runs took (TrendChart)
  *   Section of recent runs as EventRow; a run opens its log in a Sheet (?run=…)
  *   Section of read-only settings as label / value rows
  */
 
 import { useSearchParams } from "react-router-dom";
 import {
-  BarChart, EventRow, KeyValue, LayoutSwitch, List, LIVE, PageHeader, Section, Sheet, STATUS_DOT, StatGrid, StatTile, TONES, TrendChart, useListLayout, type Tone,
+  BarChart, Columns, EventRow, KeyValue, LayoutSwitch, List, LIVE, PageHeader, Section, Sheet, STATUS_DOT, StatGrid, StatTile, TONES, TrendChart, useListLayout, type Tone,
 } from "@/components/ui/kit";
 import { Button } from "@/components/ui/button";
+import { JobTile } from "@/components/ui/feedback";
 import { cn } from "@/lib/cn";
 
 type Job = { id: string; name: string; from: string; status: "ok" | "running" | "failed" | "never"; last: string; error?: string };
@@ -68,6 +72,17 @@ export function DashboardPage() {
         <StatTile label="Failed" value={trouble} accent="highlight" trend={[0, 0, 2, 1, 0, 0, 1]} />
       </StatGrid>
 
+      <Section title="Running now" count={3} plain>
+        <List layout="tiles">
+          <JobTile title="Sync the shared folder" value={1204} max={3480} current="Photos / 2026 / October / harbour-at-dusk.jpg"
+            facts={[{ label: "Speed", value: "4.2 files/s" }, { label: "Left", value: "about 9 min" }, { label: "Updated", value: "just now" }]} />
+          <JobTile title="Nightly report" state="done" stateLabel="Done 08:04"
+            note="Sent to the team inbox: three pages, the week's numbers and the two runs that took longest." />
+          <JobTile title="Check the website" state="failed" stateLabel="Failed 22:00"
+            note="The site didn't answer after three tries, so the hourly check stopped until someone runs it again." />
+        </List>
+      </Section>
+
       <Section title="Jobs" count={JOBS.length} action={<LayoutSwitch value={layout} onChange={setLayout} />} plain>
         <List layout={layout}>
           {JOBS.map((j) => (
@@ -85,16 +100,17 @@ export function DashboardPage() {
         </List>
       </Section>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <Columns>
         <Section title="Runs this week">
           <BarChart direction="vertical" tone="support" title="Runs per day this week"
             items={DAYS.map((d, i) => ({ id: d, label: d, value: RUNS_PER_DAY[i]! }))} />
+          <p className="mt-3 text-sm text-text-muted">Busiest: Thursday (5), Tuesday (4).</p>
         </Section>
         <Section title="Minutes per run">
           <TrendChart labels={DATES} title="Minutes per run, last two weeks" format={(n) => `${n}m`}
             series={[{ label: "Sync", values: MINUTES.sync }, { label: "Report", values: MINUTES.report }]} />
         </Section>
-      </div>
+      </Columns>
 
       <Section title="Recent runs" count={RUNS.length} flush>
         <div className="divide-etched">

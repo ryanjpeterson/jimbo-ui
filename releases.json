@@ -1,7 +1,110 @@
 {
   "$comment": "Generated from CHANGELOG.md by scripts/releases.mjs — don't edit. Apps' jimbo-ui config section reads it to show what a newer release changes.",
-  "latest": "0.14.5",
+  "latest": "0.14.6",
   "releases": [
+    {
+      "version": "0.14.6",
+      "date": "2026-11-06",
+      "type": "feature",
+      "summary": "Symmetry, scrollbars that always show, and job tiles that put progress first; changes that load look like they're loading, and can be cancelled.",
+      "items": [
+        {
+          "kind": "added",
+          "text": "`Page` in the kit: every page's frame. `AppShell`'s main is now a column at least the screen's height, and a `Page` takes all of it, so a page low on content fills the screen: its `Section fill` or `EmptyState fill` (new) stretches down to the dock. Guide section 6: pages fill the screen.",
+          "affects": [
+            "page",
+            "app-shell",
+            "section",
+            "empty-state"
+          ]
+        },
+        {
+          "kind": "added",
+          "text": "Cards side by side are one size: `MediaGrid`, `List layout=\"tiles\"` and `StatGrid` make every row as tall as the tallest card, and each card fills its cell. Guide section 6.",
+          "affects": [
+            "media-grid",
+            "list",
+            "stat-grid"
+          ]
+        },
+        {
+          "kind": "added",
+          "text": "`Columns` in the kit: sections or cards side by side (`count` 2 or 3, from `lg:` or `sm:`), every row one height. Guide section 6 makes symmetry a rule: nothing in a row is shorter than its neighbour.",
+          "affects": [
+            "columns"
+          ]
+        },
+        {
+          "kind": "added",
+          "text": "Scrollbars always show. `globals.css` themes every scrollbar inside the page — a `surface-2` lane with a `text-subtle` thumb (≥ 3:1 on the lane in every look and tone), `text-muted` on hover, accent while dragged — and in Chrome and Safari it stays visible on macOS too, so a capped list plainly scrolls. New utilities `.scroll-area` and `.scroll-area-x`; `List maxHeight` caps a list of rows and scrolls inside its card. Guide sections 6 and 7; never hide a scrollbar (section 12).",
+          "affects": [
+            "scroll-area",
+            "list"
+          ]
+        },
+        {
+          "kind": "added",
+          "text": "`JobTile` (`ui/feedback.tsx`): one job in a \"running now\" list, made for `List layout=\"tiles\"`. A large percentage with the count beside it and a thick bar first, the item it's on in readable type on an accent wash, then a note and a compact block of facts (speed, time left, updated) at the bottom; `done`, `failed` and `queued` are compact (name, badge, note). Text wraps instead of being cut. `ProgressBar size=\"lg\"` is its thick bar.",
+          "affects": [
+            "job-tile",
+            "list",
+            "progress-bar"
+          ]
+        },
+        {
+          "kind": "added",
+          "text": "Guide section 6: an item's page is a path — the singular kind and its name (`/service/mail`), never `?id=` or the list's path with the item after it.",
+          "affects": []
+        },
+        {
+          "kind": "added",
+          "text": "`Pending` in the kit: wraps a result that's being replaced after a control changed. The old result stays, dimmed, under a glass bar (\"Sorting…\") after 150 ms, with Cancel after a second. `useSettled` remembers the last view whose data arrived, so Cancel can abort the request and put the control back. Guide section 7 makes it the rule: nothing looks like it did nothing.",
+          "affects": [
+            "pending"
+          ]
+        },
+        {
+          "kind": "changed",
+          "text": "`Section`'s card stretches to fill its cell, content at the top, so two sections side by side in a grid are one height (one with a line under its chart no longer leaves its neighbour short).",
+          "affects": [
+            "section"
+          ]
+        },
+        {
+          "kind": "changed",
+          "text": "`PillTabs scroll` shows its scrollbar under the row instead of hiding it, and a `Sheet`'s body keeps its bar showing.",
+          "affects": [
+            "pill-tabs",
+            "sheet"
+          ]
+        },
+        {
+          "kind": "changed",
+          "text": "The Dashboard and Status archetypes put their charts in `Columns`; the Dashboard adds a \"Running now\" list of `JobTile`s.",
+          "affects": [
+            "columns",
+            "job-tile"
+          ]
+        },
+        {
+          "kind": "fixed",
+          "text": "`setUrlParams` (`lib/useUrlState.ts`) started from React Router 6's updater argument, which holds the params from the last render, so two sets in one handler (a sort, then its page back to 1) dropped the first. It now starts from the live URL. **Apps must:** Nothing — copy the foundation files (`styles/globals.css` brings the scrollbars and `.scroll-area`) and `lib/useUrlState.ts` again. Available to adopt from `reference/`: `Pending`, `Page` and the `fill` props (port `AppShell`'s main, a `flex flex-1 flex-col` column, and wrap pages in `Page` to have short pages fill the screen); `Section`'s stretching card and `Columns` (replace `grid lg:grid-cols-2` around sections with `Columns`); `List maxHeight` in place of a hand-capped `overflow-y-auto` list; `PillTabs`' visible bar (drop `[scrollbar-width:none]` and the hidden webkit bar from any copy); `JobTile` and `ProgressBar size` from `ui/feedback.tsx` for a running-now list. An app that hid a scrollbar itself can drop that to match. **Available:** `Columns`, `JobTile`, `.scroll-area`, `.scroll-area-x`, `List maxHeight`, `ProgressBar size`, `Pending`, `useSettled`, `Page`.",
+          "affects": [
+            "scroll-area",
+            "pending",
+            "page",
+            "app-shell",
+            "section",
+            "columns",
+            "list",
+            "pill-tabs",
+            "job-tile",
+            "progress-bar"
+          ]
+        }
+      ],
+      "appsMust": []
+    },
     {
       "version": "0.14.5",
       "date": "2026-11-05",
@@ -536,7 +639,8 @@
           "kind": "added",
           "text": "**`ToggleGrid`** (kit): several picks from a small fixed set as a wrapping grid of 44 px toggle buttons (`columns`, `smColumns`), picked ones a flat accent fill with `aria-pressed`.",
           "affects": [
-            "toggle-grid"
+            "toggle-grid",
+            "columns"
           ]
         },
         {

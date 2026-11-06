@@ -5,7 +5,7 @@ description: Ryan's shared brand and UI system, jimbo.ui (repo and plugin jimbo-
 
 # jimbo.ui
 
-**This is jimbo.ui 0.14.5.** (Kept in step with the plugin version and the
+**This is jimbo.ui 0.14.6.** (Kept in step with the plugin version and the
 newest numbered `CHANGELOG.md` entry; `scripts/versions.mjs` checks.)
 jimbo.ui is a work in progress, so it's on 0.x. **The number says what an
 update takes** (Semantic Versioning, read for 0.x — guide section 1,
@@ -97,6 +97,12 @@ this check, then the preview workflow if they want detail.
   (every NHL, NBA, MLB and NFL team, plus Toronto, Ottawa and Chicago tabs),
   with a search box. New team, country, place or game looks come from their
   real colours via `scripts/template-from-colours.mjs`.
+- **Symmetry is valued:** cards and sections side by side are one size —
+  `Columns` for sections in a row (each card stretches to the tallest,
+  content at the top), `MediaGrid` / `List layout="tiles"` / `StatGrid`
+  for cards. **Anything that scrolls shows its scrollbar at all times**
+  (themed in `globals.css`; `.scroll-area`, `.scroll-area-x`,
+  `List maxHeight`) — never hide one. Jobs running now are `JobTile`s.
 - Phone first at 375 px; floating frosted tab dock (≤ 5 tabs); things pinned
   to the bottom sit above it; touch targets ≥ 44 px; no horizontal scroll
   strips; nothing hover-only.

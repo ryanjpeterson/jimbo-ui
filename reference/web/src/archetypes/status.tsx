@@ -17,7 +17,7 @@
 
 import { useState } from "react";
 import {
-  Badge, BarChart, KeyValue, LayoutSwitch, List, PageHeader, Section, STATUS_DOT, StatGrid, StatTile, Tabs, TONES, TrendChart, useListLayout, type Tone,
+  Badge, BarChart, Columns, KeyValue, LayoutSwitch, List, PageHeader, Section, STATUS_DOT, StatGrid, StatTile, Tabs, TONES, TrendChart, useListLayout, type Tone,
 } from "@/components/ui/kit";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
@@ -78,7 +78,7 @@ export function StatusPage() {
       </Section>
 
       <Section title="History" action={<Tabs size="sm" value={range} onChange={setRange} options={[...RANGES]} />} plain>
-        <div className="grid gap-6 lg:grid-cols-2">
+        <Columns>
           <Section title="Uptime">
             <TrendChart labels={h.labels} title={`Share of checks answered, over the last ${range}`} format={(n) => `${n}%`}
               series={[{ label: "Uptime", values: h.uptime }]} />
@@ -95,7 +95,7 @@ export function StatusPage() {
             <BarChart title="Each service's uptime" format={(n) => `${n}%`}
               items={SERVICES.map((s) => ({ id: s.id, label: s.name, value: s.uptime }))} />
           </Section>
-        </div>
+        </Columns>
       </Section>
     </div>
   );

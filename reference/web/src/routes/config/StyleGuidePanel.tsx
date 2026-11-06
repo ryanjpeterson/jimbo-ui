@@ -17,12 +17,12 @@ import { Button } from "@/components/ui/button";
 import { HeaderTitle } from "@/components/HeaderTitle";
 import { ColorPicker } from "@/components/ColorPicker";
 import {
-  Autocomplete, Chevron, FloatingBar, LinkChips, ToggleGrid, Badge, BarChart, DateBlock, KeyValue, LayoutSwitch, SwitchRow, EmptyState, EntityRow, EventRow, LinkCard, List, ListGroupLabel, Loading, MediaCard, MediaGrid, Page, PageHeader, Pager,
+  Autocomplete, Chevron, Columns, FloatingBar, LinkChips, ToggleGrid, Badge, BarChart, DateBlock, KeyValue, LayoutSwitch, SwitchRow, EmptyState, EntityRow, EventRow, LinkCard, List, ListGroupLabel, Loading, MediaCard, MediaGrid, Page, PageHeader, Pager,
   PillTabs, RankedList, SearchField, Section, SelectField, Sheet, Sparkline, StatGrid, StatTile, Tabs, ThemeDots, TrendChart, useListLayout, ViewSwitch, type Tone,
 } from "@/components/ui/kit";
 import { DateField, FileDrop, TextArea, TextField } from "@/components/ui/forms";
 import { Menu, Popover, SearchTrigger, Tooltip } from "@/components/ui/overlays";
-import { OfflineBanner, ProgressBar, Stepper, toast, UpdateBanner, useConfirm } from "@/components/ui/feedback";
+import { JobTile, OfflineBanner, ProgressBar, Stepper, toast, UpdateBanner, useConfirm } from "@/components/ui/feedback";
 import { Accordion, DataTable, type Column, type TableSort } from "@/components/ui/data";
 import { FONTS, MOTIFS, THEME_KEYS, themeHex } from "@/lib/theme";
 import { useBrand } from "@/lib/useBrand";
@@ -101,6 +101,7 @@ export function StyleGuidePanel({ more = [] }: { more?: { value: string; label: 
   const hex = themeHex(theme);
   const [tab, setTab] = useState<"one" | "two">("one");
   const [pill, setPill] = useState<"a" | "b" | "c">("a");
+  const [section, setSection] = useState("overview");
   const [select, setSelect] = useState<"newest" | "oldest">("newest");
   const [q, setQ] = useState("");
   const [page, setPage] = useState(2);
@@ -229,6 +230,8 @@ export function StyleGuidePanel({ more = [] }: { more?: { value: string; label: 
             options={[{ value: "newest", label: "Newest first" }, { value: "oldest", label: "Oldest first" }]} />
           <Tabs value={tab} onChange={setTab} options={[{ value: "one", label: "Tabs" }, { value: "two", label: "Segmented" }]} />
           <PillTabs value={pill} onChange={setPill} options={[{ value: "a", label: "PillTabs" }, { value: "b", label: "Filter" }, { value: "c", label: "Chips" }]} />
+          <PillTabs scroll value={section} onChange={setSection}
+            options={["Overview", "PillTabs scroll", "One row", "Its bar", "Always shows", "So you know", "There are more", "Past the edge"].map((l) => ({ value: l === "Overview" ? "overview" : l, label: l }))} />
           <ViewSwitch current="/jimbo-ui?tab=style" options={[{ to: "/jimbo-ui?tab=style", label: "List" }, { to: "/jimbo-ui?tab=style&view=map", label: "Map" }]} />
           <Autocomplete label="Autocomplete" value={ac} onChange={setAc} placeholder="Type a place…"
             options={PLACES.filter((p) => ac.trim() && p.toLowerCase().includes(ac.trim().toLowerCase())).map((p) => ({ id: p, label: p }))}
@@ -279,7 +282,7 @@ export function StyleGuidePanel({ more = [] }: { more?: { value: string; label: 
           <TrendChart labels={["Wk 1", "Wk 2", "Wk 3", "Wk 4", "Wk 5", "Wk 6"]} format={(n) => `${n}m`}
             series={[{ label: "Build", values: [12, 14, 11, 16, 13, 12] }, { label: "Tests", values: [6, 7, 7, 9, 8, 6] }]} />
         </Section>
-        <div className="grid gap-6 sm:grid-cols-2">
+        <Columns from="sm">
           <Section title="BarChart · horizontal">
             <BarChart items={[
               { id: "a", label: "Main hall", value: 42, to: "/jimbo-ui?tab=style" },
@@ -290,8 +293,9 @@ export function StyleGuidePanel({ more = [] }: { more?: { value: string; label: 
           <Section title="BarChart · vertical">
             <BarChart direction="vertical" tone="support" height={120}
               items={["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"].map((m, i) => ({ id: String(i), label: m, value: [3, 5, 2, 6, 8, 4, 9, 7, 5, 6, 3, 4][i]!, to: `/jimbo-ui?tab=style&month=${i + 1}` }))} />
+            <p className="mt-3 text-sm text-text-muted">Columns: this card has a line under its chart, and its neighbour stretches to match.</p>
           </Section>
-        </div>
+        </Columns>
         <div className="card flex items-center gap-4 p-4">
           <Sparkline values={[3, 4, 2, 5, 6, 5, 8]} className="w-28" />
           <p className="meta">Sparkline on its own — beside a row or in a card.</p>
@@ -314,6 +318,13 @@ export function StyleGuidePanel({ more = [] }: { more?: { value: string; label: 
           <EntityRow to="/jimbo-ui?tab=style" name="EntityRow — a person or place" sub="4 items" round />
           <EntityRow to="/jimbo-ui?tab=style" name="EntityRow with avatarText" sub="The avatar shows a code or number instead of initials" avatarText="12" />
         </List>
+        <Section title="List · maxHeight" count={24} plain>
+          <List maxHeight={260}>
+            {Array.from({ length: 24 }, (_, i) => (
+              <EntityRow key={i} to="/jimbo-ui?tab=style" name={`Row ${i + 1}`} sub="Capped, so it scrolls — its bar always shows" avatarText={String(i + 1)} />
+            ))}
+          </List>
+        </Section>
         <MediaGrid>
           <MediaCard to="/jimbo-ui?tab=style" name="MediaCard" sub="Image card" meta="3 items" />
           <MediaCard to="/jimbo-ui?tab=style" name="Portrait" sub="For posters" aspect="portrait" />
@@ -525,6 +536,7 @@ function FeedbackBlocks() {
       <Block section="feedback" title="ProgressBar" note="How far along a job of known length is; leave out the value while the length is unknown.">
         <div className="card space-y-5 p-5">
           <ProgressBar label="Uploading 12 photos" value={progress} />
+          <ProgressBar label="size lg — the one a JobTile is about" value={progress} size="lg" />
           <ProgressBar label="Storage" value={3.2} max={5} tone="support" format={(v, m) => `${v} of ${m} GB`} />
           <ProgressBar label="Importing" />
           <div className="flex gap-2">
@@ -532,6 +544,16 @@ function FeedbackBlocks() {
             <Button size="sm" variant="secondary" onClick={() => setProgress((p) => Math.min(100, p + 16))}>+</Button>
           </div>
         </div>
+      </Block>
+      <Block section="feedback" title="JobTile" note={'One job in a "running now" list, in List layout="tiles": the percentage, a thick bar and the item it\'s on first; speed, time left and updated in a block below. Finished or failed, it shrinks to a badge and a note. Nothing is cut short.'}>
+        <List layout="tiles">
+          <JobTile title="Importing the archive" value={Math.round(progress * 34.8)} max={3480}
+            current="Folder 12 · a-rather-long-file-name-that-wraps-instead-of-being-cut-short.jpg"
+            facts={[{ label: "Speed", value: "4.2 items/s" }, { label: "Left", value: "about 9 min" }, { label: "Updated", value: "just now" }]} />
+          <JobTile title="Building the index" current="Section 4 of 9" facts={[{ label: "Started", value: "10:42" }]} note="Length unknown until the first pass ends." />
+          <JobTile title="Sorting into groups" state="done" stateLabel="Done 09:15" note="Made 14 groups from 3,480 items; 22 didn't fit any and are listed on their own." />
+          <JobTile title="Looking up details" state="failed" note="The lookup service stopped answering after 57 items. It'll try again in an hour." />
+        </List>
       </Block>
       <Block section="feedback" title="Banners" note="Slim bars that stick under the top bar, first thing on the page: offline (fixed yellow, with changes waiting) or a new version ready.">
         <div className="card space-y-3 overflow-hidden p-5 [&_[role=status]]:static [&_[role=status]]:m-0 [&_[role=status]]:rounded-xl">

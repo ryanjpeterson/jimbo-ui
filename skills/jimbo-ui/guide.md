@@ -843,10 +843,10 @@ and body fonts.
   history entry (tapping tabs doesn't fill Back) and drop out at their
   default.
 - **An item's page is a path.** A detail page lives at the singular kind
-  and the item's name or id — `/service/plex`, `/project/jimbos-servarr`,
+  and the item's name or id — `/service/mail`, `/project/home-server`,
   `/entry/42` — under the plural list it comes from (`/services`). Never
   `?id=` for a page of its own, and never the list's path with the item
-  after it (`/services/plex`). Old paths redirect to the new ones. A sheet
+  after it (`/services/mail`). Old paths redirect to the new ones. A sheet
   over the list (the item open without leaving it) stays a search
   parameter. Only passing state stays in React: a selection in progress, a
   half-typed form, hover. Preferences that belong to the person, not the
@@ -870,12 +870,28 @@ and body fonts.
   backdrop under it: its last `Section fill` (or `EmptyState fill`)
   stretches down to the dock. Use it on the one block that's meant to grow
   (a console, a list, an empty state), not on every section.
-- **Cards side by side are one size.** In a grid, every row is as tall as
-  the tallest card and every card fills its cell (`auto-rows-fr`, `h-full`:
-  `MediaGrid`, `List layout="tiles"` and `StatGrid` do it). A card low on
-  content keeps its neighbours' size, with its actions pinned to the bottom
-  (`mt-auto`); text that would make it taller is trimmed to a fixed number
-  of lines instead.
+- **Symmetry: cards side by side are one size.** Symmetry is valued:
+  nothing in a row is shorter than its neighbour. In a grid, every row is as
+  tall as the tallest card and every card fills its cell (`auto-rows-fr`,
+  `h-full`: `MediaGrid`, `List layout="tiles"` and `StatGrid` do it).
+  Sections side by side go in `Columns` (`count` 2 or 3, from `lg:` or
+  `sm:`), never a bare `grid lg:grid-cols-2`: each `Section`'s card stretches
+  to the row's tallest with its content at the top, so two charts are one
+  size even when one has a line under it. A card low on content keeps its
+  neighbours' size, with its actions pinned to the bottom (`mt-auto`); text
+  that would make it taller is trimmed to a fixed number of lines instead.
+- **Anything that scrolls shows its scrollbar, always.** A box that
+  scrolls inside the page (a capped `List`, `PillTabs scroll`, a sheet's
+  body, a wide chart) shows a themed bar at all times — macOS hides
+  scrollbars until you scroll, and a list cut off at a card's edge looks
+  finished. `globals.css` styles every scrollbar under `<body>` (a
+  `surface-2` lane, a `text-subtle` thumb at ≥ 3:1 on it in every look,
+  muted on hover, accent while dragged); Chrome and Safari keep it showing,
+  Firefox styles it but still follows the system setting. Use
+  `.scroll-area` (with a `max-h-*`) for a box that scrolls down and
+  `.scroll-area-x` for one that scrolls sideways; `List maxHeight` does it
+  for a list. Never hide a scrollbar (`scrollbar-width: none`,
+  `::-webkit-scrollbar { display: none }`).
 - **Tab dock (phones):** floats 12 px above the bottom safe area, `max-w-md`,
   a 5-column grid in a 20 px-radius slab: `bg-surface/95`, `border-border`,
   `ring-1 ring-black/30`, `backdrop-blur-md`, deep
@@ -893,6 +909,7 @@ and body fonts.
   `gap-3` in grids, `p-4 sm:p-5` inside cards; grids are 2 columns on phones,
   3 from `sm:`.
 - **No horizontal scroll strips.** Wrap, use a select on phones, or a sheet.
+  The one exception, `PillTabs scroll`, shows its bar under the row.
 - **Text never overflows; it's trimmed.** Any text whose length you don't
   control is cut with an ellipsis rather than pushing a layout wide or
   running to many lines. One line (`truncate`, and `min-w-0` on the flex
@@ -902,7 +919,9 @@ and body fonts.
   titles, hints, descriptions and stacked values. Numbers with a unit never
   wrap between them (`whitespace-nowrap`); give the column enough width
   instead (`minmax(17rem,1fr)`). Meta at a row's end gets a cap
-  (`max-w-[40%]`) so it can't squeeze the name away.
+  (`max-w-[40%]`) so it can't squeeze the name away. Where the whole text is the
+  point (a job's current item or a failure's reason in a `JobTile`), it
+  wraps (`break-words`) instead of being cut.
 - **Touch targets ≥ 44 px** (`h-11`/`h-12` on phones), rows ≥ 76 px (`py-3.5`), each divided from the next by an etched line.
 
 ### Layers (z-index)
@@ -927,6 +946,7 @@ and body fonts.
 | `.glass` / `.card-glass` | Lightly frosted: `bg-surface/90`, `backdrop-blur-md`, `border-border`, soft drop. For tabs, unselected pills, the secondary top-bar buttons, the pager, floating controls and anything over a banner — anything that sits straight on the backdrop |
 | `.dot-accent/highlight/support` | A brand colour as a **flat circle**: one solid fill, nothing else (see Circles in section 2). Size it with utilities. `.orb-*` are older names for the same thing |
 | `.motif-accent/highlight/support` | A brand colour in the theme's motif shape (circle unless `Theme.motif` says otherwise), for `ThemeDots` only |
+| `.scroll-area` / `.scroll-area-x` | A box that scrolls inside the page, down or sideways: the scrollbar always shows (every scrollbar under `<body>` is themed: `surface-2` lane, `text-subtle` thumb, `text-muted` on hover, `accent` while dragged), its room is kept (`scrollbar-gutter: stable`), and scrolling stops at its end. Cap its height (`max-h-*`) |
 | `.divide-etched` | Lines between stacked items, on the parent like `divide-y`: a full-strength `border` line with a faint light line under it (`inset 0 1px 0 rgba(255,255,255,.05)`). It also reaches one level down, so rows grouped in wrappers (a month's label and rows) are divided too. Lists, ranked lists |
 | `.fade-out` (`.fade-both`) | **How a full-width opener ends.** A banner, a hero, a photo or gradient header never stops on a hard edge, a border, or a fade to solid `bg` — the page behind has its backdrop (pattern and glow), so any of those shows as a line. Put the opener's background (blurred photo, dim, gradient, pattern) in its own layer behind the content and mask that layer out to transparent: `.fade-out` fades the bottom 45%; add `.fade-both` to fade the top too when something sits above it. Mask the background, never the text. `Banner`, `Hero` and `HeroSection` do this |
 | `.lit-accent/highlight/support` | A solid brand fill: one flat colour, no outline, `on-c` text (with `border-transparent` on a bordered shape). Active tabs and pills, select ticks, the date band, count badges (the name is from when they were shaded) |
@@ -953,7 +973,9 @@ and body fonts.
   second aborts the request (pass the query's `signal` to `fetch`) and puts
   the control back (`useSettled`). Long jobs show a live dot, the stage
   they're on, a moving `ProgressBar` and a clock that ticks — never a
-  static "working…" line.
+  static "working…" line. A list of jobs running now is `JobTile`s in a
+  `List layout="tiles"`: how far along and the item it's on come first and
+  biggest; speed, time left and updated sit below.
 - No page transitions, no parallax, no bouncing.
 
 ---
@@ -967,8 +989,9 @@ and body fonts.
 | `HeroSection` | Full-width page opener with no photo: eyebrow, big title, a line, actions, over a backdrop pattern (`pattern`, any of the backdrops) on a gradient; `size="lg"` fills most of the first screen; `align="center"`. It tucks up under the top bar; pass `pullUp={false}` when something sits above it (as `Banner` and `Hero` take too) |
 | `FullBleed` | Any section edge to edge: a band (`tone`: `surface`, or a flat `accent` / `highlight` / `support` with its `on-` text), a strip of media (`flush`), a call to action. Content lines up with the page column unless `flush` |
 | `RangeField` | A labelled slider (weight, spacing, strength…) with its value shown |
-| `Section` | A titled card holding one block of content; `plain` drops the card (a grid of tiles under a title) |
-| `List` + `ListGroupLabel` | A card of rows, optionally grouped (by month: a wrapper that starts with a `ListGroupLabel`); group labels are support text with an 8 px support dot, on a support wash fading right. `layout="tiles"` shows the same children as a grid of cards (one column on phones, two or three wider); `bare` drops the card for use inside `Section flush` |
+| `Section` | A titled card holding one block of content; `plain` drops the card (a grid of tiles under a title). In a grid row its card stretches to the tallest, content at the top |
+| `Columns` | Sections or cards side by side: one column on phones, `count` 2 or 3 from `lg:` (`from="sm"` for earlier). Every row as tall as its tallest cell — symmetry |
+| `List` + `ListGroupLabel` | A card of rows, optionally grouped (by month: a wrapper that starts with a `ListGroupLabel`); group labels are support text with an 8 px support dot, on a support wash fading right. `layout="tiles"` shows the same children as a grid of cards (one column on phones, two or three wider); `bare` drops the card for use inside `Section flush`; `maxHeight` caps a list of rows and scrolls inside the card, its bar always showing |
 | `LayoutSwitch` + `useListLayout` | Lets people pick rows or tiles for a `List` (small `Tabs` in the section's action slot); the choice is remembered per list in the browser |
 | `EventRow` | A dated item. `DateBlock` on the left, a `status` dot (`{ tone, label, live? }` — `live` pulses); `to` to go somewhere or `onOpen` to open something in place (a log in a `Sheet`); `selected`/`onSelect` for select mode |
 | `EntityRow` | A named thing with an avatar (a person, a place); `avatarText` puts a short code or number in the placeholder avatar instead of initials |
@@ -1019,7 +1042,8 @@ and body fonts.
 | `SearchTrigger` / `SearchIcon` (`ui/overlays.tsx`) | A button that looks like a search field and opens the palette (an explore page's search bar), and the magnifier for the top-bar `TopBarButton` |
 | `toast()` + `Toaster` (`ui/feedback.tsx`) | A short note after an action, above the dock: done (accent dot), info (support), error (highlight, stays until closed); one `action` (Undo); three at most. `Toaster` sits in the shell once; `toast()` works from anywhere |
 | `ConfirmSheet` / `useConfirm` (`ui/feedback.tsx`) | Asks before something destructive or surprising: the question, what survives, Cancel and the action in its own words (`danger`: a highlight fill, Cancel focused). `useConfirm` makes it one `await` |
-| `ProgressBar` (`ui/feedback.tsx`) | How far along a job of known length is (`value` / `max`, `format`); no `value` is a slow sweep while the length is unknown |
+| `ProgressBar` (`ui/feedback.tsx`) | How far along a job of known length is (`value` / `max`, `format`); no `value` is a slow sweep while the length is unknown; `size="lg"` is the thick bar for the one job a tile is about |
+| `JobTile` (`ui/feedback.tsx`) | One job in a "running now" list, in `List layout="tiles"`: its name and a status `Badge`, then a large percentage with the count beside it ("57 of 3,384") and a thick bar, the item it's on in readable type on an accent wash (`current`, "Now"), a `note` line, and `facts` (speed, time left, updated) in a compact block at the bottom. `state` `done` / `failed` / `queued` is compact: name, badge (`stateLabel` for "Done 09:15"), note. Text wraps; nothing is cut short |
 | `Stepper` (`ui/feedback.tsx`) | Where you are in two to five steps: numbered circles joined by a line, done ones ticked (`onStep` goes back), "Step 2 of 4 · Details" on phones |
 | `OfflineBanner` / `UpdateBanner` (`ui/feedback.tsx`) | Slim bars stuck under the top bar, first thing on the page: offline with changes waiting (fixed yellow; `useOnline`), or a new version ready (Reload / Later) |
 | `DataTable` (`ui/data.tsx`) | Many records with several facts: a sortable table on desktop (`sortValue` per column; `aria-sort`), a row per record on phones with the `primary` column as its title — never a sideways-scrolling table. Keep `sort` in the URL |
@@ -1049,7 +1073,7 @@ one here fits.
 | **Opening a page** | `PageHeader` (title row) · `HeroSection` (full-width, pattern, no photo) · `Banner` / `Hero` (over a blurred photo) |
 | **A list of things** | `List` + `EventRow` (dated, with date tickets) · `List` + `EntityRow` (people, places, with avatars) · `RankedList` (top-N with counts) · `MediaGrid` of `MediaCard`s (image-led, three sizes) · `LinkCard` stack (a few destinations) |
 | **Numbers** | `StatGrid` + `StatTile` (headline numbers, coloured dots) · `RankedList` (counts in a list) · `Section` with big `font-display` numbers |
-| **A block of content** | `Section` (titled card) · plain `.card` · `FullBleed` band (`surface`, or a brand colour) · `Sheet` (when it's a choice or a short flow) |
+| **A block of content** | `Section` (titled card; side by side in `Columns`) · plain `.card` · `FullBleed` band (`surface`, or a brand colour) · `Sheet` (when it's a choice or a short flow) |
 | **Calls to action** | primary `Button` · `LinkCard` with `accent` · `FullBleed` band in a brand colour · `HeroSection` actions |
 | **Switching views** | `Tabs` (2–4, segmented) · `PillTabs` (wrapping filters) · `ViewSwitch` (list ⇄ map) · `SelectField` (many options on phones) |
 | **Finding things** | `SearchField` (one list) · `CommandPalette` with providers (app-wide, Spotlight) · `SearchTrigger` (a page's search bar that opens it) · `PillTabs` filters · `SelectField` sort · `Autocomplete` (pick or add a record) |
@@ -1060,7 +1084,7 @@ one here fits.
 | **Taking input** | `TextField` · `TextArea` · `DateField` · `FileDrop` · `SelectField` · `RangeField` · `SwitchRow` |
 | **Actions on one thing** | `Menu` (⋯) · `Popover` (a few controls) · `Tooltip` on icon buttons · `CommandPalette` (⌘K, app-wide) |
 | **After an action** | `toast()` (done, Undo) · `ConfirmSheet` (before a destructive one) · inline `TextField` errors |
-| **Work in progress** | `ProgressBar` (known length) · `Stepper` (a flow of steps) · `FloatingBar` (running now) · `OfflineBanner` / `UpdateBanner` |
+| **Work in progress** | `JobTile`s in `List layout="tiles"` (jobs running now) · `ProgressBar` (known length) · `Stepper` (a flow of steps) · `FloatingBar` (running now) · `OfflineBanner` / `UpdateBanner` |
 | **Many records** | `DataTable` (several facts each, sortable) · `List` + rows (one or two facts) · `Accordion` (content to fold away) |
 | **Settings** | `SwitchRow` (on/off), `KeyValue` (read-only), `.field`, `SelectField`, `RangeField`, `Tabs`, `Section` cards |
 | **Page width** | column (default) · wide · full (`AppShell width`) |
@@ -1225,6 +1249,7 @@ archetype only sets the starting shape.
   under it, no fade to solid `bg`, no `overflow-hidden` cut. Fade its
   background layer out with `.fade-out` (section 7).
 - No horizontal scrolling rows, no hover-only actions.
+- No hidden scrollbars, and no cards side by side at different heights.
 - No native colour inputs, and no browser alerts except as a last-resort
   error.
 - No new font sizes outside the scale in section 5.
@@ -1497,3 +1522,12 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   columns link (`to`), with an *Open* link in the readout. New rule: text
   never overflows — the kit trims every text slot (one line or a 2–3 line
   clamp), and apps do the same.
+- **0.14.6 (2026-11-06)** — Symmetry: `Section`s side by side go in
+  `Columns`, and each card stretches to its row's tallest, content at the
+  top; `MediaGrid`, `List layout="tiles"` and `StatGrid` rows are one size.
+  Scrollbars always show: every scrollbar inside the page is themed and
+  stays visible (macOS too), with `.scroll-area`, `.scroll-area-x` and
+  `List maxHeight`; `PillTabs scroll` and sheets show theirs. `JobTile`
+  for jobs running now (big percentage, thick bar, the item it's on, facts
+  below; a compact finished state) and `ProgressBar size="lg"`. `Page` and
+  `fill`; `Pending` for results being replaced; an item's page is a path.

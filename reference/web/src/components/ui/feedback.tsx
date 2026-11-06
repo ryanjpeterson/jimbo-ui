@@ -6,6 +6,8 @@
  * - `ConfirmSheet` / `useConfirm` — asks before something destructive or
  *   surprising, in plain words, saying what survives.
  * - `ProgressBar` — how far along a job of known length is.
+ * - `JobTile` — one job in a "running now" list: progress and the item it's
+ *   on up front, the rest in a compact block; a short finished state.
  * - `Stepper` — where you are in a flow of a few steps.
  * - `OfflineBanner` / `UpdateBanner` — slim bars under the top bar: offline
  *   (with changes waiting), or a new version ready.
@@ -16,7 +18,7 @@
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
-import { Sheet } from "@/components/ui/kit";
+import { Badge, Sheet, type Tone } from "@/components/ui/kit";
 import { cn } from "@/lib/cn";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -174,7 +176,7 @@ const BAR_FILL = { accent: "bg-accent", support: "bg-support", highlight: "bg-hi
  * No `value` is "working, length unknown" — a slow sweep. For background
  * work that shouldn't take a whole row, use the corner ring (guide section 9).
  */
-export function ProgressBar({ label, value, max = 100, tone = "accent", format, hideLabel = false, className }: {
+export function ProgressBar({ label, value, max = 100, tone = "accent", format, hideLabel = false, size = "md", className }: {
   label: string;
   /** Leave out while the length is unknown. */
   value?: number;
@@ -184,6 +186,8 @@ export function ProgressBar({ label, value, max = 100, tone = "accent", format, 
   format?: (value: number, max: number) => string;
   /** Keep the label for screen readers only. */
   hideLabel?: boolean;
+  /** `lg`: a thicker bar, for the one job a tile is about (`JobTile`). */
+  size?: "md" | "lg";
   className?: string;
 }) {
   const known = value != null;
@@ -196,11 +200,120 @@ export function ProgressBar({ label, value, max = 100, tone = "accent", format, 
         <span className="shrink-0 tabular-nums text-text-subtle">{text}</span>
       </div>
       <div role="progressbar" aria-label={label} aria-valuemin={0} aria-valuemax={max} aria-valuenow={known ? value : undefined} aria-valuetext={text}
-        className="relative h-2 overflow-hidden rounded-full bg-surface-2">
+        className={cn("relative overflow-hidden rounded-full bg-surface-2", size === "lg" ? "h-3" : "h-2")}>
         {known
           ? <div className={cn("h-full rounded-full transition-[width] duration-300", BAR_FILL[tone])} style={{ width: `${pct}%` }} />
           : <div className={cn("absolute inset-y-0 w-1/3 rounded-full motion-safe:animate-[jimbo-sweep_1.4s_ease-in-out_infinite]", BAR_FILL[tone])} />}
       </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Job tiles
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type JobState = "running" | "queued" | "paused" | "done" | "failed";
+
+const JOB_STATE: Record<JobState, { tone: Tone; label: string; live?: boolean }> = {
+  running: { tone: "accent", label: "Running", live: true },
+  queued: { tone: "muted", label: "Queued" },
+  paused: { tone: "yellow", label: "Paused" },
+  done: { tone: "accent", label: "Done" },
+  failed: { tone: "red", label: "Failed" },
+};
+
+/**
+ * One job in a "running now" list, made for `List layout="tiles"` (which
+ * gives it its card; in rows it's a roomy row). While it runs, what matters
+ * most comes first and biggest: how far along it is (a large percentage,
+ * the count beside it, a thick `ProgressBar`) and the item it's on, on an
+ * accent wash in readable type ("Now · Some item"). The rest — speed, time
+ * left, when it last reported — sits in a compact block of `facts` at the
+ * bottom, lined up across tiles. Finished, failed or queued, it shrinks to
+ * its name, a status badge and its `note`. Long text wraps; nothing here
+ * is cut with an ellipsis.
+ */
+export function JobTile({ title, state = "running", value, max = 100, count, current, currentLabel = "Now", facts, note, stateLabel, action, className }: {
+  title: ReactNode;
+  state?: JobState;
+  /** Done so far, of `max`. Leave out while the length is unknown. */
+  value?: number;
+  max?: number;
+  /** Beside the percentage: "57 of 3,384". Defaults to `value` of `max`. */
+  count?: ReactNode;
+  /** The item it's working on right now. */
+  current?: ReactNode;
+  currentLabel?: string;
+  /** Secondary facts (speed, time left, updated), a compact block at the bottom. */
+  facts?: { label: string; value: ReactNode }[];
+  /** A line of detail: the stage while running, what happened once finished (a failure's reason). Wraps. */
+  note?: ReactNode;
+  /** Replaces the badge's word ("Done 3 min ago"). */
+  stateLabel?: string;
+  /** One small control (Pause, Cancel, a ⋯ `Menu`). */
+  action?: ReactNode;
+  className?: string;
+}) {
+  const s = JOB_STATE[state];
+  const name = typeof title === "string" ? title : "Progress";
+  const header = (
+    <div className="flex items-start gap-3">
+      <p className="min-w-0 flex-1 break-words text-15 font-semibold leading-snug text-text-base">{title}</p>
+      <Badge tone={s.tone} dot live={s.live} className="mt-0.5 shrink-0">{stateLabel ?? s.label}</Badge>
+      {action}
+    </div>
+  );
+  const factBlock = facts && facts.length > 0 && (
+    <dl className="mt-auto flex flex-wrap gap-x-5 gap-y-2 border-t border-border pt-3">
+      {facts.map((f) => (
+        <div key={f.label} className="min-w-0">
+          <dt className="text-11 font-semibold uppercase tracking-wider text-text-subtle">{f.label}</dt>
+          <dd className="break-words text-sm font-semibold text-text-base">{f.value}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+
+  if (state === "done" || state === "failed" || state === "queued") {
+    return (
+      <div className={cn("flex h-full flex-col gap-2 p-4 sm:p-5", className)}>
+        {header}
+        {/* Muted, not highlight: highlight text on a card can drop under 3:1 in some looks; the badge says it failed. */}
+        {note && <p className="break-words text-sm text-text-muted">{note}</p>}
+        {factBlock}
+      </div>
+    );
+  }
+
+  const known = value != null;
+  const pct = known ? Math.min(100, Math.max(0, (value / max) * 100)) : 0;
+  const shown = pct > 0 && pct < 10 ? pct.toFixed(1) : Math.round(pct).toString();
+  const countText = count ?? (known ? `${value.toLocaleString()} of ${max.toLocaleString()}` : null);
+  return (
+    <div className={cn("flex h-full flex-col gap-3 p-4 sm:p-5", className)}>
+      {header}
+      <div>
+        <p className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
+          {known
+            ? <span className="font-display text-40 leading-none text-text-base">{shown}%</span>
+            : <span className="font-display text-28 leading-none text-text-muted">Working…</span>}
+          {countText && <span className="text-sm font-medium text-text-muted">{countText}</span>}
+        </p>
+        <ProgressBar label={name} hideLabel size="lg" value={value} max={max} className="mt-3" />
+      </div>
+      {current && (
+        // The item it's on: readable type on an accent wash (text on accent-950 is ≥ 6.5:1 in every look).
+        <div className="rounded-xl bg-accent-950 px-3 py-2.5">
+          <p className="flex items-center gap-1.5 text-11 font-semibold uppercase tracking-wider text-text-base">
+            <span aria-hidden="true" className={cn("dot-accent h-2 w-2 shrink-0", state === "running" && "animate-pulse")} />
+            {currentLabel}
+          </p>
+          <p className="mt-1 break-words text-15 font-semibold leading-snug text-text-base">{current}</p>
+        </div>
+      )}
+      {note && <p className="break-words text-sm text-text-muted">{note}</p>}
+      {factBlock}
     </div>
   );
 }

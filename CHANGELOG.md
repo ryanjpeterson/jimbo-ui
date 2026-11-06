@@ -34,9 +34,11 @@ the matching 0.x release.
 
 ## Unreleased
 
+## 0.14.6 — 2026-11-06
+
 **Update:** feature
 
-Changes that load look like they're loading, and can be cancelled.
+Symmetry, scrollbars that always show, and job tiles that put progress first; changes that load look like they're loading, and can be cancelled.
 
 ### Added
 
@@ -48,8 +50,24 @@ Changes that load look like they're loading, and can be cancelled.
 - Cards side by side are one size: `MediaGrid`, `List layout="tiles"` and
   `StatGrid` make every row as tall as the tallest card, and each card
   fills its cell. Guide section 6.
+- `Columns` in the kit: sections or cards side by side (`count` 2 or 3,
+  from `lg:` or `sm:`), every row one height. Guide section 6 makes
+  symmetry a rule: nothing in a row is shorter than its neighbour.
+- Scrollbars always show. `globals.css` themes every scrollbar inside the
+  page — a `surface-2` lane with a `text-subtle` thumb (≥ 3:1 on the lane
+  in every look and tone), `text-muted` on hover, accent while dragged — and
+  in Chrome and Safari it stays visible on macOS too, so a capped list
+  plainly scrolls. New utilities `.scroll-area` and `.scroll-area-x`;
+  `List maxHeight` caps a list of rows and scrolls inside its card. Guide
+  sections 6 and 7; never hide a scrollbar (section 12).
+- `JobTile` (`ui/feedback.tsx`): one job in a "running now" list, made for
+  `List layout="tiles"`. A large percentage with the count beside it and a
+  thick bar first, the item it's on in readable type on an accent wash,
+  then a note and a compact block of facts (speed, time left, updated) at
+  the bottom; `done`, `failed` and `queued` are compact (name, badge, note).
+  Text wraps instead of being cut. `ProgressBar size="lg"` is its thick bar.
 - Guide section 6: an item's page is a path — the singular kind and its
-  name (`/service/plex`), never `?id=` or the list's path with the item
+  name (`/service/mail`), never `?id=` or the list's path with the item
   after it.
 - `Pending` in the kit: wraps a result that's being replaced after a
   control changed. The old result stays, dimmed, under a glass bar
@@ -58,6 +76,16 @@ Changes that load look like they're loading, and can be cancelled.
   request and put the control back. Guide section 7 makes it the rule:
   nothing looks like it did nothing.
 
+### Changed
+
+- `Section`'s card stretches to fill its cell, content at the top, so two
+  sections side by side in a grid are one height (one with a line under
+  its chart no longer leaves its neighbour short).
+- `PillTabs scroll` shows its scrollbar under the row instead of hiding it,
+  and a `Sheet`'s body keeps its bar showing.
+- The Dashboard and Status archetypes put their charts in `Columns`; the
+  Dashboard adds a "Running now" list of `JobTile`s.
+
 ### Fixed
 
 - `setUrlParams` (`lib/useUrlState.ts`) started from React Router 6's
@@ -65,10 +93,20 @@ Changes that load look like they're loading, and can be cancelled.
   in one handler (a sort, then its page back to 1) dropped the first. It
   now starts from the live URL.
 
-**Apps must:** Nothing — copy `lib/useUrlState.ts` again. `Pending`,
-`Page` and the `fill` props are available to adopt: port `AppShell`'s
-main (a `flex flex-1 flex-col` column) and wrap pages in `Page` to have
-short pages fill the screen.
+**Apps must:** Nothing — copy the foundation files (`styles/globals.css`
+brings the scrollbars and `.scroll-area`) and `lib/useUrlState.ts` again.
+Available to adopt from `reference/`: `Pending`, `Page` and the `fill`
+props (port `AppShell`'s main, a `flex flex-1 flex-col` column, and wrap
+pages in `Page` to have short pages fill the screen); `Section`'s
+stretching card and `Columns` (replace `grid lg:grid-cols-2` around
+sections with `Columns`); `List maxHeight` in place of a hand-capped
+`overflow-y-auto` list; `PillTabs`' visible bar (drop
+`[scrollbar-width:none]` and the hidden webkit bar from any copy);
+`JobTile` and `ProgressBar size` from `ui/feedback.tsx` for a running-now
+list. An app that hid a scrollbar itself can drop that to match.
+
+**Available:** `Columns`, `JobTile`, `.scroll-area`, `.scroll-area-x`,
+`List maxHeight`, `ProgressBar size`, `Pending`, `useSettled`, `Page`.
 
 ## 0.14.5 — 2026-11-05
 

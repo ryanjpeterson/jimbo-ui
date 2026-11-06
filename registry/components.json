@@ -392,9 +392,27 @@
         "flush": "boolean",
         "count": "number",
         "plain": "no card (tiles under a title)",
-        "fill": "takes the rest of the page's height"
+        "fill": "takes the rest of the page's height",
+        "in a grid row": "its card stretches to the tallest, content at the top"
       },
       "source": "reference/web/src/components/ui/kit.tsx#Section"
+    },
+    {
+      "id": "columns",
+      "name": "Columns",
+      "purpose": "Lays out sections or cards side by side, every row one height.",
+      "tier": "kit",
+      "aliases": [
+        "SectionGrid",
+        "Two-up",
+        "Side by side",
+        "grid lg:grid-cols-2"
+      ],
+      "variants": {
+        "count": "2 | 3",
+        "from": "lg | sm"
+      },
+      "source": "reference/web/src/components/ui/kit.tsx#Columns"
     },
     {
       "id": "list",
@@ -410,7 +428,8 @@
       ],
       "variants": {
         "layout": "rows | tiles",
-        "bare": "no card, inside Section flush"
+        "bare": "no card, inside Section flush",
+        "maxHeight": "rows: caps the card and scrolls inside it, scrollbar always showing"
       },
       "source": "reference/web/src/components/ui/kit.tsx#List"
     },
@@ -612,7 +631,9 @@
         "FilterPills",
         "Chips"
       ],
-      "variants": {},
+      "variants": {
+        "scroll": "one row that scrolls sideways, its scrollbar showing"
+      },
       "source": "reference/web/src/components/ui/kit.tsx#PillTabs"
     },
     {
@@ -855,9 +876,46 @@
       ],
       "variants": {
         "tone": "accent | support | highlight",
-        "value": "omitted = length unknown"
+        "value": "omitted = length unknown",
+        "size": "md | lg (thick, for a JobTile)"
       },
       "source": "reference/web/src/components/ui/feedback.tsx#ProgressBar"
+    },
+    {
+      "id": "job-tile",
+      "name": "JobTile",
+      "purpose": "Shows one job in a running-now list: how far along, the item it's on, its facts; compact once finished.",
+      "tier": "kit",
+      "aliases": [
+        "ProgressCard",
+        "JobCard",
+        "TaskTile",
+        "RunningJob",
+        "Running now tile"
+      ],
+      "variants": {
+        "state": "running | queued | paused | done | failed",
+        "current": "the item it's on (accent wash)",
+        "facts": "speed, time left, updated",
+        "note": "stage, or what happened"
+      },
+      "source": "reference/web/src/components/ui/feedback.tsx#JobTile"
+    },
+    {
+      "id": "scroll-area",
+      "name": ".scroll-area",
+      "purpose": "A box that scrolls inside the page with its themed scrollbar always showing.",
+      "tier": "foundation",
+      "aliases": [
+        "ScrollArea",
+        "Scrollable",
+        "overflow-y-auto box",
+        "scroll-x"
+      ],
+      "variants": {
+        "axis": ".scroll-area (down) | .scroll-area-x (sideways)"
+      },
+      "source": "foundation/src/styles/globals.css#scroll-area"
     },
     {
       "id": "bar-chart",

@@ -389,7 +389,10 @@ export function Hero({ imageUrl, imageAlt, eyebrow, title, children, actions, ba
 // Sections and lists
 // ─────────────────────────────────────────────────────────────────────────────
 
-/** Titled block. `flush` drops the inner padding for edge-to-edge lists; `plain` drops the card (for a grid of tiles under a title). */
+/**
+ * Titled block. `flush` drops the inner padding for edge-to-edge lists; `plain` drops the card (for a grid of tiles under a title).
+ * Side by side in a grid (`Columns`) its card stretches to the row's tallest, content at the top: one size per row.
+ */
 export function Section({ title, count, action, children, flush = false, plain = false, fill = false, className }: {
   title?: ReactNode;
   count?: number;
@@ -402,7 +405,8 @@ export function Section({ title, count, action, children, flush = false, plain =
   className?: string;
 }) {
   return (
-    <section className={cn(fill ? "flex flex-1 flex-col gap-3" : "space-y-3", className)}>
+    // A column, so in a grid row (which stretches every cell to the tallest) the card takes the spare height.
+    <section className={cn("flex min-w-0 flex-col gap-3", fill && "flex-1", className)}>
       {(title || action) && (
         <div className="flex items-end justify-between gap-3 px-0.5">
           {title && (
@@ -414,9 +418,23 @@ export function Section({ title, count, action, children, flush = false, plain =
           {action}
         </div>
       )}
-      {plain ? children : <div className={cn("card", flush ? "overflow-hidden" : "p-4 sm:p-5", fill && "flex-1")}>{children}</div>}
+      {plain ? children : <div className={cn("card flex-1", flush ? "overflow-hidden" : "p-4 sm:p-5")}>{children}</div>}
     </section>
   );
+}
+
+/**
+ * Sections or cards side by side: one column on phones, `count` (2 or 3)
+ * from `lg:` (`sm:` with `from="sm"`). Every row is as tall as its tallest
+ * cell and each `Section`'s card stretches to it, content at the top — so
+ * two charts side by side are one size even when one has a line under it.
+ */
+export function Columns({ count = 2, from = "lg", children, className }: { count?: 2 | 3; from?: "sm" | "lg"; children: ReactNode; className?: string }) {
+  const cols = {
+    sm: { 2: "sm:grid-cols-2", 3: "sm:grid-cols-2 lg:grid-cols-3" },
+    lg: { 2: "lg:grid-cols-2", 3: "lg:grid-cols-3" },
+  }[from][count];
+  return <div className={cn("grid items-stretch gap-6", cols, className)}>{children}</div>;
 }
 
 export type ListLayout = "rows" | "tiles";
@@ -426,12 +444,29 @@ export type ListLayout = "rows" | "tiles";
  * shows the same items as a grid of cards instead (one column on phones, two
  * or three wider); `bare` leaves out the card around rows, for use inside a
  * `Section flush`. Let people pick with `LayoutSwitch` + `useListLayout`.
+ * `maxHeight` (rows) caps the card and scrolls inside it, with the bar
+ * always showing (`.scroll-area`) so it's plain there's more.
  */
-export function List({ children, layout = "rows", bare = false, className }: { children: ReactNode; layout?: ListLayout; bare?: boolean; className?: string }) {
+export function List({ children, layout = "rows", bare = false, maxHeight, className }: {
+  children: ReactNode;
+  layout?: ListLayout;
+  bare?: boolean;
+  /** Rows only: the most the list grows to (px or a CSS length), then it scrolls. */
+  maxHeight?: number | string;
+  className?: string;
+}) {
   if (layout === "tiles") {
     return (
       <div className={cn("grid auto-rows-fr gap-3 sm:grid-cols-2 lg:grid-cols-3", className)}>
         {Children.toArray(children).map((child, i) => <div key={i} className="card h-full overflow-hidden">{child}</div>)}
+      </div>
+    );
+  }
+  if (maxHeight != null) {
+    // The card clips its corners; the box inside scrolls, so the bar sits within the card's edge.
+    return (
+      <div className={cn(!bare && "card overflow-hidden", className)}>
+        <div className="scroll-area divide-etched" style={{ maxHeight }}>{children}</div>
       </div>
     );
   }
@@ -1248,7 +1283,8 @@ export function Tabs<T extends string>({ value, onChange, options, size = "md" }
  * Pill tabs for desktop filters; wraps rather than scrolling. `scroll` keeps
  * them on one row that scrolls sideways (to the screen's edges on phones) —
  * for a page's own sections when there are more than fit, so they don't stack
- * into rows that look like the filters under them.
+ * into rows that look like the filters under them. Its scrollbar always shows
+ * under the row (`.scroll-area-x`), so it's plain there are more.
  */
 export function PillTabs<T extends string>({ value, onChange, options, scroll = false }: {
   value: T;
@@ -1268,7 +1304,7 @@ export function PillTabs<T extends string>({ value, onChange, options, scroll = 
   }, [scroll, value]);
   return (
     <div ref={row} className={scroll
-      ? "-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden"
+      ? "scroll-area-x -mx-4 flex gap-2 px-4 sm:mx-0 sm:px-0"
       : "flex flex-wrap gap-2"}>
       {options.map((o) => {
         const active = o.value === value;
@@ -1455,7 +1491,7 @@ export function Sheet({ title, subtitle, onClose, children, wide = false }: {
             </svg>
           </button>
         </header>
-        <div className="flex-1 overflow-y-auto overscroll-contain pb-[var(--safe-bottom)]">{children}</div>
+        <div className="scroll-area flex-1 pb-[var(--safe-bottom)]">{children}</div>
       </div>
     </div>,
     document.body,
