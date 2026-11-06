@@ -57,7 +57,7 @@ export function Shell() {
         <Sheet title="Add an entry" subtitle="The + button opens the app's main add flow in a sheet." onClose={() => setSheet(null)}>
           <div className="space-y-3 p-5">
             <label className="label" htmlFor="add-title">Title</label>
-            <input id="add-title" className="field h-12 w-full sm:h-11" placeholder="What's happening?" />
+            <input id="add-title" className="field h-control w-full" placeholder="What's happening?" />
             <Button className="w-full" onClick={() => setSheet(null)}>Add entry</Button>
           </div>
         </Sheet>

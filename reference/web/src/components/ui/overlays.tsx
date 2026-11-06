@@ -425,7 +425,7 @@ export function SearchIcon({ size = 18 }: { size?: number }) {
 export function SearchTrigger({ onClick, label = "Search", className }: { onClick: () => void; label?: string; className?: string }) {
   return (
     <button type="button" onClick={onClick}
-      className={cn("glass flex h-12 w-full items-center gap-3 rounded-xl px-4 text-left text-base text-text-subtle transition-colors hover:border-accent sm:h-11", className)}>
+      className={cn("glass flex h-control w-full items-center gap-3 rounded-xl px-4 text-left text-base text-text-subtle transition-colors hover:border-accent sm:h-11", className)}>
       <SearchIcon />
       <span className="min-w-0 flex-1 truncate">{label}</span>
       <kbd className="hidden shrink-0 rounded-md border border-border px-1.5 py-0.5 font-mono text-11 sm:block">{MOD}K</kbd>

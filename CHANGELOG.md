@@ -34,6 +34,56 @@ the matching 0.x release.
 
 ## Unreleased
 
+## 0.14.7 — 2026-11-06
+
+**Update:** feature
+
+One control height everywhere, rows of controls that line up, Back on every page below a tab with paths that nest, and linked share sliders.
+
+### Added
+
+- One control height: `h-control` (`--control-h`: 44 px on phones, 40 px
+  from `sm`) and `h-control-sm` (36/32 px). `.btn`, `.btn-sm`, fields,
+  `SelectField`, `SearchField`, `Autocomplete`, `TextField`, `Tabs`,
+  `ViewSwitch`, `PillTabs`, `RangeField` and the search trigger all use it,
+  so a field and its button, or a select beside a button, are one height.
+  Guide section 6.
+- `.controls`: a row of controls where every button, field, select and
+  switch is `h-control`, whatever size it was given. `PageHeader actions`
+  and `Section action` are now `.controls` rows, so a small button beside
+  a `LayoutSwitch` no longer sits shorter than it. `.control-grid` lays
+  options out in equal columns, each one control high and full width.
+- `PageHeader back`: Back to the parent page, above the eyebrow. Guide
+  section 6: paths nest under their dock tab, one segment per step
+  (`/library/import`), and every page below a tab's own page has Back.
+- `useRememberPages` (call it in the shell; the reference `AppShell` does),
+  `backHref` and `parentPath`: `BackButton` now goes to the parent as it
+  was left — its tabs, filters and page — not a bare path.
+- `ShareSliders`, `rebalance` and `normaliseShares`: linked sliders that
+  split one total. Moving one moves the rest the other way in proportion,
+  so they always add up to the total and never pass it; each shows its
+  percentage and amount.
+
+### Changed
+
+- `Section`'s title row is one control high with or without an action, and
+  its action sits on the right even when the row wraps, so sections side by
+  side start their cards level.
+- `Tabs` (both sizes) and `ViewSwitch` are one control high, their options
+  filling the switch.
+- Phone fields are 44 px (were 48), matching buttons.
+
+**Apps must:** Nothing — copy the foundation files (`styles/globals.css`
+brings `h-control`, `.controls` and `.control-grid`). Available to adopt
+from `reference/`: the kit's control heights, `PageHeader back`,
+`BackButton`'s remembered parent (port `useRememberPages` into `AppShell`),
+`ShareSliders`. Replace hand-set heights (`h-12 sm:h-11`, `h-11 sm:h-10`)
+with `h-control`, and sliders that split one total with `ShareSliders`.
+
+**Available:** `h-control`, `h-control-sm`, `.controls`, `.control-grid`,
+`PageHeader back`, `useRememberPages`, `backHref`, `parentPath`,
+`ShareSliders`, `rebalance`, `normaliseShares`.
+
 ## 0.14.6 — 2026-11-06
 
 **Update:** feature

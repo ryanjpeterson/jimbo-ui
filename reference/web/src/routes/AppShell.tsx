@@ -11,6 +11,7 @@ import type { ReactNode } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { HeaderTitle } from "@/components/HeaderTitle";
 import { Toaster } from "@/components/ui/feedback";
+import { useRememberPages } from "@/components/ui/kit";
 import { usePullToRefresh } from "@/lib/gestures";
 import { cn } from "@/lib/cn";
 
@@ -37,6 +38,7 @@ export function AppShell({ tabs, actions, onRefresh, width = "column", children 
   children: ReactNode;
 }) {
   const location = useLocation();
+  useRememberPages(); // so Back lands on a page as it was left (BackButton)
   const { pull, refreshing } = usePullToRefresh(onRefresh ?? (async () => {}));
   const inTab = (t: ShellTab) =>
     [t.to, ...(t.also ?? [])].some((p) => (p === "/" ? location.pathname === "/" : location.pathname.startsWith(p)));

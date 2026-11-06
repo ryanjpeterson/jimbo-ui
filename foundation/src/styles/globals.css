@@ -11,6 +11,11 @@
    ThemeScope's colours, a heading's --fs — not where it was defined.
    ───────────────────────────────────────────────────────────────────────── */
 @theme inline {
+  /* One control height (h-control): buttons, fields, selects and switches
+     side by side line up. 44 px on phones (the touch target), 40 px from
+     sm. h-control-sm is the compact size for inside rows and cards. */
+  --spacing-control: var(--control-h);
+  --spacing-control-sm: var(--control-h-sm);
   --color-bg: rgb(var(--c-bg));
   --color-bg-deep: rgb(var(--c-bg-deep));
   --color-surface: rgb(var(--c-surface));
@@ -133,6 +138,10 @@
   }
   /* Buttons show a pointer, as they did before Tailwind 4. */
   button:not(:disabled), [role="button"]:not(:disabled) { cursor: pointer; }
+  :root { --control-h: 2.75rem; --control-h-sm: 2.25rem; }
+  @media (min-width: 640px) {
+    :root { --control-h: 2.5rem; --control-h-sm: 2rem; }
+  }
 }
 
 @layer base {
@@ -364,13 +373,13 @@
   }
   /* Buttons: pill-shaped, one height per size, three tones. */
   .btn {
-    @apply inline-flex h-11 shrink-0 select-none items-center justify-center gap-2 whitespace-nowrap rounded-control px-5
+    @apply inline-flex h-control shrink-0 select-none items-center justify-center gap-2 whitespace-nowrap rounded-control px-5
       text-15 font-semibold transition-colors
       focus:outline-hidden focus-visible:ring-2 focus-visible:ring-accent/50
-      disabled:cursor-not-allowed disabled:opacity-50 sm:h-10 sm:text-sm;
+      disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm;
   }
   .btn-sm {
-    @apply h-9 px-3.5 text-sm sm:h-8;
+    @apply h-control-sm px-3.5 text-sm;
   }
   /* Flat accent fill with a slight outline in the accent's darker shade. */
   .btn-primary {
@@ -438,6 +447,31 @@
   body *::-webkit-scrollbar-corner { background: transparent; }
   @supports not selector(::-webkit-scrollbar) {
     body * { scrollbar-color: rgb(var(--c-text-subtle)) rgb(var(--c-surface-2)); scrollbar-width: thin; }
+  }
+}
+
+/* A row of controls (a page's or section's actions, a field and its
+   button, a form's options): every button, field, select and switch in it
+   is one height, h-control, whatever size it was given, so the row reads
+   as one strip. Wraps on narrow screens. */
+@utility controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  & > .btn, & > .field, & > [role="tablist"], & > label > .field, & > label > select, & > a.btn {
+    height: var(--control-h);
+  }
+}
+/* A grid of controls: each cell one control high and the full width of its
+   column, so options laid out in two or more columns are one size. */
+@utility control-grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+  & > .btn, & > .field, & > [role="tablist"], & > label > .field, & > label > select {
+    height: var(--control-h);
+    width: 100%;
   }
 }
 

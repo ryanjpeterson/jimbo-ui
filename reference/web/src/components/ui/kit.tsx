@@ -12,7 +12,7 @@
 
 import { Children, createContext, useContext, useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode, type RefObject } from "react";
 import { createPortal } from "react-dom";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/cn";
 import { backdropCss, fullTheme, loadFonts, themeVars, type BackdropPattern, type Theme } from "@/lib/theme";
 import { useBrand } from "@/lib/useBrand";
@@ -188,7 +188,7 @@ export function HeroSection({ eyebrow, title, children, actions, pattern = "ripp
         {eyebrow && <p className="eyebrow text-support">{eyebrow}</p>}
         <h1 className="line-clamp-3 break-words font-display text-40 leading-[1.02] text-text-base sm:text-6xl">{title}</h1>
         {children && <div className={cn("max-w-xl text-17 text-text-muted", align === "center" && "mx-auto")}>{children}</div>}
-        {actions && <div className="mt-2 flex flex-wrap gap-2">{actions}</div>}
+        {actions && <div className="controls mt-2">{actions}</div>}
       </div>
     </FullBleed>
   );
@@ -198,37 +198,66 @@ export function HeroSection({ eyebrow, title, children, actions, pattern = "ripp
 // Page scaffolding
 // ─────────────────────────────────────────────────────────────────────────────
 
-export function PageHeader({ eyebrow, title, count, actions, className }: {
+export function PageHeader({ eyebrow, title, count, actions, back, className }: {
   eyebrow?: ReactNode;
   title: ReactNode;
   count?: number;
+  /** Buttons and switches, laid out as one `.controls` row: every one the same height. */
   actions?: ReactNode;
+  /** The page this one sits under (its path minus the last part). Every page below a dock tab's own page has one. */
+  back?: { to: string; label: string };
   className?: string;
 }) {
   return (
     <header className={cn("mb-5 sm:mb-6", className)}>
+      {back && <div className="mb-2"><BackButton to={back.to} label={back.label} /></div>}
       {eyebrow && <p className="eyebrow mb-1 text-support">{eyebrow}</p>}
-      <div className="flex items-end justify-between gap-3">
+      <div className="flex flex-wrap items-end justify-between gap-3">
         <h1 className="h-page min-w-0 line-clamp-2 break-words">
           {title}
           {count != null && count > 0 && (
             <span className="ml-2 align-middle text-base font-body font-medium text-text-subtle">{count.toLocaleString()}</span>
           )}
         </h1>
-        {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
+        {actions && <div className="controls shrink-0 justify-end">{actions}</div>}
       </div>
     </header>
   );
 }
 
-/** Round back button — sits top-left on heroes and above plain pages. */
+// The last full URL (path and search) seen for each path, so Back to a page
+// lands on it as it was left — its tab, filters and page — not a bare path.
+const lastUrl = new Map<string, string>();
+
+/** Call once in the app shell: remembers where each page was left, for `BackButton`. */
+export function useRememberPages() {
+  const { pathname, search } = useLocation();
+  useEffect(() => { lastUrl.set(pathname, pathname + search); }, [pathname, search]);
+}
+
+/** Where Back to `to` goes: that page as it was last left, or `to` itself. */
+export function backHref(to: string): string {
+  return to.includes("?") ? to : lastUrl.get(to) ?? to;
+}
+
+/** A path's parent: "/library/import/review" → "/library/import"; "/library" → "/". */
+export function parentPath(pathname: string): string {
+  const parts = pathname.replace(/\/+$/, "").split("/").filter(Boolean);
+  return "/" + parts.slice(0, -1).join("/");
+}
+
+/**
+ * Back to the page above this one — on heroes (`overlay`) and above a
+ * `PageHeader` (its `back` prop). It goes to the parent as it was left
+ * (`useRememberPages` in the shell), so filters and tabs there survive.
+ */
 export function BackButton({ to, label, overlay = false }: { to: string; label: string; overlay?: boolean }) {
   return (
     <Link
-      to={to}
+      to={backHref(to)}
       aria-label={`Back to ${label}`}
       className={cn(
-        "inline-flex h-10 items-center gap-1 rounded-full pl-2 pr-3.5 text-sm font-semibold transition-colors",
+        "inline-flex h-control items-center gap-1 rounded-full pl-2 pr-3.5 text-sm font-semibold transition-colors",
         overlay
           ? "bg-black/45 text-white backdrop-blur-md hover:bg-black/60"
           : "-ml-2 text-text-muted hover:text-text-base",
@@ -380,7 +409,7 @@ export function Hero({ imageUrl, imageAlt, eyebrow, title, children, actions, ba
           {children && <div className="mt-2 line-clamp-3 space-y-0.5 break-words text-15 text-text-muted sm:mt-3 sm:text-lg">{children}</div>}
         </div>
       </div>
-      {actions && <div className="flex flex-wrap gap-2 pb-6 sm:pb-8">{actions}</div>}
+      {actions && <div className="controls pb-6 sm:pb-8">{actions}</div>}
     </Banner>
   );
 }
@@ -408,14 +437,16 @@ export function Section({ title, count, action, children, flush = false, plain =
     // A column, so in a grid row (which stretches every cell to the tallest) the card takes the spare height.
     <section className={cn("flex min-w-0 flex-col gap-3", fill && "flex-1", className)}>
       {(title || action) && (
-        <div className="flex items-end justify-between gap-3 px-0.5">
+        // One control high whether or not it has actions, so sections side by side start their cards level.
+        <div className="flex min-h-control flex-wrap items-center justify-between gap-x-3 gap-y-2 px-0.5">
           {title && (
-            <h2 className="h-section min-w-0 truncate">
+            // Shrinks (and trims) before the actions wrap: they only drop below once the title would be under 8 rem.
+            <h2 className="h-section min-w-[8rem] flex-1 basis-0 truncate">
               {title}
               {count != null && <span className="ml-2 text-sm font-body font-medium text-text-subtle">{count.toLocaleString()}</span>}
             </h2>
           )}
-          {action}
+          {action && <div className="controls ml-auto shrink-0 justify-end">{action}</div>}
         </div>
       )}
       {plain ? children : <div className={cn("card flex-1", flush ? "overflow-hidden" : "p-4 sm:p-5")}>{children}</div>}
@@ -655,7 +686,7 @@ export function Autocomplete({ label, value, onChange, options, onPick, onCreate
           else if (e.key === "Enter" && open && count) { e.preventDefault(); choose(active); }
           else if (e.key === "Escape") setOpen(false);
         }}
-        className={cn("field h-12 w-full sm:h-11", label && "mt-1.5")} />
+        className={cn("field h-control w-full", label && "mt-1.5")} />
       {open && count > 0 && text && (
         <ul role="listbox" className="absolute inset-x-0 top-full z-30 mt-1 max-h-64 overflow-y-auto rounded-xl border border-border bg-surface py-1 shadow-2xl">
           {options.map((o, i) => (
@@ -1181,7 +1212,7 @@ export function SearchField({ value, onChange, placeholder }: { value: string; o
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="field h-12 w-full pl-10 sm:h-11"
+        className="field h-control w-full pl-10"
       />
     </label>
   );
@@ -1209,8 +1240,93 @@ export function RangeField({ label, value, onChange, min, max, step, format = St
         <span className="font-mono text-xs text-text-subtle">{format(value)}</span>
       </span>
       <input type="range" min={min} max={max} step={step} value={value} onChange={(e) => onChange(Number(e.target.value))}
-        className="h-11 w-full cursor-pointer accent-[rgb(var(--c-accent))]" />
+        className="h-control w-full cursor-pointer accent-[rgb(var(--c-accent))]" />
     </label>
+  );
+}
+
+/**
+ * Spread `total` over shares after one moves: share `i` becomes `value`
+ * (kept between 0 and `total`, on a `step`), and the others split what's
+ * left in proportion to what they had (evenly if they had nothing), rounded
+ * to whole steps by largest remainder. The result always adds up to `total`.
+ */
+export function rebalance(values: number[], i: number, value: number, total: number, step = 1): number[] {
+  const units = Math.round(total / step);
+  if (values.length === 0) return [];
+  if (values.length === 1) return [units * step];
+  const mine = Math.max(0, Math.min(units, Math.round(value / step)));
+  const others = values.map((_, j) => j).filter((j) => j !== i);
+  const weights = others.map((j) => Math.max(0, values[j]!));
+  const sum = weights.reduce((a, b) => a + b, 0);
+  const share = spread(units - mine, sum > 0 ? weights : weights.map(() => 1));
+  const out = values.slice();
+  out[i] = mine * step;
+  others.forEach((j, k) => { out[j] = share[k]! * step; });
+  return out;
+}
+
+/** Shares scaled to add up to `total` (on a `step`), keeping their proportions — for a total that changed, or values from a link. */
+export function normaliseShares(values: number[], total: number, step = 1): number[] {
+  if (values.length === 0) return [];
+  const sum = values.reduce((a, b) => a + Math.max(0, b), 0);
+  return spread(Math.round(total / step), sum > 0 ? values.map((v) => Math.max(0, v)) : values.map(() => 1)).map((u) => u * step);
+}
+
+/** `units` whole units split by `weights`, largest remainder first. */
+function spread(units: number, weights: number[]): number[] {
+  const sum = weights.reduce((a, b) => a + b, 0) || 1;
+  const exact = weights.map((w) => (units * w) / sum);
+  const out = exact.map(Math.floor);
+  let left = units - out.reduce((a, b) => a + b, 0);
+  const order = exact.map((e, k) => [e - Math.floor(e), k] as const).sort((a, b) => b[0] - a[0]);
+  for (let n = 0; left > 0; n = (n + 1) % order.length, left--) out[order[n]![1]]! += 1;
+  return out;
+}
+
+export type ShareItem = { id: string; label: ReactNode; sub?: ReactNode; value: number; action?: ReactNode };
+
+/**
+ * Linked sliders that split one total (100%, 60 items, a budget): moving
+ * one moves the others the other way, in proportion, so they always add up
+ * to `total` and never go past it. Each shows its percentage and its amount
+ * ("40% · 24 items"). One share alone is the whole total. `onChange` gets
+ * every value, in order. Pair with `normaliseShares` when the total changes.
+ */
+export function ShareSliders({ items, total, step = 1, unit, onChange, className }: {
+  items: ShareItem[];
+  total: number;
+  step?: number;
+  /** What the total counts ("items", "hours"); left out, only the percentage shows. */
+  unit?: string;
+  onChange: (values: number[]) => void;
+  className?: string;
+}) {
+  const values = items.map((it) => it.value);
+  const sum = values.reduce((a, b) => a + b, 0) || 1;
+  return (
+    <div className={cn("divide-etched", className)}>
+      {items.map((it, i) => (
+        <div key={it.id} className="py-3 first:pt-0 last:pb-0">
+          <div className="flex min-h-control items-center justify-between gap-3">
+            <div className="min-w-0">
+              <p className="truncate text-15 font-semibold">{it.label}</p>
+              {it.sub && <p className="meta truncate">{it.sub}</p>}
+            </div>
+            <div className="flex shrink-0 items-center gap-2">
+              <span className="whitespace-nowrap font-mono text-xs text-text-subtle">
+                {Math.round((100 * it.value) / sum)}%{unit ? ` · ${it.value} ${unit}` : ""}
+              </span>
+              {it.action}
+            </div>
+          </div>
+          <input type="range" min={0} max={total} step={step} value={it.value} disabled={items.length < 2}
+            aria-label={`Share for ${typeof it.label === "string" ? it.label : it.id}`}
+            onChange={(e) => onChange(rebalance(values, i, Number(e.target.value), total, step))}
+            className="h-control w-full cursor-pointer accent-[rgb(var(--c-accent))] disabled:cursor-default disabled:opacity-60" />
+        </div>
+      ))}
+    </div>
   );
 }
 
@@ -1226,7 +1342,7 @@ export function SelectField<T extends string>({ value, onChange, options, label,
     <label className={cn("relative block", className)}>
       <span className="sr-only">{label}</span>
       <select value={value} onChange={(e) => onChange(e.target.value as T)}
-        className="field h-12 w-full appearance-none pr-10 font-semibold sm:h-11">
+        className="field h-control w-full appearance-none pr-10 font-semibold">
         {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
       </select>
       <Chevron dir="down" className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-text-subtle" />
@@ -1243,13 +1359,13 @@ export function Tabs<T extends string>({ value, onChange, options, size = "md" }
 }) {
   if (size === "sm") {
     return (
-      <div role="tablist" className="glass inline-grid shrink-0 rounded-control p-0.5" style={{ gridTemplateColumns: `repeat(${options.length}, auto)` }}>
+      <div role="tablist" className="glass inline-grid h-control shrink-0 rounded-control p-0.5" style={{ gridTemplateColumns: `repeat(${options.length}, auto)` }}>
         {options.map((o) => {
           const active = o.value === value;
           return (
-            // 36 px tall, with the row's padding making up a 44 px target.
+            // Fills the switch, which is one control high: it lines up with the buttons beside it.
             <button key={o.value} role="tab" aria-selected={active} onClick={() => onChange(o.value)}
-              className={cn("h-9 rounded-lg px-3 text-sm font-semibold transition-colors", active ? "lit-accent" : "text-text-muted hover:text-text-base")}>
+              className={cn("h-full rounded-lg px-3 text-sm font-semibold transition-colors", active ? "lit-accent" : "text-text-muted hover:text-text-base")}>
               {o.label}
             </button>
           );
@@ -1258,7 +1374,7 @@ export function Tabs<T extends string>({ value, onChange, options, size = "md" }
     );
   }
   return (
-    <div role="tablist" className="glass grid rounded-xl p-1 sm:inline-grid sm:min-w-[320px]"
+    <div role="tablist" className="glass grid h-control rounded-xl p-0.5 sm:inline-grid sm:min-w-[320px]"
       // Four or more tabs size to their labels (equal widths would clip the longest).
       style={{ gridTemplateColumns: options.length > 3 ? `repeat(${options.length}, auto)` : `repeat(${options.length}, minmax(0, 1fr))` }}>
       {options.map((o) => {
@@ -1266,7 +1382,7 @@ export function Tabs<T extends string>({ value, onChange, options, size = "md" }
         return (
           <button key={o.value} role="tab" aria-selected={active} onClick={() => onChange(o.value)}
             className={cn(
-              "h-10 truncate rounded-lg font-semibold transition-colors sm:h-9 sm:px-4 sm:text-sm",
+              "h-full truncate rounded-lg font-semibold transition-colors sm:px-4 sm:text-sm",
               // Four or more tabs: tighter on phones so every label fits.
               options.length > 3 ? "px-2.5 text-sm" : "px-4 text-15",
               active ? "lit-accent" : "text-text-muted hover:text-text-base",
@@ -1311,7 +1427,7 @@ export function PillTabs<T extends string>({ value, onChange, options, scroll = 
         return (
           <button key={o.value} type="button" aria-pressed={active} onClick={() => onChange(o.value)}
             className={cn(
-              "h-10 shrink-0 rounded-control border px-4 text-sm font-semibold transition-colors",
+              "h-control shrink-0 rounded-control border px-4 text-sm font-semibold transition-colors",
               active ? cn("border-transparent", o.activeClass ?? "lit-accent") : "glass text-text-muted hover:border-text-subtle hover:text-text-base",
             )}>
             {o.label}
@@ -1615,13 +1731,13 @@ export function ViewSwitch({ options, current, floating = false }: {
 }) {
   return (
     <div className={cn(
-      "flex rounded-xl p-0.5",
+      "flex h-control rounded-xl p-0.5",
       floating ? "border border-border bg-bg/90 shadow-xl backdrop-blur-md" : "glass",
     )}>
       {options.map((o) => (
         <Link key={o.to} to={o.to} replace aria-current={o.to === current ? "page" : undefined}
           className={cn(
-            "flex h-9 items-center rounded-lg px-4 text-sm font-semibold transition-colors",
+            "flex h-full items-center rounded-lg px-4 text-sm font-semibold transition-colors",
             o.to === current ? "lit-accent" : "text-text-muted hover:text-text-base",
           )}>
           {o.label}

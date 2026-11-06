@@ -73,7 +73,7 @@ export function TextField({ label, value, onChange, hint, error, optional, prefi
         {prefix && <span className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-15 text-text-subtle">{prefix}</span>}
         <input id={id} value={value} onChange={(e) => onChange(e.target.value)} aria-invalid={error ? true : undefined}
           aria-describedby={error || hint ? `${id}-msg` : undefined} {...rest}
-          className={cn(fieldCls(error), "h-12 sm:h-11", prefix && "pl-9", suffix && "pr-12")} />
+          className={cn(fieldCls(error), "h-control", prefix && "pl-9", suffix && "pr-12")} />
         {suffix && <span className="absolute inset-y-0 right-1 flex items-center">{suffix}</span>}
       </div>
     </FieldFrame>
@@ -159,7 +159,7 @@ export function DateField({ label, value, onChange, type = "date", min, max, hin
         {/* The picker button is the whole field: the platform's own icon is hidden (ours sits left). */}
         <input id={id} type={type} value={value} min={min} max={max} onChange={(e) => onChange(e.target.value)}
           aria-invalid={error ? true : undefined} aria-describedby={error || hint ? `${id}-msg` : undefined}
-          className={cn(fieldCls(error), "h-12 appearance-none pl-10 tabular-nums sm:h-11",
+          className={cn(fieldCls(error), "h-control appearance-none pl-10 tabular-nums",
             "[&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:h-auto [&::-webkit-calendar-picker-indicator]:w-auto [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0",
             "[&::-webkit-date-and-time-value]:text-left", !value && "text-text-subtle")} />
       </div>

@@ -18,7 +18,7 @@ import { HeaderTitle } from "@/components/HeaderTitle";
 import { ColorPicker } from "@/components/ColorPicker";
 import {
   Autocomplete, Chevron, Columns, FloatingBar, LinkChips, ToggleGrid, Badge, BarChart, DateBlock, KeyValue, LayoutSwitch, SwitchRow, EmptyState, EntityRow, EventRow, LinkCard, List, ListGroupLabel, Loading, MediaCard, MediaGrid, Page, PageHeader, Pager,
-  PillTabs, RankedList, SearchField, Section, SelectField, Sheet, Sparkline, StatGrid, StatTile, Tabs, ThemeDots, TrendChart, useListLayout, ViewSwitch, type Tone,
+  PillTabs, RankedList, SearchField, Section, SelectField, ShareSliders, Sheet, Sparkline, StatGrid, StatTile, Tabs, ThemeDots, TrendChart, useListLayout, ViewSwitch, type Tone,
 } from "@/components/ui/kit";
 import { DateField, FileDrop, TextArea, TextField } from "@/components/ui/forms";
 import { Menu, Popover, SearchTrigger, Tooltip } from "@/components/ui/overlays";
@@ -113,6 +113,7 @@ export function StyleGuidePanel({ more = [] }: { more?: { value: string; label: 
   const [on, setOn] = useState(true);
   const [days, setDays] = useState<string[]>(["Mon", "Wed"]);
   const [bar, setBar] = useState(false);
+  const [shares, setShares] = useState([30, 20, 10]);
   // The section shown is in the URL (?section=), so a refresh or a shared link opens it.
   const [showing, setShowing] = useUrlState<string>("section", "brand", [...SECTIONS.map((s) => s.value), ...more.map((m) => m.value)]);
   const extra = more.find((m) => m.value === showing);
@@ -222,10 +223,46 @@ export function StyleGuidePanel({ more = [] }: { more?: { value: string; label: 
         </div>
       </Block>
 
+      <Block section="controls" title="PageHeader and Back" note="Every page below a dock tab's own page has Back to its parent — the path minus its last part (/library/import → /library) — above its eyebrow. Back lands on the parent as it was left (its tabs and filters), and the path says how far in you are. Actions are one .controls row.">
+        <div className="card p-5">
+          <PageHeader className="mb-0" back={{ to: "/jimbo-ui", label: "jimbo-ui config" }} eyebrow="Library" title="Import"
+            actions={<><Button variant="secondary" size="sm">Cancel</Button><Button>Import</Button></>} />
+        </div>
+      </Block>
+
+      <Block section="controls" title="Control rows" note="One control height (h-control: 44 px on phones, 40 px wider) for buttons, fields, selects and switches. In a .controls row — a PageHeader's actions, a Section's action, a field and its button — everything is that height, whatever size it was given; .control-grid lays options out in equal columns, each one control high.">
+        <div className="card space-y-4 p-5">
+          <div className="controls">
+            <LayoutSwitch value={layout} onChange={setLayout} />
+            <Button size="sm" variant="secondary">Small, made one height</Button>
+            <Button>Primary</Button>
+          </div>
+          <div className="flex gap-2">
+            <input className="field h-control min-w-0 flex-1" placeholder="A field and its button" />
+            <Button>Go</Button>
+          </div>
+          <div className="control-grid">
+            <SelectField label="Length" value={select} onChange={setSelect}
+              options={[{ value: "newest", label: "Newest first" }, { value: "oldest", label: "Oldest first" }]} />
+            <SelectField label="Order" value={select} onChange={setSelect}
+              options={[{ value: "newest", label: "Newest first" }, { value: "oldest", label: "Oldest first" }]} />
+            <Button variant="secondary">Shuffle</Button>
+            <Button variant="secondary">Even shares</Button>
+          </div>
+        </div>
+      </Block>
+
+      <Block section="controls" title="ShareSliders" note="Linked sliders that split one total: moving one moves the others the other way, in proportion, so they always add up to the total and none goes past it. Each shows its percentage and amount. rebalance and normaliseShares do the sums for your own controls.">
+        <div className="card p-5">
+          <ShareSliders total={60} unit="items" onChange={setShares}
+            items={["First", "Second", "Third"].map((label, i) => ({ id: label, label, sub: "A share of 60", value: shares[i]! }))} />
+        </div>
+      </Block>
+
       <Block section="controls" title="Fields and filters">
         <div className="card space-y-3 p-5">
           <SearchField value={q} onChange={setQ} placeholder="SearchField" />
-          <input className="field h-12 w-full sm:h-11" placeholder=".field text input" />
+          <input className="field h-control w-full" placeholder=".field text input" />
           <SelectField label="SelectField" value={select} onChange={setSelect}
             options={[{ value: "newest", label: "Newest first" }, { value: "oldest", label: "Oldest first" }]} />
           <Tabs value={tab} onChange={setTab} options={[{ value: "one", label: "Tabs" }, { value: "two", label: "Segmented" }]} />

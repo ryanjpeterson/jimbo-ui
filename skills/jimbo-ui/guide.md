@@ -851,6 +851,17 @@ and body fonts.
   parameter. Only passing state stays in React: a selection in progress, a
   half-typed form, hover. Preferences that belong to the person, not the
   view (list or grid layout), stay in local storage.
+- **Paths say how far in you are, and Back is always there.** A feature
+  or tool under a dock tab nests under that tab's path, one segment per
+  step in — `/library/import`, `/library/import/review`, `/settings/account`
+  — never a top-level path of its own (`/import`). Every page below a dock
+  tab's own page shows Back to its parent, the path minus its last part:
+  `PageHeader back`, or `Hero`/`Banner back` on pages that open with a
+  picture. An item's page (above) goes Back to the list it belongs to.
+  `BackButton` goes to the parent as it was left (its tabs, filters and
+  page), which the shell remembers (`useRememberPages` in `AppShell`);
+  `parentPath` works the parent out from a path. Old paths redirect,
+  keeping their search.
 - **Top bar:** sticky, 56 px (64 px on desktop) plus `--safe-top` (0 under
   a solid status bar; in a browser with a notch in landscape or any page
   drawn under the status bar, its content still starts below it),
@@ -922,7 +933,19 @@ and body fonts.
   (`max-w-[40%]`) so it can't squeeze the name away. Where the whole text is the
   point (a job's current item or a failure's reason in a `JobTile`), it
   wraps (`break-words`) instead of being cut.
-- **Touch targets ≥ 44 px** (`h-11`/`h-12` on phones), rows ≥ 76 px (`py-3.5`), each divided from the next by an etched line.
+- **Touch targets ≥ 44 px** (`h-control` on phones), rows ≥ 76 px (`py-3.5`), each divided from the next by an etched line.
+- **One control height.** Buttons, fields, selects, `Tabs`, `ViewSwitch`,
+  `PillTabs` and `RangeField` tracks are all `h-control` — 44 px on phones,
+  40 px from `sm` (`--control-h`); `h-control-sm` (36/32 px) is the
+  compact size inside rows and cards. Never set a control's height by hand
+  (`h-11 sm:h-10`). Controls side by side are one height and line up on
+  one baseline: put them in a **`.controls`** row (a `PageHeader`'s
+  `actions` and a `Section`'s `action` already are), which makes every
+  button, field and switch in it `h-control`, whatever size it was given.
+  Options laid out in columns go in a **`.control-grid`**: equal columns,
+  each cell one control high and full width — never a mix of a big select
+  and a small button. A `Section`'s title row is one control high with or
+  without actions, so sections side by side start level.
 
 ### Layers (z-index)
 
@@ -951,7 +974,9 @@ and body fonts.
 | `.fade-out` (`.fade-both`) | **How a full-width opener ends.** A banner, a hero, a photo or gradient header never stops on a hard edge, a border, or a fade to solid `bg` — the page behind has its backdrop (pattern and glow), so any of those shows as a line. Put the opener's background (blurred photo, dim, gradient, pattern) in its own layer behind the content and mask that layer out to transparent: `.fade-out` fades the bottom 45%; add `.fade-both` to fade the top too when something sits above it. Mask the background, never the text. `Banner`, `Hero` and `HeroSection` do this |
 | `.lit-accent/highlight/support` | A solid brand fill: one flat colour, no outline, `on-c` text (with `border-transparent` on a bordered shape). Active tabs and pills, select ticks, the date band, count badges (the name is from when they were shaded) |
 | `.field` | 11 px radius, `bg-surface-2`, `border-border`, 15 px text, `px-4`; focus = accent border + 2 px accent ring at 20% |
-| `.btn` | 10 px radius (`rounded-control`), 44 px tall on phones (40 px desktop), `px-5`, 15 px semibold; `.btn-sm` 36 px (32 px desktop); `lg` 48 px |
+| `.btn` | 10 px radius (`rounded-control`), `h-control` (44 px on phones, 40 px desktop), `px-5`, 15 px semibold; `.btn-sm` `h-control-sm` (36/32 px), and `h-control` inside a `.controls` row; `lg` 48 px |
+| `.controls` | A row of controls, every one `h-control`, wrapping on phones. `PageHeader actions` and `Section action` use it |
+| `.control-grid` | Options in equal columns (≥ 9 rem each), every cell one control high and full width |
 | `.btn-primary` | Solid accent fill, no outline, on-accent text, `accent-hover` on hover |
 | `.btn-secondary` | `bg-surface-2`, border, border lightens on hover |
 | `.btn-ghost` | Muted text, `surface-2` on hover |
@@ -984,11 +1009,13 @@ and body fonts.
 
 | Component | Use it for |
 | --- | --- |
-| `PageHeader` | Every index page's title row |
+| `PageHeader` | Every page's title row: `back` (Back to the parent page, above the eyebrow), eyebrow, title, count, `actions` (a `.controls` row) |
+| `BackButton` + `useRememberPages` + `parentPath` | Back to the page above, as it was left. `PageHeader back` and `Hero`/`Banner back` draw it |
+| `ShareSliders` + `rebalance` + `normaliseShares` | Linked sliders that split one total (100%, 60 items, a budget): moving one moves the rest the other way in proportion, so they always add up to the total. Each shows its percentage and amount. `normaliseShares` when the total changes |
 | `Hero` / `Banner` | Detail page header over a blurred image (full width) |
 | `HeroSection` | Full-width page opener with no photo: eyebrow, big title, a line, actions, over a backdrop pattern (`pattern`, any of the backdrops) on a gradient; `size="lg"` fills most of the first screen; `align="center"`. It tucks up under the top bar; pass `pullUp={false}` when something sits above it (as `Banner` and `Hero` take too) |
 | `FullBleed` | Any section edge to edge: a band (`tone`: `surface`, or a flat `accent` / `highlight` / `support` with its `on-` text), a strip of media (`flush`), a call to action. Content lines up with the page column unless `flush` |
-| `RangeField` | A labelled slider (weight, spacing, strength…) with its value shown |
+| `RangeField` | A labelled slider (weight, spacing, strength…) with its value shown. Sliders that are shares of one total are `ShareSliders`, never independent `RangeField`s |
 | `Section` | A titled card holding one block of content; `plain` drops the card (a grid of tiles under a title). In a grid row its card stretches to the tallest, content at the top |
 | `Columns` | Sections or cards side by side: one column on phones, `count` 2 or 3 from `lg:` (`from="sm"` for earlier). Every row as tall as its tallest cell — symmetry |
 | `List` + `ListGroupLabel` | A card of rows, optionally grouped (by month: a wrapper that starts with a `ListGroupLabel`); group labels are support text with an 8 px support dot, on a support wash fading right. `layout="tiles"` shows the same children as a grid of cards (one column on phones, two or three wider); `bare` drops the card for use inside `Section flush`; `maxHeight` caps a list of rows and scrolls inside the card, its bar always showing |
@@ -1531,3 +1558,11 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   for jobs running now (big percentage, thick bar, the item it's on, facts
   below; a compact finished state) and `ProgressBar size="lg"`. `Page` and
   `fill`; `Pending` for results being replaced; an item's page is a path.
+- **0.14.7 (2026-11-06)** — One control height (`h-control`, `--control-h`) for
+  buttons, fields, selects and switches; `.controls` rows and
+  `.control-grid` make controls side by side one size, and `PageHeader`
+  and `Section` action slots are control rows. Paths nest under their
+  tab, one segment per step; every page below a tab's own page has Back
+  (`PageHeader back`, `useRememberPages`, `parentPath`). `ShareSliders`
+  for shares of one total. Lists with more than a name per item
+  offer rows or tiles (`LayoutSwitch`).

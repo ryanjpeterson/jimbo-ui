@@ -188,7 +188,7 @@ function EntryPage({ at, pullUp }: At) {
         <Sheet title="Edit entry" subtitle={item.title} onClose={() => setSheet(false)}>
           <div className="space-y-3 p-5">
             <label className="label" htmlFor="edit-title">Title</label>
-            <input id="edit-title" className="field h-12 w-full sm:h-11" defaultValue={item.title} />
+            <input id="edit-title" className="field h-control w-full" defaultValue={item.title} />
             <Button className="w-full" onClick={() => setSheet(false)}>Save</Button>
           </div>
         </Sheet>

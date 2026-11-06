@@ -1341,6 +1341,19 @@
         "multiple": "several open at once"
       },
       "source": "reference/web/src/components/ui/data.tsx#Accordion"
+    },
+    {
+      "id": "share-sliders",
+      "name": "ShareSliders",
+      "purpose": "Splits one total across several shares with linked sliders that always add up to it.",
+      "tier": "kit",
+      "aliases": [
+        "LinkedSliders",
+        "WeightSliders",
+        "rebalance"
+      ],
+      "variants": {},
+      "source": "reference/web/src/components/ui/kit.tsx#ShareSliders"
     }
   ]
 }
