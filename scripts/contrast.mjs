@@ -8,9 +8,9 @@
  *
  * Targets (WCAG ratios; text ones checked on cards, the surface most text sits on):
  *   text 7 · muted 4.5 · subtle (labels) 3.5 · border vs card 1.75 · card vs page 1.19
- *   accent and highlight vs page 3 · support vs card 4.5 · text on the accent 4.5
- *   apart: accent and highlight at least 15 apart (CIE ΔE), and no two of accent,
- *   highlight and support closer than 10 — a tonal theme (shades of one colour)
+ *   accent and highlight vs page 3.5 · support vs card 4.5 · text on the accent 4.5
+ *   apart: accent and highlight at least 22 apart (CIE ΔE), and no two of accent,
+ *   highlight and support closer than 15 — a tonal theme (shades of one colour)
  *   passes; identical colours don't
  */
 import { mkdtempSync, copyFileSync, writeFileSync, rmSync } from "node:fs";

@@ -260,11 +260,11 @@ export function LooksPanel({ d }: { d: ThemeDraft }) {
 export function ColoursPanel({ d }: { d: ThemeDraft }) {
   const { draft, setDraft, shown, hex } = d;
   const [editing, setEditing] = useState<ColourKey>("accent");
-  // Readability (WCAG): body text 4.5:1; accent / highlight 3:1 on the page; support 4.5:1 on cards; text on buttons 4.5:1.
+  // Readability (WCAG): body text 4.5:1; accent / highlight 3.5:1 on the page; support 4.5:1 on cards; text on buttons 4.5:1.
   const warnings = [
     contrast(hex.text!, shown.background) < 4.5 && "Body text is hard to read on this background.",
-    contrast(shown.accent, shown.background) < 3 && "The accent blends into the background.",
-    contrast(shown.highlight, shown.background) < 3 && "The highlight blends into the background.",
+    contrast(shown.accent, shown.background) < 3.5 && "The accent blends into the background.",
+    contrast(shown.highlight, shown.background) < 3.5 && "The highlight blends into the background.",
     contrast(shown.support, hex.surface!) < 4.5 && "Support text is hard to read on cards.",
     contrast(hex["on-accent"]!, shown.accent) < 4.5 && "Button text is hard to read on the accent.",
   ].filter((w): w is string => !!w);

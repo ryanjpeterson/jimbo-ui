@@ -21,7 +21,7 @@ import {
   PillTabs, RankedList, SearchField, Section, SelectField, ShareSliders, Sheet, Sparkline, StatGrid, StatTile, Tabs, ThemeDots, TrendChart, useListLayout, ViewSwitch, type Tone,
 } from "@/components/ui/kit";
 import { DateField, FileDrop, TextArea, TextField } from "@/components/ui/forms";
-import { Menu, Popover, SearchTrigger, Tooltip } from "@/components/ui/overlays";
+import { DropdownButton, Menu, Popover, SearchTrigger, Tooltip } from "@/components/ui/overlays";
 import { JobTile, OfflineBanner, ProgressBar, Stepper, toast, UpdateBanner, useConfirm } from "@/components/ui/feedback";
 import { Accordion, DataTable, type Column, type TableSort } from "@/components/ui/data";
 import { FONTS, MOTIFS, THEME_KEYS, themeHex } from "@/lib/theme";
@@ -513,14 +513,14 @@ function OverlayBlocks() {
           </div>
           <div className="flex min-h-[64px] items-center gap-3 px-4 py-2">
             <p className="min-w-0 flex-1 text-15 font-semibold">With its own trigger</p>
-            <Menu label="Sort" align="end" trigger={(p) => <button type="button" {...p} className="btn btn-secondary btn-sm">Sort <Chevron dir="down" /></button>}
+            <Menu label="Sort" align="end" trigger={(p) => <DropdownButton size="sm" label="Sort" {...p}>Newest</DropdownButton>}
               items={[{ label: "Newest first", onSelect: () => toast("Newest first") }, { label: "Oldest first", onSelect: () => toast("Oldest first") }, { label: "A to Z", onSelect: () => toast("A to Z") }]} />
           </div>
         </div>
       </Block>
       <Block section="overlays" title="Popover and Tooltip" note="Popover: a few controls by their button, open while you use them. Tooltip: a label for an icon button on hover or keyboard focus — never the only place something's said.">
         <div className="card flex flex-wrap items-center gap-3 p-5">
-          <Popover label="Sizes" trigger={(p) => <button type="button" {...p} className="btn btn-secondary">Sizes · {sizes.length || "any"}</button>}>
+          <Popover label="Sizes" trigger={(p) => <DropdownButton label="Sizes" {...p}>{sizes.length ? sizes.join(", ") : "Any"}</DropdownButton>}>
             {(close) => (
               <div className="space-y-3">
                 <p className="text-sm font-semibold text-text-muted">Show sizes</p>

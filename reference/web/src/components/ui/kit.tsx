@@ -725,13 +725,15 @@ export function EntityRow({ to, name, imageUrl, sub, meta, round = false, avatar
 }) {
   return (
     <Link to={to} className={rowBase}>
-      <div className={cn("h-12 w-12 shrink-0 overflow-hidden bg-surface-2", round ? "rounded-full" : "rounded-lg")}>
-        {imageUrl ? (
+      {/* A picture keeps its shape (square for places and covers, round for people);
+          with none, the placeholder is a bare flat circle — never a circle in a box. */}
+      {imageUrl ? (
+        <div className={cn("h-12 w-12 shrink-0 overflow-hidden bg-surface-2", round ? "rounded-full" : "rounded-lg")}>
           <img src={imageUrl} alt="" loading="lazy" className="h-full w-full object-cover" />
-        ) : (
-          <div className="dot-support flex h-full w-full items-center justify-center font-display text-base text-on-support">{avatarText ?? initials(name)}</div>
-        )}
-      </div>
+        </div>
+      ) : (
+        <div aria-hidden="true" className="dot-support flex h-12 w-12 shrink-0 items-center justify-center font-display text-base text-on-support">{avatarText ?? initials(name)}</div>
+      )}
       <div className="min-w-0 flex-1">
         <p className="truncate text-15 font-semibold text-text-base group-hover:text-accent sm:text-base">{name}</p>
         {sub && <p className="mt-0.5 truncate text-sm text-text-muted">{sub}</p>}

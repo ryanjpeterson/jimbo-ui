@@ -34,7 +34,8 @@ the `brand.config.ts` line and `tokens.css` to paste into the app.
 
 | Path | What |
 | --- | --- |
-| `skills/jimbo-ui/guide.md` | **The guide** — every rule, value and pattern |
+| `skills/jimbo-ui/rulebook.md` | **The rulebook** — every rule numbered and checkable; audits cite it |
+| `skills/jimbo-ui/guide.md` | **The guide** — each rule explained, with values and patterns |
 | `skills/jimbo-ui/SKILL.md` | The skill: core rules + workflows |
 | `foundation/` | Code copied verbatim into apps (never edited there) |
 | `starter/` | Code copied once into a new app, then app-owned |

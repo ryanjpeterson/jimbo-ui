@@ -455,7 +455,9 @@
 /* A row of controls (a page's or section's actions, a field and its
    button, a form's options): every button, field, select and switch in it
    is one height, h-control, whatever size it was given, so the row reads
-   as one strip. Wraps on narrow screens. */
+   as one strip. Buttons in it are one size too — the same padding and type
+   whatever size they were given — so a primary never sits beside a smaller
+   neighbour. Wraps on narrow screens. */
 @utility controls {
   display: flex;
   flex-wrap: wrap;
@@ -463,6 +465,18 @@
   gap: 0.5rem;
   & > .btn, & > .field, & > [role="tablist"], & > label > .field, & > label > select, & > a.btn {
     height: var(--control-h);
+  }
+  /* A bare wrapper (a component returning <span>…</span>) doesn't break the row:
+     it steps aside so its controls are sized like the rest. */
+  & > span:not([class]), & > div:not([class]) {
+    display: contents;
+  }
+  & > :is(span, div):not([class]) > :is(.btn, .field, [role="tablist"]) {
+    height: var(--control-h);
+  }
+  & > .btn:not(:has(> svg:only-child)), & > :is(span, div):not([class]) > .btn:not(:has(> svg:only-child)) {
+    padding-inline: 1.25rem;
+    font-size: 0.9375rem;
   }
 }
 /* A grid of controls: each cell one control high and the full width of its

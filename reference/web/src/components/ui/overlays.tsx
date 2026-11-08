@@ -95,6 +95,37 @@ export const MoreButton = forwardRef<HTMLButtonElement, Omit<TriggerProps, "ref"
 ));
 MoreButton.displayName = "MoreButton";
 
+/**
+ * The trigger for anything that opens a list of choices — a sort, a filter,
+ * "more ways to do this…" — drawn as a dropdown, not a button: the field's
+ * surface and border, its text, and a down arrow that turns while it's open.
+ * One control high (`h-control`, or `h-control-sm` with `size="sm"`), so it
+ * sits level in a `.controls` row. Spread a `Menu` or `Popover` trigger's
+ * props on it. A ⋯ `MoreButton` stays only for a row's own actions.
+ */
+export const DropdownButton = forwardRef<HTMLButtonElement, Omit<TriggerProps, "ref"> & {
+  children: ReactNode;
+  /** Muted text before the value: "Sort" in "Sort: Newest". */
+  label?: ReactNode;
+  size?: "sm" | "md";
+  className?: string;
+}>(({ children, label, size = "md", className, ...props }, ref) => (
+  <button ref={ref} type="button" {...props}
+    className={cn(
+      "field group inline-flex max-w-full shrink-0 items-center gap-2 pr-3 text-left font-semibold text-text-base transition-colors hover:border-text-subtle aria-expanded:border-accent",
+      size === "sm" ? "h-control-sm px-3 text-sm" : "h-control",
+      className,
+    )}>
+    {label && <span className="shrink-0 font-medium text-text-muted">{label}</span>}
+    <span className="min-w-0 truncate">{children}</span>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round"
+      aria-hidden="true" className="ml-auto shrink-0 text-text-subtle transition-transform group-aria-expanded:rotate-180">
+      <path d="M6 9l6 6 6-6" />
+    </svg>
+  </button>
+));
+DropdownButton.displayName = "DropdownButton";
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Menu — a short list of actions on one thing
 // ─────────────────────────────────────────────────────────────────────────────

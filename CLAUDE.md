@@ -36,7 +36,7 @@ repos only, never code), so the scan skips it.
 | `showcase/` | Demo app assembled from reference → foundation → starter → `showcase/overrides/` | Published as a private page each release |
 | `scripts/` | `inventory.mjs` (registry report), `tokens.mjs` (an app's `tokens.css`), `contrast.mjs` (template contrast report), `versions.mjs` (versions agree), `releases.mjs` (`releases.json` from the changelog), `build-zip.sh` (claude.ai upload) | |
 | `hooks/` | `hooks.json` + `check-version.mjs`: tells an app's session when it's behind the installed release | |
-| `skills/jimbo-ui/` | `SKILL.md` (core rules + workflows), `guide.md` (the full guide) | |
+| `skills/jimbo-ui/` | `rulebook.md` (every rule, numbered — it decides), `SKILL.md` (core rules + workflows), `guide.md` (each rule explained) | New rules go in the rulebook first, next number in their group |
 | `.claude-plugin/` | `plugin.json` and `marketplace.json` | Versions must match |
 
 Brand decisions so far: two to four source colours (accent and background

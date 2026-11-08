@@ -26,7 +26,7 @@
  */
 
 import { BRAND } from "./brand.config";
-import { atTone, fullTheme, PAGE_TONES, THEME_KEYS, toneOf, type PageTone, type Theme } from "./theme";
+import { atTone, fullTheme, PAGE_TONES, templateIssues, THEME_KEYS, toneOf, type PageTone, type Theme } from "./theme";
 
 /** The type, backdrop and motif a look comes with (optional; most looks are colours only). */
 export type TemplateStyle = Pick<Theme, "fonts" | "backdrop" | "motif">;
@@ -779,8 +779,12 @@ const NEAREST: Record<PageTone, PageTone[]> = { light: ["light", "mid", "dark"],
 
 /** The template a family shows in a tone: as written, else made from its own colours; null if it can't be (each target is checked). */
 export function familyAt(f: TemplateFamily, tone: PageTone): Template | null {
-  if (f.authored[tone]) return f.authored[tone]!;
   const id = `${f.key}|${tone}`;
+  // A tone as written is used only if it meets every readability target; one that
+  // doesn't (two colours that read as one, an accent lost on the page) is remade
+  // from the look's own colours, or dropped when that can't be done either.
+  const own = f.authored[tone];
+  if (own && !made.has(id) && !templateIssues(own.theme).length) made.set(id, own);
   if (!made.has(id)) {
     const src = f.authored.dark ?? f.authored.mid ?? f.authored.light!;
     const theme = atTone(src.theme, tone, f.colours);

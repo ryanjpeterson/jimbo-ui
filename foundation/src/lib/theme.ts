@@ -476,7 +476,7 @@ function tonal(theme: Theme, others: string[], target: number, apart: number): s
  * saturated, made to reach 3.5:1 on the page. A grey accent gets a red.
  */
 export function deriveHighlight(theme: Theme): string {
-  if (theme.infer === "tonal") return tonal(theme, [], 3.5, 15) ?? deriveHighlight({ ...theme, infer: "contrast" });
+  if (theme.infer === "tonal") return tonal(theme, [], 3.7, 23) ?? deriveHighlight({ ...theme, infer: "contrast" });
   const [ha, sa, la] = rgbToHsl(hexToRgb(theme.accent));
   const grey = sa < 0.15;
   return readableOn(hexToRgb(theme.background), grey ? 350 : (ha + 150) % 360, grey ? 0.85 : Math.max(0.6, sa), grey ? 0.6 : la, 3.5);
@@ -490,7 +490,7 @@ export function deriveHighlight(theme: Theme): string {
 export function deriveSupport(theme: Theme): string {
   if (theme.infer === "tonal") {
     const hl = theme.highlight ?? deriveHighlight(theme);
-    return tonal(theme, [hl], 5.4, 10) ?? deriveSupport({ ...theme, infer: "contrast" });
+    return tonal(theme, [hl], 5.4, 16) ?? deriveSupport({ ...theme, infer: "contrast" });
   }
   const bg = hexToRgb(theme.background);
   const [ha, sa, la] = rgbToHsl(hexToRgb(theme.accent));
@@ -1875,7 +1875,7 @@ export function toneOf(theme: Theme): PageTone {
 }
 
 /** The readability targets every template meets (scripts/contrast.mjs): the names of any it misses. */
-export const TEMPLATE_TARGETS = { text: 7, muted: 4.5, subtle: 3.5, border: 1.75, card: 1.19, accent: 3, highlight: 3, support: 4.5, button: 4.5, apart: 10 } as const;
+export const TEMPLATE_TARGETS = { text: 7, muted: 4.5, subtle: 3.5, border: 1.75, card: 1.19, accent: 3.5, highlight: 3.5, support: 4.5, button: 4.5, apart: 15 } as const;
 export function templateScores(theme: Theme): Record<keyof typeof TEMPLATE_TARGETS, number> {
   const c = themeHex(theme);
   return {
@@ -1883,8 +1883,9 @@ export function templateScores(theme: Theme): Record<keyof typeof TEMPLATE_TARGE
     border: contrast(c.border!, c.surface!), card: contrast(c.surface!, c.bg!),
     accent: contrast(c.accent!, c.bg!), highlight: contrast(c.highlight!, c.bg!), support: contrast(c.support!, c.surface!),
     button: contrast(c["on-accent"]!, c.accent!),
-    // Accent and highlight need 15 apart; the other pairs 10 (scaled so the one target covers both).
-    apart: Math.min(deltaE(c.accent!, c.highlight!) * (10 / 15), deltaE(c.accent!, c.support!), deltaE(c.highlight!, c.support!)),
+    // Accent and highlight need 22 apart; the other pairs 15 (scaled so the one target covers both).
+    // Closer than that and two roles read as one colour: an eyebrow looks like a link, a badge like a button.
+    apart: Math.min(deltaE(c.accent!, c.highlight!) * (15 / 22), deltaE(c.accent!, c.support!), deltaE(c.highlight!, c.support!)),
   };
 }
 export function templateIssues(theme: Theme): string[] {
@@ -1916,7 +1917,7 @@ function atLuminance(base: RGB, target: number): RGB {
  * readability target in that tone.
  */
 export function atTone(theme: Theme, tone: PageTone, extra: string[] = []): Theme | null {
-  if (toneOf(theme) === tone) return theme;
+  if (toneOf(theme) === tone && !templateIssues(theme).length) return theme;
   const own: string[] = [];
   for (const h of [theme.accent, theme.highlight, theme.support, ...extra, theme.background]) {
     if (h && isHex(h) && !own.some((o) => deltaE(o, h) < 8)) own.push(h.toUpperCase());
@@ -1953,10 +1954,10 @@ function rolesOn(theme: Theme, own: string[], page: string, lightPage: boolean):
     }
     return null;
   };
-  const accent = pick((c) => contrast(c, page) >= 3.2 && onBest(c) >= 4.7, []);
+  const accent = pick((c) => contrast(c, page) >= 3.7 && onBest(c) >= 4.7, []);
   if (!accent) return null;
-  const highlight = theme.highlight ? pick((c) => contrast(c, page) >= 3.2, [[accent, 16]]) : null;
-  const support = theme.support ? pick((c) => contrast(c, surface) >= 4.7, [[accent, 11], ...(highlight ? [[highlight, 11]] as [string, number][] : [])]) : null;
+  const highlight = theme.highlight ? pick((c) => contrast(c, page) >= 3.7, [[accent, 23]]) : null;
+  const support = theme.support ? pick((c) => contrast(c, surface) >= 4.7, [[accent, 16], ...(highlight ? [[highlight, 16]] as [string, number][] : [])]) : null;
   return {
     accent, background: page, ...(highlight ? { highlight } : {}), ...(support ? { support } : {}),
     // A role no own colour can fill is left to shades of the accent, never a new hue.

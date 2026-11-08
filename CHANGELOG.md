@@ -34,6 +34,49 @@ the matching 0.x release.
 
 ## Unreleased
 
+jimbo.ui is a rulebook: every rule numbered; circles never in a box, neighbours one size, dropdowns look like dropdowns, stricter theme contrast.
+
+**Update:** breaking
+
+### Added
+- **The rulebook** (`skills/jimbo-ui/rulebook.md`): every rule numbered and
+  checkable, in groups — B brand, C colour, S shapes, K controls, L layout,
+  N navigation, M motion, P parts, A accessibility. Audits cite rule
+  numbers; the guide explains each. An audit workflow in `SKILL.md`.
+- **`DropdownButton`** (`ui/overlays.tsx`): the trigger for anything that
+  opens choices — field surface, its value, a down arrow that turns while
+  open. The Style guide's Menu and Popover use it.
+- New rules: **S4** a circle is never inside a box; **K2** neighbours are
+  one size; **K3** nothing between a control row and its controls; **K4**
+  primary and secondary only in a row of actions; **K5** anything that
+  opens choices looks like a dropdown; **M2** nothing changes by itself;
+  **N4** no `#` links or arrow-text links beside buttons; **P4** no glyphs
+  as icons.
+
+### Changed
+- **Stricter theme contrast** (C6, C7): accent and highlight 3.5:1 on the
+  page (was 3), accent and highlight 22 apart and the other pairs 15 (were
+  15 and 10). A template tone written in `themes.ts` that misses any target
+  is remade from the look's own colours, or not offered (the look shows at
+  its nearest tone); tonal looks spread their shades further. Every look
+  passes; none removed. The Colours tab warns at 3.5:1.
+- **`.controls`** gives every button in it the same padding and type size,
+  not just height, and steps through a bare `<span>`/`<div>` wrapper.
+
+### Fixed
+- `EntityRow` with no picture drew its initials circle inside a rounded
+  square; it's now the bare circle.
+
+### Apps must
+- Audit against the rulebook ("audit this app's UI against jimbo-ui") and
+  fix the breaks, at least: menu and popover triggers become
+  `DropdownButton`s (K5); controls side by side are one size, passed to
+  action slots as fragments (K2, K3); no circle sits in a box (S4); no
+  carousel advances by itself (M2).
+- Copy `reference/.../ui/overlays.tsx`, `kit.tsx` and
+  `routes/config/ThemePanel.tsx` (or bring in `DropdownButton`, the
+  `EntityRow` placeholder and the 3.5:1 warnings).
+
 ## 0.15.0 — 2026-11-06
 
 **Update:** breaking

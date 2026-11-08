@@ -18,8 +18,13 @@ number is on the matching 0.x release (1.0.0 → 0.1.0, 1.1.0 → 0.2.0,
 2.0.0 → 0.3.0, 3.0.0 → 0.4.0, 3.1.0 → 0.5.0).
 
 jimbo.ui is a shared look and behaviour for Ryan's apps: phone-first, app-like, dark by
-default, themeable from two to four colours. The full rules are in
-[guide.md](guide.md); read the sections a task needs before writing UI.
+default, themeable from two to four colours. **jimbo.ui is a rulebook:**
+[rulebook.md](rulebook.md) numbers every rule (B1 brand, C colour, S shapes,
+K controls, L layout, N navigation, M motion, P parts, A accessibility) so
+each is checkable and an audit can cite it. The rulebook decides;
+[guide.md](guide.md) explains each rule with values and components. Read the
+rulebook groups a task touches, and the guide sections they point to,
+before writing UI.
 
 The source of truth is the GitHub repo **ryanjpeterson/jimbo-ui** (private).
 Releases are git tags `jimbo-ui--v<version>`; `CHANGELOG.md` says what changed
@@ -45,6 +50,9 @@ section, using the `CHANGELOG.md` bundled with the skill.
 this check, then the preview workflow if they want detail.
 
 ## Core rules (always)
+
+The short form of the rulebook; the numbered rules are in
+[rulebook.md](rulebook.md).
 
 - Colours come from tokens only: `bg-bg`, `bg-surface`, `bg-surface-2`,
   `border-border`, `text-text-base/muted/subtle`, `*-accent`, `*-highlight`,
@@ -344,6 +352,22 @@ update", or before updating if the user wants to look first.
 7. Typecheck and build; check the config section's tabs at phone width.
 8. Set `version` in `jimbo-ui.json`, add an entry to the app's own changelog
    ("Updated to jimbo-ui 0.6.0: …"), and commit. Push only if the user asks.
+
+## Workflow: audit an app against the rulebook
+
+"Audit this app's UI against jimbo-ui", "does this app follow the brand
+standards?". Read-only until the user says to fix.
+
+1. Read [rulebook.md](rulebook.md) and the app's `jimbo-ui.json`.
+2. Go group by group (B, C, S, K, L, N, M, P, A) over the app's own code —
+   routes and components; the kit copies only for drift from the reference.
+   Look at the app at 375 px in a light, a mid and a dark look too.
+3. Report each break as `rule · file:line · what's wrong · fix`, grouped by
+   rule, then the app's own components that duplicate kit ones (P1) with
+   whether each is justified.
+4. Anything the rulebook doesn't cover yet but should: propose it as a
+   generic rule (no app terms) for jimbo-ui, numbered next in its group.
+5. Record `registry.audited` in `jimbo-ui.json` when the fixes land.
 
 ## Workflow: register an app
 

@@ -1185,6 +1185,23 @@
       "source": "reference/web/src/components/ui/overlays.tsx#Menu"
     },
     {
+      "id": "dropdown-button",
+      "name": "DropdownButton",
+      "purpose": "Opens a list of choices from a trigger that looks like a dropdown.",
+      "tier": "kit",
+      "aliases": [
+        "SelectTrigger",
+        "MenuButton",
+        "DropdownTrigger",
+        "SortButton"
+      ],
+      "variants": {
+        "label": "a muted prefix before the value",
+        "size": "sm | md"
+      },
+      "source": "reference/web/src/components/ui/overlays.tsx#DropdownButton"
+    },
+    {
       "id": "popover",
       "name": "Popover",
       "purpose": "Shows a few controls by their button without leaving the page.",

@@ -5,7 +5,10 @@ with this guide you can build an app that looks and feels like the others,
 with its own name and colours, whether or not you copy the code. Generic
 implementations of everything below are in the repo's `reference/` folder.
 
-- **The rules:** this guide. It's versioned with the jimbo-ui repo; see
+- **The rulebook:** [rulebook.md](rulebook.md) — every rule numbered and
+  checkable (B1, K5…). Audits cite its numbers; it decides, and this guide
+  explains.
+- **The detail:** this guide. It's versioned with the jimbo-ui repo; see
   `CHANGELOG.md` for what changed in each version and what apps must do.
 - **The living picture:** the Style guide tab of each app's **jimbo-ui
   config** section (`/jimbo-ui`) renders every shared component in that
@@ -413,6 +416,10 @@ turn up here and there. Every circle follows these rules:
 - **Fixed sizes:** 8 px inline (`ThemeDots`, the dot before a stat label or
   a month header), 10 px status dots on rows, 16 px colour swatches (theme
   tiles), 40–48 px editor swatches and avatars.
+- **Never inside a box.** No square, rounded square, border, ring, tile
+  or background behind a circle. An avatar with no picture is the bare
+  circle (`EntityRow` draws it so); a picture keeps its own frame — square
+  for places and covers, round for people.
 - **The page colour as a swatch** gets a 1 px `border-border`, so it shows
   against the page — the one circle with an edge.
 - **Inferred colours** show at 55% opacity, not with a dashed ring.
@@ -551,16 +558,21 @@ family of tokens:
 Checked live on the Colours tab for the colours an admin picks (and for the
 inferred ones, which are built to pass):
 - Body text ≥ 4.5:1 on the background.
-- Accent and highlight ≥ 3:1 on the background.
+- Accent and highlight ≥ 3.5:1 on the background.
 - Support ≥ 4.5:1 on cards (it's used for small text).
 - Text on an accent button ≥ 4.5:1.
 
 Every template must also pass `node scripts/contrast.mjs --check`, measured
 on cards: body text ≥ 7:1, muted ≥ 4.5:1, labels ≥ 3.5:1, card border
 ≥ 1.75:1, card against page ≥ 1.19:1 — and the three above, plus
-**colours apart**: accent and highlight at least 15 apart (CIE76 ΔE) and no
-two of accent, highlight and support closer than 10 — so a tonal theme
-(shades of one colour) passes, and identical colours don't. Mid-grey backgrounds limit body text
+**colours apart**: accent and highlight at least 22 apart (CIE76 ΔE) and no
+two of accent, highlight and support closer than 15 — closer than that, two
+roles read as one colour (an eyebrow looks like a link, a badge like a
+button). A tonal theme passes when its shades are spread that far (the
+engine spreads them); identical colours don't. A tone written into
+`themes.ts` that misses any target isn't offered as written: it's remade
+from the look's own colours (`atTone`), or that tone isn't offered and the
+look shows at its nearest tone. Mid-grey backgrounds limit body text
 most: keep them dark enough (luminance under about 0.07) for 7:1.
 
 ---
@@ -946,6 +958,21 @@ and body fonts.
   each cell one control high and full width — never a mix of a big select
   and a small button. A `Section`'s title row is one control high with or
   without actions, so sections side by side start level.
+- **Neighbours are one size.** Two controls side by side never differ in
+  height, padding or type size: a `.controls` row also gives every button
+  in it the same padding and type, so a `size="lg"` primary and a `sm`
+  ghost come out alike. Actions passed to an action slot are a fragment;
+  a bare `<span>` or `<div>` (no class) around them steps aside
+  (`display: contents`), but a classed wrapper (`flex gap-2`) takes them
+  out of the row — don't. A row of actions is primary and secondary only,
+  one primary at most; ghost buttons belong inside rows and cards.
+- **Anything that opens choices looks like a dropdown.** A trigger for a
+  `Menu` of options, a sort, a filter `Popover` or "more ways to…" is a
+  `DropdownButton`: the field's surface and border, its current value (or
+  a muted label and the value), and a down arrow that turns while open.
+  Never a plain or ghost button, never a bare "Or…". A choice that applies
+  at once can be a `SelectField`. The ⋯ `MoreButton` stays for a row's own
+  actions.
 
 ### Layers (z-index)
 
@@ -1001,7 +1028,10 @@ and body fonts.
   static "working…" line. A list of jobs running now is `JobTile`s in a
   `List layout="tiles"`: how far along and the item it's on come first and
   biggest; speed, time left and updated sit below.
-- No page transitions, no parallax, no bouncing.
+- **Nothing changes by itself.** Content moves only when the person acts:
+  no auto-advancing carousels or rotating panels. A set of things to step
+  through has a `Pager`.
+- No page transitions, no parallax, no bouncing, no decorative hover zoom.
 
 ---
 
@@ -1062,7 +1092,8 @@ and body fonts.
 | `TextArea` (`ui/forms.tsx`) | Several lines; grows with its text up to `maxRows`; with `maxLength` it counts what's left once close |
 | `DateField` (`ui/forms.tsx`) | A date, time or both (`type`) with the platform's own picker, in the page's light or dark scheme; `min` / `max` |
 | `FileDrop` (`ui/forms.tsx`) | Pick or drop files: a dashed area that is the button, then the files with sizes and Remove; turns away wrong types and files over `maxSize`, saying why |
-| `Menu` + `MoreButton` (`ui/overlays.tsx`) | Actions on one thing from the ⋯ button (or any `trigger`): arrow keys, Home / End, a letter; `danger` items last after a `"divider"`, in the highlight colour, confirmed |
+| `Menu` + `MoreButton` (`ui/overlays.tsx`) | Actions on one thing from the ⋯ button, or a list of choices from a `DropdownButton` trigger: arrow keys, Home / End, a letter; `danger` items last after a `"divider"`, in the highlight colour, confirmed |
+| `DropdownButton` (`ui/overlays.tsx`) | **The trigger for anything that opens choices** (a `Menu` of options, a sort, a filter `Popover`): looks like a select — field surface, the value (`label` adds a muted prefix: "Sort Newest"), a down arrow that turns while open. `h-control`, or `size="sm"`; spread the trigger props on it |
 | `Popover` (`ui/overlays.tsx`) | A few controls by their button (filters, a quick setting), open while you use them; anything that saves is a `Sheet` |
 | `Tooltip` (`ui/overlays.tsx`) | A label for an icon-only control on hover or keyboard focus. Never the only place something's said — touch screens don't show it |
 | `CommandPalette` + `useSpotlight` (`ui/overlays.tsx`) | **App-wide search** (Spotlight), on ⌘K / Ctrl+K and a top-bar search button on phones: live results from the app's `providers`, grouped, with thumbnails and a preview pane on wide screens; `facets` turn `key:value` tokens into chips; recent picks and `suggestions` while empty; `commands` (go to a page, run an action) after the results. `useSpotlight` keeps it in the URL (`?find=`); `useCommandPalette` is the older local-state hook. See section 9, *App-wide search* |
@@ -1284,6 +1315,12 @@ archetype only sets the starting shape.
 - No native colour inputs, and no browser alerts except as a last-resort
   error.
 - No new font sizes outside the scale in section 5.
+- No circle inside a box, and no two controls side by side at different
+  sizes.
+- No button that opens choices without looking like a dropdown.
+- No glyphs or letters as icons (`✕`, `‹ ›`, `★`, `i`), no `href="#"`, no
+  `uppercase` utilities (use `.eyebrow`).
+- No content that changes by itself.
 
 ---
 
@@ -1574,3 +1611,12 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   failed requests included: top right under the top bar (full width on
   phones), newest on top, and every one timed — 4 s, 6 s with an action,
   8 s for an error — with a line showing the time left; hover holds it.
+- **Unreleased** — The **rulebook** (`rulebook.md`): every rule numbered
+  and checkable, cited by audits; the guide explains. New rules: a circle
+  is never inside a box (S4; `EntityRow`'s placeholder is the bare
+  circle); neighbours are one size (K2; `.controls` evens padding and type
+  too, and steps through bare wrappers); anything that opens choices looks
+  like a dropdown (K5; `DropdownButton`); nothing changes by itself (M2).
+  Stricter readability: accent and highlight 3.5:1 on the page, colours
+  22 / 15 apart; tones that miss are remade from their own colours or not
+  offered, and every look passes.
