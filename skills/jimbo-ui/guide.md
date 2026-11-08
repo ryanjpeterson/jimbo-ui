@@ -1611,7 +1611,7 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   failed requests included: top right under the top bar (full width on
   phones), newest on top, and every one timed — 4 s, 6 s with an action,
   8 s for an error — with a line showing the time left; hover holds it.
-- **Unreleased** — The **rulebook** (`rulebook.md`): every rule numbered
+- **0.16.0 (2026-11-08)** — The **rulebook** (`rulebook.md`): every rule numbered
   and checkable, cited by audits; the guide explains. New rules: a circle
   is never inside a box (S4; `EntityRow`'s placeholder is the bare
   circle); neighbours are one size (K2; `.controls` evens padding and type

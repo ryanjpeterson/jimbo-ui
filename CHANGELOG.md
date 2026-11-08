@@ -32,7 +32,7 @@ now 0.1.0–0.5.0 (1.0.0 → 0.1.0, 1.1.0 → 0.2.0, 2.0.0 → 0.3.0, 3.0.0 → 
 3.1.0 → 0.5.0). An app whose `jimbo-ui.json` still says an old number is on
 the matching 0.x release.
 
-## Unreleased
+## 0.16.0 — 2026-11-08
 
 jimbo.ui is a rulebook: every rule numbered; circles never in a box, neighbours one size, dropdowns look like dropdowns, stricter theme contrast.
 
