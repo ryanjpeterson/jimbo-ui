@@ -1,7 +1,7 @@
 {
   "version": "0.1.0",
   "docs": "docs/explain",
-  "synced": { "commit": "32c6eef", "date": "2026-11-08" },
+  "synced": { "commit": "8477686", "date": "2026-11-08" },
   "facts": {
     "name": "jimbo-ui",
     "tagline": "Shared brand and UI system for Ryan's web apps, as code to copy and a Claude Code plugin",

@@ -13,7 +13,7 @@ jimbo.ui (repo and plugin `jimbo-ui`) is Ryan's shared brand and UI system for h
 | Built with | TypeScript, React 18, Tailwind 4, Vite 5, Node scripts, Playwright |
 | Leans on | GitHub (releases and each app's `jimbo-ui.json`), Google Fonts, Google Maps (MapView) |
 | Started | 2026-10-23 |
-| Docs checked | 2026-11-08 at 32c6eef |
+| Docs checked | 2026-11-08 at 8477686 |
 
 ## The docs
 
