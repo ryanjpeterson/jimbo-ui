@@ -1051,7 +1051,7 @@ and body fonts.
 | `List` + `ListGroupLabel` | A card of rows, optionally grouped (by month: a wrapper that starts with a `ListGroupLabel`); group labels are support text with an 8 px support dot, on a support wash fading right. `layout="tiles"` shows the same children as a grid of cards (one column on phones, two or three wider); `bare` drops the card for use inside `Section flush`; `maxHeight` caps a list of rows and scrolls inside the card, its bar always showing |
 | `LayoutSwitch` + `useListLayout` | Lets people pick rows or tiles for a `List` (small `Tabs` in the section's action slot); the choice is remembered per list in the browser |
 | `EventRow` | A dated item. `DateBlock` on the left, a `status` dot (`{ tone, label, live? }` — `live` pulses); `to` to go somewhere or `onOpen` to open something in place (a log in a `Sheet`); `selected`/`onSelect` for select mode |
-| `EntityRow` | A named thing with an avatar (a person, a place); `avatarText` puts a short code or number in the placeholder avatar instead of initials |
+| `EntityRow` | A named thing with an avatar (a person, a place); `avatarText` puts a short code or number in the placeholder avatar instead of initials. A picture that fails to load falls back to the placeholder (`useImageOrFallback`), never a broken image — as in `MediaCard`, `EventRow` and `Hero` |
 | `DateBlock` | A tear-off calendar ticket (52 px wide, 12 px radius, `surface-2`): the month on a solid highlight band, the day big below, then the year or weekday |
 | `MediaCard` + `MediaGrid` | Image-led grid card (`aspect="portrait"` for posters), always in a `MediaGrid`, whose `size` sets the card size: `sm` (three across on phones, up to six wide, smaller type: covers, a big collection to scan), `md` (two, up to four; the default) or `lg` (one, up to three: a few things to feature) |
 | `LinkCard` | A card that navigates (eyebrow / title / sub); `accent` for the one to notice |
@@ -1061,6 +1061,7 @@ and body fonts.
 | `BarChart` | Comparing a few amounts in one tone: `horizontal` rows (label, bar, value at the tip; `to` links each) or `vertical` columns over a short run (tap a column to read it; the largest shows until you do). Vertical columns with a `to` go there on a click or Enter; on touch the first tap reads and a second tap goes, and the readout gets an *Open* link |
 | `ThemeDots` | The motif: the theme's three colours as flat 8 px shapes side by side (4 px apart) — circles, or the theme's `motif` shape. In empty states and brand moments — never above a page title |
 | `RankedList` | Top-N lists with counts |
+| `Timeline` | Milestones in order along a vertical line, in `groups` (a year, a month, a phase; `label` optional). Each milestone is a card beside the line: a `when` line (the date and what kind of milestone it is), title (two lines), `body` (three), `meta` (one), an optional `badge`. Its 10 px dot sits on the line, outside the card (S3, S4), in a `tone` — `accent`, `highlight`, `support` or `muted`, one per kind — which the `when` line names too, so colour is never the only cue. With `to` the whole card is the one tap target (K7) |
 | `SearchField`, `SelectField` | Search and single-choice filters (select on phones) |
 | `Tabs` | 2–4 mutually exclusive views (segmented); `size="sm"` is a compact inline switch for a section's action slot |
 | `PillTabs` | Filters on desktop; `scroll` for a page's own sections when there are more than fit (one row that scrolls sideways) |
@@ -1130,6 +1131,7 @@ one here fits.
 | --- | --- |
 | **Opening a page** | `PageHeader` (title row) · `HeroSection` (full-width, pattern, no photo) · `Banner` / `Hero` (over a blurred photo) |
 | **A list of things** | `List` + `EventRow` (dated, with date tickets) · `List` + `EntityRow` (people, places, with avatars) · `RankedList` (top-N with counts) · `MediaGrid` of `MediaCard`s (image-led, three sizes) · `LinkCard` stack (a few destinations) |
+| **Things in order over time** | `Timeline` (milestones along a line, grouped by year or month) · `List` + `EventRow` grouped with `ListGroupLabel` (dated entries, many of them) |
 | **Numbers** | `StatGrid` + `StatTile` (headline numbers, coloured dots) · `RankedList` (counts in a list) · `Section` with big `font-display` numbers |
 | **A block of content** | `Section` (titled card; side by side in `Columns`) · plain `.card` · `FullBleed` band (`surface`, or a brand colour) · `Sheet` (when it's a choice or a short flow) |
 | **Calls to action** | primary `Button` · `LinkCard` with `accent` · `FullBleed` band in a brand colour · `HeroSection` actions |
@@ -1620,3 +1622,10 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   Stricter readability: accent and highlight 3.5:1 on the page, colours
   22 / 15 apart; tones that miss are remade from their own colours or not
   offered, and every look passes.
+- **Unreleased** — `Timeline` in the kit (promoted from the catalogue's
+  candidates): milestones along a line, the 10 px dot on the line outside
+  the card, its kind named in the `when` line, one tap target each.
+  Pictures that fail to load fall back to the placeholder in `MediaCard`,
+  `EntityRow`, `EventRow` and `Hero` (`useImageOrFallback`). `Columns` is
+  one column on phones even with a long trimmed line, and `PageHeader` /
+  `Section` action rows wrap on phones instead of running off the screen.

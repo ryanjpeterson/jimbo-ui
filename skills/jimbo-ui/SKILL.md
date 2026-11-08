@@ -156,7 +156,8 @@ The short form of the rulebook; the numbered rules are in
 - **Ask before building a feature or section:** "What existing component do
   you want to use for this feature or section's styling?" — offer 3–4
   fitting options from the component menu (guide section 9: e.g. for a list,
-  `EventRow` list, `EntityRow` list, `MediaCard` grid, `RankedList`), plus
+  `EventRow` list, `EntityRow` list, `MediaCard` grid, `RankedList`; for
+  milestones over time, `Timeline`), plus
   something new, recommending one. Use Claude Code's question tool when
   available. One question per feature or section; then build with the
   choice.

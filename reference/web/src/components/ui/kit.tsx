@@ -219,7 +219,7 @@ export function PageHeader({ eyebrow, title, count, actions, back, className }: 
             <span className="ml-2 align-middle text-base font-body font-medium text-text-subtle">{count.toLocaleString()}</span>
           )}
         </h1>
-        {actions && <div className="controls shrink-0 justify-end">{actions}</div>}
+        {actions && <div className="controls max-w-full shrink-0 justify-end">{actions}</div>}
       </div>
     </header>
   );
@@ -376,20 +376,22 @@ export function Hero({ imageUrl, imageAlt, eyebrow, title, children, actions, ba
     purple: "from-purple-900/70",
   }[accent];
   const [viewing, setViewing] = useState(false);
+  // A picture that fails to load gives the initials thumbnail and the plain glow, not a broken image.
+  const shown = useImageOrFallback(imageUrl);
   const thumbCls = cn(
     "shrink-0 overflow-hidden rounded-xl border border-white/10 bg-surface-2 shadow-2xl shadow-black/50",
     square ? "h-24 w-24 sm:h-44 sm:w-44" : "h-32 w-24 sm:h-60 sm:w-44",
   );
 
   return (
-    <Banner backdrop={imageUrl} glow={accent} back={back} badge={badge} pullUp={pullUp}>
-      {viewing && imageUrl && <ImageViewer src={imageUrl} alt={imageAlt ?? title} onClose={() => setViewing(false)} />}
+    <Banner backdrop={shown.src} glow={accent} back={back} badge={badge} pullUp={pullUp}>
+      {viewing && shown.src && <ImageViewer src={shown.src} alt={imageAlt ?? title} onClose={() => setViewing(false)} />}
       <div className="flex items-end gap-4 pb-6 pt-6 sm:gap-8 sm:pb-8 sm:pt-10">
         <div className={thumbCls}>
-          {imageUrl ? (
+          {shown.src ? (
             <button type="button" onClick={() => setViewing(true)} aria-label="View full size"
               className="group relative block h-full w-full cursor-zoom-in">
-              <img src={imageUrl} alt={imageAlt ?? title} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
+              <img src={shown.src} alt={imageAlt ?? title} onError={shown.onError} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
               {/* Small expand hint in the corner */}
               <span className="absolute bottom-1.5 right-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-black/55 text-white/90 backdrop-blur-xs">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -446,7 +448,7 @@ export function Section({ title, count, action, children, flush = false, plain =
               {count != null && <span className="ml-2 text-sm font-body font-medium text-text-subtle">{count.toLocaleString()}</span>}
             </h2>
           )}
-          {action && <div className="controls ml-auto shrink-0 justify-end">{action}</div>}
+          {action && <div className="controls ml-auto max-w-full shrink-0 justify-end">{action}</div>}
         </div>
       )}
       {plain ? children : <div className={cn("card flex-1", flush ? "overflow-hidden" : "p-4 sm:p-5")}>{children}</div>}
@@ -465,7 +467,8 @@ export function Columns({ count = 2, from = "lg", children, className }: { count
     sm: { 2: "sm:grid-cols-2", 3: "sm:grid-cols-2 lg:grid-cols-3" },
     lg: { 2: "lg:grid-cols-2", 3: "lg:grid-cols-3" },
   }[from][count];
-  return <div className={cn("grid items-stretch gap-6", cols, className)}>{children}</div>;
+  // One column on phones, minmax(0, 1fr), so a card's trimmed line can't widen it past the screen.
+  return <div className={cn("grid grid-cols-1 items-stretch gap-6", cols, className)}>{children}</div>;
 }
 
 export type ListLayout = "rows" | "tiles";
@@ -567,6 +570,7 @@ export function EventRow({ to, onOpen, date, title, subtitle, meta, imageUrl, st
   selected?: boolean;
   onSelect?: () => void;
 }) {
+  const thumb = useImageOrFallback(imageUrl);
   if (onSelect) {
     return (
       <button type="button" onClick={onSelect} aria-pressed={!!selected}
@@ -593,7 +597,7 @@ export function EventRow({ to, onOpen, date, title, subtitle, meta, imageUrl, st
       <DateBlock date={date} showYear={showYear} approximate={approximate} />
       {imageUrl !== undefined && (
         <div className="hidden h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-surface-2 sm:block">
-          {imageUrl && <img src={imageUrl} alt="" loading="lazy" className="h-full w-full object-cover" />}
+          {thumb.src && <img src={thumb.src} alt="" loading="lazy" onError={thumb.onError} className="h-full w-full object-cover" />}
         </div>
       )}
       <div className="min-w-0 flex-1">
@@ -712,6 +716,17 @@ export function Autocomplete({ label, value, onChange, options, onPick, onCreate
   );
 }
 
+/**
+ * An image URL that falls back when it fails to load: `src` is null once the
+ * browser reports an error for that URL, so the caller shows its placeholder
+ * instead of a broken image. A new URL gets a fresh try.
+ */
+export function useImageOrFallback(url?: string | null): { src: string | null; onError: () => void } {
+  const [failed, setFailed] = useState<string | null>(null);
+  const src = url && failed !== url ? url : null;
+  return { src, onError: () => setFailed(src) };
+}
+
 /** A named thing (person, place, group) as a row with an avatar. */
 export function EntityRow({ to, name, imageUrl, sub, meta, round = false, avatarText }: {
   to: string;
@@ -723,13 +738,14 @@ export function EntityRow({ to, name, imageUrl, sub, meta, round = false, avatar
   /** What the placeholder avatar shows instead of the name's initials: a short code, a number, a symbol. */
   avatarText?: string;
 }) {
+  const shown = useImageOrFallback(imageUrl);
   return (
     <Link to={to} className={rowBase}>
       {/* A picture keeps its shape (square for places and covers, round for people);
-          with none, the placeholder is a bare flat circle — never a circle in a box. */}
-      {imageUrl ? (
+          with none (or one that fails to load), the placeholder is a bare flat circle — never a circle in a box. */}
+      {shown.src ? (
         <div className={cn("h-12 w-12 shrink-0 overflow-hidden bg-surface-2", round ? "rounded-full" : "rounded-lg")}>
-          <img src={imageUrl} alt="" loading="lazy" className="h-full w-full object-cover" />
+          <img src={shown.src} alt="" loading="lazy" onError={shown.onError} className="h-full w-full object-cover" />
         </div>
       ) : (
         <div aria-hidden="true" className="dot-support flex h-12 w-12 shrink-0 items-center justify-center font-display text-base text-on-support">{avatarText ?? initials(name)}</div>
@@ -782,17 +798,19 @@ export function MediaCard({ to, name, imageUrl, sub, meta, aspect = "video", con
 }) {
   const aspectCls = aspect === "square" ? "aspect-square" : aspect === "portrait" ? "aspect-[3/4]" : "aspect-video";
   const small = useContext(MediaSizeContext) === "sm";
+  // An image that fails to load (missing, moved, offline) falls back to the initials, not a broken image.
+  const shown = useImageOrFallback(imageUrl);
   return (
     <Link to={to} className="group card flex flex-col overflow-hidden transition-colors hover:border-accent/60">
       <div className={cn("relative overflow-hidden bg-surface-2", aspectCls)}>
-        {imageUrl ? (
+        {shown.src ? (
           contain ? (
             <>
-              <img src={imageUrl} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full scale-110 object-cover opacity-70 blur-lg" />
-              <img src={imageUrl} alt={name} loading="lazy" className="relative h-full w-full object-contain" />
+              <img src={shown.src} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full scale-110 object-cover opacity-70 blur-lg" />
+              <img src={shown.src} alt={name} loading="lazy" onError={shown.onError} className="relative h-full w-full object-contain" />
             </>
           ) : (
-            <img src={imageUrl} alt={name} loading="lazy" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
+            <img src={shown.src} alt={name} loading="lazy" onError={shown.onError} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
           )
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-linear-to-br from-surface-2 to-surface">
@@ -1192,6 +1210,88 @@ export function RankedList({ items, unit = "item" }: { items: RankedItem[]; unit
             );
           })}
         </div>
+      ))}
+    </div>
+  );
+}
+
+export type TimelineTone = "accent" | "highlight" | "support" | "muted";
+
+export interface TimelineItem {
+  id: string;
+  /**
+   * The short line above the title: the date, and what kind of milestone it
+   * is ("Mar 2024 · Started"). It names what the dot's colour means, so the
+   * colour is never the only cue.
+   */
+  when: ReactNode;
+  title: ReactNode;
+  body?: ReactNode;
+  meta?: ReactNode;
+  /** Where the milestone goes: the whole card is the one tap target. */
+  to?: string;
+  /** The dot's colour, one per kind of milestone. Default `accent`. */
+  tone?: TimelineTone;
+  /** At the end of the `when` line, e.g. a "Now" or "New" `Badge`. */
+  badge?: ReactNode;
+}
+
+export interface TimelineGroup {
+  /** A year, a month, a phase. Leave it out for one ungrouped run. */
+  label?: ReactNode;
+  items: TimelineItem[];
+}
+
+const TIMELINE_DOT: Record<TimelineTone, string> = {
+  accent: "dot-accent",
+  highlight: "dot-highlight",
+  support: "dot-support",
+  muted: "rounded-full bg-text-subtle",
+};
+
+function TimelineMilestone({ item }: { item: TimelineItem }) {
+  const inner = (
+    <>
+      <div className="flex min-w-0 items-center gap-2">
+        <p className="eyebrow min-w-0 flex-1 truncate">{item.when}</p>
+        {item.badge && <span className="shrink-0">{item.badge}</span>}
+      </div>
+      <p className="mt-1 line-clamp-2 break-words font-semibold leading-snug text-text-base group-hover:text-accent">{item.title}</p>
+      {item.body && <p className="mt-1 line-clamp-3 break-words text-sm text-text-muted">{item.body}</p>}
+      {item.meta && <p className="mt-1.5 truncate text-xs font-medium text-text-subtle">{item.meta}</p>}
+    </>
+  );
+  return (
+    <li className="relative pl-7">
+      {/* The 10 px status dot sits on the line, on the page — never inside the card. */}
+      <span aria-hidden="true" className={cn("absolute left-0 top-5 h-2.5 w-2.5", TIMELINE_DOT[item.tone ?? "accent"])} />
+      {item.to ? (
+        <Link to={item.to} className="group card block min-h-11 px-4 py-3 transition-colors hover:border-accent/60">{inner}</Link>
+      ) : (
+        <div className="card px-4 py-3">{inner}</div>
+      )}
+    </li>
+  );
+}
+
+/**
+ * Milestones in order along a vertical line, in groups (a year, a month).
+ * Each milestone is a card beside the line with its 10 px dot on the line,
+ * outside the card; the dot's colour is one per kind of milestone, and the
+ * `when` line names the kind too. A milestone with `to` is one tap target.
+ * Text is trimmed: `when` and `meta` on one line, the title at two, the body
+ * at three. Put it straight on the page or in a `Section plain`.
+ */
+export function Timeline({ groups, className }: { groups: TimelineGroup[]; className?: string }) {
+  return (
+    <div className={cn("space-y-6", className)}>
+      {groups.map((g, i) => (
+        <section key={i} className="min-w-0">
+          {g.label != null && <h3 className="h-section mb-3 truncate pl-7">{g.label}</h3>}
+          <ol className="relative space-y-3 before:absolute before:bottom-2 before:left-[4.5px] before:top-2 before:w-px before:bg-border">
+            {g.items.map((it) => <TimelineMilestone key={it.id} item={it} />)}
+          </ol>
+        </section>
       ))}
     </div>
   );
