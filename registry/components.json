@@ -1406,6 +1406,18 @@
       ],
       "variants": {},
       "source": "reference/web/src/components/ui/kit.tsx#ShareSliders"
+    },
+    {
+      "id": "prose",
+      "name": "Prose",
+      "purpose": "Markdown rendered in the theme: headings, lists, tables in a visible-scrollbar scroll area, code, quotes; sanitised; internal links handled in-app.",
+      "tier": "candidate",
+      "aliases": [
+        "Markdown",
+        "RichText",
+        "MarkdownView"
+      ],
+      "variants": {}
     }
   ]
 }
