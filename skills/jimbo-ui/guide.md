@@ -1631,7 +1631,7 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   Stricter readability: accent and highlight 3.5:1 on the page, colours
   22 / 15 apart; tones that miss are remade from their own colours or not
   offered, and every look passes.
-- **Unreleased** — `Timeline` in the kit (promoted from the catalogue's
+- **0.17.0 (2026-11-08)** — `Timeline` in the kit (promoted from the catalogue's
   candidates): milestones along a line, the 10 px dot on the line outside
   the card, its kind named in the `when` line, one tap target each.
   Pictures that fail to load fall back to the placeholder in `MediaCard`,

@@ -1,7 +1,171 @@
 {
   "$comment": "Generated from CHANGELOG.md by scripts/releases.mjs — don't edit. Apps' jimbo-ui config section reads it to show what a newer release changes.",
-  "latest": "0.16.0",
+  "latest": "0.17.0",
   "releases": [
+    {
+      "version": "0.17.0",
+      "date": "2026-11-08",
+      "type": "breaking",
+      "summary": "Every page opens with a hero (`PageHeader` is now a compact one), `HeroCarousel` slides are facts only with their controls top left and a full-width timer, `JumpMenu` puts every page in a series one tap away, plus `Timeline`, `ScrollingLine`, one-line `MediaCard` titles and pictures that fall back to their placeholder.",
+      "items": [
+        {
+          "kind": "added",
+          "text": "**`Timeline`** in the kit (promoted from the catalogue's candidates): milestones in order along a vertical line, in groups (a year, a month, a phase). Each milestone is a card beside the line — a `when` line (the date and what kind of milestone it is), title, `body`, `meta` and an optional `badge` — with its 10 px dot on the line, outside the card (S3, S4). The dot's `tone` (`accent`, `highlight`, `support`, `muted`) is one per kind of milestone and the `when` line names it, so colour is never the only cue; with `to` the whole card is the one tap target (K7). Text is trimmed: `when` and `meta` one line, title two, body three. In the Style guide's Lists section, the showcase, and guide sections 8 and 9.",
+          "affects": [
+            "timeline",
+            "badge",
+            "tones"
+          ]
+        },
+        {
+          "kind": "added",
+          "text": "`useImageOrFallback(url)`: an image URL that drops to `null` once it fails to load, so the caller shows its placeholder.",
+          "affects": []
+        },
+        {
+          "kind": "added",
+          "text": "**`HeroCarousel`** in the kit: `HeroSection` slides one at a time. Every slide is laid in one cell, so it's always as tall as its fullest slide and nothing under it moves (new rule **L10**). Prev / next arrows (they wrap round), a 10 s timer drawn as a bar along Next, a pause button; it stops while hovered, focused or in a hidden tab. `index` / `onIndex` keep the slide in the URL. The catalogue archetype's Home opens with one.",
+          "affects": [
+            "hero-carousel",
+            "hero-section"
+          ]
+        },
+        {
+          "kind": "added",
+          "text": "**`ScrollingLine`** in the kit: one line that never wraps, cut with an ellipsis; while its card is hovered or focused the rest scrolls into view. Text that fits stays still; reduced motion keeps the ellipsis.",
+          "affects": [
+            "scrolling-line"
+          ]
+        },
+        {
+          "kind": "changed",
+          "text": "**Every page opens with a hero** (new rule **L11**). `PageHeader` is a compact hero now: the theme's colours blurred the full width, a big title, Back at the top left, pulled up under the top bar (`pullUp`). `pattern` picks the blur's layout; `plain` is the old in-column header, for demos and headers inside a card.",
+          "affects": [
+            "page-header"
+          ]
+        },
+        {
+          "kind": "changed",
+          "text": "**Different data, different look** (new rule **L12**): each kind of page gets its own hero `pattern` and `tone` (`HeroTone`: `accent`, `highlight` or `support` leads the blur, as a wash placed differently for each); pages of one kind share theirs. `HeroSection` and `HeroCarousel` take `tone` too.",
+          "affects": [
+            "tones",
+            "hero-section",
+            "hero-carousel"
+          ]
+        },
+        {
+          "kind": "changed",
+          "text": "**Every data page is one tap away** (new rule **N7**): pages in a series get a `JumpMenu` to any other one, and an app with more data pages than tabs lists them in a top-bar ☰.",
+          "affects": [
+            "jump-menu"
+          ]
+        },
+        {
+          "kind": "changed",
+          "text": "**`HeroCarousel` slides are facts only** (L11): `HeroSlide` has no `actions`. The arrows, pause and \"3 / 29\" sit at the hero's top left, and the timer is a thin bar the screen's full width along its bottom edge (M2 updated).",
+          "affects": [
+            "hero-carousel"
+          ]
+        },
+        {
+          "kind": "changed",
+          "text": "The shell sets `--page-max` from its `width`, and `FullBleed` lines its content up with it, so a hero's text starts where the page column does on wide pages.",
+          "affects": [
+            "full-bleed"
+          ]
+        },
+        {
+          "kind": "changed",
+          "text": "`Menu` items take `current` (accent text and a tick) and `{ heading }` rows; a long menu scrolls (`.scroll-area`, 30rem at most).",
+          "affects": [
+            "menu",
+            "scroll-area"
+          ]
+        },
+        {
+          "kind": "changed",
+          "text": "**`HeroSection`'s pattern is always a blur** (rule **L7**): the layer is the pattern on a glow, blurred until no line shows, so the title never sits on crisp line art. `pattern` still picks the backdrop it's made from.",
+          "affects": [
+            "hero-section"
+          ]
+        },
+        {
+          "kind": "changed",
+          "text": "**M2** names `HeroCarousel` as its one exception in apps.",
+          "affects": [
+            "hero-carousel"
+          ]
+        },
+        {
+          "kind": "changed",
+          "text": "**L2**: a card wrapped in a box of its own still fills its cell.",
+          "affects": []
+        },
+        {
+          "kind": "changed",
+          "text": "**`MediaCard`'s title is one line** (was two) and its sub line too, both `ScrollingLine`s, so every card in a grid is the same size.",
+          "affects": [
+            "media-card",
+            "scrolling-line"
+          ]
+        },
+        {
+          "kind": "added",
+          "text": "**`JumpMenu`** in `overlays.tsx`: a `Menu` of links to pages in a series or every page of a kind, the current one ticked; a `DropdownButton` (\"Year: 2019\") by default, or any `trigger` (a top-bar ☰).",
+          "affects": [
+            "jump-menu",
+            "menu",
+            "dropdown-button"
+          ]
+        },
+        {
+          "kind": "added",
+          "text": "`LinkCard size=\"sm\"`: tighter padding and type, for a row of quick ways in.",
+          "affects": [
+            "link-card"
+          ]
+        },
+        {
+          "kind": "fixed",
+          "text": "`MediaCard` fills its cell (`h-full`) even when an app wraps it (to lay a button over the cover), so a `MediaGrid` row is one height (L2).",
+          "affects": [
+            "media-card",
+            "media-grid"
+          ]
+        },
+        {
+          "kind": "fixed",
+          "text": "`MediaCard`, `EntityRow`, `EventRow` and `Hero` fall back to their placeholder (initials, the bare avatar circle, the empty thumbnail) when a picture fails to load, instead of showing a broken image.",
+          "affects": [
+            "media-card",
+            "entity-row",
+            "event-row",
+            "hero"
+          ]
+        },
+        {
+          "kind": "fixed",
+          "text": "`Columns` sets `grid-cols-1` on phones, so a card's trimmed line can't widen the column past a 375 px screen.",
+          "affects": [
+            "columns"
+          ]
+        },
+        {
+          "kind": "fixed",
+          "text": "`PageHeader` and `Section` action rows (`.controls`) get `max-w-full`, so a long row of actions wraps on phones instead of running off the screen. **Available:** `Timeline`, `TimelineItem`, `TimelineGroup`, `TimelineTone`, `useImageOrFallback`, `JumpMenu`, `JumpItem`, `HeroTone`. **Apps must:** 1. Port `kit.tsx`, `overlays.tsx` and `AppShell.tsx` (the `--page-max` lines) from `reference/`. 2. Give every page a hero (L11): a `PageHeader` used inside a card or a demo gets `plain`; a page that opened with a bare title gets a `PageHeader`. 3. Drop `actions` from any `HeroCarousel` slides; put those buttons in the page below. 4. Give each kind of page its own `PageHeader pattern` and `tone` (L12). 5. Put a `JumpMenu` on pages in a series, and list every data page in a top-bar ☰ if the tabs don't reach them (N7).",
+          "affects": [
+            "page-header",
+            "section",
+            "timeline",
+            "jump-menu",
+            "app-shell",
+            "hero-carousel",
+            "tones"
+          ]
+        }
+      ],
+      "appsMust": []
+    },
     {
       "version": "0.16.0",
       "date": "2026-11-08",

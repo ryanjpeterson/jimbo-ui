@@ -34,6 +34,8 @@ the matching 0.x release.
 
 ## Unreleased
 
+## 0.17.0 — 2026-11-08
+
 **Update:** breaking
 
 Every page opens with a hero (`PageHeader` is now a compact one), `HeroCarousel` slides are facts only with their controls top left and a full-width timer, `JumpMenu` puts every page in a series one tap away, plus `Timeline`, `ScrollingLine`, one-line `MediaCard` titles and pictures that fall back to their placeholder.
