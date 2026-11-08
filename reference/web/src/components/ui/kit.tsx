@@ -157,10 +157,11 @@ export function FullBleed({ children, tone = "none", flush = false, pad = true, 
 
 /**
  * A full-width page opener without a photo: big title, a line, actions, over
- * an abstract pattern in the theme's colours (any backdrop pattern) on a
- * gradient. Use at the top of a landing or home page; `size="lg"` fills most
- * of the first screen. Pulls up under the top bar like `Banner`.
- * `pattern="none"` draws no layer of its own: the page's backdrop shows through.
+ * a soft blur of the theme's colours (a backdrop pattern on a glow, blurred
+ * until no line of it shows — never the pattern's crisp lines). Use at the top
+ * of a landing or home page; `size="lg"` fills most of the first screen. Pulls
+ * up under the top bar like `Banner`. `pattern="none"` draws no layer of its
+ * own: the page's backdrop shows through. Several to step through: `HeroCarousel`.
  */
 export function HeroSection({ eyebrow, title, children, actions, pattern = "ripples", size = "md", align = "left", pullUp = true }: {
   eyebrow?: ReactNode;
@@ -168,29 +169,165 @@ export function HeroSection({ eyebrow, title, children, actions, pattern = "ripp
   /** A line or two under the title. */
   children?: ReactNode;
   actions?: ReactNode;
+  /** The backdrop the blur is made from (it decides the colours' layout, not lines). */
   pattern?: BackdropPattern;
   size?: "md" | "lg";
   align?: "left" | "center";
   /** Tuck up under the top bar (the default, when it opens the page). Turn off when something sits above it. */
   pullUp?: boolean;
 }) {
+  return (
+    <HeroFrame pattern={pattern} size={size} align={align} pullUp={pullUp}>
+      <HeroText eyebrow={eyebrow} title={title} actions={actions} align={align}>{children}</HeroText>
+    </HeroFrame>
+  );
+}
+
+/** HeroSection's full-width box and its blurred layer. */
+function HeroFrame({ pattern, size, align, pullUp, children, className, ...rest }: {
+  pattern: BackdropPattern;
+  size: "md" | "lg";
+  align: "left" | "center";
+  pullUp: boolean;
+  children: ReactNode;
+  className?: string;
+} & Omit<React.HTMLAttributes<HTMLDivElement>, "children" | "className">) {
   const { theme } = useBrand();
-  const look = backdropCss({ ...theme, backdrop: { pattern, base: "gradient", intensity: 0.75, scale: 0.8 } });
+  const look = backdropCss({ ...theme, backdrop: { pattern, base: "glow", intensity: 0.9, scale: 0.8 } });
   return (
     <FullBleed pad={false} className={cn("isolate mb-2", pullUp && "-mt-6 sm:-mt-8")}>
-      {/* The pattern fades out top and bottom (.fade-out, plus .fade-in when something sits above),
-          so the opener melts into the page's backdrop instead of ending on a line. */}
+      {/* Always a blur: the layer is blurred and scaled up a little so its edges don't show, and it fades
+          out top and bottom (.fade-out, plus .fade-both when something sits above) into the page's backdrop. */}
       {pattern !== "none" && (
-        <div aria-hidden="true" className={cn("fade-out absolute inset-0 -z-10", !pullUp && "fade-both")}
-          style={{ backgroundImage: look.image, backgroundSize: look.size, backgroundPosition: look.position, backgroundRepeat: look.repeat }} />
+        <div aria-hidden="true" className={cn("fade-out pointer-events-none absolute inset-0 -z-10 overflow-hidden", !pullUp && "fade-both")}>
+          <div className="absolute -inset-16 blur-3xl saturate-150"
+            style={{ backgroundImage: look.image, backgroundSize: look.size, backgroundPosition: look.position, backgroundRepeat: look.repeat }} />
+        </div>
       )}
-      <div className={cn("flex flex-col justify-end gap-3 py-10 sm:py-14", size === "lg" ? "min-h-[62dvh]" : "min-h-[34dvh]", align === "center" && "items-center text-center")}>
-        {eyebrow && <p className="eyebrow text-support">{eyebrow}</p>}
-        <h1 className="line-clamp-3 break-words font-display text-40 leading-[1.02] text-text-base sm:text-6xl">{title}</h1>
-        {children && <div className={cn("max-w-xl text-17 text-text-muted", align === "center" && "mx-auto")}>{children}</div>}
-        {actions && <div className="controls mt-2">{actions}</div>}
+      <div {...rest} className={cn("flex flex-col justify-end gap-3 py-10 sm:py-14", size === "lg" ? "min-h-[62dvh]" : "min-h-[34dvh]", align === "center" && "items-center text-center", className)}>
+        {children}
       </div>
     </FullBleed>
+  );
+}
+
+function HeroText({ eyebrow, title, children, actions, align }: {
+  eyebrow?: ReactNode; title: ReactNode; children?: ReactNode; actions?: ReactNode; align: "left" | "center";
+}) {
+  return (
+    <>
+      {eyebrow && <p className="eyebrow text-support">{eyebrow}</p>}
+      <h1 className="line-clamp-3 break-words font-display text-40 leading-[1.02] text-text-base sm:text-6xl">{title}</h1>
+      {children && <div className={cn("max-w-xl text-17 text-text-muted", align === "center" && "mx-auto")}>{children}</div>}
+      {actions && <div className="controls mt-2">{actions}</div>}
+    </>
+  );
+}
+
+export interface HeroSlide {
+  /** Stable id (kept in the URL by the caller, if it likes). */
+  id: string;
+  eyebrow?: ReactNode;
+  title: ReactNode;
+  children?: ReactNode;
+  actions?: ReactNode;
+}
+
+/**
+ * Several HeroSection slides, one at a time. Every slide is laid out in the
+ * same cell, so the hero is always as tall as its fullest slide and nothing
+ * under it moves when it changes. Prev / next arrows step through (wrapping
+ * round); it moves on by itself every `interval` (10 s), the time left drawn
+ * as a bar along the Next arrow, and stops while it's hovered or has focus,
+ * or for good with the pause button (rulebook M2's one exception). Reduced
+ * motion: slides swap without the fade. `index` / `onIndex` to control it
+ * (a URL parameter); without them it keeps its own.
+ */
+export function HeroCarousel({ slides, index, onIndex, interval = 10_000, label = "Highlights", pattern = "ripples", size = "md", align = "left", pullUp = true }: {
+  slides: HeroSlide[];
+  index?: number;
+  onIndex?: (i: number) => void;
+  /** Milliseconds each slide stays; 0 never moves on by itself. */
+  interval?: number;
+  /** What the carousel is, for screen readers. */
+  label?: string;
+  pattern?: BackdropPattern;
+  size?: "md" | "lg";
+  align?: "left" | "center";
+  pullUp?: boolean;
+}) {
+  const [own, setOwn] = useState(0);
+  const n = slides.length;
+  const i = n ? (((index ?? own) % n) + n) % n : 0;
+  const go = (to: number) => { const v = ((to % n) + n) % n; onIndex ? onIndex(v) : setOwn(v); };
+  const goRef = useRef(go);
+  goRef.current = go;
+  const [paused, setPaused] = useState(false);
+  const [held, setHeld] = useState({ hover: false, focus: false });
+  const stopped = paused || held.hover || held.focus;
+  const bar = useRef<HTMLSpanElement>(null);
+  const run = useRef<Animation | null>(null);
+
+  // The timer is the bar's own animation: when it finishes, the next slide. Pausing pauses it, so the time
+  // left is kept; a new slide starts it again.
+  useEffect(() => {
+    const el = bar.current;
+    if (!el || n < 2 || !interval || typeof el.animate !== "function") return;
+    const a = el.animate([{ transform: "scaleX(0)" }, { transform: "scaleX(1)" }], { duration: interval, easing: "linear", fill: "forwards" });
+    a.onfinish = () => goRef.current(i + 1);
+    run.current = a;
+    return () => { a.onfinish = null; a.cancel(); run.current = null; };
+  }, [i, n, interval]);
+  useEffect(() => { if (stopped) run.current?.pause(); else run.current?.play(); }, [stopped, i]);
+  useEffect(() => {
+    const onVis = () => { if (document.hidden) run.current?.pause(); else if (!stopped) run.current?.play(); };
+    document.addEventListener("visibilitychange", onVis);
+    return () => document.removeEventListener("visibilitychange", onVis);
+  }, [stopped]);
+
+  if (!n) return null;
+  const arrow = "glass relative inline-flex h-control w-control items-center justify-center overflow-hidden rounded-control text-text-base transition-colors hover:border-accent active:scale-95";
+  return (
+    <HeroFrame pattern={pattern} size={size} align={align} pullUp={pullUp}
+      role="region" aria-roledescription="carousel" aria-label={label}
+      onPointerEnter={(e) => e.pointerType === "mouse" && setHeld((h) => ({ ...h, hover: true }))}
+      onPointerLeave={() => setHeld((h) => ({ ...h, hover: false }))}
+      onFocus={() => setHeld((h) => ({ ...h, focus: true }))}
+      onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setHeld((h) => ({ ...h, focus: false })); }}>
+      {/* Every slide in one cell: the tallest decides the height. Only the current one shows or takes focus. */}
+      <div className="grid" aria-live={stopped ? "polite" : "off"}>
+        {slides.map((s, k) => (
+          <div key={s.id} role="group" aria-roledescription="slide" aria-label={`${k + 1} of ${n}`}
+            aria-hidden={k !== i} {...(k !== i ? { inert: "" } as object : {})}
+            className={cn("col-start-1 row-start-1 flex flex-col justify-end gap-3 motion-safe:transition-opacity motion-safe:duration-500",
+              align === "center" && "items-center text-center", k === i ? "opacity-100" : "invisible opacity-0")}>
+            <HeroText eyebrow={s.eyebrow} title={s.title} actions={s.actions} align={align}>{s.children}</HeroText>
+          </div>
+        ))}
+      </div>
+      {n > 1 && (
+        <div className={cn("mt-4 flex items-center gap-2", align === "center" && "justify-center")}>
+          <button type="button" className={arrow} onClick={() => go(i - 1)} aria-label="Previous"><Chevron dir="left" /></button>
+          <button type="button" className={arrow} onClick={() => go(i + 1)} aria-label="Next">
+            <Chevron />
+            {interval > 0 && (
+              <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-[3px] bg-accent/15">
+                <span ref={bar} className={cn("block h-full origin-left bg-accent", stopped && "opacity-50")} style={{ transform: "scaleX(0)" }} />
+              </span>
+            )}
+          </button>
+          {interval > 0 && (
+            <button type="button" className={cn(arrow, "text-text-muted")} onClick={() => setPaused((p) => !p)}
+              aria-label={paused ? "Play" : "Pause"} aria-pressed={paused}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                {paused ? <path d="M8 5.5v13l11-6.5z" /> : <><rect x="6.5" y="5" width="3.5" height="14" rx="1" /><rect x="14" y="5" width="3.5" height="14" rx="1" /></>}
+              </svg>
+            </button>
+          )}
+          <p className="ml-2 text-sm tabular-nums text-text-subtle">{i + 1} / {n}</p>
+        </div>
+      )}
+    </HeroFrame>
   );
 }
 
@@ -784,6 +921,38 @@ export function MediaGrid({ size = "md", children, className }: { size?: MediaSi
   );
 }
 
+/**
+ * One line of text that never wraps: cut with an ellipsis, and while its card (the nearest `group`) is
+ * hovered or focused, the rest of it scrolls into view and back when the pointer leaves. Text that fits
+ * stays still. Reduced motion: the ellipsis only, the whole line in the tooltip.
+ */
+export function ScrollingLine({ children, className }: { children: ReactNode; className?: string }) {
+  const outer = useRef<HTMLSpanElement>(null);
+  const inner = useRef<HTMLSpanElement>(null);
+  const [shift, setShift] = useState(0);
+  useLayoutEffect(() => {
+    const o = outer.current, i = inner.current;
+    if (!o || !i) return;
+    const measure = () => setShift(Math.max(0, Math.ceil(i.scrollWidth - o.clientWidth)));
+    measure();
+    if (typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver(measure);
+    ro.observe(o);
+    return () => ro.disconnect();
+  }, [children]);
+  return (
+    <span ref={outer} className={cn("block overflow-hidden whitespace-nowrap", className)}
+      title={typeof children === "string" && shift ? children : undefined}>
+      <span ref={inner}
+        className={cn("inline-block max-w-full overflow-hidden text-ellipsis whitespace-nowrap align-top",
+          shift > 0 && "motion-safe:transition-transform motion-safe:ease-linear motion-safe:group-hover:max-w-none motion-safe:group-hover:overflow-visible motion-safe:group-hover:[transform:translateX(var(--scroll-by))] motion-safe:group-hover:delay-300 motion-safe:group-focus-visible:max-w-none motion-safe:group-focus-visible:overflow-visible motion-safe:group-focus-visible:[transform:translateX(var(--scroll-by))]")}
+        style={shift ? ({ "--scroll-by": `-${shift}px`, transitionDuration: `${Math.max(600, shift * 30)}ms` } as React.CSSProperties) : undefined}>
+        {children}
+      </span>
+    </span>
+  );
+}
+
 /** Image-led card for grids — put it in a `MediaGrid`, which sets its size. */
 export function MediaCard({ to, name, imageUrl, sub, meta, aspect = "video", contain = false, badge }: {
   to: string;
@@ -801,7 +970,7 @@ export function MediaCard({ to, name, imageUrl, sub, meta, aspect = "video", con
   // An image that fails to load (missing, moved, offline) falls back to the initials, not a broken image.
   const shown = useImageOrFallback(imageUrl);
   return (
-    <Link to={to} className="group card flex flex-col overflow-hidden transition-colors hover:border-accent/60">
+    <Link to={to} className="group card flex h-full flex-col overflow-hidden transition-colors hover:border-accent/60">
       <div className={cn("relative overflow-hidden bg-surface-2", aspectCls)}>
         {shown.src ? (
           contain ? (
@@ -820,8 +989,8 @@ export function MediaCard({ to, name, imageUrl, sub, meta, aspect = "video", con
         {badge && <div className="absolute left-2 top-2">{badge}</div>}
       </div>
       <div className={cn("flex flex-1 flex-col gap-0.5", small ? "p-2 sm:p-2.5" : "p-3")}>
-        <p className={cn("line-clamp-2 font-semibold leading-snug text-text-base group-hover:text-accent", small ? "text-sm" : "text-15")}>{name}</p>
-        {sub && <p className={cn("truncate text-text-muted", small ? "text-xs" : "text-sm")}>{sub}</p>}
+        <ScrollingLine className={cn("font-semibold leading-snug text-text-base group-hover:text-accent", small ? "text-sm" : "text-15")}>{name}</ScrollingLine>
+        {sub && <ScrollingLine className={cn("text-text-muted", small ? "text-xs" : "text-sm")}>{sub}</ScrollingLine>}
         {meta && <p className={cn("mt-auto truncate pt-1 font-medium text-text-subtle", small ? "text-11" : "text-xs")}>{meta}</p>}
       </div>
     </Link>

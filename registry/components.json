@@ -288,7 +288,7 @@
     {
       "id": "hero-section",
       "name": "HeroSection",
-      "purpose": "Opens a page with a big title over a pattern, no photo.",
+      "purpose": "Opens a page with a big title over a soft blur of the theme's colours, no photo.",
       "tier": "kit",
       "aliases": [
         "Jumbotron",
@@ -298,9 +298,28 @@
       "variants": {
         "size": "md | lg",
         "align": "start | center",
-        "pattern": "a backdrop"
+        "pattern": "a backdrop (always blurred)"
       },
       "source": "reference/web/src/components/ui/kit.tsx#HeroSection"
+    },
+    {
+      "id": "hero-carousel",
+      "name": "HeroCarousel",
+      "purpose": "Several HeroSection slides one at a time, as tall as the fullest, with prev / next arrows, a 10 s timer and pause.",
+      "tier": "kit",
+      "aliases": [
+        "Slideshow",
+        "Carousel",
+        "Spotlight",
+        "Rotator"
+      ],
+      "variants": {
+        "interval": "ms (10 s; 0 never moves on)",
+        "size": "md | lg",
+        "align": "start | center",
+        "pattern": "a backdrop (always blurred)"
+      },
+      "source": "reference/web/src/components/ui/kit.tsx#HeroCarousel"
     },
     {
       "id": "page",
@@ -502,6 +521,19 @@
         "aspect": "square | portrait"
       },
       "source": "reference/web/src/components/ui/kit.tsx#MediaCard"
+    },
+    {
+      "id": "scrolling-line",
+      "name": "ScrollingLine",
+      "purpose": "One line of text cut with an ellipsis that scrolls the rest into view on hover.",
+      "tier": "kit",
+      "aliases": [
+        "Marquee",
+        "Ticker",
+        "TruncateScroll"
+      ],
+      "variants": {},
+      "source": "reference/web/src/components/ui/kit.tsx#ScrollingLine"
     },
     {
       "id": "media-grid",

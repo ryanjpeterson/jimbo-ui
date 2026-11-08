@@ -61,12 +61,13 @@ How to use it:
 ## L · Layout
 
 - **L1** Phone first: designed at 375 px, relaxed from `sm:`. Full screen edge to edge, insets from the `--safe-*` variables, never `env()`. *§6*
-- **L2** **Symmetry.** Cards and sections side by side are one height: `Columns`, `StatGrid`, `MediaGrid`, `List layout="tiles"` — never a bare `grid lg:grid-cols-*` of cards, never `items-start` across a row of cards. *§6*
+- **L2** **Symmetry.** Cards and sections side by side are one height: `Columns`, `StatGrid`, `MediaGrid`, `List layout="tiles"` — a card wrapped in a box of its own (to lay a button over it) still fills its cell (the wrapper and the card `h-full`); never a bare `grid lg:grid-cols-*` of cards, never `items-start` across a row of cards. *§6*
 - **L3** No horizontal scrolling: no sideways strips, no sideways-scrolling tables (use `DataTable`). `PillTabs scroll` for a page's own sections is the one exception. *§6*
 - **L4** Anything that scrolls inside the page shows its scrollbar (`.scroll-area`, `List maxHeight`). Never hide one. *§6*
-- **L5** Text never overflows: one line with `truncate`, or a 2–3 line clamp; numbers and units never split. *§6*
+- **L5** Text never overflows: one line with `truncate`, or a 2–3 line clamp; numbers and units never split. A card's title and sub line in a grid are one line (`ScrollingLine`: an ellipsis, the rest scrolling into view on hover), so the cards stay one size. *§6*
 - **L6** Every page is a `Page`; its one growing block fills down to the dock (`fill`). *§6*
-- **L7** Full-width openers fade into the page (`.fade-out`); never a hard edge, a border under them, or a fade to solid `bg`. *§7*
+- **L7** Full-width openers fade into the page (`.fade-out`); never a hard edge, a border under them, or a fade to solid `bg`. A `HeroSection`'s pattern is always a blur — never crisp lines behind the title. *§7*
+- **L10** **Steps of one thing are one height.** Slides, pages or steps shown one at a time in the same place are as tall as the fullest of them (`HeroCarousel` lays every slide in one cell), so nothing below moves when they change. *§6*
 - **L8** Rows are at least 76 px tall, divided by an etched line (`.divide-etched`). *§6*
 - **L9** Font sizes come from the type scale; no `text-[10px]`-style sizes. *§5*
 
@@ -80,7 +81,7 @@ How to use it:
 ## M · Motion and feedback
 
 - **M1** Motion is quick and physical: press scale, colour transitions. No page transitions, parallax, bouncing or decorative hover zoom. *§7*
-- **M2** **Nothing changes by itself.** Content moves only when the person acts — no auto-advancing carousels or rotating panels. (The showcase's rotating looks are the one exception: a demo of the themes, with pause and arrows, not an app.) *§7*
+- **M2** **Nothing changes by itself.** Content moves only when the person acts — no auto-advancing carousels or rotating panels. Two exceptions: `HeroCarousel` (a page opener's slides, 10 s each, with prev / next arrows, the timer shown on Next, a pause button, and stopped while hovered or focused), and the showcase's rotating looks (a demo of the themes). *§7*
 - **M3** Nothing looks like it did nothing: a result being replaced is `Pending`; long jobs show live progress (`JobTile`, `ProgressBar`). *§7*
 - **M4** Every pop-up notice is a `toast()`: top right, timed. Errors to fix in a form are inline. *§9*
 - **M5** Destructive or surprising actions confirm first (`ConfirmSheet`), naming the action on its button. *§9*

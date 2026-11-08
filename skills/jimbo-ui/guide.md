@@ -1030,7 +1030,12 @@ and body fonts.
   biggest; speed, time left and updated sit below.
 - **Nothing changes by itself.** Content moves only when the person acts:
   no auto-advancing carousels or rotating panels. A set of things to step
-  through has a `Pager`.
+  through has a `Pager`. The one exception in apps is `HeroCarousel`, a
+  page opener's slides: it moves on every 10 s, with prev / next arrows,
+  the time left drawn as a bar along Next, a pause button, and it stops
+  while hovered or focused (and in a hidden tab). Its slides are all laid
+  in one cell, so it's always as tall as its fullest slide and the page
+  under it never jumps.
 - No page transitions, no parallax, no bouncing, no decorative hover zoom.
 
 ---
@@ -1043,7 +1048,8 @@ and body fonts.
 | `BackButton` + `useRememberPages` + `parentPath` | Back to the page above, as it was left. `PageHeader back` and `Hero`/`Banner back` draw it |
 | `ShareSliders` + `rebalance` + `normaliseShares` | Linked sliders that split one total (100%, 60 items, a budget): moving one moves the rest the other way in proportion, so they always add up to the total. Each shows its percentage and amount. `normaliseShares` when the total changes |
 | `Hero` / `Banner` | Detail page header over a blurred image (full width) |
-| `HeroSection` | Full-width page opener with no photo: eyebrow, big title, a line, actions, over a backdrop pattern (`pattern`, any of the backdrops) on a gradient; `size="lg"` fills most of the first screen; `align="center"`. It tucks up under the top bar; pass `pullUp={false}` when something sits above it (as `Banner` and `Hero` take too) |
+| `HeroSection` | Full-width page opener with no photo: eyebrow, big title, a line, actions, over a soft blur of the theme's colours (`pattern`, any of the backdrops, blurred on a glow until no line shows — never the pattern's crisp lines); `size="lg"` fills most of the first screen; `align="center"`. It tucks up under the top bar; pass `pullUp={false}` when something sits above it (as `Banner` and `Hero` take too) |
+| `HeroCarousel` | `HeroSection` slides one at a time (`slides`: id, eyebrow, title, a line, actions): always as tall as its fullest slide, prev / next arrows that wrap round, moves on every `interval` (10 s) with the time left as a bar on Next, a pause button, stops while hovered or focused. `index` / `onIndex` to keep the slide in the URL |
 | `FullBleed` | Any section edge to edge: a band (`tone`: `surface`, or a flat `accent` / `highlight` / `support` with its `on-` text), a strip of media (`flush`), a call to action. Content lines up with the page column unless `flush` |
 | `RangeField` | A labelled slider (weight, spacing, strength…) with its value shown. Sliders that are shares of one total are `ShareSliders`, never independent `RangeField`s |
 | `Section` | A titled card holding one block of content; `plain` drops the card (a grid of tiles under a title). In a grid row its card stretches to the tallest, content at the top |
@@ -1054,6 +1060,7 @@ and body fonts.
 | `EntityRow` | A named thing with an avatar (a person, a place); `avatarText` puts a short code or number in the placeholder avatar instead of initials. A picture that fails to load falls back to the placeholder (`useImageOrFallback`), never a broken image — as in `MediaCard`, `EventRow` and `Hero` |
 | `DateBlock` | A tear-off calendar ticket (52 px wide, 12 px radius, `surface-2`): the month on a solid highlight band, the day big below, then the year or weekday |
 | `MediaCard` + `MediaGrid` | Image-led grid card (`aspect="portrait"` for posters), always in a `MediaGrid`, whose `size` sets the card size: `sm` (three across on phones, up to six wide, smaller type: covers, a big collection to scan), `md` (two, up to four; the default) or `lg` (one, up to three: a few things to feature) |
+| `ScrollingLine` | One line that never wraps: an ellipsis, and the rest scrolls into view while its card (the nearest `group`) is hovered or focused. `MediaCard`'s title and sub line; any card's line that has to stay one line |
 | `LinkCard` | A card that navigates (eyebrow / title / sub); `accent` for the one to notice |
 | `StatTile` / `StatGrid` | Headline numbers (`accent="accent"` / `"highlight"` / `"support"`: the number in that colour, an 8 px dot by the label and a soft pool of it in the corner); `trend` adds a `Sparkline` of recent values under the number |
 | `Sparkline` | A small trend with no axes: a 2 px line in the subtle text colour, the latest point as a dot in the tone |
@@ -1129,7 +1136,7 @@ one here fits.
 
 | For… | Options |
 | --- | --- |
-| **Opening a page** | `PageHeader` (title row) · `HeroSection` (full-width, pattern, no photo) · `Banner` / `Hero` (over a blurred photo) |
+| **Opening a page** | `PageHeader` (title row) · `HeroSection` (full-width, blur, no photo) · `HeroCarousel` (several of them, one at a time) · `Banner` / `Hero` (over a blurred photo) |
 | **A list of things** | `List` + `EventRow` (dated, with date tickets) · `List` + `EntityRow` (people, places, with avatars) · `RankedList` (top-N with counts) · `MediaGrid` of `MediaCard`s (image-led, three sizes) · `LinkCard` stack (a few destinations) |
 | **Things in order over time** | `Timeline` (milestones along a line, grouped by year or month) · `List` + `EventRow` grouped with `ListGroupLabel` (dated entries, many of them) |
 | **Numbers** | `StatGrid` + `StatTile` (headline numbers, coloured dots) · `RankedList` (counts in a list) · `Section` with big `font-display` numbers |
@@ -1629,3 +1636,8 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   `EntityRow`, `EventRow` and `Hero` (`useImageOrFallback`). `Columns` is
   one column on phones even with a long trimmed line, and `PageHeader` /
   `Section` action rows wrap on phones instead of running off the screen.
+  `HeroSection`'s pattern is always a blur (L7); `HeroCarousel` — slides as
+  tall as the fullest (L10), prev / next arrows, a 10 s timer on Next, pause
+  — the one exception to M2. `MediaCard` fills its cell even inside a
+  wrapper (L2), and its title and sub line are one line each
+  (`ScrollingLine`, L5).

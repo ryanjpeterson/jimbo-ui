@@ -36,7 +36,7 @@ the matching 0.x release.
 
 **Update:** feature
 
-A `Timeline` in the kit, and pictures that fail to load show their placeholder instead of a broken image.
+A `Timeline`, a `HeroCarousel` and a `ScrollingLine` in the kit, one-line `MediaCard` titles, hero patterns always a blur, and pictures that fail to load show their placeholder instead of a broken image.
 
 ### Added
 
@@ -52,9 +52,30 @@ A `Timeline` in the kit, and pictures that fail to load show their placeholder i
   Style guide's Lists section, the showcase, and guide sections 8 and 9.
 - `useImageOrFallback(url)`: an image URL that drops to `null` once it
   fails to load, so the caller shows its placeholder.
+- **`HeroCarousel`** in the kit: `HeroSection` slides one at a time. Every
+  slide is laid in one cell, so it's always as tall as its fullest slide
+  and nothing under it moves (new rule **L10**). Prev / next arrows (they
+  wrap round), a 10 s timer drawn as a bar along Next, a pause button; it
+  stops while hovered, focused or in a hidden tab. `index` / `onIndex` keep
+  the slide in the URL. The catalogue archetype's Home opens with one.
+- **`ScrollingLine`** in the kit: one line that never wraps, cut with an
+  ellipsis; while its card is hovered or focused the rest scrolls into
+  view. Text that fits stays still; reduced motion keeps the ellipsis.
+
+### Changed
+
+- **`HeroSection`'s pattern is always a blur** (rule **L7**): the layer is
+  the pattern on a glow, blurred until no line shows, so the title never
+  sits on crisp line art. `pattern` still picks the backdrop it's made from.
+- **M2** names `HeroCarousel` as its one exception in apps.
+- **L2**: a card wrapped in a box of its own still fills its cell.
+- **`MediaCard`'s title is one line** (was two) and its sub line too, both
+  `ScrollingLine`s, so every card in a grid is the same size.
 
 ### Fixed
 
+- `MediaCard` fills its cell (`h-full`) even when an app wraps it (to lay
+  a button over the cover), so a `MediaGrid` row is one height (L2).
 - `MediaCard`, `EntityRow`, `EventRow` and `Hero` fall back to their
   placeholder (initials, the bare avatar circle, the empty thumbnail) when
   a picture fails to load, instead of showing a broken image.
