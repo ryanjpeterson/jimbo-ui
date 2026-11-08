@@ -10,6 +10,8 @@ jimbo-ui and a catalogue of shared components, with each app describing
 itself in its own `jimbo-ui.json` — so nothing gets built twice. It's
 generic on purpose: no app's code, names or artwork live here.
 
+How and why it works: [docs/explain](docs/explain/README.md)
+
 It is also a **Claude Code plugin**: the `jimbo-ui` skill teaches Claude the
 rules and how to start, update and release.
 

@@ -132,3 +132,7 @@ Follow "change and release the guidelines" in `skills/jimbo-ui/SKILL.md`. In sho
 - Commit when work is done; push only when asked.
 - Apps that use jimbo.ui each have a `jimbo-ui.json` at their repo root.
   Updating an app happens in that app's own session, not here.
+
+This repo's docs follow jimbo-explain (`docs/explain/`, `jimbo-explain.json`). When a change adds, removes or changes a feature,
+dependency, integration, roadmap item or key decision, update the matching doc and facts in the same change, and move `synced` to
+HEAD. Check with the jimbo-explain skill's `scripts/check.mjs`.
