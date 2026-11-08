@@ -5,7 +5,7 @@
  *
  * Shape (dock tabs): Home · Entries · People · Places — plus the jimbo-ui
  * config section under the app's settings.
- *   Home      HeroSection, StatGrid, "Coming up" EventRow, RankedList
+ *   Home      HeroCarousel, StatGrid, "Coming up" EventRow, RankedList
  *   Entries   SearchField, PillTabs, List grouped by month of EventRow, select mode, Pager
  *   Entry     Hero, Sections, a compact MapView, edit in a Sheet
  *   People    SearchField, List of EntityRow
@@ -18,7 +18,7 @@
 import { useMemo, useState, type ReactNode } from "react";
 import { Route, Routes, useParams } from "react-router-dom";
 import {
-  Badge, EmptyState, EntityRow, EventRow, Hero, HeroSection, List, ListGroupLabel, PageHeader, Pager, PillTabs, RankedList,
+  Badge, EmptyState, EntityRow, EventRow, Hero, HeroCarousel, List, ListGroupLabel, PageHeader, Pager, PillTabs, RankedList,
   SearchField, Section, Sheet, StatGrid, StatTile, ViewSwitch, type RowStatus,
 } from "@/components/ui/kit";
 import { Button } from "@/components/ui/button";
@@ -88,9 +88,11 @@ function CatalogueHome({ at, pullUp }: At) {
   const byPlace = countBy(ENTRIES, (e) => e.place);
   return (
     <div className="space-y-8">
-      <HeroSection eyebrow="Catalogue" title="Your year so far" pattern="ripples" pullUp={pullUp}>
-        A log of things you've done, who was there and where — with the numbers.
-      </HeroSection>
+      <HeroCarousel label="Your year" pattern="ripples" pullUp={pullUp} slides={[
+        { id: "year", eyebrow: "Catalogue", title: "Your year so far", children: "A log of things you've done, who was there and where — with the numbers." },
+        { id: "entries", eyebrow: "This year", title: `${ENTRIES.length} entries`, children: `With ${PEOPLE.length} people, in ${Object.keys(byPlace).length} places.` },
+        { id: "next", eyebrow: "Coming up", title: next.title, children: "The next thing on the list." },
+      ]} />
       <StatGrid>
         <StatTile label="Entries" value={ENTRIES.length} accent="accent" />
         <StatTile label="People" value={PEOPLE.length} accent="support" />
