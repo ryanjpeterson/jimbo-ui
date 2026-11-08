@@ -1,0 +1,21 @@
+{
+  "version": "0.1.0",
+  "docs": "docs/explain",
+  "synced": { "commit": "8477686", "date": "2026-11-08" },
+  "facts": {
+    "name": "jimbo-ui",
+    "tagline": "Shared brand and UI system for Ryan's web apps, as code to copy and a Claude Code plugin",
+    "status": "active",
+    "audience": "self",
+    "repo": "ryanjpeterson/jimbo-ui",
+    "stack": ["TypeScript", "React", "Tailwind CSS", "Claude Code plugin"],
+    "integrations": [
+      { "name": "GitHub", "kind": "service", "direction": "both", "required": true, "what": "plugin source, releases, apps' jimbo-ui.json" },
+      { "name": "Google Fonts", "kind": "service", "direction": "read", "required": false, "what": "fonts picked in apps" },
+      { "name": "Google Maps", "kind": "service", "direction": "read", "required": false, "what": "MapView" }
+    ],
+    "standards": ["jimbo-ui", "jimbo-explain"],
+    "now": []
+  },
+  "files": {}
+}
