@@ -18,7 +18,7 @@ import { HeaderTitle } from "@/components/HeaderTitle";
 import { ColorPicker } from "@/components/ColorPicker";
 import {
   Autocomplete, Chevron, Columns, FloatingBar, LinkChips, ToggleGrid, Badge, BarChart, DateBlock, KeyValue, LayoutSwitch, SwitchRow, EmptyState, EntityRow, EventRow, LinkCard, List, ListGroupLabel, Loading, MediaCard, MediaGrid, Page, PageHeader, Pager,
-  PillTabs, RankedList, SearchField, Section, SelectField, ShareSliders, Sheet, Sparkline, StatGrid, StatTile, Tabs, ThemeDots, TrendChart, useListLayout, ViewSwitch, type Tone,
+  PillTabs, RankedList, SearchField, Section, SelectField, ShareSliders, Sheet, Sparkline, StatGrid, StatTile, Tabs, ThemeDots, Timeline, TrendChart, useListLayout, ViewSwitch, type Tone,
 } from "@/components/ui/kit";
 import { DateField, FileDrop, TextArea, TextField } from "@/components/ui/forms";
 import { DropdownButton, Menu, Popover, SearchTrigger, Tooltip } from "@/components/ui/overlays";
@@ -386,6 +386,19 @@ export function StyleGuidePanel({ more = [] }: { more?: { value: string; label: 
           <DateBlock date="2026-10-23" showYear />
           <p className="meta">DateBlock — the ticket-style date on every dated row.</p>
         </div>
+      </Block>
+
+      <Block section="lists" title="Timeline" note="Milestones in order along a line, in groups. The 10 px dot sits on the line, outside the card; its colour is the kind of milestone, and the when line names it too. A milestone with a link is one tap target.">
+        <Timeline groups={[
+          { label: "2026", items: [
+            { id: "c", when: "Oct 2026 · Release", title: "Version two goes out", body: "The rebuild ships to everyone, with the old data carried over.", tone: "highlight", badge: <Badge tone="accent">Now</Badge>, to: "/jimbo-ui?tab=style" },
+            { id: "b", when: "Mar 2026 · Milestone", title: "A thousand entries", meta: "Took 14 months", to: "/jimbo-ui?tab=style" },
+          ] },
+          { label: "2025", items: [
+            { id: "a", when: "Jan 2025 · Started", title: "The first entry, and a title long enough to show the two-line trim at phone width before it gives up", tone: "support" },
+            { id: "z", when: "Jan 2025 · Note", title: "No link: a plain card", tone: "muted" },
+          ] },
+        ]} />
       </Block>
 
       <Block section="controls" title="Picks, related links and the floating bar" note="ToggleGrid for several picks from a small set; LinkChips for related things to go to; FloatingBar for a status and its actions above the dock.">

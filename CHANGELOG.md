@@ -32,6 +32,45 @@ now 0.1.0–0.5.0 (1.0.0 → 0.1.0, 1.1.0 → 0.2.0, 2.0.0 → 0.3.0, 3.0.0 → 
 3.1.0 → 0.5.0). An app whose `jimbo-ui.json` still says an old number is on
 the matching 0.x release.
 
+## Unreleased
+
+**Update:** feature
+
+A `Timeline` in the kit, and pictures that fail to load show their placeholder instead of a broken image.
+
+### Added
+
+- **`Timeline`** in the kit (promoted from the catalogue's candidates):
+  milestones in order along a vertical line, in groups (a year, a month,
+  a phase). Each milestone is a card beside the line — a `when` line (the
+  date and what kind of milestone it is), title, `body`, `meta` and an
+  optional `badge` — with its 10 px dot on the line, outside the card (S3,
+  S4). The dot's `tone` (`accent`, `highlight`, `support`, `muted`) is one
+  per kind of milestone and the `when` line names it, so colour is never
+  the only cue; with `to` the whole card is the one tap target (K7). Text
+  is trimmed: `when` and `meta` one line, title two, body three. In the
+  Style guide's Lists section, the showcase, and guide sections 8 and 9.
+- `useImageOrFallback(url)`: an image URL that drops to `null` once it
+  fails to load, so the caller shows its placeholder.
+
+### Fixed
+
+- `MediaCard`, `EntityRow`, `EventRow` and `Hero` fall back to their
+  placeholder (initials, the bare avatar circle, the empty thumbnail) when
+  a picture fails to load, instead of showing a broken image.
+- `Columns` sets `grid-cols-1` on phones, so a card's trimmed line can't
+  widen the column past a 375 px screen.
+- `PageHeader` and `Section` action rows (`.controls`) get `max-w-full`,
+  so a long row of actions wraps on phones instead of running off the
+  screen.
+
+**Available:** `Timeline`, `TimelineItem`, `TimelineGroup`,
+`TimelineTone`, `useImageOrFallback`.
+
+**Apps must:** Nothing — copy the foundation files. Port the kit
+(`reference/web/src/components/ui/kit.tsx`) when you want `Timeline` and
+the fixes.
+
 ## 0.16.0 — 2026-11-08
 
 jimbo.ui is a rulebook: every rule numbered; circles never in a box, neighbours one size, dropdowns look like dropdowns, stricter theme contrast.

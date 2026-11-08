@@ -994,12 +994,15 @@
       "id": "timeline",
       "name": "Timeline",
       "purpose": "Shows milestones in order along a line.",
-      "tier": "candidate",
+      "tier": "kit",
       "aliases": [
         "Milestones",
         "History"
       ],
-      "variants": {}
+      "variants": {
+        "tone": "accent | highlight | support | muted (per milestone)"
+      },
+      "source": "reference/web/src/components/ui/kit.tsx#Timeline"
     },
     {
       "id": "share-button",
