@@ -17,7 +17,7 @@ import {
   type CSSProperties, type KeyboardEvent as ReactKeyboardEvent, type ReactElement, type ReactNode, type RefObject,
 } from "react";
 import { createPortal } from "react-dom";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { BRAND } from "@/lib/brand.config";
 import { cn } from "@/lib/cn";
 
@@ -131,7 +131,10 @@ DropdownButton.displayName = "DropdownButton";
 // ─────────────────────────────────────────────────────────────────────────────
 
 export type MenuItem =
-  | { label: string; onSelect: () => void; hint?: ReactNode; icon?: ReactNode; danger?: boolean; disabled?: boolean }
+  | { label: string; onSelect: () => void; hint?: ReactNode; icon?: ReactNode; danger?: boolean; disabled?: boolean;
+      /** The one you're on (a JumpMenu's current page): accent text and a tick. */
+      current?: boolean }
+  | { heading: string }
   | "divider";
 
 /**
@@ -173,7 +176,7 @@ export function Menu({ items, label = "More", trigger, align = "end" }: {
       if (next) { e.preventDefault(); next.focus(); }
     }
   };
-  const pick = (item: Exclude<MenuItem, "divider">) => { close(); anchor.current?.focus(); item.onSelect(); };
+  const pick = (item: Exclude<MenuItem, "divider" | { heading: string }>) => { close(); anchor.current?.focus(); item.onSelect(); };
   const props: TriggerProps = { ref: anchor, onClick: () => setOpen((o) => !o), "aria-expanded": open, "aria-controls": id, "aria-haspopup": "menu" };
 
   return (
@@ -181,24 +184,64 @@ export function Menu({ items, label = "More", trigger, align = "end" }: {
       {trigger ? trigger(props) : <MoreButton label={label} {...props} />}
       {open && createPortal(
         <div ref={panel} id={id} role="menu" aria-label={label} onKeyDown={onKey} style={style}
-          className={cn(PANEL, "min-w-[12rem] max-w-[calc(100vw-16px)] py-1")}>
+          className={cn(PANEL, "scroll-area max-h-[min(30rem,70dvh)] min-w-[12rem] max-w-[calc(100vw-16px)] overflow-y-auto py-1")}>
           {items.map((item, i) => item === "divider"
             ? <div key={i} role="separator" className="my-1 h-px bg-border" />
+            : "heading" in item
+            ? <p key={i} role="presentation" className="eyebrow px-3.5 pt-3 pb-1 text-support">{item.heading}</p>
             : (
               <button key={i} type="button" role="menuitem" disabled={item.disabled} onClick={() => pick(item)}
+                aria-current={item.current ? "page" : undefined}
                 className={cn(
                   "flex min-h-11 w-full items-center gap-3 px-3.5 text-left text-15 font-semibold outline-hidden transition-colors focus-visible:bg-surface-2 hover:bg-surface-2 disabled:opacity-45",
-                  item.danger ? "text-highlight" : "text-text-base",
+                  item.danger ? "text-highlight" : item.current ? "text-accent" : "text-text-base",
                 )}>
                 {item.icon && <span aria-hidden="true" className="flex w-5 shrink-0 justify-center text-text-subtle">{item.icon}</span>}
                 <span className="min-w-0 flex-1 truncate">{item.label}</span>
                 {item.hint && <span className="shrink-0 text-xs font-medium text-text-subtle">{item.hint}</span>}
+                {item.current && (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="shrink-0">
+                    <path d="M5 12.5l4.5 4.5L19 7.5" />
+                  </svg>
+                )}
               </button>
             ))}
         </div>,
         document.body,
       )}
     </>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// JumpMenu — one tap to any page in a series, or to every page of a kind
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type JumpItem = { label: string; to: string; hint?: ReactNode; current?: boolean } | { heading: string } | "divider";
+
+/**
+ * Pages in a series (years, months, seasons, chapters) and every page of a
+ * kind are one tap away (rulebook N7): a `Menu` of links. By default its
+ * trigger is a `DropdownButton` showing where you are ("Year: 2019"); pass
+ * `trigger` for a top-bar ☰ (a `TopBarButton` spread with the props) that
+ * lists every page. `{ heading }` items group a long list; the menu scrolls.
+ */
+export function JumpMenu({ items, label, value, trigger, align = "start", size }: {
+  items: JumpItem[];
+  /** What the pages are ("Year", "Pages"): the button's muted label and the menu's name. */
+  label: string;
+  /** Where you are now, shown on the button. */
+  value?: ReactNode;
+  trigger?: (props: TriggerProps) => ReactNode;
+  align?: "start" | "end";
+  size?: "sm" | "md";
+}) {
+  const navigate = useNavigate();
+  return (
+    <Menu label={label} align={align}
+      items={items.map((it) => (it === "divider" || "heading" in it ? it
+        : { label: it.label, hint: it.hint, current: it.current, onSelect: () => navigate(it.to) }))}
+      trigger={trigger ?? ((p) => <DropdownButton {...p} label={label} size={size}>{value ?? "Pick one"}</DropdownButton>)} />
   );
 }
 

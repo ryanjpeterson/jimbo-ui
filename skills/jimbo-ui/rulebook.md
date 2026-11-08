@@ -68,6 +68,8 @@ How to use it:
 - **L6** Every page is a `Page`; its one growing block fills down to the dock (`fill`). *§6*
 - **L7** Full-width openers fade into the page (`.fade-out`); never a hard edge, a border under them, or a fade to solid `bg`. A `HeroSection`'s pattern is always a blur — never crisp lines behind the title. *§7*
 - **L10** **Steps of one thing are one height.** Slides, pages or steps shown one at a time in the same place are as tall as the fullest of them (`HeroCarousel` lays every slide in one cell), so nothing below moves when they change. *§6*
+- **L11** **Every page opens with a hero.** A tab's home opens with `HeroSection` or `HeroCarousel`, an item's page with `Hero` / `Banner` (its picture), and every other page with `PageHeader`, which is itself a compact hero (the theme's blur the full width, a big title, pulled up under the top bar) — never a bare title in the column (`PageHeader plain` is for demos and headers inside a card). A `HeroCarousel` is facts only: its slides carry an eyebrow, a big value and a line, never buttons; what you'd do about them lives in the page below. Its arrows, pause and count sit at the top left, and its timer is a thin bar the screen's full width along its bottom edge. *§6*
+- **L12** **Different data, different look.** Pages that show different kinds of data don't look alike: each kind gets its own hero `pattern` and `tone` (and its own opening block — stats, a chart, a timeline, a list), so you know where you are before reading. Pages of the same kind (every year, every month) share theirs. *§6*
 - **L8** Rows are at least 76 px tall, divided by an etched line (`.divide-etched`). *§6*
 - **L9** Font sizes come from the type scale; no `text-[10px]`-style sizes. *§5*
 
@@ -76,12 +78,13 @@ How to use it:
 - **N1** The URL holds the view: tab, sub-tab, segmented control, filter, sort, search, page and open sheet are search params (`useUrlState`). Never `useState` for what the page shows. *§6*
 - **N2** An item's page is a path (`/kind/name`), nested under the tab it belongs to, one segment per step in. *§6*
 - **N3** Every page below a tab's own page has Back to its parent (`PageHeader back`, `Hero`/`Banner back`). *§6*
+- **N7** **Every data page is one tap away.** Pages in a series (years, months, seasons, chapters) have a `JumpMenu` in their header to any other one, not just earlier / later; and an app with more data pages than its tabs show lists them all in one place — a top-bar ☰ `JumpMenu`, grouped with headings, the current page ticked. A page someone visits often enough to ask for gets a tab (within N's five). *§6*
 - **N4** A link goes somewhere real: no `href="#"`, no link drawn as text with an arrow beside a button. A stat that opens something is a `StatTile` with `to`; a destination is a `LinkCard` or a `Button`. *§8*
 
 ## M · Motion and feedback
 
 - **M1** Motion is quick and physical: press scale, colour transitions. No page transitions, parallax, bouncing or decorative hover zoom. *§7*
-- **M2** **Nothing changes by itself.** Content moves only when the person acts — no auto-advancing carousels or rotating panels. Two exceptions: `HeroCarousel` (a page opener's slides, 10 s each, with prev / next arrows, the timer shown on Next, a pause button, and stopped while hovered or focused), and the showcase's rotating looks (a demo of the themes). *§7*
+- **M2** **Nothing changes by itself.** Content moves only when the person acts — no auto-advancing carousels or rotating panels. Two exceptions: `HeroCarousel` (a page opener's slides, 10 s each, with prev / next arrows and a pause button at its top left, the timer a full-width bar along its bottom edge, and stopped while hovered or focused), and the showcase's rotating looks (a demo of the themes). *§7*
 - **M3** Nothing looks like it did nothing: a result being replaced is `Pending`; long jobs show live progress (`JobTile`, `ProgressBar`). *§7*
 - **M4** Every pop-up notice is a `toast()`: top right, timed. Errors to fix in a form are inline. *§9*
 - **M5** Destructive or surprising actions confirm first (`ConfirmSheet`), naming the action on its button. *§9*

@@ -14,7 +14,7 @@ import { Children, createContext, useContext, useEffect, useLayoutEffect, useRef
 import { createPortal } from "react-dom";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/cn";
-import { backdropCss, fullTheme, loadFonts, themeVars, type BackdropPattern, type Theme } from "@/lib/theme";
+import { backdropCss, fullTheme, loadFonts, themeHex, themeVars, type BackdropPattern, type Theme } from "@/lib/theme";
 import { useBrand } from "@/lib/useBrand";
 import { BRAND } from "@/lib/brand.config";
 
@@ -150,7 +150,7 @@ export function FullBleed({ children, tone = "none", flush = false, pad = true, 
 }) {
   return (
     <section className={cn("relative ml-[calc(50%-50vw)] w-screen", BLEED_TONES[tone], pad && "py-6 sm:py-8", className)} style={style}>
-      <div className={flush ? "" : "mx-auto max-w-5xl px-4 sm:px-6"}>{children}</div>
+      <div className={flush ? "" : "mx-auto max-w-[var(--page-max,64rem)] px-4 sm:px-6"}>{children}</div>
     </section>
   );
 }
@@ -163,7 +163,7 @@ export function FullBleed({ children, tone = "none", flush = false, pad = true, 
  * up under the top bar like `Banner`. `pattern="none"` draws no layer of its
  * own: the page's backdrop shows through. Several to step through: `HeroCarousel`.
  */
-export function HeroSection({ eyebrow, title, children, actions, pattern = "ripples", size = "md", align = "left", pullUp = true }: {
+export function HeroSection({ eyebrow, title, children, actions, pattern = "ripples", tone, size = "md", align = "left", pullUp = true }: {
   eyebrow?: ReactNode;
   title: ReactNode;
   /** A line or two under the title. */
@@ -171,42 +171,69 @@ export function HeroSection({ eyebrow, title, children, actions, pattern = "ripp
   actions?: ReactNode;
   /** The backdrop the blur is made from (it decides the colours' layout, not lines). */
   pattern?: BackdropPattern;
+  /** The brand colour that leads the blur. */
+  tone?: HeroTone;
   size?: "md" | "lg";
   align?: "left" | "center";
   /** Tuck up under the top bar (the default, when it opens the page). Turn off when something sits above it. */
   pullUp?: boolean;
 }) {
   return (
-    <HeroFrame pattern={pattern} size={size} align={align} pullUp={pullUp}>
+    <HeroFrame pattern={pattern} tone={tone} size={size} align={align} pullUp={pullUp}>
       <HeroText eyebrow={eyebrow} title={title} actions={actions} align={align}>{children}</HeroText>
     </HeroFrame>
   );
 }
 
-/** HeroSection's full-width box and its blurred layer. */
-function HeroFrame({ pattern, size, align, pullUp, children, className, ...rest }: {
+/** Which brand colour leads a hero's blur. Kinds of page each get their own (with `pattern`, L12). */
+export type HeroTone = "accent" | "highlight" | "support";
+
+const WASH_AT: Record<HeroTone, string> = { accent: "18% 30%", highlight: "82% 25%", support: "35% 85%" };
+/** A hex colour at 40%, for the hero's wash. */
+function washOf(hex: string): string {
+  const n = parseInt(hex.replace("#", "").slice(0, 6), 16);
+  return `rgb(${(n >> 16) & 255} ${(n >> 8) & 255} ${n & 255} / 0.4)`;
+}
+
+/** The theme with `tone` swapped into the accent's place, so the blur is led by that colour. */
+function leadWith(theme: Theme, tone: HeroTone): Theme {
+  if (tone === "accent") return theme;
+  const hex = themeHex(theme);
+  return { ...theme, accent: hex[tone]!, highlight: tone === "highlight" ? hex.accent : hex.highlight, support: tone === "support" ? hex.accent : hex.support };
+}
+
+/** HeroSection's full-width box and its blurred layer. `under` sits along its bottom edge, the screen's full width. */
+function HeroFrame({ pattern, tone = "accent", size, align, pullUp, under, children, className, ...rest }: {
   pattern: BackdropPattern;
-  size: "md" | "lg";
+  tone?: HeroTone;
+  size: "sm" | "md" | "lg";
   align: "left" | "center";
   pullUp: boolean;
+  under?: ReactNode;
   children: ReactNode;
   className?: string;
 } & Omit<React.HTMLAttributes<HTMLDivElement>, "children" | "className">) {
   const { theme } = useBrand();
-  const look = backdropCss({ ...theme, backdrop: { pattern, base: "glow", intensity: 0.9, scale: 0.8 } });
+  const look = backdropCss({ ...leadWith(theme, tone), backdrop: { pattern, base: "glow", intensity: 0.9, scale: 0.8 } });
+  // A wash of the leading colour, somewhere of its own per tone, so kinds of page read apart at a glance (L12).
+  const wash = `radial-gradient(55% 90% at ${WASH_AT[tone]}, ${washOf(themeHex(theme)[tone] ?? "#888888")}, transparent 72%)`;
   return (
-    <FullBleed pad={false} className={cn("isolate mb-2", pullUp && "-mt-6 sm:-mt-8")}>
+    <FullBleed pad={false} className={cn("isolate", size === "sm" ? "mb-4 sm:mb-6" : "mb-2", pullUp && "-mt-6 sm:-mt-8")}>
       {/* Always a blur: the layer is blurred and scaled up a little so its edges don't show, and it fades
           out top and bottom (.fade-out, plus .fade-both when something sits above) into the page's backdrop. */}
       {pattern !== "none" && (
         <div aria-hidden="true" className={cn("fade-out pointer-events-none absolute inset-0 -z-10 overflow-hidden", !pullUp && "fade-both")}>
           <div className="absolute -inset-16 blur-3xl saturate-150"
-            style={{ backgroundImage: look.image, backgroundSize: look.size, backgroundPosition: look.position, backgroundRepeat: look.repeat }} />
+            style={{ backgroundImage: `${wash}, ${look.image}`, backgroundSize: `100% 100%, ${look.size}`,
+              backgroundPosition: `0 0, ${look.position}`, backgroundRepeat: `no-repeat, ${look.repeat}` }} />
         </div>
       )}
-      <div {...rest} className={cn("flex flex-col justify-end gap-3 py-10 sm:py-14", size === "lg" ? "min-h-[62dvh]" : "min-h-[34dvh]", align === "center" && "items-center text-center", className)}>
+      <div {...rest} className={cn("flex flex-col justify-end",
+        size === "sm" ? "min-h-[24dvh] gap-2 pt-10 pb-6 sm:min-h-[28dvh] sm:pt-14 sm:pb-8" : "gap-3 py-10 sm:py-14",
+        size === "lg" ? "min-h-[62dvh]" : size === "md" && "min-h-[34dvh]", align === "center" && "items-center text-center", className)}>
         {children}
       </div>
+      {under}
     </FullBleed>
   );
 }
@@ -229,21 +256,23 @@ export interface HeroSlide {
   id: string;
   eyebrow?: ReactNode;
   title: ReactNode;
+  /** The fact's line. Slides are facts only: no buttons (rulebook L11). */
   children?: ReactNode;
-  actions?: ReactNode;
 }
 
 /**
  * Several HeroSection slides, one at a time. Every slide is laid out in the
  * same cell, so the hero is always as tall as its fullest slide and nothing
- * under it moves when it changes. Prev / next arrows step through (wrapping
- * round); it moves on by itself every `interval` (10 s), the time left drawn
- * as a bar along the Next arrow, and stops while it's hovered or has focus,
- * or for good with the pause button (rulebook M2's one exception). Reduced
+ * under it moves when it changes. Slides are facts, never buttons (L11). The
+ * prev / next arrows, the pause button and "3 / 29" sit at the hero's top
+ * left; it moves on by itself every `interval` (10 s), the time left drawn as
+ * a thin bar the screen's full width along the hero's bottom edge, and stops
+ * while it's hovered or has focus, or for good with the pause button
+ * (rulebook M2's one exception). Reduced
  * motion: slides swap without the fade. `index` / `onIndex` to control it
  * (a URL parameter); without them it keeps its own.
  */
-export function HeroCarousel({ slides, index, onIndex, interval = 10_000, label = "Highlights", pattern = "ripples", size = "md", align = "left", pullUp = true }: {
+export function HeroCarousel({ slides, index, onIndex, interval = 10_000, label = "Highlights", pattern = "ripples", tone, size = "md", align = "left", pullUp = true }: {
   slides: HeroSlide[];
   index?: number;
   onIndex?: (i: number) => void;
@@ -252,6 +281,7 @@ export function HeroCarousel({ slides, index, onIndex, interval = 10_000, label 
   /** What the carousel is, for screen readers. */
   label?: string;
   pattern?: BackdropPattern;
+  tone?: HeroTone;
   size?: "md" | "lg";
   align?: "left" | "center";
   pullUp?: boolean;
@@ -287,35 +317,24 @@ export function HeroCarousel({ slides, index, onIndex, interval = 10_000, label 
 
   if (!n) return null;
   const arrow = "glass relative inline-flex h-control w-control items-center justify-center overflow-hidden rounded-control text-text-base transition-colors hover:border-accent active:scale-95";
+  // The timer: the screen's full width, along the hero's bottom edge. Only the fill shows, no track (L7).
+  const timer = n > 1 && interval > 0 && (
+    <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-[3px]">
+      <span ref={bar} className={cn("block h-full origin-left bg-accent", stopped && "opacity-50")} style={{ transform: "scaleX(0)" }} />
+    </span>
+  );
   return (
-    <HeroFrame pattern={pattern} size={size} align={align} pullUp={pullUp}
+    <HeroFrame pattern={pattern} tone={tone} size={size} align={align} pullUp={pullUp} under={timer}
       role="region" aria-roledescription="carousel" aria-label={label}
       onPointerEnter={(e) => e.pointerType === "mouse" && setHeld((h) => ({ ...h, hover: true }))}
       onPointerLeave={() => setHeld((h) => ({ ...h, hover: false }))}
       onFocus={() => setHeld((h) => ({ ...h, focus: true }))}
       onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setHeld((h) => ({ ...h, focus: false })); }}>
-      {/* Every slide in one cell: the tallest decides the height. Only the current one shows or takes focus. */}
-      <div className="grid" aria-live={stopped ? "polite" : "off"}>
-        {slides.map((s, k) => (
-          <div key={s.id} role="group" aria-roledescription="slide" aria-label={`${k + 1} of ${n}`}
-            aria-hidden={k !== i} {...(k !== i ? { inert: "" } as object : {})}
-            className={cn("col-start-1 row-start-1 flex flex-col justify-end gap-3 motion-safe:transition-opacity motion-safe:duration-500",
-              align === "center" && "items-center text-center", k === i ? "opacity-100" : "invisible opacity-0")}>
-            <HeroText eyebrow={s.eyebrow} title={s.title} actions={s.actions} align={align}>{s.children}</HeroText>
-          </div>
-        ))}
-      </div>
+      {/* The controls, top left (centred with align="center"). */}
       {n > 1 && (
-        <div className={cn("mt-4 flex items-center gap-2", align === "center" && "justify-center")}>
+        <div className={cn("flex items-center gap-2", align === "center" && "justify-center")}>
           <button type="button" className={arrow} onClick={() => go(i - 1)} aria-label="Previous"><Chevron dir="left" /></button>
-          <button type="button" className={arrow} onClick={() => go(i + 1)} aria-label="Next">
-            <Chevron />
-            {interval > 0 && (
-              <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-[3px] bg-accent/15">
-                <span ref={bar} className={cn("block h-full origin-left bg-accent", stopped && "opacity-50")} style={{ transform: "scaleX(0)" }} />
-              </span>
-            )}
-          </button>
+          <button type="button" className={arrow} onClick={() => go(i + 1)} aria-label="Next"><Chevron /></button>
           {interval > 0 && (
             <button type="button" className={cn(arrow, "text-text-muted")} onClick={() => setPaused((p) => !p)}
               aria-label={paused ? "Play" : "Pause"} aria-pressed={paused}>
@@ -327,6 +346,17 @@ export function HeroCarousel({ slides, index, onIndex, interval = 10_000, label 
           <p className="ml-2 text-sm tabular-nums text-text-subtle">{i + 1} / {n}</p>
         </div>
       )}
+      {/* Every slide in one cell: the tallest decides the height. Only the current one shows or takes focus. */}
+      <div className="mt-auto grid pt-6" aria-live={stopped ? "polite" : "off"}>
+        {slides.map((s, k) => (
+          <div key={s.id} role="group" aria-roledescription="slide" aria-label={`${k + 1} of ${n}`}
+            aria-hidden={k !== i} {...(k !== i ? { inert: "" } as object : {})}
+            className={cn("col-start-1 row-start-1 flex flex-col justify-end gap-3 motion-safe:transition-opacity motion-safe:duration-500",
+              align === "center" && "items-center text-center", k === i ? "opacity-100" : "invisible opacity-0")}>
+            <HeroText eyebrow={s.eyebrow} title={s.title} align={align}>{s.children}</HeroText>
+          </div>
+        ))}
+      </div>
     </HeroFrame>
   );
 }
@@ -335,30 +365,58 @@ export function HeroCarousel({ slides, index, onIndex, interval = 10_000, label 
 // Page scaffolding
 // ─────────────────────────────────────────────────────────────────────────────
 
-export function PageHeader({ eyebrow, title, count, actions, back, className }: {
+/**
+ * Every page's opener (rulebook L11): a compact hero — the full-width blur of
+ * the theme's colours, a big title, the eyebrow, a count and the page's
+ * controls — pulled up under the top bar. `pattern` picks the blur's layout
+ * and `tone` the colour that leads it: give each kind of page its own pair,
+ * so pages of different data look different (L12). `plain` is the old in-column header, for demos and headers inside a
+ * card; never at the top of a page.
+ */
+export function PageHeader({ eyebrow, title, count, actions, back, pattern = "ripples", tone, pullUp = true, plain = false, className }: {
   eyebrow?: ReactNode;
   title: ReactNode;
   count?: number;
-  /** Buttons and switches, laid out as one `.controls` row: every one the same height. */
+  /** Buttons, switches and jump menus, laid out as one `.controls` row: every one the same height. */
   actions?: ReactNode;
   /** The page this one sits under (its path minus the last part). Every page below a dock tab's own page has one. */
   back?: { to: string; label: string };
+  /** The backdrop the hero's blur is made from. */
+  pattern?: BackdropPattern;
+  /** The brand colour that leads the blur. `pattern` and `tone` together tell kinds of page apart (L12). */
+  tone?: HeroTone;
+  /** Tuck up under the top bar (the default). Turn off when something sits above it. */
+  pullUp?: boolean;
+  /** No hero: a header in the column (demos, inside a card). */
+  plain?: boolean;
   className?: string;
 }) {
+  const heading = (big: boolean) => (
+    <div className="flex flex-wrap items-end justify-between gap-3">
+      <h1 className={cn("min-w-0 line-clamp-2 break-words", big ? "font-display text-4xl leading-[1.05] text-text-base sm:text-5xl" : "h-page")}>
+        {title}
+        {count != null && count > 0 && (
+          <span className="ml-2 align-middle text-base font-body font-medium text-text-subtle">{count.toLocaleString()}</span>
+        )}
+      </h1>
+      {actions && <div className="controls max-w-full shrink-0 justify-end">{actions}</div>}
+    </div>
+  );
+  if (plain) {
+    return (
+      <header className={cn("mb-5 sm:mb-6", className)}>
+        {back && <div className="mb-2"><BackButton to={back.to} label={back.label} /></div>}
+        {eyebrow && <p className="eyebrow mb-1 text-support">{eyebrow}</p>}
+        {heading(false)}
+      </header>
+    );
+  }
   return (
-    <header className={cn("mb-5 sm:mb-6", className)}>
-      {back && <div className="mb-2"><BackButton to={back.to} label={back.label} /></div>}
-      {eyebrow && <p className="eyebrow mb-1 text-support">{eyebrow}</p>}
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <h1 className="h-page min-w-0 line-clamp-2 break-words">
-          {title}
-          {count != null && count > 0 && (
-            <span className="ml-2 align-middle text-base font-body font-medium text-text-subtle">{count.toLocaleString()}</span>
-          )}
-        </h1>
-        {actions && <div className="controls max-w-full shrink-0 justify-end">{actions}</div>}
-      </div>
-    </header>
+    <HeroFrame pattern={pattern} tone={tone} size="sm" align="left" pullUp={pullUp} className={className}>
+      {back && <div className="mb-auto"><BackButton to={back.to} label={back.label} /></div>}
+      {eyebrow && <p className="eyebrow text-support">{eyebrow}</p>}
+      {heading(true)}
+    </HeroFrame>
   );
 }
 
@@ -1006,8 +1064,10 @@ const GLOW = {
   support: "bg-[radial-gradient(circle_at_100%_0%,rgb(var(--c-support)/0.2),transparent_55%),linear-gradient(rgb(var(--c-surface)/0.9),rgb(var(--c-bg-deep)/0.9))]",
 } as const;
 
-export function LinkCard({ to, eyebrow, title, sub, accent = false }: {
+export function LinkCard({ to, eyebrow, title, sub, accent = false, size = "md" }: {
   to?: string;
+  /** "sm": tighter padding and type, for a row of quick ways in. */
+  size?: "sm" | "md";
   eyebrow: ReactNode;
   title: ReactNode;
   sub?: ReactNode;
@@ -1017,14 +1077,14 @@ export function LinkCard({ to, eyebrow, title, sub, accent = false }: {
   const body = (
     <>
       <div className="min-w-0 flex-1">
-        <p className="eyebrow mb-1">{eyebrow}</p>
-        <p className="truncate text-base font-semibold text-text-base group-hover:text-accent sm:text-lg">{title}</p>
+        <p className={cn("eyebrow", size === "md" && "mb-1")}>{eyebrow}</p>
+        <p className={cn("truncate font-semibold text-text-base group-hover:text-accent", size === "md" ? "text-base sm:text-lg" : "text-15")}>{title}</p>
         {sub && <p className="mt-0.5 truncate text-sm text-text-muted">{sub}</p>}
       </div>
       {to && <Chevron className="text-text-subtle group-hover:text-accent" />}
     </>
   );
-  const cls = cn("group card flex min-h-[84px] items-center gap-3 p-4 sm:p-5", accent && cn("border-accent/50", GLOW.accent));
+  const cls = cn("group card flex items-center gap-3", size === "md" ? "min-h-[84px] p-4 sm:p-5" : "min-h-[64px] px-4 py-3", accent && cn("border-accent/50", GLOW.accent));
   return to
     ? <Link to={to} className={cn(cls, "transition-colors hover:border-accent/60")}>{body}</Link>
     : <div className={cls}>{body}</div>;

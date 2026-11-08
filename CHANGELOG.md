@@ -34,9 +34,9 @@ the matching 0.x release.
 
 ## Unreleased
 
-**Update:** feature
+**Update:** breaking
 
-A `Timeline`, a `HeroCarousel` and a `ScrollingLine` in the kit, one-line `MediaCard` titles, hero patterns always a blur, and pictures that fail to load show their placeholder instead of a broken image.
+Every page opens with a hero (`PageHeader` is now a compact one), `HeroCarousel` slides are facts only with their controls top left and a full-width timer, `JumpMenu` puts every page in a series one tap away, plus `Timeline`, `ScrollingLine`, one-line `MediaCard` titles and pictures that fall back to their placeholder.
 
 ### Added
 
@@ -64,6 +64,29 @@ A `Timeline`, a `HeroCarousel` and a `ScrollingLine` in the kit, one-line `Media
 
 ### Changed
 
+- **Every page opens with a hero** (new rule **L11**). `PageHeader` is a
+  compact hero now: the theme's colours blurred the full width, a big
+  title, Back at the top left, pulled up under the top bar (`pullUp`).
+  `pattern` picks the blur's layout; `plain` is the old in-column header,
+  for demos and headers inside a card.
+- **Different data, different look** (new rule **L12**): each kind of page
+  gets its own hero `pattern` and `tone` (`HeroTone`: `accent`, `highlight`
+  or `support` leads the blur, as a wash placed differently for each);
+  pages of one kind share theirs. `HeroSection` and `HeroCarousel` take
+  `tone` too.
+- **Every data page is one tap away** (new rule **N7**): pages in a series
+  get a `JumpMenu` to any other one, and an app with more data pages than
+  tabs lists them in a top-bar ☰.
+- **`HeroCarousel` slides are facts only** (L11): `HeroSlide` has no
+  `actions`. The arrows, pause and "3 / 29" sit at the hero's top left, and
+  the timer is a thin bar the screen's full width along its bottom edge
+  (M2 updated).
+- The shell sets `--page-max` from its `width`, and `FullBleed` lines its
+  content up with it, so a hero's text starts where the page column does
+  on wide pages.
+- `Menu` items take `current` (accent text and a tick) and `{ heading }`
+  rows; a long menu scrolls (`.scroll-area`, 30rem at most).
+
 - **`HeroSection`'s pattern is always a blur** (rule **L7**): the layer is
   the pattern on a glow, blurred until no line shows, so the title never
   sits on crisp line art. `pattern` still picks the backdrop it's made from.
@@ -71,6 +94,14 @@ A `Timeline`, a `HeroCarousel` and a `ScrollingLine` in the kit, one-line `Media
 - **L2**: a card wrapped in a box of its own still fills its cell.
 - **`MediaCard`'s title is one line** (was two) and its sub line too, both
   `ScrollingLine`s, so every card in a grid is the same size.
+
+### Added (heroes and jumping)
+
+- **`JumpMenu`** in `overlays.tsx`: a `Menu` of links to pages in a series
+  or every page of a kind, the current one ticked; a `DropdownButton`
+  ("Year: 2019") by default, or any `trigger` (a top-bar ☰).
+- `LinkCard size="sm"`: tighter padding and type, for a row of quick ways
+  in.
 
 ### Fixed
 
@@ -86,11 +117,20 @@ A `Timeline`, a `HeroCarousel` and a `ScrollingLine` in the kit, one-line `Media
   screen.
 
 **Available:** `Timeline`, `TimelineItem`, `TimelineGroup`,
-`TimelineTone`, `useImageOrFallback`.
+`TimelineTone`, `useImageOrFallback`, `JumpMenu`, `JumpItem`, `HeroTone`.
 
-**Apps must:** Nothing — copy the foundation files. Port the kit
-(`reference/web/src/components/ui/kit.tsx`) when you want `Timeline` and
-the fixes.
+**Apps must:**
+
+1. Port `kit.tsx`, `overlays.tsx` and `AppShell.tsx` (the `--page-max`
+   lines) from `reference/`.
+2. Give every page a hero (L11): a `PageHeader` used inside a card or a
+   demo gets `plain`; a page that opened with a bare title gets a
+   `PageHeader`.
+3. Drop `actions` from any `HeroCarousel` slides; put those buttons in the
+   page below.
+4. Give each kind of page its own `PageHeader pattern` and `tone` (L12).
+5. Put a `JumpMenu` on pages in a series, and list every data page in a
+   top-bar ☰ if the tabs don't reach them (N7).
 
 ## 0.16.0 — 2026-11-08
 

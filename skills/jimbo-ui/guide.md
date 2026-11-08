@@ -1031,8 +1031,9 @@ and body fonts.
 - **Nothing changes by itself.** Content moves only when the person acts:
   no auto-advancing carousels or rotating panels. A set of things to step
   through has a `Pager`. The one exception in apps is `HeroCarousel`, a
-  page opener's slides: it moves on every 10 s, with prev / next arrows,
-  the time left drawn as a bar along Next, a pause button, and it stops
+  page opener's slides: it moves on every 10 s, with prev / next arrows
+  and a pause button at its top left, the time left drawn as a thin bar the
+  screen's full width along its bottom edge, and it stops
   while hovered or focused (and in a hidden tab). Its slides are all laid
   in one cell, so it's always as tall as its fullest slide and the page
   under it never jumps.
@@ -1044,12 +1045,13 @@ and body fonts.
 
 | Component | Use it for |
 | --- | --- |
-| `PageHeader` | Every page's title row: `back` (Back to the parent page, above the eyebrow), eyebrow, title, count, `actions` (a `.controls` row) |
+| `PageHeader` | Every page's opener (L11): a compact hero — the theme's colours blurred the full width, pulled up under the top bar — with `back` (top left), eyebrow, a big title, count, `actions` (a `.controls` row). `pattern` and `tone` (which brand colour leads the blur) give each kind of page its own look (L12); `plain` is the old in-column header, for demos and headers inside a card |
 | `BackButton` + `useRememberPages` + `parentPath` | Back to the page above, as it was left. `PageHeader back` and `Hero`/`Banner back` draw it |
 | `ShareSliders` + `rebalance` + `normaliseShares` | Linked sliders that split one total (100%, 60 items, a budget): moving one moves the rest the other way in proportion, so they always add up to the total. Each shows its percentage and amount. `normaliseShares` when the total changes |
 | `Hero` / `Banner` | Detail page header over a blurred image (full width) |
 | `HeroSection` | Full-width page opener with no photo: eyebrow, big title, a line, actions, over a soft blur of the theme's colours (`pattern`, any of the backdrops, blurred on a glow until no line shows — never the pattern's crisp lines); `size="lg"` fills most of the first screen; `align="center"`. It tucks up under the top bar; pass `pullUp={false}` when something sits above it (as `Banner` and `Hero` take too) |
-| `HeroCarousel` | `HeroSection` slides one at a time (`slides`: id, eyebrow, title, a line, actions): always as tall as its fullest slide, prev / next arrows that wrap round, moves on every `interval` (10 s) with the time left as a bar on Next, a pause button, stops while hovered or focused. `index` / `onIndex` to keep the slide in the URL |
+| `HeroCarousel` | `HeroSection` slides one at a time (`slides`: id, eyebrow, title, a line — facts only, no buttons, L11): always as tall as its fullest slide; prev / next arrows that wrap round, a pause button and "3 / 29" at the top left; moves on every `interval` (10 s), the time left a thin bar the screen's full width along the bottom edge; stops while hovered or focused. `index` / `onIndex` to keep the slide in the URL |
+| `JumpMenu` (`overlays.tsx`) | One tap to any page in a series or every page of a kind (N7): a `Menu` of links (`{ label, to, hint, current }`, `{ heading }` to group, `"divider"`), the current one ticked. A `DropdownButton` saying where you are ("Year: 2019") by default; `trigger` for a top-bar ☰ that lists every data page. The menu scrolls past 30rem |
 | `FullBleed` | Any section edge to edge: a band (`tone`: `surface`, or a flat `accent` / `highlight` / `support` with its `on-` text), a strip of media (`flush`), a call to action. Content lines up with the page column unless `flush` |
 | `RangeField` | A labelled slider (weight, spacing, strength…) with its value shown. Sliders that are shares of one total are `ShareSliders`, never independent `RangeField`s |
 | `Section` | A titled card holding one block of content; `plain` drops the card (a grid of tiles under a title). In a grid row its card stretches to the tallest, content at the top |
@@ -1136,7 +1138,7 @@ one here fits.
 
 | For… | Options |
 | --- | --- |
-| **Opening a page** | `PageHeader` (title row) · `HeroSection` (full-width, blur, no photo) · `HeroCarousel` (several of them, one at a time) · `Banner` / `Hero` (over a blurred photo) |
+| **Opening a page** (every page has one, L11) | `PageHeader` (a compact hero) · `HeroSection` (full-width, blur, no photo) · `HeroCarousel` (several of them, one at a time) · `Banner` / `Hero` (over a blurred photo) |
 | **A list of things** | `List` + `EventRow` (dated, with date tickets) · `List` + `EntityRow` (people, places, with avatars) · `RankedList` (top-N with counts) · `MediaGrid` of `MediaCard`s (image-led, three sizes) · `LinkCard` stack (a few destinations) |
 | **Things in order over time** | `Timeline` (milestones along a line, grouped by year or month) · `List` + `EventRow` grouped with `ListGroupLabel` (dated entries, many of them) |
 | **Numbers** | `StatGrid` + `StatTile` (headline numbers, coloured dots) · `RankedList` (counts in a list) · `Section` with big `font-display` numbers |
@@ -1640,4 +1642,12 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   tall as the fullest (L10), prev / next arrows, a 10 s timer on Next, pause
   — the one exception to M2. `MediaCard` fills its cell even inside a
   wrapper (L2), and its title and sub line are one line each
-  (`ScrollingLine`, L5).
+  (`ScrollingLine`, L5). Every page opens with a hero (L11): `PageHeader` is
+  now a compact one (its blur the full width, a big title; `plain` for
+  demos), with its own `pattern` per kind of page (L12). `HeroCarousel`
+  slides are facts only (no `actions`); its controls sit at the top left
+  and its timer runs the screen's full width along its bottom. `JumpMenu`
+  (N7) puts every page in a series, or every data page, one tap away;
+  `Menu` items take `current` and `{ heading }`, and long menus scroll.
+  `LinkCard size="sm"` for a row of quick ways in. The shell sets
+  `--page-max`, so a full-width hero's text lines up with the page column.

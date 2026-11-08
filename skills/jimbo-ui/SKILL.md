@@ -69,6 +69,13 @@ The short form of the rulebook; the numbered rules are in
   inferred. Light backgrounds flip text dark automatically. Spread the
   colours: a page shows more than the accent, and no brand colour is white or
   grey.
+- **Every page opens with a hero** (L11): `HeroSection` / `HeroCarousel`
+  on a tab's home, `Hero` / `Banner` on an item's page, and `PageHeader` —
+  itself a compact hero — everywhere else. A `HeroCarousel` is facts only
+  (no buttons), its arrows and pause top left, its timer a full-width bar
+  along its bottom. Each kind of page has its own hero `pattern`, so
+  different data looks different (L12). Pages in a series, and every data
+  page, are one tap away with a `JumpMenu` (N7).
 - Full-width openers (banners, heroes, photo or gradient headers) **fade
   into the page**: mask their background layer out with `.fade-out`
   (`.fade-both` when something sits above) — never a hard bottom edge, a

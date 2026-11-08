@@ -7,7 +7,7 @@
  * actions and its routes as children.
  */
 
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { HeaderTitle } from "@/components/HeaderTitle";
 import { Toaster } from "@/components/ui/feedback";
@@ -26,6 +26,8 @@ export interface ShellTab {
 }
 
 const WIDTHS = { column: "max-w-5xl", wide: "max-w-7xl", full: "max-w-none" } as const;
+/** The same widths as a CSS value: full-width heroes (FullBleed) line their content up with the page column. */
+const PAGE_MAX = { column: "64rem", wide: "80rem", full: "none" } as const;
 
 export function AppShell({ tabs, actions, onRefresh, width = "column", children }: {
   tabs: ShellTab[];
@@ -45,7 +47,7 @@ export function AppShell({ tabs, actions, onRefresh, width = "column", children 
 
   return (
     // A column at least the screen's height, so main (and a Page in it) can fill what's left
-    <div className="flex min-h-[100dvh] flex-col overflow-x-clip">
+    <div className="flex min-h-[100dvh] flex-col overflow-x-clip" style={{ "--page-max": PAGE_MAX[width] } as CSSProperties}>
       {/* Top padding is --safe-top: 0 under the installed app's solid status bar, the notch
           wherever the page is drawn under it, so nothing sits under the status bar. */}
       <header className="sticky top-0 z-40 border-b border-border bg-bg/90 pt-[var(--safe-top)] backdrop-blur-md">

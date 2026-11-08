@@ -21,7 +21,7 @@ import {
   PillTabs, RankedList, SearchField, Section, SelectField, ShareSliders, Sheet, Sparkline, StatGrid, StatTile, Tabs, ThemeDots, Timeline, TrendChart, useListLayout, ViewSwitch, type Tone,
 } from "@/components/ui/kit";
 import { DateField, FileDrop, TextArea, TextField } from "@/components/ui/forms";
-import { DropdownButton, Menu, Popover, SearchTrigger, Tooltip } from "@/components/ui/overlays";
+import { DropdownButton, JumpMenu, Menu, Popover, SearchTrigger, Tooltip } from "@/components/ui/overlays";
 import { JobTile, OfflineBanner, ProgressBar, Stepper, toast, UpdateBanner, useConfirm } from "@/components/ui/feedback";
 import { Accordion, DataTable, type Column, type TableSort } from "@/components/ui/data";
 import { FONTS, MOTIFS, THEME_KEYS, themeHex } from "@/lib/theme";
@@ -223,9 +223,9 @@ export function StyleGuidePanel({ more = [] }: { more?: { value: string; label: 
         </div>
       </Block>
 
-      <Block section="controls" title="PageHeader and Back" note="Every page below a dock tab's own page has Back to its parent — the path minus its last part (/library/import → /library) — above its eyebrow. Back lands on the parent as it was left (its tabs and filters), and the path says how far in you are. Actions are one .controls row.">
+      <Block section="controls" title="PageHeader and Back" note="On a page, PageHeader is a compact hero: the theme's colours blurred the full width, a big title, pulled up under the top bar (L11). Give each kind of page its own pattern (L12). Shown here plain, as it is inside a card. Every page below a dock tab's own page has Back to its parent — the path minus its last part (/library/import → /library) — above its eyebrow. Back lands on the parent as it was left (its tabs and filters), and the path says how far in you are. Actions are one .controls row.">
         <div className="card p-5">
-          <PageHeader className="mb-0" back={{ to: "/jimbo-ui", label: "jimbo-ui config" }} eyebrow="Library" title="Import"
+          <PageHeader plain className="mb-0" back={{ to: "/jimbo-ui", label: "jimbo-ui config" }} eyebrow="Library" title="Import"
             actions={<><Button variant="secondary" size="sm">Cancel</Button><Button>Import</Button></>} />
         </div>
       </Block>
@@ -372,6 +372,7 @@ export function StyleGuidePanel({ more = [] }: { more?: { value: string; label: 
           ))}
         </MediaGrid>
         <LinkCard to="/jimbo-ui?tab=style" eyebrow="LinkCard" title="A card that goes somewhere" sub="Eyebrow, title, sub line" accent />
+        <LinkCard size="sm" to="/jimbo-ui?tab=style" eyebrow="size=sm" title="A quick way in" sub="Tighter, for a row of them" />
         <Section title="Section" count={3}>
           <p className="p-4 text-sm text-text-muted">A titled card for a block of related content.</p>
         </Section>
@@ -509,6 +510,13 @@ function OverlayBlocks() {
   };
   return (
     <>
+      <Block section="overlays" title="JumpMenu" note="Pages in a series (years, months, chapters) and every page of a kind are one tap away (N7): a menu of links, the one you're on ticked. A dropdown that says where you are, or a top-bar ☰ that lists every page, grouped with headings.">
+        <div className="controls">
+          <JumpMenu label="Year" value="2024" items={[2026, 2025, 2024, 2023, 2022].map((y) => ({ label: String(y), to: "/jimbo-ui?tab=style", current: y === 2024 }))} />
+          <JumpMenu label="Pages" value="Overview" items={[{ heading: "Numbers" }, { label: "Overview", to: "/jimbo-ui?tab=style", current: true }, { label: "By month", to: "/jimbo-ui?tab=style" }, { heading: "People" }, { label: "Everyone", to: "/jimbo-ui?tab=style" }]} />
+        </div>
+      </Block>
+
       <Block section="overlays" title="Menu" note="Actions on one thing, from the ⋯ button or any trigger. Arrow keys, Home / End and a letter move; destructive ones go last, in the highlight colour, and confirm.">
         <div className="card divide-etched overflow-hidden">
           <div className="flex min-h-[64px] items-center gap-3 py-2 pl-4 pr-2">

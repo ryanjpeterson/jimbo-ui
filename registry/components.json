@@ -305,7 +305,7 @@
     {
       "id": "hero-carousel",
       "name": "HeroCarousel",
-      "purpose": "Several HeroSection slides one at a time, as tall as the fullest, with prev / next arrows, a 10 s timer and pause.",
+      "purpose": "Several HeroSection slides of facts one at a time, as tall as the fullest, with prev / next arrows and pause at the top left and a full-width 10 s timer along the bottom.",
       "tier": "kit",
       "aliases": [
         "Slideshow",
@@ -338,7 +338,7 @@
     {
       "id": "page-header",
       "name": "PageHeader",
-      "purpose": "Titles an index page.",
+      "purpose": "Opens every page as a compact hero: the theme's blur the full width, eyebrow, big title, count, back and a row of actions.",
       "tier": "kit",
       "aliases": [
         "PageTitle",
@@ -559,7 +559,8 @@
         "SettingsLink"
       ],
       "variants": {
-        "accent": "boolean"
+        "accent": "boolean",
+        "size": "md | sm"
       },
       "source": "reference/web/src/components/ui/kit.tsx#LinkCard"
     },
@@ -1218,6 +1219,25 @@
         "align": "start | end"
       },
       "source": "reference/web/src/components/ui/overlays.tsx#Menu"
+    },
+    {
+      "id": "jump-menu",
+      "name": "JumpMenu",
+      "purpose": "Takes you to any page in a series (years, months) or any page of a kind in one tap, from a dropdown that says where you are or a top-bar menu.",
+      "tier": "kit",
+      "aliases": [
+        "PageSwitcher",
+        "YearPicker",
+        "Hamburger",
+        "NavMenu",
+        "SiblingNav",
+        "PagesMenu"
+      ],
+      "variants": {
+        "trigger": "a DropdownButton (default) or a top-bar \u2630",
+        "items": "links, headings, dividers"
+      },
+      "source": "reference/web/src/components/ui/overlays.tsx#JumpMenu"
     },
     {
       "id": "dropdown-button",
