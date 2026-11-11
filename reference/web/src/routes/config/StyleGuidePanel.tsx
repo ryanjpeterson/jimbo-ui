@@ -12,19 +12,21 @@
  * sections.
  */
 
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { HeaderTitle } from "@/components/HeaderTitle";
 import { ColorPicker } from "@/components/ColorPicker";
 import {
   Autocomplete, Chevron, Columns, FloatingBar, LinkChips, ToggleGrid, Badge, BarChart, DateBlock, KeyValue, LayoutSwitch, SwitchRow, EmptyState, EntityRow, EventRow, LinkCard, List, ListGroupLabel, Loading, MediaCard, MediaGrid, Page, PageHeader, Pager,
   PillTabs, RankedList, SearchField, Section, SelectField, ShareSliders, Sheet, Sparkline, StatGrid, StatTile, Tabs, ThemeDots, Timeline, TrendChart, useListLayout, ViewSwitch, type Tone,
+  Hero, useImageCells,
 } from "@/components/ui/kit";
+import { TopBarButton } from "@/routes/AppShell";
 import { DateField, FileDrop, TextArea, TextField } from "@/components/ui/forms";
 import { DropdownButton, JumpMenu, Menu, Popover, SearchTrigger, Tooltip } from "@/components/ui/overlays";
 import { JobTile, OfflineBanner, ProgressBar, Stepper, toast, UpdateBanner, useConfirm } from "@/components/ui/feedback";
 import { Accordion, DataTable, type Column, type TableSort } from "@/components/ui/data";
-import { FONTS, MOTIFS, THEME_KEYS, themeHex } from "@/lib/theme";
+import { contrast, FONTS, hexToRgb, MOTIFS, photoScrim, rgbToHex, THEME_KEYS, themeHex, type Theme } from "@/lib/theme";
 import { useBrand } from "@/lib/useBrand";
 import { useUrlState } from "@/lib/useUrlState";
 
@@ -221,6 +223,10 @@ export function StyleGuidePanel({ more = [] }: { more?: { value: string; label: 
           <Button disabled>Disabled</Button>
           <a className="link-action">.link-action</a>
         </div>
+      </Block>
+
+      <Block section="controls" title="Text over pictures" note="A hero keeps the page's own text colours and veils its picture in the page colour, as much as that picture needs for the title to reach 7:1 and every other line 4.5:1 (C8). It reads the picture where it can (useImageCells) and takes the strongest veil where it can't. Back, ⋯ and + on a hero are glass in body text; a page's own ⋯ is named for its item.">
+        <PhotoTextDemo theme={theme} />
       </Block>
 
       <Block section="controls" title="PageHeader and Back" note="On a page, PageHeader is a compact hero: the theme's colours blurred the full width, a big title, pulled up under the top bar (L11). Give each kind of page its own pattern (L12). Shown here plain, as it is inside a card. Every page below a dock tab's own page has Back to its parent — the path minus its last part (/library/import → /library) — above its eyebrow. Back lands on the parent as it was left (its tabs and filters), and the path says how far in you are. Actions are one .controls row.">
@@ -554,7 +560,7 @@ function OverlayBlocks() {
           {[["Share", "M4 12v7h16v-7M12 3v13M7.5 7.5 12 3l4.5 4.5"], ["Download", "M4 15v4h16v-4M12 3v12M7.5 10.5 12 15l4.5-4.5"], ["Pin", "M9 4h6l-1 6 4 4H6l4-4zM12 14v6"]].map(([label, d]) => (
             <Tooltip key={label} text={label!}>
               <button type="button" aria-label={label} onClick={() => toast(`${label} picked`)}
-                className="glass flex h-11 w-11 items-center justify-center rounded-full text-text-muted transition-colors hover:text-text-base"><Icon d={d!} /></button>
+                className="glass flex h-11 w-11 items-center justify-center rounded-full text-text-base transition-colors hover:border-accent"><Icon d={d!} /></button>
             </Tooltip>
           ))}
           <p className="meta">Hover or tab to the icons.</p>
@@ -671,3 +677,52 @@ function DataBlocks() {
   );
 }
 
+/** A cover of one colour with a soft lighter and darker patch, drawn on a canvas (so it can be read). */
+function cover(base: string): string {
+  if (typeof document === "undefined") return "";
+  const cv = document.createElement("canvas");
+  cv.width = 120; cv.height = 120;
+  const ctx = cv.getContext("2d");
+  if (!ctx) return "";
+  ctx.fillStyle = base;
+  ctx.fillRect(0, 0, 120, 120);
+  const g = ctx.createRadialGradient(30, 30, 0, 30, 30, 70);
+  g.addColorStop(0, "rgba(255,255,255,0.35)"); g.addColorStop(1, "rgba(255,255,255,0)");
+  ctx.fillStyle = g; ctx.fillRect(0, 0, 120, 120);
+  return cv.toDataURL("image/png");
+}
+
+const COVERS = [
+  { value: "light", label: "Light cover", base: "#D9D4CC" },
+  { value: "mid", label: "Mid cover", base: "#7E8A94" },
+  { value: "dark", label: "Dark cover", base: "#1F2226" },
+] as const;
+
+/** One Hero per cover, with the veil it got and the weakest muted line under it. */
+function PhotoTextDemo({ theme }: { theme: Theme }) {
+  const [which, setWhich] = useUrlState<string>("cover", "light", COVERS.map((c) => c.value));
+  const picked = COVERS.find((c) => c.value === which) ?? COVERS[0];
+  const src = useMemo(() => cover(picked.base), [picked.base]);
+  const cells = useImageCells(src);
+  const hex = themeHex(theme);
+  const veil = photoScrim(theme, cells);
+  const [bg, muted] = [hexToRgb(hex.bg!), hex["text-muted"]!];
+  const under = (cell: string) => { const c = hexToRgb(cell); return rgbToHex([0, 1, 2].map((i) => c[i]! + (bg[i]! - c[i]!) * veil) as [number, number, number]); };
+  const worst = cells ? Math.min(...cells.map((c) => contrast(muted, under(c)))) : null;
+  return (
+    <div className="space-y-3">
+      <Tabs value={picked.value} onChange={setWhich} options={COVERS.map(({ value, label }) => ({ value, label }))} size="sm" />
+      <Hero pullUp={false} imageUrl={src} imageAlt={picked.label} square eyebrow="Item · 2026" title={picked.label}
+        back={{ to: "/jimbo-ui", label: "jimbo-ui config" }}
+        badge={<div className="flex gap-2">
+          <TopBarButton size="md" label={`Add to ${picked.label}`} onClick={() => toast("Add picked")}><Icon d="M12 5v14M5 12h14" /></TopBarButton>
+          <Menu glass label={`Options for ${picked.label}`} items={[{ label: "Rename", onSelect: () => toast("Rename picked") }, { label: "Share", onSelect: () => toast("Share picked") }]} />
+        </div>}
+        actions={<><Button>Open</Button><Button variant="secondary">Edit</Button></>}>
+        <p>A subtitle line with <a className="link-action" href="/jimbo-ui">a link</a></p>
+        <p className="meta">Meta · 12 parts · 48 min</p>
+      </Hero>
+      <p className="meta">Veil {Math.round(veil * 100)}%{worst ? ` · weakest muted line ${worst.toFixed(2)}:1` : " · picture not read yet (strongest veil)"}</p>
+    </div>
+  );
+}

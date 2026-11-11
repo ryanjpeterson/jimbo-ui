@@ -493,8 +493,8 @@ clear cards and labels as a near-black one.
 | `surface-2` | `bg-surface-2` | stepTo vs surface, **1.15:1** | Fields, chips, hover rows |
 | `border` | `border-border` | stepTo vs surface, **1.8:1** | Lines, outlines, card edges, row dividers |
 | `text` | `text-text-base` | text | Body text, header text |
-| `text-muted` | `text-text-muted` | mix(text, bg, fadeTo **5:1** on surface, at most 0.4) | Secondary lines |
-| `text-subtle` | `text-text-subtle` | mix(text, bg, fadeTo **3.8:1** on surface, at most 0.6) | Labels, hints, counts |
+| `text-muted` | `text-text-muted` | mix(text, bg, fadeTo **4.7:1** on surface-2, at most 0.4) — about 5.4:1 on cards | Secondary lines, ghost-button hover, chips |
+| `text-subtle` | `text-text-subtle` | mix(text, bg, fadeTo **4.6:1** on surface, at most 0.6) | Labels, eyebrows, hints, counts |
 
 Each brand colour *c* — `accent`, `highlight`, `support` — gets the same
 family of tokens:
@@ -563,7 +563,9 @@ inferred ones, which are built to pass):
 - Text on an accent button ≥ 4.5:1.
 
 Every template must also pass `node scripts/contrast.mjs --check`, measured
-on cards: body text ≥ 7:1, muted ≥ 4.5:1, labels ≥ 3.5:1, card border
+on cards: body text ≥ 7:1, muted ≥ 4.5:1 on `surface-2` (fields and
+chips, the lightest place it sits; about 5.4:1 on cards), labels and
+eyebrows ≥ 4.5:1 (small type, so the full AA ratio), card border
 ≥ 1.75:1, card against page ≥ 1.19:1 — and the three above, plus
 **colours apart**: accent and highlight at least 22 apart (CIE76 ΔE) and no
 two of accent, highlight and support closer than 15 — closer than that, two
@@ -574,6 +576,37 @@ engine spreads them); identical colours don't. A tone written into
 from the look's own colours (`atTone`), or that tone isn't offered and the
 look shows at its nearest tone. Mid-grey backgrounds limit body text
 most: keep them dark enough (luminance under about 0.07) for 7:1.
+
+### Text over pictures and blurs (C8)
+
+A hero's text sits on whatever its picture is — a white cover, a grey
+one, a dark one — so a fixed dim (the old `bg-black/35`) and fixed
+colours (`text-white`, muted) can't work everywhere: muted grey over a
+light cover in a dark look was 1.1:1. Instead the text keeps the page's
+own colours (dark on light pages, light on dark ones, so it matches where
+the hero fades into the page) and the picture gets a **veil of the page
+colour**, as strong as it needs:
+
+- `photoScrim(theme, samples, also?)` (theme engine) — the weakest veil
+  (0.2 up, in steps of 0.02, at most `PHOTO_MAX` 0.9) at which the title
+  reaches 7:1 and the muted lines 4.5:1 (plus 0.3 margin) over every
+  sample. `also` adds brand colours drawn as text there (`HeroSection`'s
+  support eyebrow).
+- `useImageCells(src)` (kit) — reads the picture as the banner shows it:
+  its middle two-thirds, 1.5× saturated, averaged into a 4×4 grid on a
+  canvas. A picture from another site without CORS can't be read (the
+  canvas is tainted), so the banner keeps the worst case — black and white
+  — which is the 0.84–0.9 veil. Serve covers same-origin or with CORS for
+  the lighter veil.
+- With no picture, `Banner` samples its glow; `HeroSection` samples
+  `blurSamples` (each brand colour at 60% over the page, brighter than its
+  wash ever gets).
+
+`scripts/contrast.mjs` checks it for every look in every tone: `photo`
+(an unreadable picture at the veil it gets) and `blur` (`HeroSection`'s
+wash with its support eyebrow) are each the weakest line over its target —
+1 or more passes. Anything else on a hero is `.glass` in body text: the
+back button, the thumbnail's expand hint, ⋯ and + buttons.
 
 ---
 
@@ -972,7 +1005,11 @@ and body fonts.
   a muted label and the value), and a down arrow that turns while open.
   Never a plain or ghost button, never a bare "Or…". A choice that applies
   at once can be a `SelectField`. The ⋯ `MoreButton` stays for a row's own
-  actions.
+  actions — and, round glass (`Menu glass` or `MoreButton glass`), for a
+  page's or part's own options in its header or hero, labelled for its
+  item ("Options for *name*"), since there it's one thing's actions, not
+  a choice of view. A header's own + (add one) is a 44 px round glass
+  `TopBarButton size="md"`; the top bar's are `sm` (40 px).
 
 ### Layers (z-index)
 
@@ -1006,8 +1043,8 @@ and body fonts.
 | `.control-grid` | Options in equal columns (≥ 9 rem each), every cell one control high and full width |
 | `.btn-primary` | Solid accent fill, no outline, on-accent text, `accent-hover` on hover |
 | `.btn-secondary` | `bg-surface-2`, border, border lightens on hover |
-| `.btn-ghost` | Muted text, `surface-2` on hover |
-| `.btn-danger` | Muted text, red wash and highlight text on hover |
+| `.btn-ghost` | Body text (it has no surface, so its words carry it), `surface-2` on hover |
+| `.btn-danger` | Body text, `surface-2` and highlight text on hover (the highlight is only 3:1 on some cards, so not at rest) |
 | `.chip` | 8 px radius, `bg-surface-2`, border, 14 px medium, muted |
 | Top bar | `bg-bg/90`, `backdrop-blur-md`, `border-border` |
 | Floating bars and the dock | `bg-surface/95`, `backdrop-blur-md`, `border-border`, deep shadow; the dock is a 20 px-radius slab and its active tab a 14 px-radius `accent/15` fill with a 1 px `accent/30` outline |
@@ -1046,9 +1083,9 @@ and body fonts.
 | Component | Use it for |
 | --- | --- |
 | `PageHeader` | Every page's opener (L11): a compact hero — the theme's colours blurred the full width, pulled up under the top bar — with `back` (top left), eyebrow, a big title, count, `actions` (a `.controls` row). `pattern` and `tone` (which brand colour leads the blur) give each kind of page its own look (L12); `plain` is the old in-column header, for demos and headers inside a card |
-| `BackButton` + `useRememberPages` + `parentPath` | Back to the page above, as it was left. `PageHeader back` and `Hero`/`Banner back` draw it |
+| `BackButton` + `useRememberPages` + `parentPath` | Back to the page above, as it was left: glass, softly rounded, body text, a long name truncated. `PageHeader back` and `Hero`/`Banner back` draw it |
 | `ShareSliders` + `rebalance` + `normaliseShares` | Linked sliders that split one total (100%, 60 items, a budget): moving one moves the rest the other way in proportion, so they always add up to the total. Each shows its percentage and amount. `normaliseShares` when the total changes |
-| `Hero` / `Banner` | Detail page header over a blurred image (full width) |
+| `Hero` / `Banner` | Detail page header over a blurred image (full width), veiled in the page colour as much as the picture needs (C8; `useImageCells`, `photoScrim`) |
 | `HeroSection` | Full-width page opener with no photo: eyebrow, big title, a line, actions, over a soft blur of the theme's colours (`pattern`, any of the backdrops, blurred on a glow until no line shows — never the pattern's crisp lines); `size="lg"` fills most of the first screen; `align="center"`. It tucks up under the top bar; pass `pullUp={false}` when something sits above it (as `Banner` and `Hero` take too) |
 | `HeroCarousel` | `HeroSection` slides one at a time (`slides`: id, eyebrow, title, a line — facts only, no buttons, L11): always as tall as its fullest slide; prev / next arrows that wrap round, a pause button and "3 / 29" at the top left; moves on every `interval` (10 s), the time left a thin bar the screen's full width along the bottom edge; stops while hovered or focused. `index` / `onIndex` to keep the slide in the URL |
 | `JumpMenu` (`overlays.tsx`) | One tap to any page in a series or every page of a kind (N7): a `Menu` of links (`{ label, to, hint, current }`, `{ heading }` to group, `"divider"`), the current one ticked. A `DropdownButton` saying where you are ("Year: 2019") by default; `trigger` for a top-bar ☰ that lists every data page. The menu scrolls past 30rem |
@@ -1651,3 +1688,12 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   `Menu` items take `current` and `{ heading }`, and long menus scroll.
   `LinkCard size="sm"` for a row of quick ways in. The shell sets
   `--page-max`, so a full-width hero's text lines up with the page column.
+- **Unreleased** — Text over pictures and blurs (C8): `Hero`, `Banner` and
+  `HeroSection` veil their picture or blur in the page colour as much as it
+  needs (`photoScrim`, `useImageCells`) and keep the page's text colours —
+  no more `text-white` or a fixed black dim; `contrast.mjs` checks `photo`
+  and `blur`. Muted text now steps to 4.7:1 on `surface-2` and labels and
+  eyebrows to 4.6:1 on cards (C6: muted ≥ 4.5:1 on `surface-2`, labels
+  ≥ 4.5:1). Ghost and danger buttons are body text. `BackButton` is glass
+  and truncates; `TopBarButton size="md"` (44 px) and a round glass ⋯
+  (`Menu glass`) for a page's or part's own options (K5).

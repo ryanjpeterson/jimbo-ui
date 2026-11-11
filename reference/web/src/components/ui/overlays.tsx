@@ -86,10 +86,18 @@ export type TriggerProps = {
 
 const PANEL = "z-[45] rounded-xl border border-border bg-surface shadow-2xl shadow-black/40";
 
-/** The kit's round "more" button (⋯): a 44 px ghost circle. Spread a trigger's props on it. */
-export const MoreButton = forwardRef<HTMLButtonElement, Omit<TriggerProps, "ref"> & { label?: string }>(({ label = "More", ...props }, ref) => (
-  <button ref={ref} type="button" aria-label={label} {...props}
-    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-text-muted transition-colors hover:bg-surface-2 hover:text-text-base aria-expanded:bg-surface-2 aria-expanded:text-text-base">
+/**
+ * The kit's round "more" button (⋯), 44 px. A ghost circle for a row's own
+ * actions; `glass` for a page's or part's own options in its header, over the
+ * page or a hero (K5) — then its `label` names the item ("Options for <name>").
+ * Spread a trigger's props on it.
+ */
+export const MoreButton = forwardRef<HTMLButtonElement, Omit<TriggerProps, "ref"> & { label?: string; glass?: boolean }>(({ label = "More", glass = false, ...props }, ref) => (
+  <button ref={ref} type="button" aria-label={label} title={glass ? label : undefined} {...props}
+    className={cn("flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-colors",
+      glass
+        ? "glass text-text-base hover:border-accent aria-expanded:border-accent"
+        : "text-text-base hover:bg-surface-2 aria-expanded:bg-surface-2")}>
     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.9" /><circle cx="12" cy="12" r="1.9" /><circle cx="19" cy="12" r="1.9" /></svg>
   </button>
 ));
@@ -101,7 +109,8 @@ MoreButton.displayName = "MoreButton";
  * surface and border, its text, and a down arrow that turns while it's open.
  * One control high (`h-control`, or `h-control-sm` with `size="sm"`), so it
  * sits level in a `.controls` row. Spread a `Menu` or `Popover` trigger's
- * props on it. A ⋯ `MoreButton` stays only for a row's own actions.
+ * props on it. A ⋯ `MoreButton` stays only for a row's own actions and,
+ * `glass`, for a page's or part's own options in its header (K5).
  */
 export const DropdownButton = forwardRef<HTMLButtonElement, Omit<TriggerProps, "ref"> & {
   children: ReactNode;
@@ -144,8 +153,10 @@ export type MenuItem =
  * it, Enter picks. `danger` items are in the highlight colour and go last,
  * after a divider; confirm them with `ConfirmSheet`.
  */
-export function Menu({ items, label = "More", trigger, align = "end" }: {
+export function Menu({ items, label = "More", trigger, align = "end", glass = false }: {
   items: MenuItem[];
+  /** A round glass ⋯ — for a page's or part's own options in its header (K5); `label` names the item. */
+  glass?: boolean;
   /** Names the button for screen readers. */
   label?: string;
   trigger?: (props: TriggerProps) => ReactNode;
@@ -181,7 +192,7 @@ export function Menu({ items, label = "More", trigger, align = "end" }: {
 
   return (
     <>
-      {trigger ? trigger(props) : <MoreButton label={label} {...props} />}
+      {trigger ? trigger(props) : <MoreButton label={label} glass={glass} {...props} />}
       {open && createPortal(
         <div ref={panel} id={id} role="menu" aria-label={label} onKeyDown={onKey} style={style}
           className={cn(PANEL, "scroll-area max-h-[min(30rem,70dvh)] min-w-[12rem] max-w-[calc(100vw-16px)] overflow-y-auto py-1")}>
