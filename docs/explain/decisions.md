@@ -2,9 +2,16 @@
 
 ## Log
 
+### 2026-11-11 — shadcn/ui, flat, and binding
+
+- **Decision:** the component layer is shadcn/ui primitives (copied into foundation with jimbo's edits) and a kit composed from them, themed through one token mapping onto shadcn's variable names; the look goes flat (no shadows or blur on components); the rules are binding, and apps amend jimbo.ui only by PR.
+- **Why:** accessible, well-known primitives instead of hand-rolled ones; one mapping means any shadcn component takes any theme; binding rules stop apps drifting apart.
+- **Alternatives:** keep the hand-rolled kit; let apps add shadcn components themselves.
+- **Consequences:** a breaking update (token class renames — the theme's accent is `primary`, React 19); apps keep a tracked pending version while a PR is open.
+
 ### 2026-11-08 — A numbered rulebook decides
 
-- **Decision:** every rule numbered in nine groups; the guide explains, the rulebook wins.
+- **Decision:** every rule numbered in groups (ten since J); the guide explains, the rulebook wins.
 - **Why:** audits and updates can cite rules ("breaks K3").
 - **Alternatives:** the guide alone.
 - **Consequences:** new rules take the next number; numbers never reused.

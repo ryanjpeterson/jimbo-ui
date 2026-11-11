@@ -9,7 +9,7 @@
       "name": "jimbo-ui",
       "source": "./",
       "version": "0.17.0",
-      "description": "Ryan's shared brand and UI system, with workflows to start apps on it, update them, and release changes."
+      "description": "Ryan's shared brand and UI system — binding rules on shadcn/ui — with workflows to start apps on it, update and audit them, amend it by PR, and release changes."
     }
   ]
 }

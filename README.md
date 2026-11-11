@@ -3,12 +3,18 @@
 Ryan's shared brand and UI system for web apps (repo and plugin name:
 `jimbo-ui`): a theme engine
 that turns two to four colours into a full palette with shades, 324 looks — each in light, mid and dark — (everyday, holidays,
-countries, provinces, sports teams and games: Zelda, Mario, Donkey Kong, more Nintendo, Sly Cooper, Tony Hawk's Underground and retro consoles — the end of the world, space and Halloween), 79 backdrops that can move slowly (or keep turning, breathing and twinkling), frosted glass and a motif of circles (or a triforce, sparkles, stars, skulls, planets, bats and more), Tailwind 4 tokens, a UI kit (fields, menus, toasts, tables, Spotlight-style app-wide search and more), a phone-first, full-screen app shell with a
+countries, provinces, sports teams and games: Zelda, Mario, Donkey Kong, more Nintendo, Sly Cooper, Tony Hawk's Underground and retro consoles — the end of the world, space and Halloween), 79 backdrops that can move slowly (or keep turning, breathing and twinkling), a flat look with hairline borders and a motif of circles (or a triforce, sparkles, stars, skulls, planets, bats and more), **shadcn/ui** components on Tailwind 4, themed from one token mapping, a UI kit composed from them (fields, menus, toasts, tables, Spotlight-style app-wide search and more), a phone-first, full-screen app shell with a
 floating tab dock, maps in the theme, three app archetypes to copy, the
 patterns that make the apps feel alike (the URL always holds the view), and a **registry** — the apps on
 jimbo-ui and a catalogue of shared components, with each app describing
 itself in its own `jimbo-ui.json` — so nothing gets built twice. It's
 generic on purpose: no app's code, names or artwork live here.
+
+**It's binding.** Every app on jimbo.ui uses its components and tokens and
+nothing else, never restyles them, and gets anything new through a pull
+request to this repo (rules J1–J6; [guide section 14](skills/jimbo-ui/guide.md)).
+Until a PR is released, an app may keep a marked, tracked temporary version
+(`components.pending` in its `jimbo-ui.json`).
 
 How and why it works: [docs/explain](docs/explain/README.md)
 
@@ -39,11 +45,13 @@ the `brand.config.ts` line and `tokens.css` to paste into the app.
 | `skills/jimbo-ui/rulebook.md` | **The rulebook** — every rule numbered and checkable; audits cite it |
 | `skills/jimbo-ui/guide.md` | **The guide** — each rule explained, with values and patterns |
 | `skills/jimbo-ui/SKILL.md` | The skill: core rules + workflows |
-| `foundation/` | Code copied verbatim into apps (never edited there) |
+| `foundation/` | Code copied verbatim into apps (never edited there): the theme engine, `globals.css` with the one shadcn token mapping, and the shadcn/ui primitives in `src/components/ui/` |
 | `starter/` | Code copied once into a new app, then app-owned |
-| `reference/` | Generic kit, shell, header text, maps, the jimbo-ui config section and the archetypes, adapted per app |
+| `reference/` | Generic kit composed from the primitives, shell, header text, maps, the jimbo-ui config section and the archetypes; apps adapt wiring only |
 | `registry/` | The apps on jimbo-ui (names and repos) and the catalogue of shared components; each app's details are in its own `jimbo-ui.json`, and `scripts/inventory.mjs` puts them together |
-| `scripts/inventory.mjs` | Registry report: component × app table, what to promote, raw colours, config-section checks |
+| `scripts/inventory.mjs` | Registry report: component × app table, what to promote, raw colours, config-section checks, binding checks (J2, J5) |
+| `scripts/shadcn-add.mjs` | Maintainers: add a shadcn primitive to foundation with jimbo's edits |
+| `scripts/migrate-0.18.mjs` | Codemod apps run for the shadcn update: renames token classes, reports what needs a component |
 | `showcase/` | Demo app built only from a release's code ([published](https://claude.ai/artifact/F4KAFYCkxZGZB7zKdaWjWC)) |
 | `scripts/tokens.mjs` | Prints an app's `tokens.css` for its three colours |
 | `scripts/contrast.mjs` | Contrast and colour-separation report for every template (`--check` for releases) |

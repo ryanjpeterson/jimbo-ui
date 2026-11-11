@@ -4,12 +4,12 @@
 
 A repo of three kinds of code plus the rules:
 
-- **`foundation/`**: the theme engine, templates, `globals.css` with the Tailwind 4 theme, `Button`, `ColorPicker`, gestures; copied verbatim into apps on every update.
+- **`foundation/`**: the theme engine, templates, `globals.css` with the Tailwind 4 theme and the one token mapping onto shadcn's variables, the shadcn/ui primitives (`src/components/ui/`), `ColorPicker`, gestures; copied verbatim into apps on every update, never edited there.
 - **`starter/`**: `brand.config.ts`, `tokens.css`, favicon; copied once, then app-owned.
 - **`reference/`**: the kit (`kit.tsx`, `forms`, `overlays`, `feedback`, `data`), `AppShell`, `HeaderTitle`, `MapView`, the jimbo-ui config section, and three archetypes (Catalogue, Dashboard, Status monitor); adapted per app.
-- **`skills/jimbo-ui/`**: `rulebook.md` (60 numbered rules in nine groups; it decides), `guide.md` (each rule explained), `SKILL.md` (core rules and workflows).
+- **`skills/jimbo-ui/`**: `rulebook.md` (68 numbered rules in ten groups, binding on apps; it decides), `guide.md` (each rule explained), `SKILL.md` (core rules and workflows).
 
-Around it: `registry/` (the apps and a 98-entry component catalogue), `scripts/` (inventory, tokens, contrast, versions, releases, template-from-colours, zip), `hooks/` (a session-start version check), and `showcase/` (a demo built only from a release's code).
+Around it: `registry/` (the apps and a 120-entry component catalogue), `scripts/` (inventory, tokens, contrast, versions, releases, template-from-colours, zip), `hooks/` (a session-start version check), and `showcase/` (a demo built only from a release's code).
 
 ## Why it exists
 
@@ -28,6 +28,7 @@ The first app had a look worth reusing; the next ones were starting to diverge. 
 - **Versions say what an update takes:** breaking = next 0.MINOR (apps change code), feature or fix = 0.x.PATCH (drop-in).
 - **Contrast check passes for every template** after any theme change.
 - **An app's details live only in its own `jimbo-ui.json`.**
+- **jimbo.ui is binding:** apps use its components and tokens only and amend it by PR (J1–J6).
 - **Push and release only when Ryan asks.**
 
 ## Status

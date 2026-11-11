@@ -34,26 +34,119 @@ the matching 0.x release.
 
 ## Unreleased
 
-Hero text and muted text read on every surface and picture.
+jimbo.ui moves onto shadcn/ui, goes flat, and becomes binding: apps use its components and tokens only, and amend it by PR.
 
-**Update:** fix
-
-### Changed
-
-- Muted and label text step to read on fields (`surface-2`), not just
-  cards: targets 5.5:1 and 4.5:1 (C6). New template scores: muted on
-  floating glass over any photo, and hero text over its scrim.
-- `BackButton` is always `.glass` with body text (`overlay` is ignored);
-  `Hero` and `Banner` use tokens instead of white and black.
+**Update:** breaking
 
 ### Added
 
-- Hero scrims (rule C8): `heroScrims()` in `theme.ts`, the
+- **shadcn/ui primitives in foundation** (`src/components/ui/`): accordion,
+  alert, alert-dialog, avatar, badge, button, card, command, dialog,
+  drawer, dropdown-menu, empty, field, input, label, popover, progress,
+  select, separator, skeleton, slider, sonner, switch, table, tabs,
+  textarea, toggle, toggle-group, tooltip — shadcn's files with jimbo's
+  edits (guide section 8): control heights, one radius, flat surfaces, no
+  `dark:` classes, `Button loading`, `Card asChild`, `Progress tone`,
+  brand `Badge` variants.
+- **One token mapping** in `globals.css`: the theme's channels onto shadcn's
+  variable names (`--background`, `--foreground`, `--card`, `--popover`,
+  `--primary`, `--secondary`, `--muted`, `--accent`, `--destructive`,
+  `--border`, `--input`, `--ring`, `--radius`, `--chart-1…5`, `--sidebar-*`)
+  plus jimbo's `--subtle-foreground`, `--highlight-*` and `--support-*`.
+  Guide section 3, "The token mapping".
+- **Rules J1–J6 (jimbo.ui is binding):** jimbo.ui's components and tokens
+  only (J2), no restyles through `className` (J3), anything new through a
+  PR to jimbo-ui (J4, guide section 14), temporary local versions marked
+  and tracked in `jimbo-ui.json` `components.pending` (J5), and every app
+  has the config page (J6). New rule **S8** (surfaces are flat).
+- Skill workflow **"Amend jimbo.ui"** (the PR route); a binding audit step
+  in the update and audit workflows; `scripts/inventory.mjs` checks J2 and
+  J5 for every app.
+- `scripts/shadcn-add.mjs` (maintainers: add a primitive to foundation) and
+  `scripts/migrate-0.18.mjs` (the codemod apps run for this update).
+- `registry/components.json`: a `shadcn` base on each entry, the
+  primitives, and the `pending` tier.
+- Hero scrims (rule **C8**): `heroScrims()` in `theme.ts`, the
   `--hero-scrim-image` / `--hero-scrim-blur` variables and the
   `hero-scrim-image` / `hero-scrim-blur` utilities.
 
-**Apps must:** copy the foundation files. When wanted, replace a hand-made
-`bg-black/*` dim over a hero picture with `hero-scrim-image`.
+### Changed
+
+- **Token class names are shadcn's.** The theme's accent colour is
+  `primary` (`bg-primary`, `text-primary-foreground`, `primary-950`…);
+  shadcn's `accent` is the hover surface. `bg` → `background`, `surface` →
+  `card`, `surface-2` → `muted`, `text-base` / `text-muted` / `text-subtle`
+  → `foreground` / `muted-foreground` / `subtle-foreground`, `on-highlight`
+  / `on-support` → `highlight-foreground` / `support-foreground`, `danger`
+  → `destructive`, `dot-accent` / `motif-accent` → `dot-primary` /
+  `motif-primary`. The engine, the templates, `Theme.accent` and the `--c-*`
+  channels don't change.
+- **Flat and modern** (S6, S8): solid surfaces with hairline borders, no
+  shadows or blur on components; overlays get one `shadow-md`. The top bar
+  and dock are solid; floating controls are solid cards. One radius
+  (`--radius` 10 px): controls `rounded-lg`, cards `rounded-xl`, sheets
+  `rounded-2xl`.
+- **The kit is rebuilt on the primitives:** `Sheet` (Drawer on phones,
+  Dialog from `sm`), `ConfirmSheet` (AlertDialog), `toast` / `Toaster`
+  (Sonner), `Menu` / `JumpMenu` / `DropdownButton` (DropdownMenu),
+  `Popover`, `Tooltip`, `CommandPalette` (in a Dialog), forms (Field,
+  Input, Textarea), `SelectField` (Select — no longer a native select),
+  `Tabs`, `ToggleGrid` (ToggleGroup), `SwitchRow` (Switch), `RangeField` and
+  `ShareSliders` (Slider), `DataTable` (Table), `Accordion`, `ProgressBar`,
+  `Loading` (Skeleton), `EmptyState` (Empty), `Section` / `LinkCard` /
+  `StatTile` (Card), `BackButton` / `Pager` / `PillTabs` / `TopBarButton`
+  (Button). Their props are unchanged except below.
+- `Button` variants are `default | secondary | ghost | destructive` and
+  sizes `default | sm | icon | icon-sm` (was `primary | secondary | ghost |
+  danger`, `sm | md | lg`).
+- `TriggerProps` (Menu, Popover, JumpMenu triggers) are now spread props
+  that may be empty — Radix supplies the ref, click and aria state; a
+  trigger must forward its ref.
+- Icons are `lucide-react` (P4); C1, C2, K1, P1, P5 reworded for the above.
+- Muted and label text step to read on fields (`surface-2`), not just
+  cards: targets 5.5:1 and 4.5:1 (C6). New template score: hero text over
+  its scrim. `BackButton` is a solid button with body text; `Hero` and
+  `Banner` use tokens instead of white and black.
+- React 19 (shadcn v4's components take `ref` as a prop).
+
+### Removed
+
+- The `.glass`, `.card`, `.card-glass`, `.field`, `.btn`, `.btn-*`,
+  `.chip`, `.label`, `.lit-*` and `.orb-*` classes, and the old token
+  utilities (`bg-bg`, `bg-surface`, `text-text-*`, `*-accent` as the brand
+  colour, `*-on-*`, the lit `-top` / `-bottom` shades, `danger`).
+- `foundation/src/components/ui/button.tsx`'s old API; the toast timer bar
+  and keyframes (Sonner times toasts); `glassScore` and the glass contrast
+  target.
+
+**Apps must:**
+
+1. Upgrade to React 19 and install `radix-ui`, `class-variance-authority`,
+   `lucide-react`, `cmdk`, `vaul`, `sonner` and `tw-animate-css` (versions
+   as in `showcase/package.json`).
+2. Copy the foundation files, including the new `src/components/ui/`
+   folder (it replaces any shadcn components the app had there).
+3. Run `node ~/Development/jimbo-ui/scripts/migrate-0.18.mjs src` in the web
+   root (commit first) to rename the token classes, then fix what it
+   reports: `.btn` → `<Button>`, `.field` → `<Input>` / `<Textarea>` /
+   `<SelectField>`, `.chip` → `<Badge>`, `.label` → `<Label>`, raw channel
+   colours, and any class built from a tone name (`bg-${tone}` with
+   `"accent"` now means the hover surface). Review the diff: it also
+   rewrites the words "card" and "glass" in class strings.
+4. Port the reference changes (kit, forms, overlays, feedback, data,
+   AppShell, the config page and panels): `git diff jimbo-ui--v0.17.0 -- reference/`.
+   `Button variant="primary"` → default, `"danger"` → `"destructive"`,
+   `size="lg"` → default; triggers forward their ref.
+5. Swap hand-drawn SVG icons for `lucide-react` (dock tab icons may stay).
+6. Remove any shadcn `components.json`, other UI libraries, and components
+   jimbo.ui doesn't ship (J2). Anything the app needs that jimbo.ui lacks:
+   open a PR to jimbo-ui (guide section 14) and move the app's version into
+   `src/components/jimbo-pending/`, listed under `components.pending` in
+   `jimbo-ui.json` (J5).
+7. Make sure the app has the jimbo-ui config page at `/jimbo-ui` (J6).
+8. Add the binding paragraph to the app's `CLAUDE.md` jimbo-ui block (skill,
+   "Register an app", step 8), then audit (group J first) and check at
+   375 px in a light, a mid and a dark look.
 
 ## 0.17.0 — 2026-11-08
 
