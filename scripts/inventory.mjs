@@ -208,3 +208,37 @@ for (const a of apps) {
   frame.push([a.name, !html ? "no index.html" : cover ? "yes" : "MISSING", bar === "default" ? bar : `${bar} (want default)`, raw.length ? raw.map((f) => relative(join(dir, webRoot), f)).join(", ") : "none"]);
 }
 table(frame);
+
+// ── 8. jimbo.ui is binding (rules J2, J3, J5) ──────────────────────────────
+head("Binding (J2: components from jimbo.ui only; J5: pending local versions tracked)");
+const SHIPPED = new Set(readdirSync(join(root, "foundation/src/components/ui")));
+const OTHER_UI = /^(@mui\/|@chakra-ui\/|@mantine\/|@headlessui\/|daisyui$|bootstrap$|react-bootstrap$|antd$|@nextui-org\/|@heroui\/|@radix-ui\/)/;
+const binding = [["App", "shadcn components.json", "Other UI libraries", "ui/ not shipped or edited", "Radix outside ui/", "Pending (J5)"]];
+const prState = (url) => {
+  const m = /github\.com\/([^/]+\/[^/]+)\/pull\/(\d+)/.exec(url ?? "");
+  if (!m) return "no PR link";
+  try {
+    const pr = JSON.parse(execFileSync("gh", ["pr", "view", m[2], "--repo", m[1], "--json", "state,mergedAt"], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }));
+    return pr.state === "MERGED" ? "merged — remove once released" : pr.state.toLowerCase();
+  } catch { return "unreadable"; }
+};
+for (const a of apps) {
+  const { dir, webRoot, cfg } = local[a.name];
+  if (!dir) { binding.push([a.name, "?", "?", "?", "?", "not checked out"]); continue; }
+  const web = join(dir, webRoot);
+  const pkg = existsSync(join(web, "package.json")) ? JSON.parse(readFileSync(join(web, "package.json"), "utf8")) : {};
+  const deps = Object.keys({ ...pkg.dependencies, ...pkg.devDependencies });
+  const others = deps.filter((d) => OTHER_UI.test(d));
+  const uiDir = join(web, "src/components/ui");
+  const mine = existsSync(uiDir) ? readdirSync(uiDir).filter((f) => f.endsWith(".tsx")) : [];
+  const kitFiles = new Set(["kit.tsx", "forms.tsx", "overlays.tsx", "feedback.tsx", "data.tsx"]);
+  const off = mine.filter((f) => !kitFiles.has(f) && (!SHIPPED.has(f) || readFileSync(join(uiDir, f), "utf8") !== readFileSync(join(root, "foundation/src/components/ui", f), "utf8")));
+  const radix = walk(join(web, "src")).filter((f) => !f.startsWith(uiDir) && /from ["'](?:@radix-ui\/|radix-ui["'])/.test(readFileSync(f, "utf8")));
+  const pending = cfg?.components?.pending ?? [];
+  const pendDir = join(web, "src/components/jimbo-pending");
+  const untracked = existsSync(pendDir) ? readdirSync(pendDir).filter((f) => !pending.some((p) => (p.path ?? "").endsWith(f))) : [];
+  const pend = [...pending.map((p) => `${p.name}: ${prState(p.pr)}`), ...untracked.map((f) => `${f}: NOT IN jimbo-ui.json`)];
+  binding.push([a.name, existsSync(join(web, "components.json")) || existsSync(join(dir, "components.json")) ? "YES — remove" : "no",
+    others.join(", ") || "none", off.join(", ") || "none", radix.map((f) => relative(web, f)).join(", ") || "none", pend.join("; ") || "none"]);
+}
+table(binding);

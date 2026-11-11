@@ -10,7 +10,7 @@ jimbo.ui (repo and plugin `jimbo-ui`) is Ryan's shared brand and UI system for h
 | For | Just me (self), through Claude Code; apps' users see the result |
 | Status | Active: 0.17.0 on 2026-11-08, 33 releases in 17 days |
 | Runs at | Local only (plugin); showcase at http://localhost:4460 via Docker, and a private published page |
-| Built with | TypeScript, React 18, Tailwind 4, Vite 5, Node scripts, Playwright |
+| Built with | TypeScript, React 19, shadcn/ui (Radix), Tailwind 4, Vite 5, Node scripts, Playwright |
 | Leans on | GitHub (releases and each app's `jimbo-ui.json`), Google Fonts, Google Maps (MapView) |
 | Started | 2026-10-23 |
 | Docs checked | 2026-11-08 at 8477686 |

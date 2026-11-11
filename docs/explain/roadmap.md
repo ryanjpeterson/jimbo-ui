@@ -2,7 +2,7 @@
 
 ## Now
 
-Nothing in progress after 0.17.0.
+- **shadcn rebuild (Unreleased, breaking):** components on shadcn/ui, a flat look, binding rules and the PR route — waiting for a release.
 
 ## Next
 
@@ -12,7 +12,7 @@ Nothing in progress after 0.17.0.
 ## Later
 
 - 1.0.0 once breaking changes slow down.
-- React 19 and Vite 6 for the kit and apps.
+- Vite 6 for the kit and apps.
 
 ## Ideas
 
@@ -21,6 +21,8 @@ Nothing in progress after 0.17.0.
 ## Decided against
 
 - **Logos per app** — the brand is the name as header text with an accent dot.
-- **Gloss, glows and orbs** — flat shapes, depth from layers.
+- **Gloss, glows and orbs** — flat shapes.
+- **Frosted glass and shadows on components** — flat surfaces and hairlines since the shadcn update.
+- **Apps adding their own shadcn components** — everything comes from jimbo.ui, by PR.
 - **White or grey brand colours.**
 - **App details in this repo** — each app's `jimbo-ui.json` is the record.

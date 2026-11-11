@@ -1751,10 +1751,7 @@
         {
           "kind": "changed",
           "text": "`.card` is lit by the brand colours: a soft accent glow top left and support glow bottom right over its gradient.",
-          "affects": [
-            "card"
-          ],
-          "foundation": true
+          "affects": []
         },
         {
           "kind": "changed",
@@ -1962,10 +1959,7 @@
         {
           "kind": "changed",
           "text": "**Card borders at full strength** (`.card` uses `border-border`, not `/60`).",
-          "affects": [
-            "card"
-          ],
-          "foundation": true
+          "affects": []
         },
         {
           "kind": "changed",
@@ -2028,9 +2022,6 @@
           "kind": "added",
           "text": "**Foundation:** `globals.css` (page background, type scale, `.card`, `.btn`, `.field`, `.chip`…), `tailwind.config.js` tokens, `Button`, `ColorPicker`, `cn`, gestures.",
           "affects": [
-            "card",
-            "field",
-            "chip",
             "button",
             "color-picker"
           ],

@@ -2,7 +2,7 @@
 
 ## Summary
 
-Theme engine, kit and shell, rules, registry, tooling and the plugin. 24 features in 6 areas.
+Theme engine, kit and shell, rules, registry, tooling and the plugin. 27 features in 6 areas.
 
 ## Features
 
@@ -14,13 +14,14 @@ Theme engine, kit and shell, rules, registry, tooling and the plugin. 24 feature
 | Looks | 324 templates in Everyday, Holidays, Countries, Provinces, Games, Brands, Sports | `foundation/src/lib/themes.ts`, `scripts/template-from-colours.mjs` | stable |
 | Backdrops and motifs | 79 backdrops, still or moving; motif shapes; favicon is the motif | `foundation/` | stable |
 | Fonts | Nine per group, heading and body sizes | `foundation/` | stable |
-| Tokens | Tailwind 4 theme and an app's `tokens.css` | `foundation/src/styles/globals.css`, `scripts/tokens.mjs` | stable |
+| Tokens | Tailwind 4 theme, the one mapping onto shadcn's variables, an app's `tokens.css` | `foundation/src/styles/globals.css`, `scripts/tokens.mjs` | changed (Unreleased) |
 
 ### Kit and shell
 
 | Feature | What it does | Where | Status |
 |-|-|-|-|
-| UI kit | Buttons, fields, menus, toasts, tables, steps, lists, cards, stats, charts, Timeline, ScrollingLine | `reference/web/src/components/ui/` | stable |
+| shadcn primitives | 29 shadcn/ui components with jimbo's edits, copied into apps | `foundation/src/components/ui/`, `scripts/shadcn-add.mjs` | new (Unreleased) |
+| UI kit | Composed from the primitives: fields, menus, toasts, tables, steps, lists, cards, stats, charts, Timeline, ScrollingLine | `reference/web/src/components/ui/` | changed (Unreleased) |
 | App shell | Phone-first, full-screen, floating tab dock, safe areas, top bar | `reference/web/src/routes/AppShell.tsx` | stable |
 | Heroes | `PageHeader` (compact hero), `HeroSection`, `HeroCarousel`; a hero on every page | `reference/web/src/components/ui/kit.tsx` | new (0.17.0) |
 | JumpMenu | Every data page one tap away | kit | new (0.17.0) |
@@ -34,7 +35,8 @@ Theme engine, kit and shell, rules, registry, tooling and the plugin. 24 feature
 
 | Feature | What it does | Where | Status |
 |-|-|-|-|
-| Rulebook | 60 numbered rules (Brand, Colour, Shapes, Controls, Layout, Navigation, Motion, Parts, Accessibility) | `skills/jimbo-ui/rulebook.md` | new (0.16.0) |
+| Rulebook | 68 numbered rules (Brand, Colour, Shapes, Controls, Layout, Navigation, Motion, Parts, Binding, Accessibility) | `skills/jimbo-ui/rulebook.md` | changed (Unreleased: J binding group, S8, C8) |
+| PR route | Apps amend jimbo.ui only by PR; tracked pending versions | guide section 14, SKILL.md "Amend jimbo.ui" | new (Unreleased) |
 | Guide | Each rule explained, values and patterns | `skills/jimbo-ui/guide.md` | stable |
 
 ### Registry
@@ -42,8 +44,8 @@ Theme engine, kit and shell, rules, registry, tooling and the plugin. 24 feature
 | Feature | What it does | Where | Status |
 |-|-|-|-|
 | Apps list | Names, repos, dates | `registry/apps.json` | stable |
-| Component catalogue | 98 shared components and generic candidates in tiers | `registry/components.json` | stable |
-| Inventory | Component × app table, what to promote, raw colours, config checks from each app's pushed `jimbo-ui.json` | `scripts/inventory.mjs` | stable |
+| Component catalogue | 120 shared components, primitives and generic candidates in tiers, each with its shadcn base | `registry/components.json` | stable |
+| Inventory | Component × app table, what to promote, raw colours, config and binding checks from each app's pushed `jimbo-ui.json` | `scripts/inventory.mjs` | stable |
 
 ### Tooling
 

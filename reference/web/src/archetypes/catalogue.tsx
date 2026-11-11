@@ -22,6 +22,8 @@ import {
   SearchField, Section, Sheet, StatGrid, StatTile, ViewSwitch, type RowStatus,
 } from "@/components/ui/kit";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { MapPinCard, MapView, type MapPin } from "@/components/MapView";
 import { useUrlNumber, useUrlState } from "@/lib/useUrlState";
 
@@ -156,7 +158,7 @@ function Entries({ at }: At) {
       <Pager page={page} totalPages={3} total={56} pageSize={24} onPage={setPage} />
       {selecting && picked.size > 0 && (
         <div className="fixed inset-x-0 z-40 flex justify-center px-3 bottom-[var(--above-dock)]">
-          <div className="flex w-full max-w-md items-center gap-2 rounded-2xl border border-border bg-surface/95 p-2 pl-4 shadow-2xl backdrop-blur-xl">
+          <div className="flex w-full max-w-md items-center gap-2 rounded-2xl border border-border bg-card p-2 pl-4">
             <p className="min-w-0 flex-1 truncate text-sm font-semibold">{picked.size} selected</p>
             <Button size="sm" variant="ghost" onClick={() => setPicked(new Set())}>Clear</Button>
             <Button size="sm" onClick={() => { setSelecting(false); setPicked(new Set()); }}>Group…</Button>
@@ -189,8 +191,8 @@ function EntryPage({ at, pullUp }: At) {
       {sheet && (
         <Sheet title="Edit entry" subtitle={item.title} onClose={() => setSheet(false)}>
           <div className="space-y-3 p-5">
-            <label className="label" htmlFor="edit-title">Title</label>
-            <input id="edit-title" className="field h-control w-full" defaultValue={item.title} />
+            <Label htmlFor="edit-title">Title</Label>
+            <Input id="edit-title" defaultValue={item.title} />
             <Button className="w-full" onClick={() => setSheet(false)}>Save</Button>
           </div>
         </Sheet>
@@ -227,7 +229,7 @@ function Places({ at }: At) {
   );
 }
 
-/** The map page: the map fills the page, the switch floats, the chosen place in a card above the dock. */
+/** The map page: the map fills the page, the switch floats, the chosen place in a rounded-xl border border-border bg-card above the dock. */
 function PlacesMap({ at }: At) {
   // The chosen place is in the URL (?place=), so Back closes its card.
   const [placeId, setPlaceId] = useUrlState("place", "");

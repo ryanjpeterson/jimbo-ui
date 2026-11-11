@@ -109,16 +109,16 @@ function ServiceRow({ service: s }: { service: Service }) {
       <span title={status.label} aria-label={status.label} className={cn(STATUS_DOT, "mt-1.5", TONES[status.tone].dot)} />
       <span className="min-w-0 flex-1">
         <span className="block truncate text-15 font-semibold">{s.name}</span>
-        <span className="block text-sm text-text-muted">{s.what} · :{s.port}</span>
+        <span className="block text-sm text-muted-foreground">{s.what} · :{s.port}</span>
         <span className="mt-0.5 block truncate text-sm">
-          <span className={cn("font-semibold", s.via === "tunnel" ? "text-accent" : "text-text-subtle")}>{s.via === "tunnel" ? "Through the tunnel" : "Direct"}</span>
+          <span className={cn("font-semibold", s.via === "tunnel" ? "text-primary" : "text-subtle-foreground")}>{s.via === "tunnel" ? "Through the tunnel" : "Direct"}</span>
         </span>
-        <span className={cn("mt-0.5 block text-sm", down ? "text-highlight" : s.status === "slow" ? "text-text-muted" : "text-text-subtle")}>
+        <span className={cn("mt-0.5 block text-sm", down ? "text-highlight" : s.status === "slow" ? "text-muted-foreground" : "text-subtle-foreground")}>
           {down ? "Can't reach it." : `Answered in ${s.ms}ms`}
         </span>
         <span className="mt-2 flex items-center gap-2">
           <RecentChecks seen={s.seen} />
-          <span className="text-xs text-text-subtle">{s.uptime}%</span>
+          <span className="text-xs text-subtle-foreground">{s.uptime}%</span>
         </span>
       </span>
       <Button size="sm" variant="secondary" disabled={down}>Open</Button>

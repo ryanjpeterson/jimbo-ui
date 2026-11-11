@@ -90,7 +90,7 @@ const LOOK_SECONDS = 15;
 /**
  * The look control, top right. It sits in the page above the hero, so it
  * covers nothing, then sticks under the top bar as the page scrolls — on
- * phones as a full-width frosted strip, like the bar, so content slides
+ * phones as a full-width solid strip, like the bar, so content slides
  * under it rather than into it. Every 15 seconds the next look goes on the whole page as a
  * preview — nothing is saved until "Use". The arrows (buttons or ← → keys)
  * step by hand and pause the timer; play starts it again. The preview goes
@@ -174,23 +174,23 @@ function LookStepper() {
     setPlaying(false);
   };
   const s = i === null ? null : LOOKS[i]!;
-  const arrow = "flex h-11 w-11 shrink-0 items-center justify-center rounded-control text-text-muted transition-colors hover:bg-surface-2 hover:text-text-base";
+  const arrow = "flex h-11 w-11 shrink-0 items-center justify-center rounded-control text-muted-foreground transition-colors hover:bg-muted hover:text-foreground";
 
   return (
     // Same size stuck or not (only the strip's paint changes), so sticking never moves the page.
     <div ref={bar} className={cn(
       "sticky top-[calc(var(--safe-top)+3.5rem)] z-30 ml-[calc(50%-50vw)] flex w-screen justify-end border-b px-3 py-1.5 transition-colors",
       "sm:top-[calc(var(--safe-top)+4.75rem)] sm:ml-0 sm:w-auto sm:border-0 sm:p-0",
-      stuck ? "border-border bg-bg/90 backdrop-blur-md sm:bg-transparent sm:backdrop-blur-none" : "border-transparent",
+      stuck ? "border-border bg-background sm:bg-transparent" : "border-transparent",
     )}>
     <div role="group" aria-label="Looks"
-      className="glass flex max-w-full items-center gap-0.5 rounded-control p-0.5 shadow-lg">
+      className="border border-border bg-card flex max-w-full items-center gap-0.5 rounded-control p-0.5">
       <button ref={prevBtn} type="button" className={arrow} onClick={() => go(-1)} aria-label="Previous look">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
       </button>
       <div className="min-w-0 px-1 leading-tight" title={s ? `${FONTS[s.headings]?.label ?? s.headings} headings · ${FONTS[s.body]?.label ?? s.body} body · ${s.backdrop} on ${s.base} · ${s.motif}` : undefined}>
         <p className="max-w-[9rem] truncate text-sm font-semibold sm:max-w-[12rem]" aria-live="polite">{s ? s.name : "Your look"}</p>
-        <p className="text-xs tabular-nums text-text-subtle">
+        <p className="text-xs tabular-nums text-subtle-foreground">
           {s && <span className="capitalize">{s.tone} · </span>}
           {i !== null && `${i + 1}/${LOOKS.length} · `}{playing ? `next in ${left}s` : "paused"}
         </p>
@@ -205,7 +205,7 @@ function LookStepper() {
       </button>
       {s && (
         <button type="button" onClick={() => void useIt()} aria-label="Use this look"
-          className="h-11 shrink-0 rounded-control px-3 text-sm font-semibold text-accent transition-colors hover:bg-surface-2">
+          className="h-11 shrink-0 rounded-control px-3 text-sm font-semibold text-primary transition-colors hover:bg-muted">
           {applied ? "Using" : "Use"}
         </button>
       )}
@@ -221,8 +221,8 @@ export function HomeDemo() {
 
       <HeroSection pullUp={false} eyebrow={`jimbo.ui ${__JIMBO_VERSION__} · showcase`} title="One kit, any look" pattern="none"
         actions={<>
-          <button type="button" className="btn btn-primary" onClick={() => document.getElementById("kit")?.scrollIntoView({ behavior: "smooth" })}>See every component</button>
-          <Link to="/jimbo-ui" className="btn btn-secondary">Make a look</Link>
+          <Button onClick={() => document.getElementById("kit")?.scrollIntoView({ behavior: "smooth" })}>See every component</Button>
+          <Button asChild variant="secondary"><Link to="/jimbo-ui">Make a look</Link></Button>
         </>}>
         The same components in {ALL_FAMILIES.length} looks — each light, mid or dark — {Object.keys(FONTS).length} typefaces, {BACKDROPS.length - 1} backdrops
         and {MOTIFS.length} motifs. Ten of them take

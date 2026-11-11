@@ -32,7 +32,7 @@ function Md({ text }: { text: string }) {
     <>
       {text.split(/(`[^`]+`|\*\*[^*]+\*\*)/g).map((part, i) =>
         part.startsWith("`") ? <code key={i}>{part.slice(1, -1)}</code>
-        : part.startsWith("**") ? <strong key={i} className="font-semibold text-text-base">{part.slice(2, -2)}</strong>
+        : part.startsWith("**") ? <strong key={i} className="font-semibold text-foreground">{part.slice(2, -2)}</strong>
         : part)}
     </>
   );
@@ -44,9 +44,9 @@ function Rows<T>({ title, hint, rows, render }: { title: string; hint: string; r
   const shown = all ? rows : rows.slice(0, 5);
   return (
     <Section title={title} count={rows.length} flush>
-      <p className="px-4 pt-3 text-xs text-text-subtle">{hint}</p>
+      <p className="px-4 pt-3 text-xs text-subtle-foreground">{hint}</p>
       <div className="divide-y divide-border">
-        {shown.map((row, i) => <div key={i} className="px-4 py-3 text-sm leading-relaxed text-text-muted">{render(row)}</div>)}
+        {shown.map((row, i) => <div key={i} className="px-4 py-3 text-sm leading-relaxed text-muted-foreground">{render(row)}</div>)}
       </div>
       {rows.length > shown.length && (
         <button type="button" onClick={() => setAll(true)} className="link-action flex h-11 w-full items-center justify-center border-t border-border text-sm">
@@ -61,7 +61,7 @@ function Rows<T>({ title, hint, rows, render }: { title: string; hint: string; r
 const TYPE: Record<UpdateType, { tone: "red" | "accent" | "muted"; label: string }> = {
   breaking: { tone: "red", label: "Code changes" }, feature: { tone: "accent", label: "New" }, fix: { tone: "muted", label: "Fixes" }, first: { tone: "muted", label: "First" },
 };
-const Version = ({ v }: { v: string }) => <span className="mr-2 font-mono text-xs text-text-subtle">{v}</span>;
+const Version = ({ v }: { v: string }) => <span className="mr-2 font-mono text-xs text-subtle-foreground">{v}</span>;
 const item = ({ version, item }: { version: string; item: ReleaseItem }) => <><Version v={version} /><Md text={item.text} /></>;
 
 /**
@@ -79,9 +79,9 @@ export function JimboUpdates({ releases, current = JIMBO_UI.version, uses = JIMB
   const u = updatesFor(releases, current, uses);
   if (!u) {
     return (
-      <div className="card flex min-h-[56px] items-center justify-between gap-4 px-4 py-3">
+      <div className="rounded-xl border border-border bg-card flex min-h-[56px] items-center justify-between gap-4 px-4 py-3">
         <span className="text-15 font-semibold">Up to date</span>
-        <span className="text-sm text-text-muted">{current} is the latest release</span>
+        <span className="text-sm text-muted-foreground">{current} is the latest release</span>
       </div>
     );
   }
@@ -90,25 +90,25 @@ export function JimboUpdates({ releases, current = JIMBO_UI.version, uses = JIMB
   };
   return (
     <div className="space-y-6">
-      <div className="card space-y-4 p-5">
+      <div className="rounded-xl border border-border bg-card space-y-4 p-5">
         <div className="flex flex-wrap items-center gap-2">
           <Badge tone="yellow" dot>Update available</Badge>
-          <span className="text-sm text-text-muted">
+          <span className="text-sm text-muted-foreground">
             {u.newer.length === 1 ? "1 release" : `${u.newer.length} releases`} behind · {u.breaking ? "needs code changes" : "drop-in"}
           </span>
         </div>
         <p className="font-display text-2xl leading-tight">jimbo-ui {u.latest} is out</p>
-        <p className="text-sm text-text-muted">
+        <p className="text-sm text-muted-foreground">
           This app is on {current}. Updating is a change to the app's code: ask for it in the app's Claude session with
-          {" "}<q className="text-text-base">{UPDATE_REQUEST}</q>
+          {" "}<q className="text-foreground">{UPDATE_REQUEST}</q>
         </p>
         <div className="flex flex-wrap gap-2">
           <Button size="sm" onClick={() => void copy()}>{copied ? "Copied" : "Copy the request"}</Button>
-          <a href={JIMBO_UI.changelog} target="_blank" rel="noreferrer" className="btn btn-secondary btn-sm">Full changelog</a>
+          <Button asChild size="sm" variant="secondary"><a href={JIMBO_UI.changelog} target="_blank" rel="noreferrer">Full changelog</a></Button>
         </div>
         <ul className="space-y-2 border-t border-border pt-4">
           {u.newer.map((r) => (
-            <li key={r.version} className="text-sm text-text-muted">
+            <li key={r.version} className="text-sm text-muted-foreground">
               <Version v={r.version} />
               {r.type && <Badge tone={TYPE[r.type].tone} className="mr-2 align-middle">{TYPE[r.type].label}</Badge>}
               <Md text={r.summary || "Fixes and small changes."} />

@@ -13,6 +13,7 @@
  * bar floats over every tab.
  */
 
+import { Button } from "@/components/ui/button";
 import { useState, type ReactNode } from "react";
 import { Navigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
@@ -84,7 +85,7 @@ function BrandPanel({ d }: { d: ThemeDraft }) {
           <h2 className="h-section">Name</h2>
           <p className="meta mt-1">The brand is the app's name as header text; a dot takes the accent. Set in <code>brand.config.ts</code>.</p>
         </div>
-        <div className="card space-y-4 p-5">
+        <div className="rounded-xl border border-border bg-card space-y-4 p-5">
           {(["sm", "md", "lg"] as const).map((s) => <div key={s}><HeaderTitle size={s} /></div>)}
           <p className="meta">{BRAND.name}</p>
         </div>
@@ -111,16 +112,16 @@ function AboutPanel() {
   return (
     <div className="space-y-4">
       <JimboUpdates releases={releases} />
-      <div className="card divide-y divide-border">
+      <div className="rounded-xl border border-border bg-card divide-y divide-border">
         {rows.map(([k, v]) => (
           <p key={k} className="flex min-h-[56px] items-center justify-between gap-4 px-4 py-3">
-            <span className="text-15 font-semibold">{k}</span><span className="text-right text-sm text-text-muted">{v}</span>
+            <span className="text-15 font-semibold">{k}</span><span className="text-right text-sm text-muted-foreground">{v}</span>
           </p>
         ))}
       </div>
-      <a href={JIMBO_UI.showcase} target="_blank" rel="noreferrer" className="card flex items-center justify-between gap-3 p-4 hover:border-accent">
+      <a href={JIMBO_UI.showcase} target="_blank" rel="noreferrer" className="rounded-xl border border-border bg-card flex items-center justify-between gap-3 p-4 hover:border-primary">
         <span><span className="eyebrow block">Showcase</span><span className="mt-0.5 block text-15 font-semibold">See this release in action</span></span>
-        <span className="text-text-subtle">›</span>
+        <span className="text-subtle-foreground">›</span>
       </a>
     </div>
   );
@@ -151,19 +152,21 @@ function FaviconUpload({ faviconUrl, onChange }: { faviconUrl: string | null; on
         <h2 className="h-section">Favicon</h2>
         <p className="meta mt-1">The built-in one is your motif in the accent, on your page colour. Upload an SVG, PNG or WebP under 1 MB to replace it.</p>
       </div>
-      <div className="card flex items-center gap-4 p-4 sm:p-5">
-        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl border border-border bg-surface-2">
+      <div className="rounded-xl border border-border bg-card flex items-center gap-4 p-4 sm:p-5">
+        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl border border-border bg-muted">
           <img src={faviconUrl ?? (document.querySelector<HTMLLinkElement>('link[rel="icon"]')?.href ?? "/favicon.svg")} alt="" className="h-10 w-10" />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-xs text-text-subtle">{faviconUrl ? "Custom upload" : "Built-in — your motif in the accent"}</p>
+          <p className="text-xs text-subtle-foreground">{faviconUrl ? "Custom upload" : "Built-in — your motif in the accent"}</p>
           <div className="mt-2 flex flex-wrap gap-2">
-            <label className={`btn btn-sm btn-secondary cursor-pointer ${busy ? "pointer-events-none opacity-50" : ""}`}>
-              {busy ? "Uploading…" : faviconUrl ? "Replace" : "Upload"}
-              <input type="file" accept="image/svg+xml,image/png,image/webp,image/jpeg" className="sr-only"
-                onChange={(e) => { void upload(e.target.files?.[0]); e.target.value = ""; }} />
-            </label>
-            {faviconUrl && <button onClick={() => void remove()} className="btn btn-sm btn-ghost">Use built-in</button>}
+            <Button asChild size="sm" variant="secondary" className={busy ? "pointer-events-none opacity-50" : undefined}>
+              <label className="cursor-pointer">
+                {busy ? "Uploading…" : faviconUrl ? "Replace" : "Upload"}
+                <input type="file" accept="image/svg+xml,image/png,image/webp,image/jpeg" className="sr-only"
+                  onChange={(e) => { void upload(e.target.files?.[0]); e.target.value = ""; }} />
+              </label>
+            </Button>
+            {faviconUrl && <Button size="sm" variant="ghost" onClick={() => void remove()}>Use built-in</Button>}
           </div>
           {error && <p className="mt-2 text-sm text-highlight">{error}</p>}
         </div>

@@ -29,20 +29,27 @@ repos only, never code), so the scan skips it.
 
 | Path | What | Rule |
 | --- | --- | --- |
-| `foundation/` | Theme engine, templates, `globals.css` (with the Tailwind 4 theme), `Button`, `ColorPicker`, `cn`, gestures | Copied verbatim into apps on every update — never holds app values |
+| `foundation/` | Theme engine, templates, `globals.css` (the Tailwind 4 theme and the one token mapping onto shadcn's variables), the shadcn/ui primitives in `src/components/ui/` (with jimbo's edits), `ColorPicker`, `cn`, gestures | Copied verbatim into apps on every update — never holds app values, never edited in apps |
 | `starter/` | `brand.config.ts`, `tokens.css`, `favicon.svg` | Copied once into a new app, then app-owned |
-| `reference/` | Generic kit (`kit.tsx` plus `forms`, `overlays`, `feedback`, `data`), `AppShell`, `HeaderTitle`, `MapView`, the jimbo-ui config section (`JimboConfigPage` + `routes/config/`), the archetypes (`archetypes/catalogue.tsx`, `dashboard.tsx`, `status.tsx`), `useBrand`, `index.html` | Apps adapt and extend them |
+| `reference/` | Generic kit composed from the primitives (`kit.tsx` plus `forms`, `overlays`, `feedback`, `data`), `AppShell`, `HeaderTitle`, `MapView`, the jimbo-ui config section (`JimboConfigPage` + `routes/config/`), the archetypes (`archetypes/catalogue.tsx`, `dashboard.tsx`, `status.tsx`), `useBrand`, `index.html` | Apps adapt wiring only (J3); new things come by PR (J4) |
 | `registry/` | `apps.json` (the apps: name, repo, registered) and `components.json` (jimbo-ui's catalogue: shared components and generic candidates) | An app's details live only in its own `jimbo-ui.json`; `scripts/inventory.mjs` puts them together |
-| `showcase/` | Demo app assembled from reference → foundation → starter → `showcase/overrides/` | Published as a private page each release |
-| `scripts/` | `inventory.mjs` (registry report), `tokens.mjs` (an app's `tokens.css`), `contrast.mjs` (template contrast report), `versions.mjs` (versions agree), `releases.mjs` (`releases.json` from the changelog), `build-zip.sh` (claude.ai upload) | |
+| `showcase/` | Demo app assembled from reference → foundation → starter → `showcase/overrides/`; holds shadcn's `components.json` (never shipped) | Published as a private page each release |
+| `scripts/` | `inventory.mjs` (registry report), `tokens.mjs` (an app's `tokens.css`), `contrast.mjs` (template contrast report), `versions.mjs` (versions agree), `releases.mjs` (`releases.json` from the changelog), `build-zip.sh` (claude.ai upload), `shadcn-add.mjs` (add a primitive to foundation), `migrate-0.18.mjs` (apps' codemod for the shadcn update) | |
 | `hooks/` | `hooks.json` + `check-version.mjs`: tells an app's session when it's behind the installed release | |
 | `skills/jimbo-ui/` | `rulebook.md` (every rule, numbered — it decides), `SKILL.md` (core rules + workflows), `guide.md` (each rule explained) | New rules go in the rulebook first, next number in their group |
 | `.claude-plugin/` | `plugin.json` and `marketplace.json` | Versions must match |
 
+jimbo.ui is binding for apps: they use its shadcn components and tokens
+only, never restyle them, and get anything new by PR to this repo (rules
+J1–J6, guide section 14). Every app has the jimbo-ui config page.
+
 Brand decisions so far: two to four source colours (accent and background
 always; highlight and support set or inferred), each with lighter and darker
-shades; coloured shapes flat with a slight outline (no gloss or glows), depth
-from layers (lightly frosted solid surfaces, borders, the backdrop); circles
+shades; coloured shapes flat (no gloss or glows); built on shadcn/ui (Radix,
+Tailwind 4) with one token mapping (the theme's accent is `primary`);
+flat and modern — solid surfaces, hairline borders, no shadows or blur on
+components (overlays get one `shadow-md`), depth from surface steps and the
+backdrop; circles
 always flat, side by side, at fixed sizes — no orbs; softly rounded corners, not pills; sans, mono or serif type
 for headings and body;
 circles of the theme colours as a motif (or another flat shape the theme

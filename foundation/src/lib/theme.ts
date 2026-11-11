@@ -20,9 +20,10 @@
  * `-size` (an em multiple every text size follows: headings and body each ±);
  * and tune colour vibrancy and layer contrast with two sliders.
  *
- * Tokens are CSS variables holding "R G B" channels, so Tailwind classes keep
- * their opacity modifiers (`bg-accent/15`). The defaults live in
- * globals.css too, so the app looks right before any script runs; index.html
+ * Tokens are CSS variables holding "R G B" channels (--c-bg, --c-accent…).
+ * globals.css maps them once onto shadcn's variable names (--background,
+ * --primary…), which every class uses (`bg-primary/15`). The defaults live
+ * in tokens.css, so the app looks right before any script runs; index.html
  * applies the last-used theme from localStorage before first paint.
  *
  * Part of jimbo-ui (foundation — don't edit here; change jimbo-ui and update).
@@ -389,9 +390,11 @@ export const isHex = (v: string): boolean => /^#[0-9a-f]{6}$/i.test(v);
 
 /**
  * Contrast targets (WCAG ratios) the derived colours are stepped to meet on
- * every background, measured on cards — the surface most text sits on.
+ * every background. Layers are measured on cards; muted and subtle text on
+ * fields (surface-2) — the weakest surface text sits on — so they hold on
+ * the page, cards, fields, chips and secondary buttons alike.
  */
-export const CONTRAST_TARGETS = { card: 1.2, card2: 1.15, border: 1.8, muted: 5, subtle: 3.8 } as const;
+export const CONTRAST_TARGETS = { card: 1.2, card2: 1.15, border: 1.8, muted: 5.8, subtle: 4.7 } as const;
 
 /** Smallest t in [min, max] where mix(from, to, t) reaches `target` contrast with `against` (it grows with t). */
 function stepTo(from: RGB, to: RGB, against: RGB, target: number, min: number, max: number): number {
@@ -628,9 +631,10 @@ export function deriveColors(input: Theme): Record<string, RGB> {
     "surface-2": surface2,
     border,
     text,
-    // Secondary text fades toward the page only as far as it stays readable on cards.
-    "text-muted": mix(text, bg, fadeTo(text, bg, surface, T.muted, 0.4)),
-    "text-subtle": mix(text, bg, fadeTo(text, bg, surface, T.subtle, 0.6)),
+    // Secondary text fades toward the page only as far as it stays readable on fields
+    // (surface-2, the weakest surface text sits on), so it holds on cards and the page too.
+    "text-muted": mix(text, bg, fadeTo(text, bg, surface2, T.muted, 0.4)),
+    "text-subtle": mix(text, bg, fadeTo(text, bg, surface2, T.subtle, 0.6)),
     ...family("accent", hexToRgb(theme.accent)),
     ...family("highlight", hexToRgb(theme.highlight)),
     ...family("support", hexToRgb(theme.support)),
@@ -640,6 +644,65 @@ export function deriveColors(input: Theme): Record<string, RGB> {
 /** The same colours as hex strings — for canvas, maps and other non-CSS uses. */
 export function themeHex(theme: Theme): Record<string, string> {
   return Object.fromEntries(Object.entries(deriveColors(theme)).map(([k, v]) => [k, rgbToHex(v)]));
+}
+
+/** CSS saturate(s) on one colour (the hero blur layer is saturate-150). */
+function saturated([r, g, b]: RGB, s = 1.5): RGB {
+  const c = (v: number) => Math.max(0, Math.min(255, v));
+  return [
+    c((0.213 + 0.787 * s) * r + (0.715 - 0.715 * s) * g + (0.072 - 0.072 * s) * b),
+    c((0.213 - 0.213 * s) * r + (0.715 + 0.285 * s) * g + (0.072 - 0.072 * s) * b),
+    c((0.213 - 0.213 * s) * r + (0.715 - 0.715 * s) * g + (0.072 + 0.928 * s) * b),
+  ];
+}
+
+/** What hero text must reach on whatever is behind it: the title, its lines and eyebrow, and the eyebrow's colour on a blur. */
+export const HERO_TARGETS = { title: 7, line: 4.5 } as const;
+
+/**
+ * The worst pixels a hero's text can land on. A picture (Hero, Banner) can
+ * be anything, so pure white and pure black; the theme's own blur
+ * (HeroSection, PageHeader) at most a strong wash of a brand colour, after
+ * the layer's saturate-150, on the page.
+ */
+function heroWorst(theme: Theme, kind: "image" | "blur"): RGB[] {
+  if (kind === "image") return [WHITE, BLACK];
+  const c = deriveColors(theme);
+  return (["accent", "highlight", "support"] as const).map((k) => mix(c.bg!, saturated(c[k]!), 0.6));
+}
+
+/**
+ * How much of the page colour covers a hero's picture or blur (0–1) so its
+ * text reads on any of it: the least that keeps the title ≥ 7:1 and the
+ * eyebrow and lines (muted, and support on a blur) ≥ 4.5:1 over the worst
+ * pixels (heroWorst). Set as --hero-scrim-image / --hero-scrim-blur.
+ */
+export function heroScrims(theme: Theme): { image: number; blur: number } {
+  const c = deriveColors(theme);
+  const solve = (kind: "image" | "blur") => {
+    const worst = heroWorst(theme, kind);
+    const inks: [RGB, number][] = [[c.text!, HERO_TARGETS.title], [c["text-muted"]!, HERO_TARGETS.line], ...(kind === "blur" ? [[c.support!, HERO_TARGETS.line] as [RGB, number]] : [])];
+    // A little over target, so the colours' rounding to whole channels never drops one under.
+    const ok = (a: number) => worst.every((p) => inks.every(([ink, t]) => contrast(ink, mix(p, c.bg!, a)) >= t * 1.02));
+    if (ok(0.2)) return 0.2;
+    let lo = 0.2, hi = 1;
+    for (let i = 0; i < 20; i++) { const a = (lo + hi) / 2; if (ok(a)) hi = a; else lo = a; }
+    return Math.ceil(hi * 100) / 100;
+  };
+  return { image: solve("image"), blur: solve("blur") };
+}
+
+/** The lowest contrast hero text gets over its scrim, as a share of its target (1 = exactly on target). */
+export function heroScore(theme: Theme): number {
+  const c = deriveColors(theme);
+  const sc = heroScrims(theme);
+  let worst = Infinity;
+  for (const kind of ["image", "blur"] as const) {
+    const backs = heroWorst(theme, kind).map((p) => mix(p, c.bg!, sc[kind]));
+    const inks: [RGB, number][] = [[c.text!, HERO_TARGETS.title], [c["text-muted"]!, HERO_TARGETS.line], ...(kind === "blur" ? [[c.support!, HERO_TARGETS.line] as [RGB, number]] : [])];
+    for (const p of backs) for (const [ink, t] of inks) worst = Math.min(worst, contrast(ink, p) / t);
+  }
+  return worst;
 }
 
 /** A Google Maps style rule (the shape of google.maps.MapTypeStyle, without needing its types). */
@@ -1666,6 +1729,8 @@ export function tokensCss(theme: Theme): string {
   if (f.bodyTracking !== 0) lines.push(`  --font-body-tracking: ${f.bodyTracking}em;`);
   if (f.headingsSize !== 1) lines.push(`  --font-display-size: ${f.headingsSize};`);
   if (f.bodySize !== 1) lines.push(`  --font-body-size: ${f.bodySize};`);
+  const scrim = heroScrims(theme);
+  lines.push(`  --hero-scrim-image: ${scrim.image};`, `  --hero-scrim-blur: ${scrim.blur};`);
   if (motifMask(theme) !== "none") lines.push(`  --motif-mask: ${motifMask(theme)};`, "  --motif-radius: 0px;");
   return [
     `/* This app's default theme tokens ("R G B" channels), so the page looks right`,
@@ -1757,6 +1822,9 @@ export function themeVars(theme: Theme): Record<string, string> {
   vars["--bg-position"] = bd.position;
   vars["--bg-repeat"] = bd.repeat;
   vars["--bg-animation"] = backdropAnimation(theme);
+  const scrim = heroScrims(theme);
+  vars["--hero-scrim-image"] = String(scrim.image);
+  vars["--hero-scrim-blur"] = String(scrim.blur);
   vars["--motif-mask"] = motifMask(theme);
   vars["--motif-radius"] = motifMask(theme) === "none" ? "9999px" : "0px";
   return vars;
@@ -1875,11 +1943,14 @@ export function toneOf(theme: Theme): PageTone {
 }
 
 /** The readability targets every template meets (scripts/contrast.mjs): the names of any it misses. */
-export const TEMPLATE_TARGETS = { text: 7, muted: 4.5, subtle: 3.5, border: 1.75, card: 1.19, accent: 3.5, highlight: 3.5, support: 4.5, button: 4.5, apart: 15 } as const;
+export const TEMPLATE_TARGETS = { text: 7, muted: 5.5, subtle: 4.5, hero: 1, border: 1.75, card: 1.19, accent: 3.5, highlight: 3.5, support: 4.5, button: 4.5, apart: 15 } as const;
 export function templateScores(theme: Theme): Record<keyof typeof TEMPLATE_TARGETS, number> {
   const c = themeHex(theme);
   return {
-    text: contrast(c.text!, c.surface!), muted: contrast(c["text-muted"]!, c.surface!), subtle: contrast(c["text-subtle"]!, c.surface!),
+    // Text on the weakest surface it sits on: fields, chips and secondary buttons (surface-2).
+    text: contrast(c.text!, c["surface-2"]!), muted: contrast(c["text-muted"]!, c["surface-2"]!), subtle: contrast(c["text-subtle"]!, c["surface-2"]!),
+    // Hero text over its scrim (share of HERO_TARGETS). Floating controls are solid cards (S6), so the text targets cover them.
+    hero: heroScore(theme),
     border: contrast(c.border!, c.surface!), card: contrast(c.surface!, c.bg!),
     accent: contrast(c.accent!, c.bg!), highlight: contrast(c.highlight!, c.bg!), support: contrast(c.support!, c.surface!),
     button: contrast(c["on-accent"]!, c.accent!),

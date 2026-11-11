@@ -48,7 +48,7 @@ export function MapView({ pins, selected, onSelect, size = "full", apiKey = KEY,
   const brand = useBrand();
   const theme = override ?? brand.theme;
   const { center, zoom } = frame(pins);
-  const box = cn("relative overflow-hidden rounded-xl border border-border bg-bg", size === "fill" && "rounded-none border-0", className);
+  const box = cn("relative overflow-hidden rounded-xl border border-border bg-background", size === "fill" && "rounded-none border-0", className);
 
   if (!apiKey) return <MapPreview theme={theme} pins={pins} selected={selected} onSelect={onSelect} className={box} height={HEIGHT[size]} />;
 
@@ -78,10 +78,10 @@ function MapPreview({ theme, pins, selected, onSelect, className, height }: {
   return (
     <div className={className} style={{ height }}>
       <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 h-full w-full" aria-hidden="true">
-        <path d="M-5 78 C 20 70, 30 92, 55 84 S 90 70, 105 76 L105 105 L-5 105 Z" className="fill-accent/10" />
-        {[18, 41, 63].map((v) => <line key={`h${v}`} x1="-5" x2="105" y1={v} y2={v + 6} className="stroke-accent/25" strokeWidth="1" vectorEffect="non-scaling-stroke" />)}
-        {[22, 47, 74].map((v) => <line key={`v${v}`} y1="-5" y2="105" x1={v} x2={v - 5} className="stroke-accent/25" strokeWidth="1" vectorEffect="non-scaling-stroke" />)}
-        <path d="M-5 30 Q 40 22, 105 48" fill="none" className="stroke-accent/35" strokeWidth="3" vectorEffect="non-scaling-stroke" />
+        <path d="M-5 78 C 20 70, 30 92, 55 84 S 90 70, 105 76 L105 105 L-5 105 Z" className="fill-primary/10" />
+        {[18, 41, 63].map((v) => <line key={`h${v}`} x1="-5" x2="105" y1={v} y2={v + 6} className="stroke-primary/25" strokeWidth="1" vectorEffect="non-scaling-stroke" />)}
+        {[22, 47, 74].map((v) => <line key={`v${v}`} y1="-5" y2="105" x1={v} x2={v - 5} className="stroke-primary/25" strokeWidth="1" vectorEffect="non-scaling-stroke" />)}
+        <path d="M-5 30 Q 40 22, 105 48" fill="none" className="stroke-primary/35" strokeWidth="3" vectorEffect="non-scaling-stroke" />
       </svg>
       {pins.map((p) => {
         const on = p.id === selected;
@@ -104,14 +104,14 @@ function MapPreview({ theme, pins, selected, onSelect, className, height }: {
 export function MapPinCard({ title, sub, onClose, children }: { title: string; sub?: ReactNode; onClose: () => void; children?: ReactNode }) {
   return (
     <div className="absolute inset-x-4 bottom-[calc(6rem+var(--safe-bottom))] z-10 sm:inset-x-auto sm:bottom-4 sm:right-4 sm:w-80">
-      <div className="card p-4 shadow-2xl">
+      <div className="rounded-xl border border-border bg-card p-4">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
             <p className="truncate font-display text-xl">{title}</p>
             {sub && <p className="meta mt-0.5">{sub}</p>}
           </div>
           <button type="button" onClick={onClose} aria-label="Close"
-            className="-mr-2 -mt-2 flex h-11 w-11 items-center justify-center rounded-control text-text-subtle hover:text-text-base">✕</button>
+            className="-mr-2 -mt-2 flex h-11 w-11 items-center justify-center rounded-control text-subtle-foreground hover:text-foreground">✕</button>
         </div>
         {children && <div className="mt-3">{children}</div>}
       </div>

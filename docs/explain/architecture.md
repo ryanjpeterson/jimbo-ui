@@ -3,7 +3,7 @@
 ## Shape
 
     jimbo-ui repo
-      foundation/ ──copy verbatim──► app
+      foundation/ ──copy verbatim──► app   (engine, token mapping, shadcn primitives)
       starter/    ──copy once──────► app
       reference/  ──adapt──────────► app
       skills/jimbo-ui (rulebook, guide, SKILL.md) ──► Claude Code sessions in apps
@@ -14,7 +14,7 @@
 
 ## Data flow
 
-1. A pattern is tried in an app, brought back generic, added to the rulebook, guide and kit.
+1. An app needs something jimbo.ui lacks: a PR to this repo proposes it generic (rulebook, guide, kit or primitive); the app keeps a tracked pending version meanwhile.
 2. Release: CHANGELOG with Apps must, versions bumped, `releases.json` regenerated, tag.
 3. Apps hear about it at session start and update in their own sessions; `jimbo-ui.json` records version and components.
 

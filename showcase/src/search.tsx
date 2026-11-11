@@ -64,9 +64,9 @@ function LookPreview({ f }: { f: TemplateFamily }) {
         <p className="meta mt-1">{f.vibe}</p>
       </div>
       <ThemeDots size={12} />
-      <div className="card space-y-2 p-4">
-        <p className="text-15 font-semibold text-text-base">A card in this look</p>
-        <p className="text-sm text-text-muted">Comes in {familyTones(f).join(", ")}.</p>
+      <div className="rounded-xl border border-border bg-card space-y-2 p-4">
+        <p className="text-15 font-semibold text-foreground">A rounded-xl border border-border bg-card in this look</p>
+        <p className="text-sm text-muted-foreground">Comes in {familyTones(f).join(", ")}.</p>
       </div>
       <Button size="sm" className="self-start" tabIndex={-1}>Primary</Button>
     </ThemeScope>
@@ -77,8 +77,8 @@ function BackdropPreview({ pattern, label, hint }: { pattern: BackdropPattern; l
   const { theme } = useBrand();
   return (
     <ThemeScope theme={{ ...theme, backdrop: { ...theme.backdrop, pattern } }} className="flex h-full flex-col justify-end p-5">
-      <div className="card-glass p-4">
-        <p className="text-15 font-semibold text-text-base">{label}</p>
+      <div className="rounded-xl border border-border bg-card p-4">
+        <p className="text-15 font-semibold text-foreground">{label}</p>
         <p className="meta mt-1">{hint}</p>
       </div>
     </ThemeScope>

@@ -4,7 +4,7 @@
  * (`useThemeDraft`) and one save bar (`ThemeSaveBar`).
  *
  * Looks: pick a look from the categories — Everyday (dark, mid, light), Holidays, Countries, Provinces,
- * Games (series and console tabs) and Sports (league and city tabs) — or search them all (each card is
+ * Games (series and console tabs) and Sports (league and city tabs) — or search them all (each rounded-xl border border-border bg-card is
  * a miniature of the app in that theme, with its colours as circles), then fine-tune the
  * colours with the inline picker (Colours). Accent and background are always set; highlight and
  * support can be left to the engine, which infers them from the others. Backdrop: a pattern behind
@@ -16,6 +16,8 @@
  */
 
 import { Fragment, useEffect, useRef, useState, type ReactNode } from "react";
+import { Card } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
 import { api } from "@/lib/api";
@@ -52,7 +54,7 @@ function ThemeCard({ name, vibe, theme: input, style, selected, onPick }: { name
   const bd = style?.backdrop ? backdropCss({ ...input, backdrop: style.backdrop }) : null;
   return (
     <button type="button" onClick={onPick} aria-pressed={selected}
-      className={`group block w-full overflow-hidden rounded-2xl text-left transition-transform active:scale-[0.97] focus:outline-hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-text-base ${selected ? "ring-[3px] ring-offset-2 ring-offset-bg" : "ring-1 ring-border hover:ring-text-subtle"}`}
+      className={`group block w-full overflow-hidden rounded-2xl text-left transition-transform active:scale-[0.97] focus:outline-hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-foreground ${selected ? "ring-[3px] ring-offset-2 ring-offset-background" : "ring-1 ring-border hover:ring-subtle-foreground"}`}
       style={selected ? { ["--tw-ring-color" as string]: theme.accent } : undefined}>
       <div className="space-y-2.5 p-3" style={{ backgroundColor: theme.background, color: c.text,
         ...(bd ? { backgroundImage: bd.image, backgroundSize: bd.size, backgroundPosition: bd.position, backgroundRepeat: bd.repeat } : {}) }}>
@@ -83,18 +85,18 @@ function ThemeCard({ name, vibe, theme: input, style, selected, onPick }: { name
           <span className="rounded-md px-2.5 py-1 text-9 font-bold" style={{ background: c["surface-2"], color: c.text }}>Cancel</span>
         </div>
       </div>
-      <div className="space-y-1.5 border-t border-border bg-surface px-3 py-2">
+      <div className="space-y-1.5 border-t border-border bg-card px-3 py-2">
         {/* Every colour the theme uses, as flat circles side by side; inferred ones faded. */}
         <span className="flex items-center gap-1" aria-label={`Colours: ${(["accent", "highlight", "support", "background"] as const).map((k) => theme[k]).join(", ")}`}>
           {(["accent", "highlight", "support"] as const).map((k) => (
             <span key={k} title={input[k] ? k : `${k} (inferred)`} className="h-4 w-4 rounded-full" style={dot(c, k, !input[k])} />
           ))}
           <span title="background" className="h-4 w-4 rounded-full border border-border" style={{ background: theme.background }} />
-          {selected && <span className="ml-auto text-xs font-bold text-accent">✓</span>}
+          {selected && <span className="ml-auto text-xs font-bold text-primary">✓</span>}
         </span>
         <span className="block min-w-0">
           <span className="block truncate text-sm font-semibold">{name}</span>
-          <span className="block truncate text-11 text-text-subtle">{vibe}</span>
+          <span className="block truncate text-11 text-subtle-foreground">{vibe}</span>
         </span>
       </div>
     </button>
@@ -241,7 +243,7 @@ export function LooksPanel({ d }: { d: ThemeDraft }) {
             <PillTabs value={set} onChange={(v) => setUrlParams(setParams, { set: v === home.set ? null : v, group: null })}
               options={FAMILY_SETS.map((s) => ({ value: s.label, label: s.label }))} />
             {current.tabs && (
-              <div className="rounded-xl border border-border bg-surface-2/60 p-2">
+              <div className="rounded-xl border border-border bg-muted p-2">
                 <PillTabs value={group!.label} onChange={setSubTab} options={current.groups.map((g) => ({ value: g.label, label: g.label }))} />
               </div>
             )}
@@ -275,13 +277,13 @@ export function ColoursPanel({ d }: { d: ThemeDraft }) {
   return (
     <section className="space-y-3">
       <Intro title="Colours">Pick a colour to change, then drag. Two is enough: set the accent and background, and the rest is inferred.</Intro>
-      <div className="card space-y-5 p-4 sm:p-5">
+      <div className="rounded-xl border border-border bg-card space-y-5 p-4 sm:p-5">
         <div className="grid grid-cols-4 gap-2" role="tablist">
           {FIELDS.map((f) => {
             const active = f.key === editing;
             return (
               <button key={f.key} type="button" role="tab" aria-selected={active} onClick={() => setEditing(f.key)}
-                className={`flex min-w-0 flex-col items-center gap-1.5 rounded-2xl border p-2 transition-colors ${active ? "border-text-base bg-surface-2" : "border-border hover:border-text-subtle"}`}>
+                className={`flex min-w-0 flex-col items-center gap-1.5 rounded-2xl border p-2 transition-colors ${active ? "border-foreground bg-muted" : "border-border hover:border-subtle-foreground"}`}>
                 <span className={`h-10 w-10 rounded-full sm:h-12 sm:w-12 ${f.key === "background" ? "border border-border" : ""}`}
                   style={f.key === "background" ? { background: shown.background } : dot(hex, f.key, !draft[f.key])} />
                 <span className="max-w-full truncate text-xs font-semibold">
@@ -292,7 +294,7 @@ export function ColoursPanel({ d }: { d: ThemeDraft }) {
           })}
         </div>
         <div className="flex items-start justify-between gap-3">
-          <p className="text-sm text-text-muted">{field.hint}</p>
+          <p className="text-sm text-muted-foreground">{field.hint}</p>
           {optional && (
             <button type="button" role="switch" aria-checked={inferred}
               onClick={() => setDraft((d) => (inferred ? { ...d, [editing]: shown[editing] } : ownColours({ ...d, [editing]: undefined })))}
@@ -303,7 +305,7 @@ export function ColoursPanel({ d }: { d: ThemeDraft }) {
         </div>
         {(!draft.highlight || !draft.support) && (
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <p className="text-sm text-text-muted">Inferred colours</p>
+            <p className="text-sm text-muted-foreground">Inferred colours</p>
             <Tabs value={draft.infer ?? "contrast"} onChange={(v) => setDraft((d) => ownColours({ ...d, infer: v }))}
               options={[{ value: "contrast", label: "Contrasting" }, { value: "tonal", label: "Tonal" }]} />
           </div>
@@ -338,7 +340,7 @@ export function BackdropPanel({ d }: { d: ThemeDraft }) {
   return (
     <section className="space-y-3">
       <Intro title="Backdrop">A pattern behind every page — abstract, geometric, vintage or a texture — in your colours. Cards stay solid on top, so text stays readable.</Intro>
-      <div className="card space-y-4 p-4 sm:p-5">
+      <div className="rounded-xl border border-border bg-card space-y-4 p-4 sm:p-5">
         <PillTabs value={bdGroup} onChange={setBdGroup} options={BACKDROP_GROUPS.map((g) => ({ value: g, label: g }))} />
         <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Backdrop pattern">
           {BACKDROPS.filter((b) => b.group === null || b.group === bdGroup).map((b) => {
@@ -347,15 +349,15 @@ export function BackdropPanel({ d }: { d: ThemeDraft }) {
             return (
               <button key={b.key} type="button" role="radio" aria-checked={active} title={b.hint}
                 onClick={() => setBackdrop({ pattern: b.key })}
-                className={`overflow-hidden rounded-xl border text-left transition-colors ${active ? "border-accent ring-1 ring-accent" : "border-border hover:border-text-subtle"}`}>
+                className={`overflow-hidden rounded-xl border text-left transition-colors ${active ? "border-primary ring-1 ring-primary" : "border-border hover:border-subtle-foreground"}`}>
                 <span className="block h-16" style={{ backgroundColor: shown.background, backgroundImage: look.image, backgroundSize: look.size, backgroundPosition: look.position, backgroundRepeat: look.repeat }} />
-                <span className={`block truncate border-t border-border bg-surface px-2 py-1.5 text-11 font-semibold ${active ? "text-accent" : "text-text-muted"}`}>{b.label}</span>
+                <span className={`block truncate border-t border-border bg-card px-2 py-1.5 text-11 font-semibold ${active ? "text-primary" : "text-muted-foreground"}`}>{b.label}</span>
               </button>
             );
           })}
         </div>
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className="text-sm text-text-muted">Base</p>
+          <p className="text-sm text-muted-foreground">Base</p>
           <Tabs value={shown.backdrop.base!} onChange={(v) => setBackdrop({ base: v })}
             options={BACKDROP_BASES.map((v) => ({ value: v, label: { solid: "Solid", gradient: "Gradient", glow: "Glow" }[v] }))} />
         </div>
@@ -371,19 +373,19 @@ export function BackdropPanel({ d }: { d: ThemeDraft }) {
         </div>
         {/* Motion: the backdrop moves slowly behind the page; devices set to reduce motion keep it still. */}
         <div className="space-y-2 border-t border-border pt-4">
-          <p className="text-sm text-text-muted">Motion</p>
+          <p className="text-sm text-muted-foreground">Motion</p>
           <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Backdrop motion">
             {BACKDROP_MOTIONS.map((m) => {
               const active = shown.backdrop.motion === m.key;
               return (
                 <button key={m.key} type="button" role="radio" aria-checked={active} title={m.hint} onClick={() => setBackdrop({ motion: m.key })}
-                  className={`h-11 rounded-control border text-sm font-semibold transition-colors ${active ? "lit-accent border-transparent" : "glass text-text-muted hover:text-text-base"}`}>
+                  className={`h-11 rounded-control border text-sm font-semibold transition-colors ${active ? "bg-primary text-primary-foreground border-transparent" : "border border-border bg-card text-muted-foreground hover:text-foreground"}`}>
                   {m.label}
                 </button>
               );
             })}
           </div>
-          <p className="text-xs text-text-subtle">{BACKDROP_MOTIONS.find((m) => m.key === shown.backdrop.motion)?.hint}. Off on devices set to reduce motion.</p>
+          <p className="text-xs text-subtle-foreground">{BACKDROP_MOTIONS.find((m) => m.key === shown.backdrop.motion)?.hint}. Off on devices set to reduce motion.</p>
           {shown.backdrop.motion !== "none" && (
             <RangeField label="Speed" min={0.5} max={2} step={0.1} value={shown.backdrop.speed!}
               onChange={(v) => setBackdrop({ speed: v })} format={(v) => `${Math.round(v * 100)}%`} />
@@ -400,19 +402,19 @@ export function MotifPanel({ d }: { d: ThemeDraft }) {
   return (
     <section className="space-y-3">
       <Intro title="Motif">Your colours as three flat shapes side by side, in empty states and brand moments. Circles unless you pick another.</Intro>
-      <div className="card grid grid-cols-3 gap-2 p-4 sm:grid-cols-4 sm:p-5" role="radiogroup" aria-label="Motif">
+      <div className="rounded-xl border border-border bg-card grid grid-cols-3 gap-2 p-4 sm:grid-cols-4 sm:p-5" role="radiogroup" aria-label="Motif">
         {MOTIFS.map((m) => {
           const active = shown.motif === m.key;
           const mask = motifMask({ ...shown, motif: m.key });
           return (
             <button key={m.key} type="button" role="radio" aria-checked={active} onClick={() => setDraft((t) => ownColours({ ...t, motif: m.key }))}
-              className={`flex flex-col items-center gap-2 rounded-xl border px-2 py-3 transition-colors ${active ? "border-accent ring-1 ring-accent" : "border-border hover:border-text-subtle"}`}>
+              className={`flex flex-col items-center gap-2 rounded-xl border px-2 py-3 transition-colors ${active ? "border-primary ring-1 ring-primary" : "border-border hover:border-subtle-foreground"}`}>
               <span aria-hidden="true" className="inline-flex items-center gap-1.5">
                 {(["accent", "highlight", "support"] as const).map((k) => (
                   <span key={k} className="h-4 w-4" style={{ background: shown[k], borderRadius: mask === "none" ? 9999 : 0, WebkitMaskImage: mask, maskImage: mask, WebkitMaskSize: "contain", maskSize: "contain", WebkitMaskRepeat: "no-repeat", maskRepeat: "no-repeat", WebkitMaskPosition: "center", maskPosition: "center" }} />
                 ))}
               </span>
-              <span className={`text-11 font-semibold ${active ? "text-accent" : "text-text-muted"}`}>{m.label}</span>
+              <span className={`text-11 font-semibold ${active ? "text-primary" : "text-muted-foreground"}`}>{m.label}</span>
             </button>
           );
         })}
@@ -432,7 +434,7 @@ export function TypePanel({ d }: { d: ThemeDraft }) {
   return (
     <section className="space-y-3">
       <Intro title="Type">A font for headings and one for body text, each with its own weight, spacing and size. Decorative faces are for headings only.</Intro>
-      <div className="card space-y-5 p-4 sm:p-5">
+      <div className="rounded-xl border border-border bg-card space-y-5 p-4 sm:p-5">
         {(["headings", "body"] as const).map((part) => {
           const key = shown.fonts[part]!;
           const def = FONTS[key]!;
@@ -443,16 +445,16 @@ export function TypePanel({ d }: { d: ThemeDraft }) {
           const group = groups.find((g) => g === params.get(`${part}-fonts`)) ?? def.group;
           return (
             <div key={part} className="space-y-3">
-              <p className="label">{part === "headings" ? "Headings" : "Body text"}</p>
+              <p className="text-sm font-semibold text-muted-foreground">{part === "headings" ? "Headings" : "Body text"}</p>
               <PillTabs value={group} onChange={(g) => setUrlParams(setParams, { [`${part}-fonts`]: g })} options={groups.map((g) => ({ value: g, label: g }))} />
               <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label={part === "headings" ? "Headings font" : "Body font"}>
                 {Object.entries(FONTS).filter(([, f]) => f.group === group && (part === "headings" || f.body !== false)).map(([k, f]) => {
                   const active = key === k;
                   return (
                     <button key={k} type="button" role="radio" aria-checked={active} onClick={() => setFonts({ [part]: k })}
-                      className={`flex min-w-0 flex-col items-center gap-1 rounded-xl border p-2.5 transition-colors ${active ? "border-accent bg-accent-950" : "border-border bg-surface-2 hover:border-text-subtle"}`}>
+                      className={`flex min-w-0 flex-col items-center gap-1 rounded-xl border p-2.5 transition-colors ${active ? "border-primary bg-primary-950" : "border-border bg-muted hover:border-subtle-foreground"}`}>
                       <span className="text-24 leading-none" style={{ fontFamily: f.css, fontWeight: part === "headings" ? Math.min(f.weights[1], 800) : 400 }}>Aa</span>
-                      <span className={`max-w-full truncate text-11 font-semibold ${active ? "text-accent" : "text-text-muted"}`}>{f.label}</span>
+                      <span className={`max-w-full truncate text-11 font-semibold ${active ? "text-primary" : "text-muted-foreground"}`}>{f.label}</span>
                     </button>
                   );
                 })}
@@ -530,10 +532,10 @@ function ShareTheme({ draft, onImport }: { draft: Theme; onImport: (t: Theme) =>
         <h2 className="h-section">Share this look</h2>
         <p className="meta mt-1">Take this theme to another app, or bring one in. Importing previews it — save to keep it.</p>
       </div>
-      <div className="card flex flex-wrap gap-2 p-4 sm:p-5">
-        <button type="button" className="btn btn-secondary" onClick={() => { setError(null); setOpen("export"); }}>Export…</button>
-        <button type="button" className="btn btn-secondary" onClick={() => { setError(null); setOpen("import"); }}>Import…</button>
-      </div>
+      <Card className="flex-row flex-wrap gap-2 p-4 sm:p-5">
+        <Button variant="secondary" onClick={() => { setError(null); setOpen("export"); }}>Export…</Button>
+        <Button variant="secondary" onClick={() => { setError(null); setOpen("import"); }}>Import…</Button>
+      </Card>
 
       {open === "export" && (
         <Sheet title="Export this look" subtitle="A theme file for another Brand page, or the lines for an app's code." onClose={() => setOpen(null)}>
@@ -545,11 +547,11 @@ function ShareTheme({ draft, onImport }: { draft: Theme; onImport: (t: Theme) =>
               {format === "config" && "Replace the defaultTheme line in the app's src/lib/brand.config.ts."}
               {format === "tokens" && "Replace the app's src/styles/tokens.css, so its first paint matches."}
             </p>
-            <textarea readOnly value={out} rows={10} onFocus={(e) => e.currentTarget.select()}
-              className="field block w-full resize-y py-3 font-mono text-xs leading-relaxed" aria-label="Exported theme" />
+            <Textarea readOnly value={out} rows={10} onFocus={(e) => e.currentTarget.select()}
+              className="resize-y font-mono text-xs leading-relaxed [field-sizing:fixed]" aria-label="Exported theme" />
             <div className="flex flex-wrap gap-2">
-              <button type="button" className="btn btn-primary" onClick={() => void copy()}>{copied ? "Copied" : "Copy"}</button>
-              <button type="button" className="btn btn-secondary" onClick={download}>Download {fileName}</button>
+              <Button onClick={() => void copy()}>{copied ? "Copied" : "Copy"}</Button>
+              <Button variant="secondary" onClick={download}>Download {fileName}</Button>
             </div>
             {error && <p className="text-sm text-highlight">{error}</p>}
           </div>
@@ -559,15 +561,15 @@ function ShareTheme({ draft, onImport }: { draft: Theme; onImport: (t: Theme) =>
       {open === "import" && (
         <Sheet title="Import a look" subtitle="Paste a theme file, or choose one. It previews across the app until you save or leave." onClose={() => setOpen(null)}>
           <div className="space-y-3 p-5">
-            <textarea value={text} onChange={(e) => setText(e.target.value)} rows={8} placeholder='{ "kind": "jimbo-ui/theme", "theme": { "accent": "#…", "background": "#…" } }'
-              className="field block w-full resize-y py-3 font-mono text-xs leading-relaxed" aria-label="Theme to import" />
+            <Textarea value={text} onChange={(e) => setText(e.target.value)} rows={8} placeholder='{ "kind": "jimbo-ui/theme", "theme": { "accent": "#…", "background": "#…" } }'
+              className="resize-y font-mono text-xs leading-relaxed [field-sizing:fixed]" aria-label="Theme to import" />
             <div className="flex flex-wrap gap-2">
-              <button type="button" className="btn btn-primary" disabled={!text.trim()} onClick={() => apply(text)}>Preview it</button>
-              <label className="btn btn-secondary cursor-pointer">
+              <Button disabled={!text.trim()} onClick={() => apply(text)}>Preview it</Button>
+              <Button asChild variant="secondary"><label className="cursor-pointer">
                 Choose a file…
                 <input type="file" accept="application/json,.json,text/plain" className="sr-only"
                   onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (f) void f.text().then(apply); }} />
-              </label>
+              </label></Button>
             </div>
             {error && <p className="text-sm text-highlight">{error}</p>}
           </div>
