@@ -1,11 +1,12 @@
 {
-  "$comment": "jimbo-ui's own catalogue: the shared components (foundation, kit, pattern) and the generic candidates an app has built that may join the kit. Which apps use each is not stored here \u2014 each app lists that in its own jimbo-ui.json, and scripts/inventory.mjs puts it together. Match by purpose, not name; see the guide's \"One library, no duplicates\". Names and paths only \u2014 never app code.",
+  "$comment": "jimbo-ui's own catalogue: the shared components (foundation: the shadcn/ui primitives jimbo.ui ships, never edited in apps; kit: composed from them; pattern) and the generic candidates an app has built that may join the kit. Which apps use each is not stored here — each app lists that in its own jimbo-ui.json, and scripts/inventory.mjs puts it together. Match by purpose, not name; see the guide's \"One library, no duplicates\". Names and paths only — never app code. `shadcn` names the shadcn/ui primitive a component is built on.",
   "tiers": {
-    "foundation": "Copied into every app",
-    "kit": "In reference/, adapted per app",
+    "foundation": "Copied into every app, never edited there (shadcn primitives and the theme engine)",
+    "kit": "In reference/, composed from the primitives; apps change wiring only, never looks (J3)",
     "pattern": "A behaviour the guide describes",
-    "candidate": "Built in an app, generic \u2014 may be promoted",
-    "domain": "Stays in the app: listed only in that app's jimbo-ui.json (components.local), never here"
+    "candidate": "Built in an app, generic — may be promoted",
+    "domain": "Stays in the app: listed only in that app's jimbo-ui.json (components.local), never here",
+    "pending": "Built in an app while its PR to jimbo-ui is open: listed only in that app's jimbo-ui.json (components.pending), removed on release (J5)"
   },
   "components": [
     {
@@ -18,10 +19,11 @@
         "ActionButton"
       ],
       "variants": {
-        "variant": "primary | secondary | ghost | danger",
-        "size": "sm | md | lg"
+        "variant": "default | secondary | ghost | destructive",
+        "size": "default | sm | icon | icon-sm"
       },
-      "source": "foundation/src/components/ui/button.tsx"
+      "source": "foundation/src/components/ui/button.tsx",
+      "shadcn": "button"
     },
     {
       "id": "color-picker",
@@ -33,11 +35,232 @@
         "ColorInput"
       ],
       "variants": {},
-      "source": "foundation/src/components/ColorPicker.tsx"
+      "source": "foundation/src/components/ColorPicker.tsx",
+      "shadcn": "input"
+    },
+    {
+      "id": "alert",
+      "name": "Alert",
+      "purpose": "A short message block.",
+      "tier": "foundation",
+      "aliases": [],
+      "variants": {},
+      "source": "foundation/src/components/ui/alert.tsx",
+      "shadcn": "alert"
+    },
+    {
+      "id": "alert-dialog",
+      "name": "AlertDialog",
+      "purpose": "Asks before a destructive action.",
+      "tier": "foundation",
+      "aliases": [],
+      "variants": {},
+      "source": "foundation/src/components/ui/alert-dialog.tsx",
+      "shadcn": "alert-dialog"
+    },
+    {
+      "id": "avatar",
+      "name": "Avatar",
+      "purpose": "A person's picture in a circle, or the bare circle.",
+      "tier": "foundation",
+      "aliases": [],
+      "variants": {},
+      "source": "foundation/src/components/ui/avatar.tsx",
+      "shadcn": "avatar"
+    },
+    {
+      "id": "command",
+      "name": "Command",
+      "purpose": "A filterable list of choices (cmdk).",
+      "tier": "foundation",
+      "aliases": [],
+      "variants": {},
+      "source": "foundation/src/components/ui/command.tsx",
+      "shadcn": "command"
+    },
+    {
+      "id": "dialog",
+      "name": "Dialog",
+      "purpose": "A centred modal (desktop Sheet).",
+      "tier": "foundation",
+      "aliases": [],
+      "variants": {},
+      "source": "foundation/src/components/ui/dialog.tsx",
+      "shadcn": "dialog"
+    },
+    {
+      "id": "drawer",
+      "name": "Drawer",
+      "purpose": "A bottom sheet with drag to close (phone Sheet).",
+      "tier": "foundation",
+      "aliases": [],
+      "variants": {},
+      "source": "foundation/src/components/ui/drawer.tsx",
+      "shadcn": "drawer"
+    },
+    {
+      "id": "dropdown-menu",
+      "name": "DropdownMenu",
+      "purpose": "A list of actions from a trigger.",
+      "tier": "foundation",
+      "aliases": [],
+      "variants": {},
+      "source": "foundation/src/components/ui/dropdown-menu.tsx",
+      "shadcn": "dropdown-menu"
+    },
+    {
+      "id": "empty",
+      "name": "Empty",
+      "purpose": "An empty-state block.",
+      "tier": "foundation",
+      "aliases": [],
+      "variants": {},
+      "source": "foundation/src/components/ui/empty.tsx",
+      "shadcn": "empty"
+    },
+    {
+      "id": "popover-primitive",
+      "name": "Popover (primitive)",
+      "purpose": "A floating panel by its trigger.",
+      "tier": "foundation",
+      "aliases": [],
+      "variants": {},
+      "source": "foundation/src/components/ui/popover.tsx",
+      "shadcn": "popover"
+    },
+    {
+      "id": "progress",
+      "name": "Progress",
+      "purpose": "A flat progress track and fill.",
+      "tier": "foundation",
+      "aliases": [],
+      "variants": {},
+      "source": "foundation/src/components/ui/progress.tsx",
+      "shadcn": "progress"
+    },
+    {
+      "id": "select",
+      "name": "Select",
+      "purpose": "One pick from a list.",
+      "tier": "foundation",
+      "aliases": [],
+      "variants": {},
+      "source": "foundation/src/components/ui/select.tsx",
+      "shadcn": "select"
+    },
+    {
+      "id": "separator",
+      "name": "Separator",
+      "purpose": "A hairline rule.",
+      "tier": "foundation",
+      "aliases": [],
+      "variants": {},
+      "source": "foundation/src/components/ui/separator.tsx",
+      "shadcn": "separator"
+    },
+    {
+      "id": "skeleton",
+      "name": "Skeleton",
+      "purpose": "A loading placeholder shape.",
+      "tier": "foundation",
+      "aliases": [],
+      "variants": {},
+      "source": "foundation/src/components/ui/skeleton.tsx",
+      "shadcn": "skeleton"
+    },
+    {
+      "id": "slider",
+      "name": "Slider",
+      "purpose": "A value on a track.",
+      "tier": "foundation",
+      "aliases": [],
+      "variants": {},
+      "source": "foundation/src/components/ui/slider.tsx",
+      "shadcn": "slider"
+    },
+    {
+      "id": "sonner",
+      "name": "Toaster (Sonner)",
+      "purpose": "Timed notices, top right.",
+      "tier": "foundation",
+      "aliases": [],
+      "variants": {},
+      "source": "foundation/src/components/ui/sonner.tsx",
+      "shadcn": "sonner"
+    },
+    {
+      "id": "switch",
+      "name": "Switch",
+      "purpose": "An on/off control.",
+      "tier": "foundation",
+      "aliases": [],
+      "variants": {},
+      "source": "foundation/src/components/ui/switch.tsx",
+      "shadcn": "switch"
+    },
+    {
+      "id": "table",
+      "name": "Table",
+      "purpose": "Table parts for DataTable.",
+      "tier": "foundation",
+      "aliases": [],
+      "variants": {},
+      "source": "foundation/src/components/ui/table.tsx",
+      "shadcn": "table"
+    },
+    {
+      "id": "tabs-primitive",
+      "name": "Tabs (primitive)",
+      "purpose": "Tab list and panels.",
+      "tier": "foundation",
+      "aliases": [],
+      "variants": {},
+      "source": "foundation/src/components/ui/tabs.tsx",
+      "shadcn": "tabs"
+    },
+    {
+      "id": "textarea",
+      "name": "Textarea",
+      "purpose": "Several lines of text.",
+      "tier": "foundation",
+      "aliases": [],
+      "variants": {},
+      "source": "foundation/src/components/ui/textarea.tsx",
+      "shadcn": "textarea"
+    },
+    {
+      "id": "toggle",
+      "name": "Toggle",
+      "purpose": "A pressed/not-pressed button.",
+      "tier": "foundation",
+      "aliases": [],
+      "variants": {},
+      "source": "foundation/src/components/ui/toggle.tsx",
+      "shadcn": "toggle"
+    },
+    {
+      "id": "toggle-group",
+      "name": "ToggleGroup",
+      "purpose": "Several toggles as one group.",
+      "tier": "foundation",
+      "aliases": [],
+      "variants": {},
+      "source": "foundation/src/components/ui/toggle-group.tsx",
+      "shadcn": "toggle-group"
+    },
+    {
+      "id": "tooltip-primitive",
+      "name": "Tooltip (primitive)",
+      "purpose": "A short label on hover or focus.",
+      "tier": "foundation",
+      "aliases": [],
+      "variants": {},
+      "source": "foundation/src/components/ui/tooltip.tsx",
+      "shadcn": "tooltip"
     },
     {
       "id": "card",
-      "name": ".card",
+      "name": "Card",
       "purpose": "Groups related content on a raised surface.",
       "tier": "foundation",
       "aliases": [
@@ -46,47 +269,58 @@
         "CardContent",
         "CardFooter",
         "Panel",
-        "Box"
+        "Box",
+        ".card"
       ],
       "variants": {},
-      "source": "foundation/src/styles/globals.css#.card"
+      "source": "foundation/src/components/ui/card.tsx",
+      "shadcn": "card"
     },
     {
       "id": "field",
-      "name": ".field",
+      "name": "Input",
       "purpose": "Takes typed input from the user.",
       "tier": "foundation",
       "aliases": [
         "Input",
         "TextInput",
-        "TextField"
+        "TextField",
+        "Field",
+        ".field"
       ],
       "variants": {},
-      "source": "foundation/src/styles/globals.css#.field"
+      "source": "foundation/src/components/ui/input.tsx",
+      "shadcn": "input"
     },
     {
       "id": "label",
-      "name": ".label",
+      "name": "Label",
       "purpose": "Names a form field.",
       "tier": "foundation",
       "aliases": [
         "Label",
-        "FieldLabel"
+        "FieldLabel",
+        "FormLabel",
+        ".label"
       ],
       "variants": {},
-      "source": "foundation/src/styles/globals.css#.label"
+      "source": "foundation/src/components/ui/label.tsx",
+      "shadcn": "label"
     },
     {
       "id": "chip",
-      "name": ".chip",
+      "name": "Badge (primitive)",
       "purpose": "Shows a small tag or a toggleable filter.",
       "tier": "foundation",
       "aliases": [
         "Tag",
-        "Pill"
+        "Pill",
+        "Chip",
+        ".chip"
       ],
       "variants": {},
-      "source": "foundation/src/styles/globals.css#.chip"
+      "source": "foundation/src/components/ui/badge.tsx",
+      "shadcn": "badge"
     },
     {
       "id": "dot",
@@ -101,7 +335,7 @@
       "variants": {
         "colour": "accent | highlight | support"
       },
-      "source": "foundation/src/styles/globals.css#.dot-accent"
+      "source": "foundation/src/styles/globals.css#.dot-primary"
     },
     {
       "id": "app-shell",
@@ -117,10 +351,11 @@
       ],
       "variants": {
         "width": "column | wide | full",
-        "tabs": "ShellTab[] (\u2264 5)",
+        "tabs": "ShellTab[] (≤ 5)",
         "actions": "top-bar buttons"
       },
-      "source": "reference/web/src/routes/AppShell.tsx"
+      "source": "reference/web/src/routes/AppShell.tsx",
+      "shadcn": "button"
     },
     {
       "id": "top-bar-button",
@@ -134,7 +369,8 @@
       "variants": {
         "primary": "boolean"
       },
-      "source": "reference/web/src/routes/AppShell.tsx#TopBarButton"
+      "source": "reference/web/src/routes/AppShell.tsx#TopBarButton",
+      "shadcn": "button"
     },
     {
       "id": "dock-icon",
@@ -210,7 +446,8 @@
         "dot": "a status dot before the label (was VolumeChip)",
         "live": "pulses the dot"
       },
-      "source": "reference/web/src/components/ui/kit.tsx#Badge"
+      "source": "reference/web/src/components/ui/kit.tsx#Badge",
+      "shadcn": "badge"
     },
     {
       "id": "tones",
@@ -238,7 +475,7 @@
       ],
       "variants": {
         "tone": "Tone",
-        "live": "LIVE \u2014 pulses while running (was RUNNING)"
+        "live": "LIVE — pulses while running (was RUNNING)"
       },
       "source": "reference/web/src/components/ui/kit.tsx#STATUS_DOT"
     },
@@ -265,7 +502,7 @@
       ],
       "variants": {
         "size": "8 | 12 | 16 | 24",
-        "motif": "theme.motif (dots | triforce | sparkles | stars | \u2026)"
+        "motif": "theme.motif (dots | triforce | sparkles | stars | …)"
       },
       "source": "reference/web/src/components/ui/kit.tsx#ThemeDots"
     },
@@ -356,7 +593,8 @@
         "Back"
       ],
       "variants": {},
-      "source": "reference/web/src/components/ui/kit.tsx#BackButton"
+      "source": "reference/web/src/components/ui/kit.tsx#BackButton",
+      "shadcn": "button"
     },
     {
       "id": "banner",
@@ -396,7 +634,8 @@
         "items": "proposed: several images with swipe between them (PhotoCarousel)",
         "initialIndex": "proposed"
       },
-      "source": "reference/web/src/components/ui/kit.tsx#ImageViewer"
+      "source": "reference/web/src/components/ui/kit.tsx#ImageViewer",
+      "shadcn": "dialog"
     },
     {
       "id": "section",
@@ -414,7 +653,8 @@
         "fill": "takes the rest of the page's height",
         "in a grid row": "its card stretches to the tallest, content at the top"
       },
-      "source": "reference/web/src/components/ui/kit.tsx#Section"
+      "source": "reference/web/src/components/ui/kit.tsx#Section",
+      "shadcn": "card"
     },
     {
       "id": "columns",
@@ -450,7 +690,8 @@
         "bare": "no card, inside Section flush",
         "maxHeight": "rows: caps the card and scrolls inside it, scrollbar always showing"
       },
-      "source": "reference/web/src/components/ui/kit.tsx#List"
+      "source": "reference/web/src/components/ui/kit.tsx#List",
+      "shadcn": "card"
     },
     {
       "id": "list-group-label",
@@ -492,7 +733,8 @@
         "status.live": "pulsing dot while running",
         "onOpen": "opens something in place instead of a link (was RunRow)"
       },
-      "source": "reference/web/src/components/ui/kit.tsx#EventRow"
+      "source": "reference/web/src/components/ui/kit.tsx#EventRow",
+      "shadcn": "card"
     },
     {
       "id": "entity-row",
@@ -506,7 +748,8 @@
       "variants": {
         "avatarText": "A short code or number in the placeholder avatar"
       },
-      "source": "reference/web/src/components/ui/kit.tsx#EntityRow"
+      "source": "reference/web/src/components/ui/kit.tsx#EntityRow",
+      "shadcn": "card"
     },
     {
       "id": "media-card",
@@ -520,7 +763,8 @@
       "variants": {
         "aspect": "square | portrait"
       },
-      "source": "reference/web/src/components/ui/kit.tsx#MediaCard"
+      "source": "reference/web/src/components/ui/kit.tsx#MediaCard",
+      "shadcn": "card"
     },
     {
       "id": "scrolling-line",
@@ -562,7 +806,8 @@
         "accent": "boolean",
         "size": "md | sm"
       },
-      "source": "reference/web/src/components/ui/kit.tsx#LinkCard"
+      "source": "reference/web/src/components/ui/kit.tsx#LinkCard",
+      "shadcn": "card"
     },
     {
       "id": "stat-tile",
@@ -576,10 +821,11 @@
       ],
       "variants": {
         "accent": "accent | highlight | support",
-        "size": "proposed: sm \u2014 a compact cell for admin summaries (dl stat grids)",
-        "trend": "number[] \u2014 a Sparkline under the number"
+        "size": "proposed: sm — a compact cell for admin summaries (dl stat grids)",
+        "trend": "number[] — a Sparkline under the number"
       },
-      "source": "reference/web/src/components/ui/kit.tsx#StatTile"
+      "source": "reference/web/src/components/ui/kit.tsx#StatTile",
+      "shadcn": "card"
     },
     {
       "id": "stat-grid",
@@ -615,7 +861,8 @@
         "SearchBar"
       ],
       "variants": {},
-      "source": "reference/web/src/components/ui/kit.tsx#SearchField"
+      "source": "reference/web/src/components/ui/kit.tsx#SearchField",
+      "shadcn": "input"
     },
     {
       "id": "range-field",
@@ -626,7 +873,8 @@
         "Slider"
       ],
       "variants": {},
-      "source": "reference/web/src/components/ui/kit.tsx#RangeField"
+      "source": "reference/web/src/components/ui/kit.tsx#RangeField",
+      "shadcn": "slider"
     },
     {
       "id": "select-field",
@@ -639,12 +887,13 @@
         "YearPicker"
       ],
       "variants": {},
-      "source": "reference/web/src/components/ui/kit.tsx#SelectField"
+      "source": "reference/web/src/components/ui/kit.tsx#SelectField",
+      "shadcn": "select"
     },
     {
       "id": "tabs",
       "name": "Tabs",
-      "purpose": "Switches between 2\u20134 views of one thing.",
+      "purpose": "Switches between 2–4 views of one thing.",
       "tier": "kit",
       "aliases": [
         "SegmentedControl",
@@ -653,7 +902,8 @@
       "variants": {
         "size": "md | sm (inline, for a section's action slot)"
       },
-      "source": "reference/web/src/components/ui/kit.tsx#Tabs"
+      "source": "reference/web/src/components/ui/kit.tsx#Tabs",
+      "shadcn": "tabs"
     },
     {
       "id": "pill-tabs",
@@ -667,7 +917,8 @@
       "variants": {
         "scroll": "one row that scrolls sideways, its scrollbar showing"
       },
-      "source": "reference/web/src/components/ui/kit.tsx#PillTabs"
+      "source": "reference/web/src/components/ui/kit.tsx#PillTabs",
+      "shadcn": "button"
     },
     {
       "id": "pager",
@@ -678,7 +929,8 @@
         "Pagination"
       ],
       "variants": {},
-      "source": "reference/web/src/components/ui/kit.tsx#Pager"
+      "source": "reference/web/src/components/ui/kit.tsx#Pager",
+      "shadcn": "button"
     },
     {
       "id": "sheet",
@@ -699,7 +951,8 @@
         "title": "string",
         "subtitle": "node"
       },
-      "source": "reference/web/src/components/ui/kit.tsx#Sheet"
+      "source": "reference/web/src/components/ui/kit.tsx#Sheet",
+      "shadcn": "drawer, dialog"
     },
     {
       "id": "loading",
@@ -711,7 +964,8 @@
         "Skeleton"
       ],
       "variants": {},
-      "source": "reference/web/src/components/ui/kit.tsx#Loading"
+      "source": "reference/web/src/components/ui/kit.tsx#Loading",
+      "shadcn": "skeleton"
     },
     {
       "id": "pending",
@@ -738,7 +992,8 @@
       "variants": {
         "fill": "takes the rest of the page's height, centred"
       },
-      "source": "reference/web/src/components/ui/kit.tsx#EmptyState"
+      "source": "reference/web/src/components/ui/kit.tsx#EmptyState",
+      "shadcn": "empty"
     },
     {
       "id": "theme-scope",
@@ -778,7 +1033,8 @@
         "MarkerPopup"
       ],
       "variants": {},
-      "source": "reference/web/src/components/MapView.tsx#MapPinCard"
+      "source": "reference/web/src/components/MapView.tsx#MapPinCard",
+      "shadcn": "card"
     },
     {
       "id": "view-switch",
@@ -791,7 +1047,8 @@
       "variants": {
         "floating": "boolean"
       },
-      "source": "reference/web/src/components/ui/kit.tsx#ViewSwitch"
+      "source": "reference/web/src/components/ui/kit.tsx#ViewSwitch",
+      "shadcn": "tabs"
     },
     {
       "id": "url-state",
@@ -829,7 +1086,8 @@
       "variants": {
         "pending": "changes waiting to send"
       },
-      "source": "reference/web/src/components/ui/feedback.tsx#OfflineBanner"
+      "source": "reference/web/src/components/ui/feedback.tsx#OfflineBanner",
+      "shadcn": "alert"
     },
     {
       "id": "background-work",
@@ -868,7 +1126,8 @@
       "variants": {
         "layout": "inline (label left, value right) | stacked (label above)"
       },
-      "source": "reference/web/src/components/ui/kit.tsx#KeyValue"
+      "source": "reference/web/src/components/ui/kit.tsx#KeyValue",
+      "shadcn": "card"
     },
     {
       "id": "autocomplete",
@@ -883,7 +1142,8 @@
         "multiple": "boolean (a lineup)",
         "allowNew": "boolean"
       },
-      "source": "reference/web/src/components/ui/kit.tsx#Autocomplete"
+      "source": "reference/web/src/components/ui/kit.tsx#Autocomplete",
+      "shadcn": "input, popover"
     },
     {
       "id": "switch-row",
@@ -896,7 +1156,8 @@
         "Checkbox row"
       ],
       "variants": {},
-      "source": "reference/web/src/components/ui/kit.tsx#SwitchRow"
+      "source": "reference/web/src/components/ui/kit.tsx#SwitchRow",
+      "shadcn": "switch"
     },
     {
       "id": "progress-bar",
@@ -912,7 +1173,8 @@
         "value": "omitted = length unknown",
         "size": "md | lg (thick, for a JobTile)"
       },
-      "source": "reference/web/src/components/ui/feedback.tsx#ProgressBar"
+      "source": "reference/web/src/components/ui/feedback.tsx#ProgressBar",
+      "shadcn": "progress"
     },
     {
       "id": "job-tile",
@@ -932,7 +1194,8 @@
         "facts": "speed, time left, updated",
         "note": "stage, or what happened"
       },
-      "source": "reference/web/src/components/ui/feedback.tsx#JobTile"
+      "source": "reference/web/src/components/ui/feedback.tsx#JobTile",
+      "shadcn": "card, progress, badge"
     },
     {
       "id": "scroll-area",
@@ -980,7 +1243,7 @@
         "TimeSeries"
       ],
       "variants": {
-        "series": "1\u20133, tones in order accent \u00b7 support \u00b7 highlight",
+        "series": "1–3, tones in order accent · support · highlight",
         "format": "value formatter"
       },
       "source": "reference/web/src/components/ui/kit.tsx#TrendChart"
@@ -1010,7 +1273,8 @@
         "useListLayout"
       ],
       "variants": {},
-      "source": "reference/web/src/components/ui/kit.tsx#LayoutSwitch"
+      "source": "reference/web/src/components/ui/kit.tsx#LayoutSwitch",
+      "shadcn": "tabs"
     },
     {
       "id": "heatmap",
@@ -1102,7 +1366,8 @@
         "columns": "Columns on phones",
         "smColumns": "Columns from sm: up"
       },
-      "source": "reference/web/src/components/ui/kit.tsx#ToggleGrid"
+      "source": "reference/web/src/components/ui/kit.tsx#ToggleGrid",
+      "shadcn": "toggle-group"
     },
     {
       "id": "link-chips",
@@ -1117,7 +1382,8 @@
       "variants": {
         "tone": "accent | highlight | support dot"
       },
-      "source": "reference/web/src/components/ui/kit.tsx#LinkChips"
+      "source": "reference/web/src/components/ui/kit.tsx#LinkChips",
+      "shadcn": "badge"
     },
     {
       "id": "floating-bar",
@@ -1134,7 +1400,8 @@
       "variants": {
         "live": "Pulsing accent dot while something runs"
       },
-      "source": "reference/web/src/components/ui/kit.tsx#FloatingBar"
+      "source": "reference/web/src/components/ui/kit.tsx#FloatingBar",
+      "shadcn": "card"
     },
     {
       "id": "text-field",
@@ -1151,7 +1418,8 @@
         "suffix": "inside, after",
         "optional": "marked beside the label"
       },
-      "source": "reference/web/src/components/ui/forms.tsx#TextField"
+      "source": "reference/web/src/components/ui/forms.tsx#TextField",
+      "shadcn": "field, input"
     },
     {
       "id": "text-area",
@@ -1167,7 +1435,8 @@
         "maxLength": "counts down near the limit",
         "maxRows": "how tall it grows"
       },
-      "source": "reference/web/src/components/ui/forms.tsx#TextArea"
+      "source": "reference/web/src/components/ui/forms.tsx#TextArea",
+      "shadcn": "field, textarea"
     },
     {
       "id": "date-field",
@@ -1182,7 +1451,8 @@
       "variants": {
         "type": "date | time | datetime-local"
       },
-      "source": "reference/web/src/components/ui/forms.tsx#DateField"
+      "source": "reference/web/src/components/ui/forms.tsx#DateField",
+      "shadcn": "field, input"
     },
     {
       "id": "file-drop",
@@ -1200,7 +1470,8 @@
         "accept": "allowed types",
         "maxSize": "largest file"
       },
-      "source": "reference/web/src/components/ui/forms.tsx#FileDrop"
+      "source": "reference/web/src/components/ui/forms.tsx#FileDrop",
+      "shadcn": "field, card"
     },
     {
       "id": "menu",
@@ -1215,10 +1486,11 @@
         "MoreButton"
       ],
       "variants": {
-        "trigger": "the \u22ef MoreButton or any button",
+        "trigger": "the ⋯ MoreButton or any button",
         "align": "start | end"
       },
-      "source": "reference/web/src/components/ui/overlays.tsx#Menu"
+      "source": "reference/web/src/components/ui/overlays.tsx#Menu",
+      "shadcn": "dropdown-menu"
     },
     {
       "id": "jump-menu",
@@ -1234,10 +1506,11 @@
         "PagesMenu"
       ],
       "variants": {
-        "trigger": "a DropdownButton (default) or a top-bar \u2630",
+        "trigger": "a DropdownButton (default) or a top-bar ☰",
         "items": "links, headings, dividers"
       },
-      "source": "reference/web/src/components/ui/overlays.tsx#JumpMenu"
+      "source": "reference/web/src/components/ui/overlays.tsx#JumpMenu",
+      "shadcn": "dropdown-menu"
     },
     {
       "id": "dropdown-button",
@@ -1254,7 +1527,8 @@
         "label": "a muted prefix before the value",
         "size": "sm | md"
       },
-      "source": "reference/web/src/components/ui/overlays.tsx#DropdownButton"
+      "source": "reference/web/src/components/ui/overlays.tsx#DropdownButton",
+      "shadcn": "dropdown-menu"
     },
     {
       "id": "popover",
@@ -1269,7 +1543,8 @@
       "variants": {
         "align": "start | end | center"
       },
-      "source": "reference/web/src/components/ui/overlays.tsx#Popover"
+      "source": "reference/web/src/components/ui/overlays.tsx#Popover",
+      "shadcn": "popover"
     },
     {
       "id": "tooltip",
@@ -1281,12 +1556,13 @@
         "Title tooltip"
       ],
       "variants": {},
-      "source": "reference/web/src/components/ui/overlays.tsx#Tooltip"
+      "source": "reference/web/src/components/ui/overlays.tsx#Tooltip",
+      "shadcn": "tooltip"
     },
     {
       "id": "command-palette",
       "name": "CommandPalette",
-      "purpose": "App-wide search (Spotlight, \u2318K): live results from the app's search providers with thumbnails, a preview pane, facet:value filter chips, recent picks and suggestions; commands go to a page or run an action.",
+      "purpose": "App-wide search (Spotlight, ⌘K): live results from the app's search providers with thumbnails, a preview pane, facet:value filter chips, recent picks and suggestions; commands go to a page or run an action.",
       "tier": "kit",
       "aliases": [
         "CommandMenu",
@@ -1304,7 +1580,8 @@
         "commands": "Command[]",
         "url": "useSpotlight (?find=)"
       },
-      "source": "reference/web/src/components/ui/overlays.tsx#CommandPalette"
+      "source": "reference/web/src/components/ui/overlays.tsx#CommandPalette",
+      "shadcn": "dialog, badge"
     },
     {
       "id": "search-trigger",
@@ -1317,7 +1594,8 @@
         "SearchIcon"
       ],
       "variants": {},
-      "source": "reference/web/src/components/ui/overlays.tsx#SearchTrigger"
+      "source": "reference/web/src/components/ui/overlays.tsx#SearchTrigger",
+      "shadcn": "input"
     },
     {
       "id": "toast",
@@ -1334,7 +1612,8 @@
         "tone": "done | info | error",
         "action": "one, usually Undo"
       },
-      "source": "reference/web/src/components/ui/feedback.tsx#toast"
+      "source": "reference/web/src/components/ui/feedback.tsx#toast",
+      "shadcn": "sonner"
     },
     {
       "id": "confirm-sheet",
@@ -1350,7 +1629,8 @@
       "variants": {
         "danger": "destructive: highlight fill, Cancel focused"
       },
-      "source": "reference/web/src/components/ui/feedback.tsx#ConfirmSheet"
+      "source": "reference/web/src/components/ui/feedback.tsx#ConfirmSheet",
+      "shadcn": "alert-dialog"
     },
     {
       "id": "stepper",
@@ -1365,7 +1645,8 @@
       "variants": {
         "onStep": "go back to a done step"
       },
-      "source": "reference/web/src/components/ui/feedback.tsx#Stepper"
+      "source": "reference/web/src/components/ui/feedback.tsx#Stepper",
+      "shadcn": "button"
     },
     {
       "id": "update-banner",
@@ -1380,7 +1661,8 @@
       "variants": {
         "onDismiss": "Later"
       },
-      "source": "reference/web/src/components/ui/feedback.tsx#UpdateBanner"
+      "source": "reference/web/src/components/ui/feedback.tsx#UpdateBanner",
+      "shadcn": "button"
     },
     {
       "id": "data-table",
@@ -1396,7 +1678,8 @@
         "rowTo": "rows link",
         "sort": "controlled (URL) or its own"
       },
-      "source": "reference/web/src/components/ui/data.tsx#DataTable"
+      "source": "reference/web/src/components/ui/data.tsx#DataTable",
+      "shadcn": "table, card"
     },
     {
       "id": "accordion",
@@ -1412,7 +1695,8 @@
       "variants": {
         "multiple": "several open at once"
       },
-      "source": "reference/web/src/components/ui/data.tsx#Accordion"
+      "source": "reference/web/src/components/ui/data.tsx#Accordion",
+      "shadcn": "accordion"
     },
     {
       "id": "share-sliders",
@@ -1425,7 +1709,8 @@
         "rebalance"
       ],
       "variants": {},
-      "source": "reference/web/src/components/ui/kit.tsx#ShareSliders"
+      "source": "reference/web/src/components/ui/kit.tsx#ShareSliders",
+      "shadcn": "slider"
     },
     {
       "id": "prose",
