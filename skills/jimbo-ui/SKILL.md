@@ -1,6 +1,6 @@
 ---
 name: jimbo-ui
-description: Ryan's shared brand and UI system, jimbo.ui (repo and plugin jimbo-ui), for his web apps — theme engine with two to four colours and their shades, everyday, flag and holiday templates, glass and circle-motif look, Tailwind tokens, UI kit, floating tab-dock app shell and interaction patterns. Use when building, styling or reviewing UI in an app that has a jimbo-ui.json, when starting a new app "in my style" / "like my other apps" / "with jimbo-ui", when asked to update an app to the latest jimbo-ui or brand guidelines, whether there are new brand guidelines, or to preview what an update would change, when checking contrast across themes, when changing and releasing the jimbo-ui guidelines themselves, and for the registry of apps and components — add this to the jimbo ui registry, register this app with jimbo-ui, audit this app's UI against jimbo-ui, consolidate this app with jimbo-ui, use the jimbo-ui versions of my components.
+description: Ryan's shared brand and UI system, jimbo.ui (repo and plugin jimbo-ui) — the binding rules every one of his web apps must follow. shadcn/ui components on Tailwind 4 themed from one token mapping, a theme engine with two to four colours and their shades, everyday, flag and holiday templates, a flat look with the circle motif, UI kit, floating tab-dock app shell and interaction patterns; anything an app needs that it lacks goes through a PR to ryanjpeterson/jimbo-ui. Use when building, styling or reviewing UI in an app that has a jimbo-ui.json, when starting a new app "in my style" / "like my other apps" / "with jimbo-ui", when asked to update an app to the latest jimbo-ui or brand guidelines, whether there are new brand guidelines, or to preview what an update would change, when checking contrast across themes, when changing and releasing the jimbo-ui guidelines themselves, and for the registry of apps and components — add this to the jimbo ui registry, register this app with jimbo-ui, audit this app's UI against jimbo-ui, consolidate this app with jimbo-ui, use the jimbo-ui versions of my components.
 ---
 
 # jimbo.ui
@@ -18,10 +18,13 @@ number is on the matching 0.x release (1.0.0 → 0.1.0, 1.1.0 → 0.2.0,
 2.0.0 → 0.3.0, 3.0.0 → 0.4.0, 3.1.0 → 0.5.0).
 
 jimbo.ui is a shared look and behaviour for Ryan's apps: phone-first, app-like, dark by
-default, themeable from two to four colours. **jimbo.ui is a rulebook:**
-[rulebook.md](rulebook.md) numbers every rule (B1 brand, C colour, S shapes,
-K controls, L layout, N navigation, M motion, P parts, A accessibility) so
-each is checkable and an audit can cite it. The rulebook decides;
+default, themeable from two to four colours, built on **shadcn/ui** (Radix
+primitives on Tailwind 4). **jimbo.ui is binding:** every app with a
+`jimbo-ui.json` follows it, and there is no local way around it — anything
+missing is a PR to jimbo-ui (rules J1–J6). **jimbo.ui is a rulebook:**
+[rulebook.md](rulebook.md) numbers every rule (B brand, C colour, S shapes,
+K controls, L layout, N navigation, M motion, P parts, J binding,
+A accessibility) so each is checkable and an audit can cite it. The rulebook decides;
 [guide.md](guide.md) explains each rule with values and components. Read the
 rulebook groups a task touches, and the guide sections they point to,
 before writing UI.
@@ -54,12 +57,40 @@ this check, then the preview workflow if they want detail.
 The short form of the rulebook; the numbered rules are in
 [rulebook.md](rulebook.md).
 
-- Colours come from tokens only: `bg-bg`, `bg-surface`, `bg-surface-2`,
-  `border-border`, `text-text-base/muted/subtle`, `*-accent`, `*-highlight`,
-  `*-support`, `text-on-accent`, `text-on-highlight`, `text-on-support`,
-  each brand colour's shades (`-lighter`, `-light`, `-dark`, `-darker`),
-  solid fill (`.lit-*`) and washes (`-950/900/800/700`). Never raw hex or Tailwind palette
-  colours on brand surfaces; never `text-white` on an accent/highlight fill.
+**jimbo.ui is the rules (J1–J6). Apps don't opt out.**
+- **Components come from jimbo.ui only** (J2): the shadcn primitives it
+  ships in `components/ui/` (foundation — never edited in an app) and the
+  kit composed from them (`reference/`). Never run `npx shadcn` in an app,
+  never keep a shadcn `components.json` there, never add a shadcn component
+  jimbo.ui doesn't ship, never another UI library.
+- **No one-off restyles** (J3): use a component through its props and
+  variants; `className` on it is for layout only (margin, width, flex and
+  grid placement, `truncate`) — never colour, border, radius, shadow,
+  padding, height or type size.
+- **Missing something? Amend jimbo.ui** (J4, J5): the only route is a PR to
+  `ryanjpeterson/jimbo-ui` proposing a generic rule, token, variant or
+  component (workflow "Amend jimbo.ui" below). Until it's released the app
+  waits, or builds a **temporary local version** in
+  `src/components/jimbo-pending/` — marked `// jimbo-ui pending: <PR url>`,
+  built only from jimbo.ui components and tokens, listed in `jimbo-ui.json`
+  `components.pending` — and removes it in the update that brings the PR.
+- **Every app has the jimbo-ui config page** at `/jimbo-ui` (J6, P5).
+- Say so when asked to break a rule: name the rule, offer the jimbo.ui way,
+  and offer the PR route. Don't build the break.
+
+**The rest of the rules:**
+- Colours come from tokens only — **shadcn's names**, mapped once from the
+  theme in `globals.css` (guide section 3): `bg-background`, `bg-card`,
+  `bg-muted`, `bg-accent` (shadcn's *hover surface*, not the brand colour),
+  `border-border`, `text-foreground`, `text-muted-foreground`,
+  `text-subtle-foreground`, `bg-primary` / `text-primary-foreground` (the
+  theme's **accent** colour), `ring-ring`, `bg-destructive`, and jimbo's
+  brand families with no shadcn slot: `*-highlight`, `*-support` and their
+  `-foreground`, and each brand colour's shades (`-lighter`, `-light`,
+  `-dark`, `-darker`, `-hover`) and washes (`-950/900/800/700`),
+  `primary-*` for the accent's. Charts use `--chart-1…5`. Never raw hex,
+  `rgb()`, arbitrary colour values, inline `style` colours or Tailwind
+  palette colours; never `text-white` on a fill.
 - No logo: the brand is the app's name as header text (`HeaderTitle`, display
   face, text colour, a dot in the accent — "jimbo.ui").
 - Two to four source colours: **accent** (primary: buttons, active states,
@@ -81,13 +112,21 @@ The short form of the rulebook; the numbered rules are in
   (`.fade-both` when something sits above) — never a hard bottom edge, a
   border under them, or a fade to solid `bg` (the page's backdrop makes
   that a line).
-- Coloured shapes are one solid colour (`.lit-*`, `.btn-primary`, `.dot-*`)
-  — no outline, no tint-plus-border, no gloss, gradients or glows; a selected
-  pill or tab is the solid fill with `border-transparent`. Depth comes from
-  layers, borders and shadows. Anything sitting straight on the backdrop
-  (floating controls, unselected pills, tabs, the pager) is `.glass` — mostly
-  solid with a blur, never a bare outline or see-through. Softly rounded corners, not pills (`rounded-control` for
-  buttons and pills); full circles only for the motif.
+- **Flat and modern** (S1, S6, S8): coloured shapes are one solid colour
+  (`bg-primary`, `Badge`, `.dot-*`) — no outline, no tint-plus-border, no
+  gloss, gradients or glows; a selected tab or toggle is the solid fill
+  with `border-transparent`. Surfaces are flat: one solid fill
+  (`bg-background`, `bg-card`, `bg-muted`), a 1 px hairline `border`, **no
+  shadows and no blur** on any component (no `shadow-*`, no
+  `backdrop-blur-*`, no see-through `bg-card/90`). Overlays (menus,
+  popovers, tooltips, toasts, sheets) alone get one `shadow-md`. Anything on
+  the backdrop (floating controls, the dock, the top bar, unselected tabs,
+  the pager) is a solid `bg-card` with a hairline border. Depth comes from
+  the surface steps and the backdrop. Softly rounded corners from one
+  radius (`--radius`: 10 px; `rounded-lg` controls, `rounded-xl` cards,
+  `rounded-2xl` sheets), never pills; full circles only for the motif.
+  A hero's own pattern behind its title is still a blur (L7) — that's the
+  backdrop, not a component.
 - Type: the theme picks a font for headings and one for body (`FONTS`:
   sans, serif, mono, and decorative for headings only) with weight and
   spacing (`Theme.fonts`); use `font-display` / `font-body`, never a named
@@ -118,7 +157,7 @@ The short form of the rulebook; the numbered rules are in
   for cards. **Anything that scrolls shows its scrollbar at all times**
   (themed in `globals.css`; `.scroll-area`, `.scroll-area-x`,
   `List maxHeight`) — never hide one. Jobs running now are `JobTile`s.
-- Phone first at 375 px; floating frosted tab dock (≤ 5 tabs); things pinned
+- Phone first at 375 px; floating solid tab dock (≤ 5 tabs); things pinned
   to the bottom sit above it; touch targets ≥ 44 px; no horizontal scroll
   strips; nothing hover-only.
 - **Text never overflows.** Every piece of text whose length you don't
@@ -130,10 +169,13 @@ The short form of the rulebook; the numbered rules are in
   The kit's components already do this; app code does the same.
 - One modal style (`Sheet`); one primary button per view; sentence case;
   plain, short, slightly wry copy.
-- Use the kit (`.card`, `.btn`, `.field`, `.chip`, `.eyebrow`, `.meta`,
-  `PageHeader`, `List`, `Section`, `KeyValue`, `SwitchRow`,
-  `Autocomplete`…) before inventing anything. A new shared
-  component goes in the kit, the Style guide panel, the showcase and the guide.
+- Use jimbo.ui's components before anything else: the primitives
+  (`Button`, `Card`, `Input`, `Badge`, `Select`, `Switch`, `Tabs`,
+  `DropdownMenu`… in `components/ui/`) and the kit (`PageHeader`, `List`,
+  `Section`, `KeyValue`, `SwitchRow`, `Sheet`, `Menu`, `toast`…), plus the
+  type classes (`.eyebrow`, `.meta`, `.h-page`, `.h-section`). Icons are
+  `lucide-react` (P4). A new shared component goes in through a PR (J4):
+  the kit or foundation, the Style guide panel, the showcase and the guide.
 - **One library, no duplicates** (guide section 13). jimbo-ui's shared
   components and candidates are in `registry/components.json`; each app
   lists the ones it uses and its own in its `jimbo-ui.json`, and
@@ -184,7 +226,7 @@ The short form of the rulebook; the numbered rules are in
 - **The motif** is `ThemeDots`: circles, or the theme's `motif` shape
   (triforce, sparkles, stars, skulls, planets, bats…), picked on the Brand tab. Status dots and
   avatars stay circles.
-- **One jimbo-ui config section per app** (guide section 1). Every brand,
+- **Every app has exactly one jimbo-ui config page** (P5, J6; guide section 1) — an app without one isn't on jimbo.ui. Every brand,
   theme and style guide option lives there and nowhere else — no separate
   Brand pages, theme pickers in settings, or standalone Style guide pages.
   It's the same in every app: named **jimbo-ui config**, at **`/jimbo-ui`**,
@@ -214,7 +256,9 @@ Find the repo: use `~/Development/jimbo-ui` if it exists, otherwise
 release without touching that working copy, export it:
 `git -C ~/Development/jimbo-ui archive jimbo-ui--v<version> | tar -x -C <tmpdir>`.
 
-- `foundation/` — copied verbatim into apps (never edited in an app)
+- `foundation/` — copied verbatim into apps (never edited in an app): the
+  theme engine, `globals.css` (the one token mapping), and
+  `components/ui/` — the shadcn/ui primitives jimbo.ui ships, with its edits
 - `starter/` — copied once into a new app, then app-owned
 - `reference/` — generic implementations (kit, shell, header text, `MapView`,
   the jimbo-ui config section, and the **archetypes** in
@@ -231,8 +275,16 @@ release without touching that working copy, export it:
   `JIMBO_APPS_DIRS`) for the code checks, flagging a stale checkout;
   `--json` prints the assembled registry. It
   prints the component × app table, candidates to promote, unused kit
-  components, apps behind, raw colours in app code, and whether each app's
-  config section is missing, split up or gated wrong
+  components, apps behind, raw colours in app code, whether each app's
+  config section is missing, split up or gated wrong, and the binding
+  checks (J2, J5): a shadcn `components.json`, other UI libraries,
+  `components/ui` files jimbo.ui doesn't ship or that differ from it, Radix
+  imports outside it, and each pending local version with its PR's state
+- `scripts/shadcn-add.mjs` — maintainers only: adds a shadcn primitive to
+  foundation (runs the shadcn CLI in `showcase/`, whose `components.json`
+  never ships, then applies jimbo's mechanical edits; guide section 14)
+- `scripts/migrate-0.18.mjs` — the codemod for the shadcn update: renames
+  the old token utilities in an app and lists what needs a component
 - `scripts/tokens.mjs` — prints an app's `tokens.css` for its colours
   (accent, highlight or `-`, background, optional support)
 - `scripts/contrast.mjs` — contrast and colour-separation report for every
@@ -257,7 +309,9 @@ Each app has `jimbo-ui.json` at its repo root: `version`, `webRoot`, `auth`
 (`"admin"` or `"none"`), a `reference` map (reference file → the app's
 equivalent), `registry` (`registered`, `audited`) and `components`
 (`uses` — catalogue ids; `local` — `{ name, path, kind: domain|candidate,
-matches }`; `overrides` — kit pieces the app wraps). It is the only record
+matches }`; `overrides` — kit pieces the app adapts, for wiring only, with
+a `why`; `pending` — `{ name, path, pr, replaces? }`, temporary local
+versions waiting on a jimbo-ui PR, J5). It is the only record
 of the app: keep it current in the app's own repo. Guide section 1
 explains all of this.
 
@@ -271,9 +325,14 @@ explains all of this.
    or section (the component menu).
 1. Export the latest release (highest `jimbo-ui--v*` tag).
 2. Copy `foundation/` and `starter/` into the app's web root. Install
-   `clsx`, `tailwind-merge` 3, `tailwindcss` 4 and `@tailwindcss/vite` (add
-   `tailwindcss()` to the Vite plugins; no PostCSS or `tailwind.config.js` —
-   the theme is in `globals.css`); the `@/` alias to `src/`.
+   React 19, `clsx`, `tailwind-merge` 3, `tailwindcss` 4,
+   `@tailwindcss/vite`, `tw-animate-css` and the primitives' packages:
+   `radix-ui`, `class-variance-authority`, `lucide-react`, `cmdk`, `vaul`,
+   `sonner` (versions as in `showcase/package.json`). Add `tailwindcss()` to
+   the Vite plugins; no PostCSS, `tailwind.config.js` or shadcn
+   `components.json` — the theme and the token mapping are in
+   `globals.css`, and the components come with foundation. The `@/` alias
+   to `src/`.
 3. Set `src/lib/brand.config.ts` (name, default theme — a template from guide
    section 4 or new colours that pass the readability checks — storage
    prefix), then regenerate `src/styles/tokens.css` with `scripts/tokens.mjs`.
@@ -357,8 +416,15 @@ update", or before updating if the user wants to look first.
    the current reference has (core rule above) and is gated right; build it
    if the app doesn't have it yet, moving any separate brand, theme or style
    pages into it.
-7. Typecheck and build; check the config section's tabs at phone width.
-8. Set `version` in `jimbo-ui.json`, add an entry to the app's own changelog
+7. **Audit for deviations** (the binding checks of the audit workflow,
+   group J first, then the groups this release touched): report each as
+   `rule · file:line · what · fix`. Fix what jimbo.ui covers in this update.
+   For what it doesn't, don't build a workaround: point to the PR route
+   ("Amend jimbo.ui") and, if the user wants it now, a J5 pending version.
+   Remove every `components.pending` entry whose PR this release brings,
+   switching to the jimbo.ui version.
+8. Typecheck and build; check the config section's tabs at phone width.
+9. Set `version` in `jimbo-ui.json`, add an entry to the app's own changelog
    ("Updated to jimbo-ui 0.6.0: …"), and commit. Push only if the user asks.
 
 ## Workflow: audit an app against the rulebook
@@ -367,14 +433,32 @@ update", or before updating if the user wants to look first.
 standards?". Read-only until the user says to fix.
 
 1. Read [rulebook.md](rulebook.md) and the app's `jimbo-ui.json`.
-2. Go group by group (B, C, S, K, L, N, M, P, A) over the app's own code —
+2. **Binding first (J1–J6, P5)** — these fail the audit on their own:
+   - J6/P5: the jimbo-ui config page exists at `/jimbo-ui`, gated by `auth`.
+   - J2: no shadcn `components.json`, no `npx shadcn` components, no other
+     UI library in `package.json`; every file in `components/ui/` is one
+     jimbo.ui ships and matches the release's copy; no `radix-ui` /
+     `@radix-ui/*` imports outside `components/ui/`.
+   - J3: `className` on a jimbo.ui component sets layout only — search for
+     colour, border, radius, shadow, padding, height or text-size classes
+     on `<Button`, `<Card`, `<Input`, `<Badge`, `<Select…`, and on kit
+     components.
+   - S8 / C1: `shadow-`, `backdrop-blur`, see-through surfaces
+     (`bg-card/90`), raw hex, `rgb(`, arbitrary colours, palette colours,
+     old token names (`node ~/Development/jimbo-ui/scripts/migrate-0.18.mjs
+     src --dry` lists them).
+   - J5: every file in `src/components/jimbo-pending/` is marked and listed
+     in `components.pending`, and each PR is still open (an entry whose PR
+     has shipped is a break: swap in the jimbo.ui version).
+   `node scripts/inventory.mjs` in jimbo-ui runs most of these for every app.
+3. Then group by group (B, C, S, K, L, N, M, P, A) over the app's own code —
    routes and components; the kit copies only for drift from the reference.
    Look at the app at 375 px in a light, a mid and a dark look too.
-3. Report each break as `rule · file:line · what's wrong · fix`, grouped by
+4. Report each break as `rule · file:line · what's wrong · fix`, grouped by
    rule, then the app's own components that duplicate kit ones (P1) with
-   whether each is justified.
-4. Anything the rulebook doesn't cover yet but should: propose it as a
-   generic rule (no app terms) for jimbo-ui, numbered next in its group.
+   whether each is justified. Where the fix needs something jimbo.ui doesn't
+   have, the fix is **"→ PR route (J4)"**: name the generic rule, token,
+   variant or component to propose, and offer the "Amend jimbo.ui" workflow.
 5. Record `registry.audited` in `jimbo-ui.json` when the fixes land.
 
 ## Workflow: register an app
@@ -405,7 +489,12 @@ standards?". Read-only until the user says to fix.
    `node scripts/inventory.mjs`.
 8. On a branch in the app, add this block to its `CLAUDE.md` (create it if
    missing):
-   > This app uses jimbo-ui. Before creating a new UI component, check
+   > This app uses jimbo-ui, and jimbo-ui is binding (rules J1–J6): use
+   > only its shadcn components and tokens, never restyle them, never add
+   > shadcn components or another UI library here. Anything jimbo-ui lacks
+   > is a PR to ryanjpeterson/jimbo-ui; until it's released, a temporary
+   > version lives in src/components/jimbo-pending/, listed under
+   > components.pending in jimbo-ui.json. Before creating a new UI component, check
    > registry/components.json in jimbo-ui (and `node scripts/inventory.mjs
    > --json` there) for an existing one with the same purpose. All brand,
    > theme and style options belong in the jimbo-ui config section
@@ -435,6 +524,46 @@ components". In the app's own session.
 5. Typecheck and build. With `auth: "admin"`, check that a non-admin can't
    reach `/jimbo-ui` or call the save route (expect a 401/403). Show the
    user any visual differences before committing.
+
+## Workflow: amend jimbo.ui (the PR route)
+
+"jimbo-ui doesn't have X", "can I add a variant", "this app needs a new
+component / token / rule", or any break an audit can't fix with what
+jimbo.ui has (J4). The **only** way an app gets something new. Guide
+section 14 has the detail.
+
+1. **Make it generic.** Write down the need as a pattern any app could use,
+   with neutral names and examples — never the app's name, domain words,
+   data or artwork (the stay-generic rule; CLAUDE.md in jimbo-ui has the
+   word scan). Check the catalogue and the rulebook first: a match by
+   purpose is a variant of that one, not a new thing.
+2. **Branch jimbo-ui** (`~/Development/jimbo-ui`, pull first,
+   `amend/<short-name>`), and put in everything the change needs:
+   - **A rule** (if it's a rule): a line in `rulebook.md`, in its group,
+     with the **next free number in that group** (numbers are never reused
+     or reordered; a new group gets a new letter, agreed with Ryan), and its
+     explanation in the guide section it points to.
+   - **A token:** in the one mapping in `foundation/src/styles/globals.css`
+     (and the engine if it's a new derived colour), then
+     `node scripts/contrast.mjs --check`.
+   - **A component or variant:** a shadcn primitive goes in with
+     `node scripts/shadcn-add.mjs <name>` plus the hand edits (§14); a
+     composed one in the kit (`reference/`), built only from the
+     primitives and tokens. Add it to the Style guide panel, the showcase
+     and guide section 8, and a `registry/components.json` entry (with its
+     `shadcn` base).
+   - **CHANGELOG** under Unreleased: the change, its **Update** type and
+     **Apps must**; guide change log, README and docs/explain kept in step.
+3. **Check:** the stay-generic scan prints nothing; typecheck, contrast,
+   `versions.mjs`, `claude plugin validate --strict .`, `test:screens`.
+4. **Open the PR** to `ryanjpeterson/jimbo-ui` (ask before pushing). Its
+   body says: the need in generic words, what's added (rule number, token,
+   component), screenshots at 375 px in a light, mid and dark look, the
+   Update type, and Apps must. Never which app asked, beyond "an app".
+   Ryan reviews, merges and releases; nothing is numbered in the PR.
+5. **In the app:** wait, or build the J5 pending version (marked with the
+   PR's URL, listed in `components.pending`). The update that brings the
+   release removes it.
 
 ## Workflow: change and release the guidelines
 

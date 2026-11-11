@@ -8,6 +8,10 @@ implementations of everything below are in the repo's `reference/` folder.
 - **The rulebook:** [rulebook.md](rulebook.md) — every rule numbered and
   checkable (B1, K5…). Audits cite its numbers; it decides, and this guide
   explains.
+- **It's binding:** every app with a `jimbo-ui.json` follows it (J1). Apps
+  use jimbo.ui's shadcn components and tokens and nothing else (J2), never
+  restyle them (J3), and get anything new through a PR to jimbo-ui (J4,
+  section 14).
 - **The detail:** this guide. It's versioned with the jimbo-ui repo; see
   `CHANGELOG.md` for what changed in each version and what apps must do.
 - **The living picture:** the Style guide tab of each app's **jimbo-ui
@@ -21,11 +25,12 @@ implementations of everything below are in the repo's `reference/` folder.
   from Everyday, Holidays, Countries, Provinces or Sports templates (or a
   search across them) or fine-tuned on the Looks and Colours tabs of each app's
   jimbo-ui config section.
-- **Look:** flat colour on coloured shapes, depth from layers — solid
-  surfaces with a light frost, softly rounded corners (not pills), a
-  backdrop behind the page (still, or moving slowly), and flat circles of
-  the theme's colours as a recurring motif (no orbs) — or another flat shape
-  the theme picks (triforce, sparkles, stars…).
+- **Look:** flat and modern — shadcn/ui components on solid surfaces with
+  hairline borders, no shadows and no blur, softly rounded corners (not
+  pills), flat colour on coloured shapes, a backdrop behind the page
+  (still, or moving slowly), and flat circles of the theme's colours as a
+  recurring motif (no orbs) — or another flat shape the theme picks
+  (triforce, sparkles, stars…).
 - **Type:** sans (Archivo and Inter), mono (JetBrains Mono) or serif
   (Newsreader and Source Serif 4), chosen separately for headings and body.
 - **The URL holds the view:** the route and its tab, sub-tab, filter, search
@@ -35,16 +40,20 @@ implementations of everything below are in the repo's `reference/` folder.
 **Contents:** 1 How apps use jimbo-ui · 2 Brand · 3 Theme engine · 4 Theme
 templates · 5 Typography · 6 Layout and shell · 7 Surfaces, depth and motion ·
 8 Components · 9 Patterns · 10 Icons · 11 Accessibility · 12 Don'ts ·
-13 One library, no duplicates
+13 One library, no duplicates · 14 Amending jimbo.ui (the PR route)
 
 ---
 
 ## 1. How apps use jimbo-ui
 
-The stack is React + TypeScript + Vite + Tailwind CSS 4 (through
-`@tailwindcss/vite`, with `clsx` and `tailwind-merge` 3). Tailwind's theme
-lives in `globals.css` (`@theme`); there's no `tailwind.config.js` or
-PostCSS config. Paths below are relative to the app's web root.
+The stack is React 19 + TypeScript + Vite + Tailwind CSS 4 (through
+`@tailwindcss/vite`, with `clsx`, `tailwind-merge` 3 and `tw-animate-css`)
+and **shadcn/ui**: Radix primitives (`radix-ui`), `class-variance-authority`,
+`lucide-react` icons, `cmdk`, `vaul` (the phone sheet) and `sonner`
+(toasts). Tailwind's theme and the one token mapping live in `globals.css`
+(`@theme`); there's no `tailwind.config.js`, PostCSS config or shadcn
+`components.json` in an app — jimbo.ui ships the components, already
+themed, in foundation. Paths below are relative to the app's web root.
 
 ### Three kinds of file
 
@@ -56,8 +65,14 @@ PostCSS config. Paths below are relative to the app's web root.
 
 **Foundation:** `src/lib/theme.ts` (theme engine), `src/lib/themes.ts`
 (templates), `src/lib/jimbo.ts` (the release's version and links), `src/lib/cn.ts`, `src/lib/gestures.ts`,
-`src/components/ui/button.tsx`, `src/components/ColorPicker.tsx`,
-`src/styles/globals.css` (the Tailwind theme too).
+`src/components/ui/*.tsx` (the shadcn/ui primitives jimbo.ui ships —
+`button`, `card`, `input`, `textarea`, `label`, `field`, `badge`, `select`,
+`switch`, `slider`, `tabs`, `toggle`, `toggle-group`, `dropdown-menu`,
+`popover`, `tooltip`, `dialog`, `alert-dialog`, `drawer`, `command`,
+`sonner`, `progress`, `skeleton`, `separator`, `table`, `accordion`,
+`alert`, `avatar`, `empty` — with jimbo's edits, section 8),
+`src/components/ColorPicker.tsx`, `src/styles/globals.css` (the Tailwind
+theme and the token mapping).
 
 **Starter (app-owned):**
 - `src/lib/brand.config.ts` — the app's name, default theme and localStorage
@@ -207,7 +222,8 @@ can't support it (no storage for a favicon upload) and say so in the app's
       { "name": "PlaceAutocomplete", "path": "apps/web/src/routes/AddPage.tsx", "kind": "candidate", "matches": "autocomplete" },
       { "name": "OrderEditor", "path": "apps/web/src/routes/OrderPage.tsx", "kind": "domain", "matches": null }
     ],
-    "overrides": [{ "id": "event-row", "path": "apps/web/src/components/ui/kit.tsx", "why": "maps the app's statuses" }]
+    "overrides": [{ "id": "event-row", "path": "apps/web/src/components/ui/kit.tsx", "why": "maps the app's statuses" }],
+    "pending": [{ "name": "RatingField", "path": "apps/web/src/components/jimbo-pending/RatingField.tsx", "pr": "https://github.com/ryanjpeterson/jimbo-ui/pull/12", "replaces": null }]
   }
 }
 ```
@@ -216,7 +232,9 @@ can't support it (no storage for a favicon upload) and say so in the app's
 section (above). `registry` says when it registered and was last audited.
 `components`: `uses` (catalogue ids of the kit pieces it uses), `local`
 (its own components — `domain` or `candidate`, and the catalogue id it
-`matches`, if any) and `overrides` (kit pieces it wraps or adapts). **This
+`matches`, if any), `overrides` (kit pieces it adapts — wiring only, such
+as mapping its statuses, never looks; J3) and `pending` (temporary local
+versions of something proposed to jimbo-ui, each with its PR; J5). **This
 file is the only record of the app** — jimbo-ui doesn't keep a copy, so
 keep it current in the app's repo. At the start of every
 Claude Code session in the app, the jimbo-ui plugin compares it with the
@@ -377,14 +395,14 @@ shades (section 3). Coloured shapes — buttons, active tabs and pills, date
 bands, avatars, swatches, dots — are **one solid colour**: no outline, no
 tinted fill with a coloured border, no gloss, gradients or glows. A selected
 pill, tab, switch or tick is the solid fill with `border-transparent`.
-Depth comes from layers (cards, borders, shadows under
-floating things), not shading. **Anything that would let the backdrop show
-through is `.glass`** — floating things, and controls sitting straight on
-the page (unselected pills, tabs, pager buttons): mostly solid, a soft blur
-and a crisp border, so text keeps its contrast over any pattern. Never a
-bare outline over the backdrop, never see-through. Corners are **softly rounded, not pills**: circles are
-kept for the motif (avatars, dots, swatches, round icon buttons). Cards carry a breath of the accent (top left)
-and support (bottom right).
+Surfaces are **flat** (S8): depth comes from the surface steps (page,
+card, muted) and their hairline borders over the backdrop — no shadows,
+gradients, glows or blur on components. **Anything that would let the
+backdrop show through is a solid `bg-card` with a hairline border** —
+floating things, and controls sitting straight on the page (unselected
+tabs, pager buttons, back buttons): never a bare outline over the
+backdrop, never see-through or frosted (S6). Corners are **softly rounded,
+not pills**: circles are kept for the motif (avatars, dots, swatches).
 
 **Colour comes from opaque shapes, not thin washes.** A faint wash of a
 colour over a background of the opposite hue goes grey (amber over blue,
@@ -435,13 +453,13 @@ the accent for the "done" one:
 
 | Tone | Example status | Chip |
 | --- | --- | --- |
-| `accent` | Done | `bg-accent-950 text-accent border-accent-700` |
+| `accent` | Done | `bg-primary-950 text-primary border-primary-700` |
 | `yellow` | Going / in progress | `bg-yellow-950 text-yellow-400 border-yellow-700` |
 | `purple` | Maybe / saved | `bg-purple-950 text-purple-400 border-purple-800` |
 | `red` | Missed / failed | `bg-red-950 text-red-400 border-red-800` |
-| `muted` | Cancelled / archived | `bg-surface-2 text-text-subtle border-border` |
+| `muted` | Cancelled / archived | `bg-muted text-subtle-foreground border-border` |
 
-The offline banner is fixed yellow (`bg-yellow-950/95 text-yellow-200`).
+The offline banner is fixed yellow (`bg-yellow-950 text-yellow-200`).
 
 ---
 
@@ -485,16 +503,19 @@ clear cards and labels as a near-black one.
 - `fadeTo(…, target)` = the largest t where mix(text, bg, t) still keeps the
   target contrast on cards.
 
+The engine's channels and their formulas; classes use the shadcn names
+from "The token mapping" below (the Tailwind column).
+
 | Token (`--c-…`) | Tailwind | Formula | Use |
 | --- | --- | --- | --- |
-| `bg` | `bg-bg` | background | Page |
-| `surface` | `bg-surface` | mix(bg, away, *card*) where *card* = stepTo vs bg, **1.2:1** (at least 0.05 dark / 0.04 light) | Cards, sheets, the dock |
-| `bg-deep` | `bg-bg-deep` | mix(bg, away, *card* × 0.35) | End of the card gradient |
-| `surface-2` | `bg-surface-2` | stepTo vs surface, **1.15:1** | Fields, chips, hover rows |
+| `bg` | `bg-background` | background | Page |
+| `surface` | `bg-card` | mix(bg, away, *card*) where *card* = stepTo vs bg, **1.2:1** (at least 0.05 dark / 0.04 light) | Cards, sheets, the dock |
+| `bg-deep` | `bg-background-deep` | mix(bg, away, *card* × 0.35) | End of the backdrop's fade |
+| `surface-2` | `bg-muted` | stepTo vs surface, **1.15:1** | Fields, chips, hover rows |
 | `border` | `border-border` | stepTo vs surface, **1.8:1** | Lines, outlines, card edges, row dividers |
-| `text` | `text-text-base` | text | Body text, header text |
-| `text-muted` | `text-text-muted` | mix(text, bg, fadeTo **5:1** on surface, at most 0.4) | Secondary lines |
-| `text-subtle` | `text-text-subtle` | mix(text, bg, fadeTo **3.8:1** on surface, at most 0.6) | Labels, hints, counts |
+| `text` | `text-foreground` | text | Body text, header text |
+| `text-muted` | `text-muted-foreground` | mix(text, bg, fadeTo **5.8:1** on surface-2, at most 0.4) | Secondary lines |
+| `text-subtle` | `text-subtle-foreground` | mix(text, bg, fadeTo **4.7:1** on surface-2, at most 0.6) | Labels, hints, counts |
 
 Each brand colour *c* — `accent`, `highlight`, `support` — gets the same
 family of tokens:
@@ -553,6 +574,38 @@ family of tokens:
 - Light backgrounds: surfaces step *darker*, text flips to near-black. Photo
   viewers, banners over images and map pins stay dark/vivid on purpose.
 
+### The token mapping (shadcn's names)
+
+The engine writes "R G B" channels (`--c-bg`, `--c-accent`…). One block in
+`globals.css`, on `:root` and every `.theme-scope`, names them the way
+shadcn's components expect, so any shadcn component picks up any jimbo
+theme with no colour code of its own. It's the only mapping: nothing else
+sets these variables, and classes use only these names (C1).
+
+| shadcn variable (class) | From | For |
+| --- | --- | --- |
+| `--background` (`bg-background`) | bg | The page |
+| `--background-deep` | bg-deep | The backdrop's fade |
+| `--foreground` (`text-foreground`) | text | Body text; also `--card-foreground`, `--popover-foreground`, `--secondary-foreground`, `--accent-foreground` |
+| `--card`, `--popover`, `--sidebar` | surface | Cards, sheets, menus, the dock |
+| `--muted`, `--secondary` | surface-2 | Fields, tags, tracks, secondary buttons |
+| `--accent` (`bg-accent`) | surface-2 | **shadcn's hover surface** — not the brand colour |
+| `--muted-foreground` | text-muted | Secondary text |
+| `--subtle-foreground` | text-subtle | Labels and hints (jimbo's own) |
+| `--primary`, `--primary-foreground` | accent, on-accent | The theme's accent: primary buttons, active states, the dot in the name |
+| `--primary-hover`, `-lighter`, `-light`, `-dark`, `-darker`, `-950`…`-700` | the accent's shades | Depth and washes |
+| `--highlight`, `--support` (+ `-foreground`, shades) | highlight, support | jimbo's other two brand colours (no shadcn slot) |
+| `--border`, `--input` | border | Hairlines, field borders |
+| `--ring` | accent | Focus rings |
+| `--destructive` (+ `-foreground`) | fixed red | Destructive actions only |
+| `--chart-1` … `--chart-5` | accent, highlight, support, accent-light, support-dark | Charts (three series at most, P2) |
+| `--radius` | 10 px | `rounded-sm` 6, `-md` 8, `-lg` 10 (controls), `-xl` 14 (cards), `-2xl` 18 (sheets) |
+
+The one trap: in shadcn, **accent is the hover surface**; the theme's
+accent colour is **primary**. A prop that names a theme colour (`tone`,
+`accent` on `StatTile` or `Hero`) still says `"accent"` — it's drawn with
+`primary`. Opacity modifiers work on every name (`bg-primary/15`).
+
 ### Readability (WCAG)
 
 Checked live on the Colours tab for the colours an admin picks (and for the
@@ -565,7 +618,7 @@ inferred ones, which are built to pass):
 Every template must also pass `node scripts/contrast.mjs --check`, with text
 measured on fields (`surface-2`, the weakest surface it sits on, so it holds
 on cards and the page too): body text ≥ 7:1, muted ≥ 5.5:1, labels ≥ 4.5:1;
-muted ≥ 4.5:1 on floating `.glass` over any photo; hero text over its scrim
+hero text over its scrim
 (below); card border
 ≥ 1.75:1, card against page ≥ 1.19:1 — and the three above, plus
 **colours apart**: accent and highlight at least 22 apart (CIE76 ΔE) and no
@@ -889,9 +942,9 @@ and body fonts.
 - **Top bar:** sticky, 56 px (64 px on desktop) plus `--safe-top` (0 under
   a solid status bar; in a browser with a notch in landscape or any page
   drawn under the status bar, its content still starts below it),
-  `bg-bg/90` frosted (`backdrop-blur-xl`), bottom border. Left: the header text (and text
-  tabs on desktop). Right: 40 px round buttons — search (outlined), **+ add**
-  (accent fill), account (avatar initial in an accent circle).
+  solid `bg-background`, a hairline bottom border. Left: the header text (and text
+  tabs on desktop). Right: icon buttons (`TopBarButton`, a `Button size="icon"`) — search (secondary), **+ add**
+  (primary fill), account (avatar initial in an accent circle).
 - **Width:** `AppShell width` — `column` (`max-w-5xl`, the default, for
   reading), `wide` (`max-w-7xl`: dashboards, galleries) or `full` (the whole
   screen). Any one section can go edge to edge on its own with `FullBleed`
@@ -928,10 +981,9 @@ and body fonts.
   for a list. Never hide a scrollbar (`scrollbar-width: none`,
   `::-webkit-scrollbar { display: none }`).
 - **Tab dock (phones):** floats 12 px above the bottom safe area, `max-w-md`,
-  a 5-column grid in a 20 px-radius slab: `bg-surface/95`, `border-border`,
-  `ring-1 ring-black/30`, `backdrop-blur-md`, deep
-  shadow. Each tab is 56 px tall with a 14 px-radius active tab, icon above a
-  10.5 px label; active = accent pill, filled icon, bold label. Presses scale
+  a 5-column grid in an 18 px-radius slab: solid `bg-card`, a hairline
+  `border-border`, no shadow or blur. Each tab is 56 px tall with a 14 px-radius active tab, icon above a
+  10.5 px label; active = a solid primary fill, filled icon, bold label. Presses scale
   to 0.92. Tapping the active tab scrolls to the top. A gradient fade from
   `bg` sits behind it so content dissolves under the dock.
 - **Things pinned to the bottom** (save bar, select-mode action bar, upload
@@ -1004,27 +1056,25 @@ and body fonts.
 
 | Thing | Recipe |
 | --- | --- |
-| `.card` | 14 px radius, `border-border` (full strength), gradient `surface → bg-deep` top to bottom at 97%, under a 9% accent glow from the top left and a 9% support glow from the bottom right; inner top highlight `inset 0 1px 0 rgba(255,255,255,.06)`, soft drop `0 12px 32px -16px rgba(0,0,0,.7)` |
-| `.glass` / `.card-glass` | Lightly frosted: `bg-surface/90`, `backdrop-blur-md`, `border-border`, soft drop. For tabs, unselected pills, the secondary top-bar buttons, the pager, floating controls and anything over a banner — anything that sits straight on the backdrop |
-| `.dot-accent/highlight/support` | A brand colour as a **flat circle**: one solid fill, nothing else (see Circles in section 2). Size it with utilities. `.orb-*` are older names for the same thing |
-| `.motif-accent/highlight/support` | A brand colour in the theme's motif shape (circle unless `Theme.motif` says otherwise), for `ThemeDots` only |
-| `.scroll-area` / `.scroll-area-x` | A box that scrolls inside the page, down or sideways: the scrollbar always shows (every scrollbar under `<body>` is themed: `surface-2` lane, `text-subtle` thumb, `text-muted` on hover, `accent` while dragged), its room is kept (`scrollbar-gutter: stable`), and scrolling stops at its end. Cap its height (`max-h-*`) |
-| `.divide-etched` | Lines between stacked items, on the parent like `divide-y`: a full-strength `border` line with a faint light line under it (`inset 0 1px 0 rgba(255,255,255,.05)`). It also reaches one level down, so rows grouped in wrappers (a month's label and rows) are divided too. Lists, ranked lists |
-| `.fade-out` (`.fade-both`) | **How a full-width opener ends.** A banner, a hero, a photo or gradient header never stops on a hard edge, a border, or a fade to solid `bg` — the page behind has its backdrop (pattern and glow), so any of those shows as a line. Put the opener's background (blurred photo, dim, gradient, pattern) in its own layer behind the content and mask that layer out to transparent: `.fade-out` fades the bottom 45%; add `.fade-both` to fade the top too when something sits above it. Mask the background, never the text. `Banner`, `Hero` and `HeroSection` do this |
-| `.lit-accent/highlight/support` | A solid brand fill: one flat colour, no outline, `on-c` text (with `border-transparent` on a bordered shape). Active tabs and pills, select ticks, the date band, count badges (the name is from when they were shaded) |
-| `.field` | 11 px radius, `bg-surface-2`, `border-border`, 15 px text, `px-4`; focus = accent border + 2 px accent ring at 20% |
-| `.btn` | 10 px radius (`rounded-control`), `h-control` (44 px on phones, 40 px desktop), `px-5`, 15 px semibold; `.btn-sm` `h-control-sm` (36/32 px), and `h-control` inside a `.controls` row; `lg` 48 px |
+| Surfaces (S8) | **Flat.** One solid fill — `bg-background` (page), `bg-card` (cards, sheets, menus, the dock, the top bar, floating controls), `bg-muted` (fields, tags, tracks) — and a 1 px `border-border` hairline. No shadows, gradients, inner highlights, glows or blur on any component, and nothing see-through (`bg-card/90`). Depth comes from the surface steps (card on page ≥ 1.19:1) and the backdrop |
+| Overlays | Menus, popovers, tooltips, toasts and sheets are the one exception: a single `shadow-md` to lift them off what's under them. The dimmer under a dialog or sheet is `bg-background/80` |
+| `Card` (`components/ui/card`) | `rounded-xl` (14 px), `border`, `bg-card`, padding 16 px (20 from `sm`). `asChild` makes a whole card a link (`LinkCard`, `MediaCard`) |
+| Floating on the backdrop (S6) | Unselected tabs, the pager, back buttons, the dock and top bar: solid `bg-card` with a hairline border — never a bare outline, see-through or frosted |
+| `.dot-primary/highlight/support` | A brand colour as a **flat circle**: one solid fill, nothing else (see Circles in section 2). Size it with utilities |
+| `.motif-primary/highlight/support` | A brand colour in the theme's motif shape (circle unless `Theme.motif` says otherwise), for `ThemeDots` only |
+| `.scroll-area` / `.scroll-area-x` | A box that scrolls inside the page, down or sideways: the scrollbar always shows (every scrollbar under `<body>` is themed: `muted` lane, `subtle-foreground` thumb, `muted-foreground` on hover, `primary` while dragged), its room is kept (`scrollbar-gutter: stable`), and scrolling stops at its end. Cap its height (`max-h-*`) |
+| `.divide-etched` | Hairlines between stacked items, on the parent like `divide-y`. It also reaches one level down, so rows grouped in wrappers (a month's label and rows) are divided too. Lists, ranked lists |
+| `.fade-out` (`.fade-both`) | **How a full-width opener ends.** A banner, a hero, a photo or gradient header never stops on a hard edge, a border, or a fade to solid `bg` — the page behind has its backdrop (pattern and glow), so any of those shows as a line. Put the opener's background (blurred photo, scrim, gradient, pattern) in its own layer behind the content and mask that layer out to transparent: `.fade-out` fades the bottom 45%; add `.fade-both` to fade the top too when something sits above it. Mask the background, never the text. `Banner`, `Hero` and `HeroSection` do this |
+| Selected (S7) | A solid brand fill with its `-foreground` text and `border-transparent`: active tabs and toggles (`data-[state=on]`, `data-[state=active]`), select ticks, the date band, count badges |
+| `Input` / `Textarea` / `SelectTrigger` | `h-control`, `rounded-lg`, `bg-muted`, `border-input`, 15 px text, `px-4`; focus = `ring` border + 3 px `ring/50` ring |
+| `Button` | `rounded-lg` (10 px), `h-control` (44 px on phones, 40 px desktop), `px-5`, 15 px semibold, `active:scale-95`; `size="sm"` `h-control-sm` (36/32 px), `icon` / `icon-sm` squares. Variants: `default` (solid primary, `primary-hover` on hover), `secondary` (`bg-secondary`, border, border lightens on hover), `ghost` (muted text, `bg-accent` on hover), `destructive` (solid fixed red, for confirming only). No `outline` or `link` variants, and no `lg` (K2). `loading` disables it and shows a spinner |
+| `Badge` (`components/ui/badge`) | `rounded-md`, never a pill (S2): `default` (primary), `secondary` (muted with a border), `highlight`, `support`, `destructive`. The kit's `Badge` is the status chip in a fixed `Tone` built on it |
 | `.controls` | A row of controls, every one `h-control`, wrapping on phones. `PageHeader actions` and `Section action` use it |
 | `.control-grid` | Options in equal columns (≥ 9 rem each), every cell one control high and full width |
-| `.btn-primary` | Solid accent fill, no outline, on-accent text, `accent-hover` on hover |
-| `.btn-secondary` | `bg-surface-2`, border, border lightens on hover |
-| `.btn-ghost` | Muted text, `surface-2` on hover |
-| `.btn-danger` | Muted text, red wash and highlight text on hover |
-| `.chip` | 8 px radius, `bg-surface-2`, border, 14 px medium, muted |
-| Top bar | `bg-bg/90`, `backdrop-blur-md`, `border-border` |
-| Floating bars and the dock | `bg-surface/95`, `backdrop-blur-md`, `border-border`, deep shadow; the dock is a 20 px-radius slab and its active tab a 14 px-radius `accent/15` fill with a 1 px `accent/30` outline |
-| Sheet | Solid `bg-bg`, `border-border`. Rendered into `<body>` through a portal (so a parent's spacing or transform can't shift it); bottom sheet on phones (top corners 18 px, grab handle 40×6 px, max 92 dvh), centred dialog on desktop (18 px radius, `max-w-lg` / `max-w-xl`) |
-| Radii scale | 4 (`sm`) · 6 (`md`: badges) · 8 (`lg`: chips, tabs) · 10 (`control`: buttons, pills) · 11 (`xl`: fields) · 14 (`2xl`: cards) · 18 (`3xl`: sheets) · 20 (dock) · full only for circles (avatars, dots, orbs, round icon buttons) |
+| Top bar | `bg-background`, `border-b border-border`, solid |
+| Floating bars and the dock | `bg-card`, `border-border`, solid, no shadow; the dock is a 18 px-radius slab and its active tab a solid primary fill |
+| Sheet | shadcn `Drawer` on phones (bottom sheet, grab handle, drag down to close, up to 92 dvh, top corners 18 px) and `Dialog` from `sm` (centred, 18 px radius, `max-w-lg` / `max-w-xl`), both portalled to `<body>` on `bg-background` |
+| Radii scale | One radius, `--radius` 10 px: `rounded-sm` 6 · `rounded-md` 8 (badges) · `rounded-lg` 10 (`rounded-control`: buttons, fields, tabs) · `rounded-xl` 14 (cards) · `rounded-2xl` 18 (sheets, the dock) · full only for circles (avatars, dots, switches' thumbs) |
 
 **Motion:** quick and physical, never decorative.
 - Presses: `active:scale-95` on buttons, `0.92` on dock tabs, `0.97` on cards.
@@ -1054,6 +1104,37 @@ and body fonts.
 ---
 
 ## 8. Components (`components/ui/kit.tsx` unless noted)
+
+Every component is built on the shadcn/ui primitives jimbo.ui ships in
+`components/ui/` (foundation). Those are shadcn's own files with **jimbo's
+edits**, made when a primitive is added (`scripts/shadcn-add.mjs` does the
+mechanical ones) and kept on every update: the `@/lib/cn` import; no
+`dark:` classes (the tokens already follow light, mid and dark); no
+`shadow-xs`/`shadow-sm`, and overlays at `shadow-md` (S8); control heights
+from `h-control` / `h-control-sm` (K1); `rounded-lg` controls, `rounded-xl`
+cards, `rounded-2xl` dialogs, never a pill badge (S2); `bg-muted` fields;
+selected states as solid primary fills (S7); the dimmer
+`bg-background/80`, never black (C1); no `next-themes` in `sonner`, toasts
+top right (M4); and a few jimbo props — `Button loading`, `Card asChild`,
+`Progress tone` / `size` / indeterminate, `Badge` brand variants. Apps use
+them as they are (J2, J3).
+
+| Kit component | Built on |
+| --- | --- |
+| `Sheet` | `drawer` (phones) / `dialog` (`sm` up) |
+| `ConfirmSheet`, `useConfirm` | `alert-dialog` |
+| `toast`, `Toaster` | `sonner` |
+| `Menu`, `MoreButton`, `DropdownButton`, `JumpMenu` | `dropdown-menu`, `button` |
+| `Popover`, `Tooltip` | `popover`, `tooltip` |
+| `CommandPalette` | `dialog`, `badge` (its own listbox and query parsing) |
+| `TextField`, `TextArea`, `DateField`, `FileDrop` | `field`, `input`, `textarea`, `card` |
+| `SelectField`, `Tabs`, `ToggleGrid`, `SwitchRow`, `RangeField`, `ShareSliders` | `select`, `tabs`, `toggle-group`, `switch`, `slider` |
+| `DataTable`, `Accordion` | `table`, `accordion`, `card` |
+| `ProgressBar`, `JobTile` | `progress`, `card`, `badge` |
+| `Section`, `LinkCard`, `StatTile`, `List`, `EmptyState`, `Loading` | `card`, `empty`, `skeleton` |
+| `Badge` (status), `LinkChips` | `badge` |
+| `BackButton`, `Pager`, `PillTabs`, `TopBarButton` | `button` |
+| Heroes, `Page`, `ThemeDots`, charts, `AppShell`, `HeaderTitle`, `MapView` | Custom (no shadcn equivalent), on the same tokens |
 
 | Component | Use it for |
 | --- | --- |
@@ -1127,10 +1208,13 @@ and body fonts.
 | `Stepper` (`ui/feedback.tsx`) | Where you are in two to five steps: numbered circles joined by a line, done ones ticked (`onStep` goes back), "Step 2 of 4 · Details" on phones |
 | `OfflineBanner` / `UpdateBanner` (`ui/feedback.tsx`) | Slim bars stuck under the top bar, first thing on the page: offline with changes waiting (fixed yellow; `useOnline`), or a new version ready (Reload / Later) |
 | `DataTable` (`ui/data.tsx`) | Many records with several facts: a sortable table on desktop (`sortValue` per column; `aria-sort`), a row per record on phones with the `primary` column as its title — never a sideways-scrolling table. Keep `sort` in the URL |
-| `Accordion` (`ui/data.tsx`) | Sections that fold (FAQs, advanced settings), one open at a time unless `multiple`; native `<details>` in one card |
+| `Accordion` (`ui/data.tsx`) | Sections that fold (FAQs, advanced settings), one open at a time unless `multiple`; shadcn `Accordion` in one card |
 
-CSS classes for plain elements: `.card`, `.field`, `.btn …`, `.chip`,
-`.link-action`, `.eyebrow`, `.meta`, `.label`, `.h-page`, `.h-section`.
+Plain elements use the primitives (`Card`, `Input`, `Button`, `Badge`,
+`Label`) — the old `.card`, `.field`, `.btn`, `.chip`, `.label` and
+`.glass` classes are gone. CSS classes left: `.link-action`, `.eyebrow`,
+`.meta`, `.h-page`, `.h-section`, `.controls`, `.control-grid`,
+`.scroll-area`, `.divide-etched`, `.fade-out`, the dots and the motif.
 
 Adding a component: check the catalogue first (section 13). Build it from
 tokens, put it in the kit, add it to the Style guide panel and the
@@ -1167,7 +1251,7 @@ one here fits.
 | **After an action** | `toast()` (done, Undo) · `ConfirmSheet` (before a destructive one) · inline `TextField` errors |
 | **Work in progress** | `JobTile`s in `List layout="tiles"` (jobs running now) · `ProgressBar` (known length) · `Stepper` (a flow of steps) · `FloatingBar` (running now) · `OfflineBanner` / `UpdateBanner` |
 | **Many records** | `DataTable` (several facts each, sortable) · `List` + rows (one or two facts) · `Accordion` (content to fold away) |
-| **Settings** | `SwitchRow` (on/off), `KeyValue` (read-only), `.field`, `SelectField`, `RangeField`, `Tabs`, `Section` cards |
+| **Settings** | `SwitchRow` (on/off), `KeyValue` (read-only), `TextField`, `SelectField`, `RangeField`, `Tabs`, `Section` cards |
 | **Page width** | column (default) · wide · full (`AppShell width`) |
 | **Places** | `MapView` (`compact` inline, `full` in a section, `fill` as a map page) + `MapPinCard` · `List` + `EntityRow` with `ViewSwitch` list ⇄ map |
 
@@ -1303,8 +1387,10 @@ archetype only sets the starting shape.
 
 ## 10. Icons
 
-- Inline SVG, `stroke="currentColor"`, stroke width 2–2.25, round caps and
-  joins, 24 px in the dock and top bar, 16–20 px inline.
+- `lucide-react` (shadcn's icon set): stroked in `currentColor` with round
+  caps and joins, 24 px in the dock and top bar, 16–20 px inline (`size-4`,
+  `size-5`); components size the icons inside them. A dock's own tab icons
+  may be inline SVG paths in the same style (`DockIcon`).
 - Active dock icons get a 22% fill (`fill="currentColor" fillOpacity={0.22}`).
 - Icon-only buttons need `aria-label` (and `title` for shortcuts).
 
@@ -1314,8 +1400,8 @@ archetype only sets the starting shape.
 
 - Readability targets in section 3 (the Colours tab warns when they're missed;
   every template passes).
-- Focus is visible (`focus:ring-2 ring-accent/20` on fields,
-  `focus-visible:ring-accent/50` on buttons).
+- Focus is visible: `focus-visible:ring-[3px] ring-ring/50` on every
+  control (the primitives do it).
 - Every interactive element is a real `button`/`a`; toggles use
   `aria-pressed`/`role="switch"`; tabs use `role="tab"`/`aria-selected`;
   the picker's field and hue bar are `role="slider"`.
@@ -1326,9 +1412,15 @@ archetype only sets the starting shape.
 
 ## 12. Don'ts
 
-- No raw hex, no Tailwind palette colours for brand surfaces (`bg-zinc-900`,
-  `text-white` on cards or on accent/highlight fills) — use tokens and the
-  `on-*` colours.
+- No raw hex, `rgb()`, arbitrary colour values or Tailwind palette colours
+  (`bg-zinc-900`, `text-white`, `bg-black/50`) — use the token names and the
+  `-foreground` colours.
+- No shadows, gradients, glows or blur on components, and no see-through
+  surfaces (S8). No `.glass`, `.card`, `.btn`, `.field` or `.chip` classes —
+  they're gone; use `Card`, `Button`, `Input`, `Badge`.
+- No `npx shadcn` in an app, no shadcn component jimbo.ui doesn't ship, no
+  other UI library, and no restyling a jimbo.ui component through
+  `className` (J2, J3). Missing something? Section 14.
 - No second modal style, no full-screen blocking spinners.
 - No hard bottom edge on a full-width image or gradient header: no border
   under it, no fade to solid `bg`, no `overflow-hidden` cut. Fade its
@@ -1354,8 +1446,9 @@ fact lives in one place:**
 
 - **jimbo-ui** keeps the list of apps (`registry/apps.json`: name, repo,
   when it registered — nothing else) and its **catalogue**
-  (`registry/components.json`): the shared components and the generic
-  candidates an app has built.
+  (`registry/components.json`): the shared components (each with the
+  `shadcn` primitive it's built on) and the generic candidates an app has
+  built.
 - **Each app** keeps everything about itself in its `jimbo-ui.json`:
   version, auth, web root, the catalogue components it uses, and its own
   components (domain or candidate, and what they match).
@@ -1377,11 +1470,12 @@ that cover differences between apps).
 
 | Tier | Means |
 | --- | --- |
-| `foundation` | Copied into every app (`Button`, `.card`, `.field`…) |
-| `kit` | In `reference/`, adapted per app |
+| `foundation` | Copied into every app, never edited there: the shadcn primitives (`Button`, `Card`, `Input`…), the engine, `globals.css` |
+| `kit` | In `reference/`, composed from the primitives; an app adapts wiring only, never looks (J3) |
 | `pattern` | A behaviour the guide describes (save bar, offline banner, background work ring) |
 | `candidate` | Built in an app, generic — may be promoted. In the catalogue with a neutral name; the app's copy is in its `jimbo-ui.json` |
 | `domain` | Only that app's (its add flows, its data tools). Listed in the app's `jimbo-ui.json` only — **never in jimbo-ui** |
+| `pending` | A temporary local version while its PR to jimbo-ui is open (J5). In the app's `jimbo-ui.json` (`components.pending`) only, removed on release |
 
 **The dedupe rules:**
 
@@ -1412,6 +1506,58 @@ hand-written status tones, black or white overlays, and raw colours), and
 apps whose config section is missing, split up or gated wrong.
 `registry/apps.json` holds app names and repos only, so it's the one
 place app names appear in jimbo-ui.
+
+---
+
+## 14. Amending jimbo.ui (the PR route)
+
+jimbo.ui is binding (J1), so an app can't add its own rules, tokens,
+variants or components. When it needs something jimbo.ui doesn't have, the
+**only** route is a pull request to `ryanjpeterson/jimbo-ui` proposing a
+generic amendment (J4). The skill's "Amend jimbo.ui" workflow walks it.
+
+**Stay generic.** jimbo.ui never holds an app's code, names, artwork,
+sample content or domain terms. Bring back only the pattern, rewritten
+with neutral names and examples ("a rating field", not the app's word for
+it). Before committing, the stay-generic scan in jimbo-ui's `CLAUDE.md`
+must print nothing. A component that matches an existing one by purpose is
+a variant of it (section 13), never a second one.
+
+**What goes in the PR:**
+- **The need**, in generic words, and why the existing rules and
+  components don't cover it.
+- **A rule**, if it's one: a line in `rulebook.md` in its group, with the
+  next free number in that group. Numbers are never reused or reordered —
+  a rule that goes away leaves its number empty; rules are listed in the
+  order they were added within a group where reading order matters
+  (L7, L10, L11, L8…). A new kind of rule gets a new group with a new
+  letter, agreed with Ryan. The guide section it points to explains it.
+- **A token:** added to the one mapping in `globals.css` (and to the
+  engine if it's a new derived colour), with `node scripts/contrast.mjs
+  --check` passing for every template.
+- **A component or variant:** a new shadcn primitive goes into foundation
+  with `node scripts/shadcn-add.mjs <name>`, then jimbo's hand edits
+  (section 8: control heights, radius, flat surfaces, solid selected
+  states); a composed component goes into the kit, built only from the
+  primitives and tokens. Either way: the Style guide panel, the showcase,
+  section 8, and a `registry/components.json` entry with its `shadcn` base.
+- **The record:** a `CHANGELOG.md` entry under Unreleased with its
+  **Update** type (breaking, feature or fix) and **Apps must**; this
+  guide's change log, the README and `docs/explain` in step.
+- **The checks:** typecheck, contrast, `versions.mjs`,
+  `claude plugin validate --strict .`, the stay-generic scan, and
+  `test:screens` (screenshots at 375 px in a light, mid and dark look go
+  in the PR).
+
+Ryan reviews, merges and releases it; a PR never sets a version number.
+
+**Meanwhile, in the app (J5):** wait for the release, or build a temporary
+local version in `src/components/jimbo-pending/`, its first line
+`// jimbo-ui pending: <PR url>`, made only from jimbo.ui components and
+tokens, and listed in `jimbo-ui.json` `components.pending` (`name`,
+`path`, `pr`, and `replaces` if it stands in for something). The update
+that brings the release deletes it and uses jimbo.ui's version; an audit
+flags any pending file that isn't listed, or whose PR has shipped.
 
 ---
 
@@ -1663,8 +1809,17 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   `Menu` items take `current` and `{ heading }`, and long menus scroll.
   `LinkCard size="sm"` for a row of quick ways in. The shell sets
   `--page-max`, so a full-width hero's text lines up with the page column.
-- **Unreleased** — Stricter text contrast, measured on fields: muted
-  5.5:1, labels 4.5:1 (C6); muted on floating glass over photos. Hero
-  scrims (C8): the page colour over a hero's picture or blur, sized per
-  theme. `BackButton` is always glass with body text; `Hero` uses tokens,
-  not white and black.
+- **Unreleased** — **jimbo.ui on shadcn/ui, and binding.** Components
+  are shadcn/ui primitives in foundation (section 8, with jimbo's edits)
+  and a kit composed from them; one token mapping onto shadcn's variable
+  names in `globals.css` (section 3: the theme's accent is `primary`,
+  shadcn's `accent` is the hover surface). A flatter look: solid surfaces,
+  hairline borders, no shadows or blur on components (S6, S8; section 7).
+  lucide icons (P4). The rules are binding (group J): jimbo.ui's
+  components and tokens only, no restyles, no local shadcn, and anything
+  new through a PR (section 14), with tracked pending versions (J5); every
+  app has the config page (P5, J6). React 19.
+  Also: stricter text contrast, measured on fields: muted
+  5.5:1, labels 4.5:1 (C6). Hero scrims (C8): the page colour over a
+  hero's picture or blur, sized per theme. `BackButton` is a solid button
+  with body text; `Hero` uses tokens, not white and black.
