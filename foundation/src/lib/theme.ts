@@ -389,9 +389,11 @@ export const isHex = (v: string): boolean => /^#[0-9a-f]{6}$/i.test(v);
 
 /**
  * Contrast targets (WCAG ratios) the derived colours are stepped to meet on
- * every background, measured on cards — the surface most text sits on.
+ * every background. Layers are measured on cards; muted text on surface-2
+ * (fields, chips, a ghost button's hover — the lightest place it sits) and
+ * subtle text (eyebrows, labels: small type) on cards, both with a little margin.
  */
-export const CONTRAST_TARGETS = { card: 1.2, card2: 1.15, border: 1.8, muted: 5, subtle: 3.8 } as const;
+export const CONTRAST_TARGETS = { card: 1.2, card2: 1.15, border: 1.8, muted: 4.7, subtle: 4.6 } as const;
 
 /** Smallest t in [min, max] where mix(from, to, t) reaches `target` contrast with `against` (it grows with t). */
 function stepTo(from: RGB, to: RGB, against: RGB, target: number, min: number, max: number): number {
@@ -628,13 +630,61 @@ export function deriveColors(input: Theme): Record<string, RGB> {
     "surface-2": surface2,
     border,
     text,
-    // Secondary text fades toward the page only as far as it stays readable on cards.
-    "text-muted": mix(text, bg, fadeTo(text, bg, surface, T.muted, 0.4)),
+    // Secondary text fades toward the page only as far as it stays readable where it sits:
+    // muted on surface-2 (fields, chips), subtle (small labels) on cards.
+    "text-muted": mix(text, bg, fadeTo(text, bg, surface2, T.muted, 0.4)),
     "text-subtle": mix(text, bg, fadeTo(text, bg, surface, T.subtle, 0.6)),
     ...family("accent", hexToRgb(theme.accent)),
     ...family("highlight", hexToRgb(theme.highlight)),
     ...family("support", hexToRgb(theme.support)),
   };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Text over pictures and blurs
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * What text over a picture or a blur reaches (rulebook C8): the title as body
+ * text does on cards, the muted lines (eyebrow, subtitle, links, meta) and an
+ * eyebrow in a brand colour as muted text does. PHOTO_MAX is the strongest
+ * veil — the picture always shows a little.
+ */
+export const PHOTO_TARGETS = { text: 7, muted: 4.5 } as const;
+export const PHOTO_MAX = 0.9;
+
+/**
+ * How strongly (0–1) to veil a picture or blur in the page colour so the
+ * theme's own text reads on every part of it. The text keeps the page's
+ * colours (dark on light pages, light on dark ones), since the veil fades into
+ * the page. `samples` are the colours under the text — a picture's blurred
+ * cells (`useImageCells`), a blur's brightest wash; none known (a picture from
+ * another site that can't be read) is the worst case, black and white.
+ * `also`: brand colours drawn as text there too (HeroSection's eyebrow).
+ */
+export function photoScrim(theme: Theme, samples?: (string | RGB)[] | null, also: string[] = [], min = 0.2): number {
+  const c = deriveColors(theme);
+  const cells = samples?.length ? samples.map((x) => (typeof x === "string" ? hexToRgb(x) : x)) : [WHITE, BLACK];
+  const inks: [RGB, number][] = [[c.text!, PHOTO_TARGETS.text], [c["text-muted"]!, PHOTO_TARGETS.muted], ...also.map((n) => [c[n]!, PHOTO_TARGETS.muted] as [RGB, number])];
+  // A little margin over the targets: a blurred picture's cells are averages, its brightest spot a touch brighter.
+  const reads = (a: number) => cells.every((cell) => inks.every(([ink, t]) => contrast(ink, mix(cell, c.bg!, a)) >= t + 0.3));
+  for (let a = min; a < PHOTO_MAX; a += 0.02) if (reads(a)) return Math.round(a * 100) / 100;
+  return PHOTO_MAX;
+}
+
+/** The weakest contrast left at that veil: the lowest of text / 7 and muted / 4.5 over `samples` (≥ 1 passes). */
+export function photoScore(theme: Theme, samples?: (string | RGB)[] | null, also: string[] = []): number {
+  const c = deriveColors(theme);
+  const a = photoScrim(theme, samples, also);
+  const cells = samples?.length ? samples.map((x) => (typeof x === "string" ? hexToRgb(x) : x)) : [WHITE, BLACK];
+  const inks: [RGB, number][] = [[c.text!, PHOTO_TARGETS.text], [c["text-muted"]!, PHOTO_TARGETS.muted], ...also.map((n) => [c[n]!, PHOTO_TARGETS.muted] as [RGB, number])];
+  return Math.min(...cells.flatMap((cell) => inks.map(([ink, t]) => contrast(ink, mix(cell, c.bg!, a)) / t)));
+}
+
+/** The colours a blur of the brand colours can reach under the text: each at its brightest wash over the page. */
+export function blurSamples(theme: Theme, strength = 0.6): string[] {
+  const c = deriveColors(theme);
+  return (["accent", "highlight", "support"] as const).map((n) => rgbToHex(mix(c.bg!, c[n]!, strength)));
 }
 
 /** The same colours as hex strings — for canvas, maps and other non-CSS uses. */
@@ -1875,17 +1925,21 @@ export function toneOf(theme: Theme): PageTone {
 }
 
 /** The readability targets every template meets (scripts/contrast.mjs): the names of any it misses. */
-export const TEMPLATE_TARGETS = { text: 7, muted: 4.5, subtle: 3.5, border: 1.75, card: 1.19, accent: 3.5, highlight: 3.5, support: 4.5, button: 4.5, apart: 15 } as const;
+export const TEMPLATE_TARGETS = { text: 7, muted: 4.5, subtle: 4.5, border: 1.75, card: 1.19, accent: 3.5, highlight: 3.5, support: 4.5, button: 4.5, apart: 15, photo: 1, blur: 1 } as const;
 export function templateScores(theme: Theme): Record<keyof typeof TEMPLATE_TARGETS, number> {
   const c = themeHex(theme);
   return {
-    text: contrast(c.text!, c.surface!), muted: contrast(c["text-muted"]!, c.surface!), subtle: contrast(c["text-subtle"]!, c.surface!),
+    text: contrast(c.text!, c.surface!), muted: contrast(c["text-muted"]!, c["surface-2"]!), subtle: contrast(c["text-subtle"]!, c.surface!),
     border: contrast(c.border!, c.surface!), card: contrast(c.surface!, c.bg!),
     accent: contrast(c.accent!, c.bg!), highlight: contrast(c.highlight!, c.bg!), support: contrast(c.support!, c.surface!),
     button: contrast(c["on-accent"]!, c.accent!),
     // Accent and highlight need 22 apart; the other pairs 15 (scaled so the one target covers both).
     // Closer than that and two roles read as one colour: an eyebrow looks like a link, a badge like a button.
     apart: Math.min(deltaE(c.accent!, c.highlight!) * (15 / 22), deltaE(c.accent!, c.support!), deltaE(c.highlight!, c.support!)),
+    // Text over a picture no one can read (the worst case, black and white) at the strongest veil, and over
+    // the hero blur with its support eyebrow (C8): 1 or more is every line at its target.
+    photo: photoScore(theme, null),
+    blur: photoScore(theme, blurSamples(theme), ["support"]),
   };
 }
 export function templateIssues(theme: Theme): string[] {

@@ -7,7 +7,7 @@
  * actions and its routes as children.
  */
 
-import type { CSSProperties, ReactNode } from "react";
+import type { ButtonHTMLAttributes, CSSProperties, ReactNode } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { HeaderTitle } from "@/components/HeaderTitle";
 import { Toaster } from "@/components/ui/feedback";
@@ -127,19 +127,25 @@ export function DockIcon({ active = false, children }: { active?: boolean; child
   );
 }
 
-/** A 40 px round top-bar button: outlined, or filled with the accent for the main action. */
-export function TopBarButton({ label, onClick, primary = false, children }: {
+/**
+ * A round glass icon button: in the top bar (`sm`, 40 px), or 44 px (`md`) in a
+ * page's or hero's header for its own + or ⋯ — named for its item ("Add a
+ * playlist", "Options for <name>"; K5). Filled with the accent for the main action.
+ */
+export function TopBarButton({ label, onClick, primary = false, size = "sm", children, ...rest }: {
   label: string;
   onClick: () => void;
   primary?: boolean;
-  /** An 18 px icon. */
+  size?: "sm" | "md";
+  /** An 18 px icon (20 px at `md`). */
   children: ReactNode;
-}) {
+} & Omit<ButtonHTMLAttributes<HTMLButtonElement>, "onClick" | "children">) {
   return (
-    <button onClick={onClick} aria-label={label} title={label}
+    <button type="button" onClick={onClick} aria-label={label} title={label} {...rest}
       className={cn(
-        "flex h-10 w-10 items-center justify-center rounded-full transition-[color,border-color,transform] active:scale-95",
-        primary ? "lit-accent hover:bg-accent-hover" : "glass text-text-muted hover:border-accent hover:text-text-base",
+        "flex shrink-0 items-center justify-center rounded-full transition-[color,border-color,transform] active:scale-95",
+        size === "md" ? "h-11 w-11" : "h-10 w-10",
+        primary ? "lit-accent hover:bg-accent-hover" : "glass text-text-base hover:border-accent aria-expanded:border-accent",
       )}>
       {children}
     </button>

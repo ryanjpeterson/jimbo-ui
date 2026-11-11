@@ -390,11 +390,14 @@
   .btn-secondary {
     @apply border border-border bg-surface-2 text-text-base hover:border-text-subtle;
   }
+  /* No surface of its own, so its text carries it: body text (7:1 on cards), not muted. */
   .btn-ghost {
-    @apply text-text-muted hover:bg-surface-2 hover:text-text-base;
+    @apply text-text-base hover:bg-surface-2;
   }
+  /* A ghost that turns the highlight on hover; body text at rest, since the highlight is only 3:1 on some
+     cards. It names its action and confirms first (M5), so the words say it's the risky one. */
   .btn-danger {
-    @apply text-text-muted hover:bg-red-950/40 hover:text-highlight;
+    @apply text-text-base hover:bg-surface-2 hover:text-highlight;
   }
   /* Small rounded tag: names, filters, counts. */
   .chip {

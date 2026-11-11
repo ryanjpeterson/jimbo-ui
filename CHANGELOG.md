@@ -34,6 +34,49 @@ the matching 0.x release.
 
 ## Unreleased
 
+Text over pictures and blurs reads on any cover; muted text, labels and ghost buttons are easier to read in every look.
+
+**Update:** breaking
+
+### Added
+- **C8 — text over a picture or a blur knows what's under it.** `photoScrim`,
+  `photoScore`, `blurSamples`, `PHOTO_TARGETS` and `PHOTO_MAX` in the theme
+  engine; `useImageCells` in the kit reads a picture's blurred cells
+  (canvas, CORS-safe: an unreadable picture gets the worst-case veil).
+- `contrast.mjs` columns `photo` (an unreadable picture) and `blur`
+  (`HeroSection`'s wash and support eyebrow); both must be ≥ 1.
+- `TopBarButton size="md"` — a 44 px round glass icon button for a
+  header's own + or ⋯; `MoreButton glass` and `Menu glass` for a page's or
+  part's own options (K5 amended).
+
+### Changed
+- `Hero` and `Banner` lay a veil of the page colour over their picture, as
+  strong as it needs (0.2–0.9), instead of `bg-black/35`; the title is
+  `text-text-base`, not `text-white`. `HeroSection` veils its blur when its
+  brightest wash needs it. Muted text over a light cover in a dark look:
+  1.12:1 → 4.78:1 at worst.
+- Muted text steps to 4.7:1 on `surface-2` (was 5:1 on cards — 4.31:1 on
+  fields and chips); labels and eyebrows to 4.6:1 on cards (was 3.8:1 —
+  3.27:1 on `surface-2`). C6: muted ≥ 4.5:1 on `surface-2`, labels ≥ 4.5:1
+  on cards. Every template still passes in every tone, with the same tones
+  offered.
+- `.btn-ghost` and `.btn-danger` are body text at rest (were muted);
+  danger turns the highlight on hover.
+- `BackButton` is glass, `rounded-control` (S2), body text, its label
+  truncated — on heroes too (was `bg-black/45 text-white`, C1). Top-bar
+  and ⋯ icons are body text.
+
+### Apps must
+- Copy the foundation files (theme engine, `globals.css`).
+- Take the reference `Hero`, `Banner`, `HeroSection`, `BackButton`,
+  `useImageCells`, `TopBarButton` and `MoreButton` / `Menu`; drop app
+  overrides that add `text-white`, `bg-black/…` or a fixed dim on a hero
+  (C8) or a hand-made round glass icon button (use `TopBarButton size="md"`
+  or `Menu glass`).
+- Serve hero pictures same-origin or with CORS headers so they can be read
+  (otherwise they get the strongest veil).
+- Label a header's ⋯ for its item ("Options for *name*").
+
 ## 0.17.0 — 2026-11-08
 
 **Update:** breaking

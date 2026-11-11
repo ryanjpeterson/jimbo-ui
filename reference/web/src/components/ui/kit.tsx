@@ -14,7 +14,7 @@ import { Children, createContext, useContext, useEffect, useLayoutEffect, useRef
 import { createPortal } from "react-dom";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/cn";
-import { backdropCss, fullTheme, loadFonts, themeHex, themeVars, type BackdropPattern, type Theme } from "@/lib/theme";
+import { backdropCss, blurSamples, fullTheme, loadFonts, photoScrim, rgbToHex, themeHex, themeVars, type BackdropPattern, type Theme } from "@/lib/theme";
 import { useBrand } from "@/lib/useBrand";
 import { BRAND } from "@/lib/brand.config";
 
@@ -217,6 +217,7 @@ function HeroFrame({ pattern, tone = "accent", size, align, pullUp, under, child
   const look = backdropCss({ ...leadWith(theme, tone), backdrop: { pattern, base: "glow", intensity: 0.9, scale: 0.8 } });
   // A wash of the leading colour, somewhere of its own per tone, so kinds of page read apart at a glance (L12).
   const wash = `radial-gradient(55% 90% at ${WASH_AT[tone]}, ${washOf(themeHex(theme)[tone] ?? "#888888")}, transparent 72%)`;
+  const veil = photoScrim(theme, blurSamples(theme), ["support"]);
   return (
     <FullBleed pad={false} className={cn("isolate", size === "sm" ? "mb-4 sm:mb-6" : "mb-2", pullUp && "-mt-6 sm:-mt-8")}>
       {/* Always a blur: the layer is blurred and scaled up a little so its edges don't show, and it fades
@@ -226,6 +227,9 @@ function HeroFrame({ pattern, tone = "accent", size, align, pullUp, under, child
           <div className="absolute -inset-16 blur-3xl saturate-150"
             style={{ backgroundImage: `${wash}, ${look.image}`, backgroundSize: `100% 100%, ${look.size}`,
               backgroundPosition: `0 0, ${look.position}`, backgroundRepeat: `no-repeat, ${look.repeat}` }} />
+          {/* The page colour over the blur, as much as its brightest wash needs for the title, the muted
+              lines and the support eyebrow to read (C8) — often none. */}
+          {veil > 0.2 && <div className="absolute inset-0 bg-bg" style={{ opacity: veil }} />}
         </div>
       )}
       <div {...rest} className={cn("flex flex-col justify-end",
@@ -447,21 +451,67 @@ export function parentPath(pathname: string): string {
  * (`useRememberPages` in the shell), so filters and tabs there survive.
  */
 export function BackButton({ to, label, overlay = false }: { to: string; label: string; overlay?: boolean }) {
+  // Glass in body text, on a hero and on the page alike (S6, C8): it reads over any picture or blur.
+  // A long parent name truncates rather than pushing the badge off the row.
   return (
     <Link
       to={backHref(to)}
       aria-label={`Back to ${label}`}
       className={cn(
-        "inline-flex h-control items-center gap-1 rounded-full pl-2 pr-3.5 text-sm font-semibold transition-colors",
-        overlay
-          ? "bg-black/45 text-white backdrop-blur-md hover:bg-black/60"
-          : "-ml-2 text-text-muted hover:text-text-base",
+        "glass inline-flex h-control min-w-0 max-w-[70%] items-center gap-1 rounded-control pl-2 pr-3.5 text-sm font-semibold text-text-base transition-colors hover:border-accent",
+        !overlay && "self-start",
       )}
     >
       <Chevron dir="left" />
-      {label}
+      <span className="truncate">{label}</span>
     </Link>
   );
+}
+
+/**
+ * The colours of a picture as a banner shows it (its middle, blurred, more
+ * saturated): a 4×4 grid of averaged cells, or null until it's read — and
+ * when it can't be (a picture from another site without CORS), so the banner
+ * keeps the worst-case veil. Feed it to `photoScrim`.
+ */
+export function useImageCells(src?: string | null): string[] | null {
+  const [cells, setCells] = useState<string[] | null>(null);
+  useEffect(() => {
+    setCells(null);
+    if (!src) return;
+    let live = true;
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      try {
+        const n = 16, cell = 4;
+        const cv = document.createElement("canvas");
+        cv.width = cv.height = n;
+        const ctx = cv.getContext("2d", { willReadFrequently: true });
+        if (!ctx) return;
+        ctx.imageSmoothingQuality = "high";
+        ctx.filter = "saturate(1.5)";
+        const w = img.naturalWidth, h = img.naturalHeight;
+        ctx.drawImage(img, w / 6, h / 6, (w * 2) / 3, (h * 2) / 3, 0, 0, n, n);
+        // Throws on a picture the page isn't allowed to read: stay on the worst case.
+        const d = ctx.getImageData(0, 0, n, n).data;
+        const out: string[] = [];
+        for (let cy = 0; cy < n; cy += cell) for (let cx = 0; cx < n; cx += cell) {
+          let r = 0, g = 0, b = 0;
+          for (let y = cy; y < cy + cell; y++) for (let x = cx; x < cx + cell; x++) {
+            const i = (y * n + x) * 4;
+            r += d[i]!; g += d[i + 1]!; b += d[i + 2]!;
+          }
+          const k = cell * cell;
+          out.push(rgbToHex([r / k, g / k, b / k]));
+        }
+        if (live) setCells(out);
+      } catch { /* unreadable: keep the worst case */ }
+    };
+    img.src = src;
+    return () => { live = false; };
+  }, [src]);
+  return cells;
 }
 
 /**
@@ -487,12 +537,19 @@ export function Banner({ backdrop, glow = "accent", back, badge, children, pullU
     purple: "from-purple-900/70",
   }[glow];
 
+  const { theme } = useBrand();
+  const cells = useImageCells(backdrop);
+  // A veil of the page colour, as strong as this picture needs for the page's own text to read on it (C8):
+  // read from the picture where it can be, the worst case where it can't, the glow's colours with no picture.
+  const hex = themeHex(theme);
+  const veil = photoScrim(theme, backdrop ? cells : [hex[`${glow}-900`] ?? hex["accent-900"]!, hex["support-950"]!]);
+
   return (
     // Breaks out of the page column to the full screen width and up against the app bar.
     <section className={cn("relative isolate mb-6 ml-[calc(50%-50vw)] w-screen overflow-hidden sm:mb-8", pullUp && "-mt-6 sm:-mt-8")}>
       {/* Backdrop: the image itself, blurred and scaled up so it fills the whole
           banner edge to edge (scaling hides the soft edges blur leaves behind),
-          under a light dim. The whole layer fades out at the bottom (.fade-out), so
+          under a veil of the page colour, as strong as the picture needs. The whole layer fades out at the bottom (.fade-out), so
           the page's own backdrop shows through — never a hard edge or a band of page colour. */}
       <div aria-hidden="true" className={cn("fade-out absolute inset-0 -z-10 overflow-hidden", !pullUp && "fade-both")}>
         {backdrop ? (
@@ -500,7 +557,7 @@ export function Banner({ backdrop, glow = "accent", back, badge, children, pullU
         ) : (
           <div className={cn("absolute inset-0 bg-linear-to-br via-support-950/60 to-transparent", glowCls)} />
         )}
-        <div className="absolute inset-0 bg-black/35" />
+        <div className="absolute inset-0 bg-bg transition-opacity duration-300" style={{ opacity: veil }} />
       </div>
 
       <div className="mx-auto max-w-5xl px-4 sm:px-6">
@@ -574,7 +631,7 @@ export function Hero({ imageUrl, imageAlt, eyebrow, title, children, actions, ba
   // A picture that fails to load gives the initials thumbnail and the plain glow, not a broken image.
   const shown = useImageOrFallback(imageUrl);
   const thumbCls = cn(
-    "shrink-0 overflow-hidden rounded-xl border border-white/10 bg-surface-2 shadow-2xl shadow-black/50",
+    "shrink-0 overflow-hidden rounded-xl border border-border bg-surface-2 shadow-2xl shadow-black/50",
     square ? "h-24 w-24 sm:h-44 sm:w-44" : "h-32 w-24 sm:h-60 sm:w-44",
   );
 
@@ -588,7 +645,7 @@ export function Hero({ imageUrl, imageAlt, eyebrow, title, children, actions, ba
               className="group relative block h-full w-full cursor-zoom-in">
               <img src={shown.src} alt={imageAlt ?? title} onError={shown.onError} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
               {/* Small expand hint in the corner */}
-              <span className="absolute bottom-1.5 right-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-black/55 text-white/90 backdrop-blur-xs">
+              <span className="glass absolute bottom-1.5 right-1.5 flex h-7 w-7 items-center justify-center rounded-full text-text-base">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
                 </svg>
@@ -596,13 +653,13 @@ export function Hero({ imageUrl, imageAlt, eyebrow, title, children, actions, ba
             </button>
           ) : (
             <div className={cn("flex h-full w-full items-center justify-center bg-linear-to-br to-surface-2", glow)}>
-              <span className="font-display text-3xl text-white/40 sm:text-5xl">{initials(title)}</span>
+              <span className="font-display text-3xl text-text-muted sm:text-5xl">{initials(title)}</span>
             </div>
           )}
         </div>
         <div className="min-w-0 flex-1">
           {eyebrow && <p className="eyebrow mb-1.5 text-text-muted">{eyebrow}</p>}
-          <h1 className="line-clamp-3 font-display text-28 leading-[1.05] text-white break-words sm:text-6xl">{title}</h1>
+          <h1 className="line-clamp-3 font-display text-28 leading-[1.05] text-text-base break-words sm:text-6xl">{title}</h1>
           {children && <div className="mt-2 line-clamp-3 space-y-0.5 break-words text-15 text-text-muted sm:mt-3 sm:text-lg">{children}</div>}
         </div>
       </div>
