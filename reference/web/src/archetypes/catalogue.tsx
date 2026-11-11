@@ -229,7 +229,7 @@ function Places({ at }: At) {
   );
 }
 
-/** The map page: the map fills the page, the switch floats, the chosen place in a rounded-xl border border-border bg-card above the dock. */
+/** The map page: the map fills the page, the switch floats, the chosen place in a card above the dock. */
 function PlacesMap({ at }: At) {
   // The chosen place is in the URL (?place=), so Back closes its card.
   const [placeId, setPlaceId] = useUrlState("place", "");

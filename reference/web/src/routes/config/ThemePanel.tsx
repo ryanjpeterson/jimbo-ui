@@ -4,7 +4,7 @@
  * (`useThemeDraft`) and one save bar (`ThemeSaveBar`).
  *
  * Looks: pick a look from the categories — Everyday (dark, mid, light), Holidays, Countries, Provinces,
- * Games (series and console tabs) and Sports (league and city tabs) — or search them all (each rounded-xl border border-border bg-card is
+ * Games (series and console tabs) and Sports (league and city tabs) — or search them all (each card is
  * a miniature of the app in that theme, with its colours as circles), then fine-tune the
  * colours with the inline picker (Colours). Accent and background are always set; highlight and
  * support can be left to the engine, which infers them from the others. Backdrop: a pattern behind
@@ -21,7 +21,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
 import { api } from "@/lib/api";
-import { applyTheme, BACKDROP_BASES, BACKDROP_GROUPS, BACKDROP_MOTIONS, BACKDROPS, MOTIFS, motifMask, backdropCss, brandConfigLine, contrast, exportTheme, FONT_GROUPS, FONTS, fullTheme, importTheme, loadFonts, ownColours, PAGE_TONES, themeHex, toneOf, tokensCss, type PageTone, type Theme, THEME_KEYS } from "@/lib/theme";
+import { applyTheme, BACKDROP_BASES, BACKDROP_GROUPS, BACKDROP_MOTIONS, BACKDROPS, MOTIFS, motifMask, backdropCss, brandConfigLine, contrast, exportTheme, FONT_GROUPS, FONTS, fullTheme, GRID_COLUMNS, importTheme, loadFonts, ownColours, PAGE_TONES, themeHex, toneOf, tokensCss, type PageTone, type Theme, THEME_KEYS } from "@/lib/theme";
 import { ALL_FAMILIES, FAMILY_SETS, familyAt, familyLook, sameTheme, type Template, type TemplateFamily, type TemplateStyle } from "@/lib/themes";
 import { BRAND } from "@/lib/brand.config";
 import { useBrand } from "@/lib/useBrand";
@@ -111,7 +111,7 @@ function TemplateGrid({ label, families, tone, draft, pick }: { label?: string; 
     <div className="space-y-2 pt-1">
       {label && <p className="eyebrow px-0.5">{label}</p>}
       {families.length ? (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {families.map((f) => {
             const look = familyLook(f, tone);
             // A look that can't be made in this tone shows its nearest, and says so.
@@ -213,10 +213,11 @@ export function LooksPanel({ d }: { d: ThemeDraft }) {
 
   const current = FAMILY_SETS.find((s) => s.label === set)!;
   const group = current.groups.find((g) => g.label === subTab) ?? current.groups[0];
-  // A template sets the colours; the type, backdrop and motif you've chosen stay — unless
+  // A template sets the colours; the type, backdrop, motif and grid columns you've chosen stay — unless
   // the look comes with its own (a console's menu font, backdrop and motif), which it brings.
   const pick = (tpl: Template) => setDraft(ownColours({ ...tpl.theme,
-    fonts: tpl.style?.fonts ?? draft.fonts, backdrop: tpl.style?.backdrop ?? draft.backdrop, motif: tpl.style?.motif ?? draft.motif }));
+    fonts: tpl.style?.fonts ?? draft.fonts, backdrop: tpl.style?.backdrop ?? draft.backdrop, motif: tpl.style?.motif ?? draft.motif,
+    gridColumns: draft.gridColumns }));
   // Lower-case and without accents, so "quebec" finds Québec.
   const plain = (v: string) => v.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
   const words = plain(query.trim()).split(/\s+/).filter(Boolean);
@@ -342,7 +343,7 @@ export function BackdropPanel({ d }: { d: ThemeDraft }) {
       <Intro title="Backdrop">A pattern behind every page — abstract, geometric, vintage or a texture — in your colours. Cards stay solid on top, so text stays readable.</Intro>
       <div className="rounded-xl border border-border bg-card space-y-4 p-4 sm:p-5">
         <PillTabs value={bdGroup} onChange={setBdGroup} options={BACKDROP_GROUPS.map((g) => ({ value: g, label: g }))} />
-        <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Backdrop pattern">
+        <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-6" role="radiogroup" aria-label="Backdrop pattern">
           {BACKDROPS.filter((b) => b.group === null || b.group === bdGroup).map((b) => {
             const active = shown.backdrop.pattern === b.key;
             const look = backdropCss({ ...draft, backdrop: { ...draft.backdrop, pattern: b.key } });
@@ -396,13 +397,28 @@ export function BackdropPanel({ d }: { d: ThemeDraft }) {
   );
 }
 
+/** Desktop grids: the app-wide column count for tile grids (MediaGrid, List tiles) from 1024 px; a grid's own picker overrides it. */
+export function GridColumnsPanel({ d }: { d: ThemeDraft }) {
+  const { draft, setDraft } = d;
+  const options = [{ value: "auto", label: "Auto" }, ...GRID_COLUMNS.map((n) => ({ value: String(n), label: String(n) }))];
+  return (
+    <section className="space-y-3">
+      <Intro title="Desktop grids">How many columns tile grids show on a wide screen. Auto lets each grid pick (3 or 4 for cards, 6 for small covers). A grid with its own columns picker can still change it. Phones and tablets keep their own counts.</Intro>
+      <div className="rounded-xl border border-border bg-card space-y-3 p-4 sm:p-5">
+        <Tabs value={draft.gridColumns ? String(draft.gridColumns) : "auto"} options={options}
+          onChange={(v) => setDraft((t) => ownColours({ ...t, gridColumns: v === "auto" ? undefined : Number(v) }))} />
+      </div>
+    </section>
+  );
+}
+
 /** Motif: the flat shape the theme's colours take in brand moments (ThemeDots) — circles, or a triforce, sparkles, stars… */
 export function MotifPanel({ d }: { d: ThemeDraft }) {
   const { setDraft, shown } = d;
   return (
     <section className="space-y-3">
       <Intro title="Motif">Your colours as three flat shapes side by side, in empty states and brand moments. Circles unless you pick another.</Intro>
-      <div className="rounded-xl border border-border bg-card grid grid-cols-3 gap-2 p-4 sm:grid-cols-4 sm:p-5" role="radiogroup" aria-label="Motif">
+      <div className="rounded-xl border border-border bg-card grid grid-cols-3 gap-2 p-4 sm:grid-cols-4 sm:p-5 lg:grid-cols-6" role="radiogroup" aria-label="Motif">
         {MOTIFS.map((m) => {
           const active = shown.motif === m.key;
           const mask = motifMask({ ...shown, motif: m.key });
@@ -447,7 +463,7 @@ export function TypePanel({ d }: { d: ThemeDraft }) {
             <div key={part} className="space-y-3">
               <p className="text-sm font-semibold text-muted-foreground">{part === "headings" ? "Headings" : "Body text"}</p>
               <PillTabs value={group} onChange={(g) => setUrlParams(setParams, { [`${part}-fonts`]: g })} options={groups.map((g) => ({ value: g, label: g }))} />
-              <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label={part === "headings" ? "Headings font" : "Body font"}>
+              <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-6" role="radiogroup" aria-label={part === "headings" ? "Headings font" : "Body font"}>
                 {Object.entries(FONTS).filter(([, f]) => f.group === group && (part === "headings" || f.body !== false)).map(([k, f]) => {
                   const active = key === k;
                   return (

@@ -75,6 +75,7 @@ How to use it:
 - **L12** **Different data, different look.** Pages that show different kinds of data don't look alike: each kind gets its own hero `pattern` and `tone` (and its own opening block — stats, a chart, a timeline, a list), so you know where you are before reading. Pages of the same kind (every year, every month) share theirs. *§6*
 - **L8** Rows are at least 76 px tall, divided by an etched line (`.divide-etched`). *§6*
 - **L9** Font sizes come from the type scale; no `text-[10px]`-style sizes. *§5*
+- **L13** **Desktop columns depend on the content.** Tile grids (`MediaGrid`, `List layout="tiles"`) take their desktop column count (from `lg`) from the app-wide setting (jimbo-ui config → Brand → Desktop grids, `Theme.gridColumns`, 3–8), else their own default. A grid whose content wants a different count (covers want more, text cards fewer) offers `ColumnsPicker` in its `Section`'s action slot, kept in the URL by `useGridColumns`. Phones and tablets keep the grid's own counts. *§6*
 
 ## N · Navigation and the URL
 

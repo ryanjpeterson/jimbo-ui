@@ -1277,6 +1277,20 @@
       "shadcn": "tabs"
     },
     {
+      "id": "columns-picker",
+      "name": "ColumnsPicker",
+      "purpose": "Lets people pick how many columns a tile grid shows on desktop, kept in the URL.",
+      "tier": "kit",
+      "aliases": [
+        "GridColumnsSelect",
+        "ColumnCountPicker",
+        "useGridColumns"
+      ],
+      "variants": {},
+      "source": "reference/web/src/components/ui/kit.tsx#ColumnsPicker",
+      "shadcn": "select"
+    },
+    {
       "id": "heatmap",
       "name": "Heatmap",
       "purpose": "Shows how often something happens across a grid of days or weeks.",

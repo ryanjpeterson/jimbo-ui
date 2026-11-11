@@ -17,7 +17,7 @@
  * jimbo-ui (J4).
  */
 
-import { Children, createContext, useContext, useId, useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode, type RefObject } from "react";
+import { Children, createContext, useCallback, useContext, useId, useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type CSSProperties, type ReactNode, type RefObject } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, SearchIcon, XIcon } from "lucide-react";
 import { cn } from "@/lib/cn";
@@ -35,8 +35,9 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerTitle } from "@/components/ui/drawer";
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
-import { backdropCss, fullTheme, loadFonts, themeHex, themeVars, type BackdropPattern, type Theme } from "@/lib/theme";
+import { backdropCss, fullTheme, GRID_COLUMNS, loadFonts, themeHex, themeVars, type BackdropPattern, type Theme } from "@/lib/theme";
 import { useBrand } from "@/lib/useBrand";
+import { useUrlState } from "@/lib/useUrlState";
 import { BRAND } from "@/lib/brand.config";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -684,9 +685,11 @@ export type ListLayout = "rows" | "tiles";
  * `maxHeight` (rows) caps the card and scrolls inside it, with the bar
  * always showing (`.scroll-area`) so it's plain there's more.
  */
-export function List({ children, layout = "rows", bare = false, maxHeight, className }: {
+export function List({ children, layout = "rows", bare = false, maxHeight, columns, className }: {
   children: ReactNode;
   layout?: ListLayout;
+  /** Tiles only: columns on desktop (from `lg`), from `useGridColumns`; left out, the theme's `gridColumns` or 3. */
+  columns?: number | null;
   bare?: boolean;
   /** Rows only: the most the list grows to (px or a CSS length), then it scrolls. */
   maxHeight?: number | string;
@@ -694,7 +697,7 @@ export function List({ children, layout = "rows", bare = false, maxHeight, class
 }) {
   if (layout === "tiles") {
     return (
-      <div className={cn("grid auto-rows-fr gap-3 sm:grid-cols-2 lg:grid-cols-3", className)}>
+      <div className={cn("grid auto-rows-fr gap-3 sm:grid-cols-2", DESKTOP_COLS[3], className)} style={gridColumnsStyle(columns)}>
         {Children.toArray(children).map((child, i) => <div key={i} className="rounded-xl border border-border bg-card h-full overflow-hidden">{child}</div>)}
       </div>
     );
@@ -721,6 +724,33 @@ export function useListLayout(key: string, initial: ListLayout = "rows"): [ListL
     try { localStorage.setItem(storageKey, l); } catch { /* storage unavailable: the choice lasts until reload */ }
   };
   return [layout, set];
+}
+
+/**
+ * One grid's desktop columns, in the URL (`?<key>-cols=6`, N1): `null`
+ * follows the app-wide setting (`Theme.gridColumns`). Pass the value to
+ * `MediaGrid columns` or `List columns`, and both to a `ColumnsPicker`.
+ */
+export function useGridColumns(key: string): [number | null, (n: number | null) => void] {
+  const [raw, set] = useUrlState(`${key}-cols`, "auto", ["auto", ...GRID_COLUMNS.map(String)]);
+  const value = raw === "auto" ? null : Number(raw);
+  return [value, useCallback((n: number | null) => set(n ? String(n) : "auto"), [set])];
+}
+
+/**
+ * How many columns a tile grid shows on desktop — for content that wants
+ * more (covers, swatches) or fewer (cards with text). A small `SelectField`
+ * for a `Section`'s action slot, shown from `lg` only (phones and tablets
+ * keep the grid's own count). "Auto" follows the app-wide setting.
+ */
+export function ColumnsPicker({ value, onChange }: { value: number | null; onChange: (n: number | null) => void }) {
+  return (
+    <div className="hidden lg:block">
+      <SelectField size="sm" label="Columns on desktop" value={value ? String(value) : "auto"}
+        onChange={(v) => onChange(v === "auto" ? null : Number(v))}
+        options={[{ value: "auto", label: "Auto columns" }, ...GRID_COLUMNS.map((n) => ({ value: String(n), label: `${n} columns` }))]} />
+    </div>
+  );
 }
 
 /** The rows ⇄ tiles switch for a `List` — small `Tabs`, sized for a `Section`'s action slot. */
@@ -964,10 +994,27 @@ export function EntityRow({ to, name, imageUrl, sub, meta, round = false, avatar
 
 export type MediaSize = "sm" | "md" | "lg";
 const MediaSizeContext = createContext<MediaSize>("md");
+/**
+ * Desktop (from `lg`) columns for a tile grid: the grid's own `--grid-cols`
+ * (a `columns` prop), else the theme's (`Theme.gridColumns`, set app-wide in
+ * the jimbo-ui config), else the grid's own count here. Written out in full
+ * so Tailwind finds each class.
+ */
+const DESKTOP_COLS = {
+  3: "lg:[grid-template-columns:repeat(var(--grid-cols,3),minmax(0,1fr))]",
+  4: "lg:[grid-template-columns:repeat(var(--grid-cols,4),minmax(0,1fr))]",
+  6: "lg:[grid-template-columns:repeat(var(--grid-cols,6),minmax(0,1fr))]",
+} as const;
+
+/** The style that sets one grid's desktop columns, or nothing to follow the theme. */
+function gridColumnsStyle(columns?: number | null): CSSProperties | undefined {
+  return columns ? ({ "--grid-cols": columns } as CSSProperties) : undefined;
+}
+
 const MEDIA_COLS: Record<MediaSize, string> = {
-  sm: "grid-cols-3 gap-2 sm:grid-cols-4 sm:gap-3 md:grid-cols-5 lg:grid-cols-6",
-  md: "grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4",
-  lg: "grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3",
+  sm: cn("grid-cols-3 gap-2 sm:grid-cols-4 sm:gap-3 md:grid-cols-5", DESKTOP_COLS[6]),
+  md: cn("grid-cols-2 gap-3 sm:grid-cols-3", DESKTOP_COLS[4]),
+  lg: cn("grid-cols-1 gap-3 sm:grid-cols-2", DESKTOP_COLS[3]),
 };
 
 /**
@@ -977,11 +1024,17 @@ const MEDIA_COLS: Record<MediaSize, string> = {
  * things to feature). Cards inside take the size: smaller type and padding
  * at `sm`. Never a sideways scroll strip.
  */
-export function MediaGrid({ size = "md", children, className }: { size?: MediaSize; children: ReactNode; className?: string }) {
+export function MediaGrid({ size = "md", columns, children, className }: {
+  size?: MediaSize;
+  /** Columns on desktop (from `lg`), from `useGridColumns`; left out, the theme's `gridColumns`, else the size's own. */
+  columns?: number | null;
+  children: ReactNode;
+  className?: string;
+}) {
   return (
     <MediaSizeContext.Provider value={size}>
       {/* Every row as tall as the tallest and every card filling its cell: one size of card. */}
-      <div className={cn("grid auto-rows-fr [&>*]:h-full", MEDIA_COLS[size], className)}>{children}</div>
+      <div className={cn("grid auto-rows-fr [&>*]:h-full", MEDIA_COLS[size], className)} style={gridColumnsStyle(columns)}>{children}</div>
     </MediaSizeContext.Provider>
   );
 }

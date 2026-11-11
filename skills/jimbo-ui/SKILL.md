@@ -107,6 +107,9 @@ The short form of the rulebook; the numbered rules are in
   along its bottom. Each kind of page has its own hero `pattern`, so
   different data looks different (L12). Pages in a series, and every data
   page, are one tap away with a `JumpMenu` (N7).
+- Tile grids follow the app-wide desktop column count (config → Brand →
+  Desktop grids); a grid whose content wants another count gets a
+  `ColumnsPicker` in its section's action slot (L13).
 - Full-width openers (banners, heroes, photo or gradient headers) **fade
   into the page**: mask their background layer out with `.fade-out`
   (`.fade-both` when something sits above) — never a hard bottom edge, a

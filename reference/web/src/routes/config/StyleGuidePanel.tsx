@@ -18,8 +18,8 @@ import { Input } from "@/components/ui/input";
 import { HeaderTitle } from "@/components/HeaderTitle";
 import { ColorPicker } from "@/components/ColorPicker";
 import {
-  Autocomplete, Chevron, Columns, FloatingBar, LinkChips, ToggleGrid, Badge, BarChart, DateBlock, KeyValue, LayoutSwitch, SwitchRow, EmptyState, EntityRow, EventRow, LinkCard, List, ListGroupLabel, Loading, MediaCard, MediaGrid, Page, PageHeader, Pager,
-  PillTabs, RankedList, SearchField, Section, SelectField, ShareSliders, Sheet, Sparkline, StatGrid, StatTile, Tabs, ThemeDots, Timeline, TrendChart, useListLayout, ViewSwitch, type Tone,
+  Autocomplete, Chevron, Columns, ColumnsPicker, FloatingBar, LinkChips, ToggleGrid, Badge, BarChart, DateBlock, KeyValue, LayoutSwitch, SwitchRow, EmptyState, EntityRow, EventRow, LinkCard, List, ListGroupLabel, Loading, MediaCard, MediaGrid, Page, PageHeader, Pager,
+  PillTabs, RankedList, SearchField, Section, SelectField, ShareSliders, Sheet, Sparkline, StatGrid, StatTile, Tabs, ThemeDots, Timeline, TrendChart, useGridColumns, useListLayout, ViewSwitch, type Tone,
 } from "@/components/ui/kit";
 import { DateField, FileDrop, TextArea, TextField } from "@/components/ui/forms";
 import { DropdownButton, JumpMenu, Menu, Popover, SearchTrigger, Tooltip } from "@/components/ui/overlays";
@@ -107,6 +107,7 @@ export function StyleGuidePanel({ more = [] }: { more?: { value: string; label: 
   const [page, setPage] = useState(2);
   const [sheet, setSheet] = useState(false);
   const [layout, setLayout] = useListLayout("style-guide");
+  const [cols, setCols] = useGridColumns("covers");
   const [picked, setPicked] = useState(false);
   const [colour, setColour] = useState("#A8FF3E");
   const [ac, setAc] = useState("");
@@ -187,7 +188,7 @@ export function StyleGuidePanel({ more = [] }: { more?: { value: string; label: 
       </Block>
 
       <Block section="brand" title="Colour tokens" note="shadcn's variable names, each mapped once from a jimbo colour in globals.css. Use these classes, never raw hex (bg-card, text-muted-foreground, bg-primary/15 …). shadcn's accent is the hover surface; the theme's accent colour is primary.">
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
           {TOKENS.map((t) => (
             <div key={t.css} className="flex items-center gap-3 rounded-xl border border-border bg-card p-2.5">
               <span className="h-9 w-9 shrink-0 rounded-lg border border-border" style={{ background: `var(--${t.css})` }} />
@@ -363,18 +364,20 @@ export function StyleGuidePanel({ more = [] }: { more?: { value: string; label: 
           </List>
         </Section>
         <MediaGrid>
-          <MediaCard to="/jimbo-ui?tab=style" name="MediaCard" sub="Image rounded-xl border border-border bg-card" meta="3 items" />
+          <MediaCard to="/jimbo-ui?tab=style" name="MediaCard" sub="An image card" meta="3 items" />
           <MediaCard to="/jimbo-ui?tab=style" name="Portrait" sub="For posters" aspect="portrait" />
         </MediaGrid>
-        <MediaGrid size="sm">
-          {["Small", "MediaGrid", "size sm", "Covers", "To scan"].map((n) => (
-            <MediaCard key={n} to="/jimbo-ui?tab=style" name={n} sub="Three across on phones" meta="12 items" aspect="square" />
-          ))}
-        </MediaGrid>
-        <LinkCard to="/jimbo-ui?tab=style" eyebrow="LinkCard" title="A rounded-xl border border-border bg-card that goes somewhere" sub="Eyebrow, title, sub line" accent />
+        <Section title="MediaGrid · columns on desktop" action={<ColumnsPicker value={cols} onChange={setCols} />} plain>
+          <MediaGrid size="sm" columns={cols}>
+            {Array.from({ length: 16 }, (_, i) => (
+              <MediaCard key={i} to="/jimbo-ui?tab=style" name={`Cover ${i + 1}`} sub="Three across on phones" meta="12 items" aspect="square" />
+            ))}
+          </MediaGrid>
+        </Section>
+        <LinkCard to="/jimbo-ui?tab=style" eyebrow="LinkCard" title="A card that goes somewhere" sub="Eyebrow, title, sub line" accent />
         <LinkCard size="sm" to="/jimbo-ui?tab=style" eyebrow="size=sm" title="A quick way in" sub="Tighter, for a row of them" />
         <Section title="Section" count={3}>
-          <p className="p-4 text-sm text-muted-foreground">A titled rounded-xl border border-border bg-card for a block of related content.</p>
+          <p className="p-4 text-sm text-muted-foreground">A titled card for a block of related content.</p>
         </Section>
         <Section title="RankedList" flush>
           <RankedList items={[

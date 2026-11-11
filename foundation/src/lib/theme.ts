@@ -64,11 +64,21 @@ export interface Theme {
    * for a simple one-colour scheme.
    */
   infer?: "contrast" | "tonal";
+  /**
+   * Columns in a tile grid on desktop (from 1024 px): `MediaGrid`, `List`
+   * tiles. 3–8; left out, each grid uses its own count. A grid's own
+   * `columns` (its desktop picker) overrides it. Not part of a look: picking
+   * a look keeps it.
+   */
+  gridColumns?: number;
 }
+
+/** The desktop grid column counts a theme or a grid can pick. */
+export const GRID_COLUMNS = [3, 4, 5, 6, 7, 8] as const;
 
 /** A theme as a server or cache returns it: anything may be missing or null. */
 export type SavedTheme = { [K in "accent" | "background" | "highlight" | "support"]?: string | null }
-  & { fonts?: Theme["fonts"] | null; infer?: Theme["infer"] | null; vibrancy?: number | null; contrast?: number | null; backdrop?: Backdrop | null; motif?: MotifKey | null };
+  & { fonts?: Theme["fonts"] | null; infer?: Theme["infer"] | null; vibrancy?: number | null; contrast?: number | null; backdrop?: Backdrop | null; motif?: MotifKey | null; gridColumns?: number | null };
 
 /**
  * The fonts a theme can use. `css` is the font stack; `google` the Google Fonts
@@ -341,7 +351,7 @@ export const BACKDROPS: { key: BackdropPattern; label: string; hint: string; gro
 export const BACKDROP_BASES = ["solid", "gradient", "glow"] as const;
 
 /** A theme with all four colours filled in (missing ones inferred). */
-export type FullTheme = Required<Theme>;
+export type FullTheme = Required<Omit<Theme, "gridColumns">> & Pick<Theme, "gridColumns">;
 
 /** The colours a theme may leave out. */
 export const OPTIONAL_KEYS = ["highlight", "support"] as const;
@@ -526,6 +536,7 @@ export function fullTheme(theme: Theme): FullTheme {
       contrast: theme.backdrop?.contrast ?? 1, saturation: theme.backdrop?.saturation ?? 1, motion: theme.backdrop?.motion ?? "none", speed: theme.backdrop?.speed ?? 1 },
     motif: MOTIFS.some((m) => m.key === theme.motif) ? theme.motif! : "dots",
     infer: theme.infer ?? "contrast",
+    gridColumns: gridColumnsOf(theme.gridColumns),
   };
 }
 
@@ -568,7 +579,13 @@ export function ownColours(theme: Theme): Theme {
     ...(theme.contrast !== undefined && theme.contrast !== 1 ? { contrast: theme.contrast } : {}),
     ...(ownBackdrop(theme.backdrop) ? { backdrop: ownBackdrop(theme.backdrop) } : {}),
     ...(theme.motif && theme.motif !== "dots" && MOTIFS.some((m) => m.key === theme.motif) ? { motif: theme.motif } : {}),
+    ...(gridColumnsOf(theme.gridColumns) ? { gridColumns: gridColumnsOf(theme.gridColumns) } : {}),
   };
+}
+
+/** A desktop column count if it's one a grid can take (`GRID_COLUMNS`), else undefined (each grid's own). */
+export function gridColumnsOf(n: unknown): number | undefined {
+  return typeof n === "number" && (GRID_COLUMNS as readonly number[]).includes(n) ? n : undefined;
 }
 
 /**
@@ -1732,6 +1749,7 @@ export function tokensCss(theme: Theme): string {
   const scrim = heroScrims(theme);
   lines.push(`  --hero-scrim-image: ${scrim.image};`, `  --hero-scrim-blur: ${scrim.blur};`);
   if (motifMask(theme) !== "none") lines.push(`  --motif-mask: ${motifMask(theme)};`, "  --motif-radius: 0px;");
+  if (gridColumnsOf(theme.gridColumns)) lines.push(`  --grid-cols: ${gridColumnsOf(theme.gridColumns)};`);
   return [
     `/* This app's default theme tokens ("R G B" channels), so the page looks right`,
     `   before any script runs. Owned by the app; generate from BRAND.defaultTheme`,
@@ -1795,6 +1813,7 @@ export function importTheme(text: string): { theme: Theme; name?: string } {
       return { pattern, base, intensity: num(bd.intensity, 0, 1), scale: num(bd.scale, 0.5, 2), contrast: num(bd.contrast, 0.3, 2), saturation: num(bd.saturation, 0, 1.6), motion, speed: num(bd.speed, 0.5, 2) };
     })(),
     motif: MOTIFS.find((x) => x.key === raw.motif)?.key,
+    gridColumns: gridColumnsOf(raw.gridColumns),
   };
   const name = typeof obj.name === "string" ? obj.name.slice(0, 80) : undefined;
   return { theme: ownColours(theme), ...(name ? { name } : {}) };
@@ -1827,6 +1846,8 @@ export function themeVars(theme: Theme): Record<string, string> {
   vars["--hero-scrim-blur"] = String(scrim.blur);
   vars["--motif-mask"] = motifMask(theme);
   vars["--motif-radius"] = motifMask(theme) === "none" ? "9999px" : "0px";
+  // Desktop tile-grid columns. "initial" leaves the variable unset, so each grid falls back to its own count.
+  vars["--grid-cols"] = String(gridColumnsOf(theme.gridColumns) ?? "initial");
   return vars;
 }
 

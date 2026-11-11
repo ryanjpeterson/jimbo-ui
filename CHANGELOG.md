@@ -70,8 +70,17 @@ jimbo.ui moves onto shadcn/ui, goes flat, and becomes binding: apps use its comp
   `--hero-scrim-image` / `--hero-scrim-blur` variables and the
   `hero-scrim-image` / `hero-scrim-blur` utilities.
 
+- **Desktop grid columns (L13).** An app-wide setting in the jimbo-ui
+  config (Brand → Desktop grids: Auto or 3–8), saved with the theme as
+  `gridColumns` and applied as `--grid-cols`; picking a look keeps it.
+  `MediaGrid` and `List layout="tiles"` follow it from `lg`, and take a
+  `columns` prop for one grid; `ColumnsPicker` + `useGridColumns` give a
+  grid its own picker, kept in the URL (`?covers-cols=6`).
+
 ### Changed
 
+- The jimbo-ui config section fills the page column, as wide as the
+  header, and its grids add columns on wide screens.
 - **Token class names are shadcn's.** The theme's accent colour is
   `primary` (`bg-primary`, `text-primary-foreground`, `primary-950`…);
   shadcn's `accent` is the hover surface. `bg` → `background`, `surface` →
@@ -118,6 +127,12 @@ jimbo.ui moves onto shadcn/ui, goes flat, and becomes binding: apps use its comp
 - `foundation/src/components/ui/button.tsx`'s old API; the toast timer bar
   and keyframes (Sonner times toasts); `glassScore` and the glass contrast
   target.
+
+### Fixed
+
+- `setUrlParams` (and every `useUrlState` setter) dropped the other URL
+  parameters under a hash router — in the config's Type tab, picking a font
+  group sent you back to Looks. It now reads the live hash.
 
 **Apps must:**
 

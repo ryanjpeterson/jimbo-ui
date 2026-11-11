@@ -28,6 +28,7 @@ Theme engine, kit and shell, rules, registry, tooling and the plugin. 27 feature
 | Spotlight search | ⌘K app-wide search | kit | stable |
 | MapView | Maps in the theme | `reference/web/src/components/MapView.tsx` | stable |
 | jimbo-ui config section | `/jimbo-ui`: Theme (Looks, Colours, Type, Backdrop), Brand, Style guide, Updates/About | `reference/web/src/routes/JimboConfigPage.tsx`, `routes/config/` | stable |
+| Desktop grid columns | App-wide column count for tile grids on desktop, plus a per-grid picker | `foundation/src/lib/theme.ts` (`gridColumns`), kit `ColumnsPicker` | new (Unreleased) |
 | URL state | The view lives in the URL | `reference/web/src/lib/useUrlState.ts` | stable |
 | Archetypes | Catalogue, Dashboard, Status monitor | `reference/web/src/archetypes/` | stable |
 

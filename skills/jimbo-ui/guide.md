@@ -125,7 +125,8 @@ the colours and any uploaded favicon, and serves them:
 `GET /public/theme` → `{ theme (null = default), faviconUrl }`; admin-only
 `PUT /admin/theme` with the theme as `ownColours` gives it: accent and
 background as `#RRGGBB`, plus whatever else it sets — `highlight`,
-`support`, `fonts`, `infer`, `vibrancy`, `contrast`, `backdrop`, `motif`.
+`support`, `fonts`, `infer`, `vibrancy`, `contrast`, `backdrop`, `motif`,
+`gridColumns`.
 **Store the whole object as sent** (one JSON column), never a list of known
 fields, so new theme options save without a server change; check the
 colours are hex and the size is sane, and leave missing keys missing so they
@@ -962,6 +963,17 @@ and body fonts.
   nothing in a row is shorter than its neighbour. In a grid, every row is as
   tall as the tallest card and every card fills its cell (`auto-rows-fr`,
   `h-full`: `MediaGrid`, `List layout="tiles"` and `StatGrid` do it).
+- **Desktop columns depend on the content (L13).** From `lg`, tile grids
+  (`MediaGrid`, `List layout="tiles"`) show the app-wide count set in the
+  jimbo-ui config (Brand → Desktop grids, saved as `Theme.gridColumns`,
+  3–8; it sets `--grid-cols`), or their own default when it's Auto (3 or
+  4 for cards, 6 for small covers). Where one grid's content wants a
+  different count, give it a picker: `const [cols, setCols] =
+  useGridColumns("covers")`, `<MediaGrid columns={cols}>`, and
+  `<ColumnsPicker value={cols} onChange={setCols} />` in its `Section`'s
+  action slot (it shows from `lg` only; the choice is in the URL as
+  `?covers-cols=6`). Phones and tablets keep the grid's own counts.
+  Picking a look keeps the setting: it isn't part of a look.
   Sections side by side go in `Columns` (`count` 2 or 3, from `lg:` or
   `sm:`), never a bare `grid lg:grid-cols-2`: each `Section`'s card stretches
   to the row's tallest with its content at the top, so two charts are one
@@ -1150,11 +1162,12 @@ them as they are (J2, J3).
 | `Section` | A titled card holding one block of content; `plain` drops the card (a grid of tiles under a title). In a grid row its card stretches to the tallest, content at the top |
 | `Columns` | Sections or cards side by side: one column on phones, `count` 2 or 3 from `lg:` (`from="sm"` for earlier). Every row as tall as its tallest cell — symmetry |
 | `List` + `ListGroupLabel` | A card of rows, optionally grouped (by month: a wrapper that starts with a `ListGroupLabel`); group labels are support text with an 8 px support dot, on a support wash fading right. `layout="tiles"` shows the same children as a grid of cards (one column on phones, two or three wider); `bare` drops the card for use inside `Section flush`; `maxHeight` caps a list of rows and scrolls inside the card, its bar always showing |
+| `ColumnsPicker` + `useGridColumns` | How many columns one tile grid shows on desktop (L13): a small select in the section's action slot, shown from `lg`; *Auto* follows the app-wide setting; kept in the URL. Pass the value to `MediaGrid columns` or `List columns` |
 | `LayoutSwitch` + `useListLayout` | Lets people pick rows or tiles for a `List` (small `Tabs` in the section's action slot); the choice is remembered per list in the browser |
 | `EventRow` | A dated item. `DateBlock` on the left, a `status` dot (`{ tone, label, live? }` — `live` pulses); `to` to go somewhere or `onOpen` to open something in place (a log in a `Sheet`); `selected`/`onSelect` for select mode |
 | `EntityRow` | A named thing with an avatar (a person, a place); `avatarText` puts a short code or number in the placeholder avatar instead of initials. A picture that fails to load falls back to the placeholder (`useImageOrFallback`), never a broken image — as in `MediaCard`, `EventRow` and `Hero` |
 | `DateBlock` | A tear-off calendar ticket (52 px wide, 12 px radius, `surface-2`): the month on a solid highlight band, the day big below, then the year or weekday |
-| `MediaCard` + `MediaGrid` | Image-led grid card (`aspect="portrait"` for posters), always in a `MediaGrid`, whose `size` sets the card size: `sm` (three across on phones, up to six wide, smaller type: covers, a big collection to scan), `md` (two, up to four; the default) or `lg` (one, up to three: a few things to feature) |
+| `MediaCard` + `MediaGrid` | Image-led grid card (`aspect="portrait"` for posters), always in a `MediaGrid`, whose `size` sets the card size: `sm` (three across on phones, up to six wide, smaller type: covers, a big collection to scan), `md` (two, up to four; the default) or `lg` (one, up to three: a few things to feature). The desktop count follows the app-wide setting or `columns` (L13) |
 | `ScrollingLine` | One line that never wraps: an ellipsis, and the rest scrolls into view while its card (the nearest `group`) is hovered or focused. `MediaCard`'s title and sub line; any card's line that has to stay one line |
 | `LinkCard` | A card that navigates (eyebrow / title / sub); `accent` for the one to notice |
 | `StatTile` / `StatGrid` | Headline numbers (`accent="accent"` / `"highlight"` / `"support"`: the number in that colour, an 8 px dot by the label and a soft pool of it in the corner); `trend` adds a `Sparkline` of recent values under the number |
@@ -1823,3 +1836,6 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   5.5:1, labels 4.5:1 (C6). Hero scrims (C8): the page colour over a
   hero's picture or blur, sized per theme. `BackButton` is a solid button
   with body text; `Hero` uses tokens, not white and black.
+  Desktop grid columns (L13): an app-wide setting in the config's Brand
+  tab (`Theme.gridColumns`) and `ColumnsPicker` + `useGridColumns` for
+  one grid. The config section fills the page column, like the header.

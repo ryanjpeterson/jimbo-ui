@@ -24,7 +24,7 @@ import { useBrand } from "@/lib/useBrand";
 import { useUrlState } from "@/lib/useUrlState";
 import { HeaderTitle } from "@/components/HeaderTitle";
 import { Badge, LinkCard, PageHeader, PillTabs } from "@/components/ui/kit";
-import { BackdropPanel, ColoursPanel, LooksPanel, MotifPanel, ThemeSaveBar, TypePanel, useThemeDraft, type ThemeDraft } from "./config/ThemePanel";
+import { BackdropPanel, ColoursPanel, GridColumnsPanel, LooksPanel, MotifPanel, ThemeSaveBar, TypePanel, useThemeDraft, type ThemeDraft } from "./config/ThemePanel";
 import { StyleGuidePanel } from "./config/StyleGuidePanel";
 import { JimboUpdates, useJimboUpdates } from "./config/UpdatesPanel";
 
@@ -44,8 +44,9 @@ function ConfigSection({ app }: { app?: { label?: string; content: ReactNode } }
   ];
   // The tab (and each tab's own choices) live in the URL, so a refresh or a link opens the same view.
   const [tab, setTab] = useUrlState<Tab>("tab", "theme", tabs.map((t) => t.value));
+  // The full page column, like its header: grids add columns as it widens.
   return (
-    <div className="mx-auto max-w-3xl space-y-6 pb-24">
+    <div className="w-full space-y-6 pb-24">
       <PageHeader eyebrow="Settings" title="jimbo-ui config" />
       <PillTabs scroll value={tab} onChange={setTab} options={tabs} />
       <div hidden={tab !== "theme"}><LooksPanel d={draft} /></div>
@@ -74,7 +75,7 @@ export function JimboConfigLink({ canConfigure }: { canConfigure: boolean }) {
   );
 }
 
-/** Brand: the name as header text, the motif (part of the theme draft, so the save bar covers it) and the favicon. */
+/** Brand: the name as header text, the motif and desktop grid columns (part of the theme draft, so the save bar covers it) and the favicon. */
 function BrandPanel({ d }: { d: ThemeDraft }) {
   const brand = useBrand();
   const qc = useQueryClient();
@@ -91,6 +92,7 @@ function BrandPanel({ d }: { d: ThemeDraft }) {
         </div>
       </section>
       <MotifPanel d={d} />
+      <GridColumnsPanel d={d} />
       <FaviconUpload faviconUrl={brand.faviconUrl} onChange={() => qc.invalidateQueries({ queryKey: ["brand"] })} />
     </div>
   );

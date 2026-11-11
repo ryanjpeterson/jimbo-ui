@@ -27,12 +27,22 @@ export function useUrlNumber(key: string, fallback: number): [number, (v: number
   return [Number.isFinite(n) ? n : fallback, useCallback((v: number) => set(String(v)), [set])];
 }
 
+/**
+ * The URL's parameters as they are right now. Under a hash router (`#/page?tab=x`,
+ * as the published showcase uses) they live in the hash, and `location.search` is
+ * empty — reading that would drop every other parameter, the open tab included.
+ */
+function liveParams(): URLSearchParams {
+  const { hash, search } = window.location;
+  return new URLSearchParams(hash.startsWith("#/") ? hash.slice(hash.indexOf("?") + 1 || hash.length) : search);
+}
+
 /** Set several parameters at once (null removes one) — for a change that resets another, like a category and its sub-tab. */
 export function setUrlParams(setParams: ReturnType<typeof useSearchParams>[1], patch: Record<string, string | null>) {
   // Start from the live URL, not the updater's argument: React Router 6 hands that the params from the
   // last render, so two sets in one handler (a sort, then its page back to 1) would drop the first.
   setParams(() => {
-    const next = new URLSearchParams(window.location.search);
+    const next = liveParams();
     for (const [k, v] of Object.entries(patch)) if (v === null || v === "") next.delete(k); else next.set(k, v);
     return next;
   }, { replace: true });
