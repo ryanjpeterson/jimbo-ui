@@ -2,7 +2,7 @@
 
 ## Snapshot
 
-Very active and central: every jimbo app with a UI depends on it. The cost is churn: 12 breaking minors in 17 days, and most apps are three or more minors behind. The one thing most worth doing next: slow the breaking releases and bring the apps up to 0.17.0.
+Very active and central: every jimbo app with a UI depends on it. The cost is churn: 13 breaking minors in 20 days, and most apps are three or more minors behind. The one thing most worth doing next: slow the breaking releases and bring the apps up to 0.18.0.
 
 ## Risks
 

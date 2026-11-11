@@ -12,7 +12,7 @@
 | 2026-11-03 | 0.14.0 (Tailwind 4, many kit pieces), 0.14.1, 0.14.2 |
 | 2026-11-04 to 2026-11-06 | 0.14.3–0.14.7 (space, Halloween, Spotlight search, card grids, symmetry, one control height), 0.15.0 (toasts) |
 | 2026-11-08 | 0.16.0 (the numbered rulebook), 0.17.0 (a hero on every page, HeroCarousel, JumpMenu, Timeline) |
-| 2026-11-11 | Unreleased (breaking): hero scrims (C8); the component layer rebuilt on shadcn/ui with one token mapping, a flat look (S8), React 19, and the rules made binding (J1–J6, the PR route); desktop grid columns (L13) |
+| 2026-11-11 | 0.18.0 (breaking): hero scrims (C8); the component layer rebuilt on shadcn/ui with one token mapping, a flat look (S8), React 19, and the rules made binding (J1–J6, the PR route); desktop grid columns (L13) |
 
 ## Milestones
 
@@ -31,5 +31,5 @@
 ## By the numbers
 
 - First commit 2026-10-23, latest 2026-11-08; 97 commits on 10 active days.
-- 33 tags (`jimbo-ui--v0.1.0` to `v0.17.0`); 12 breaking minors.
+- 34 tags (`jimbo-ui--v0.1.0` to `v0.18.0`); 13 breaking minors.
 - 7 apps registered (2026-10-30 to 2026-11-08).

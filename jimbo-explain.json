@@ -46,7 +46,7 @@
       "jimbo-explain"
     ],
     "now": [
-      "shadcn rebuild, flat look and binding rules (Unreleased, breaking)"
+      "Bringing apps onto 0.18.0 (shadcn, flat, binding)"
     ]
   },
   "files": {}

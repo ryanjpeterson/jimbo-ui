@@ -2,7 +2,7 @@
 
 ## Now
 
-- **shadcn rebuild (Unreleased, breaking):** components on shadcn/ui, a flat look, binding rules and the PR route — waiting for a release.
+- **Bring the apps onto 0.18.0:** each app runs its update in its own session (React 19, the codemod, then fixing what it reports).
 
 ## Next
 

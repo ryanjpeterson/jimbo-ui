@@ -14,21 +14,21 @@ Theme engine, kit and shell, rules, registry, tooling and the plugin. 27 feature
 | Looks | 324 templates in Everyday, Holidays, Countries, Provinces, Games, Brands, Sports | `foundation/src/lib/themes.ts`, `scripts/template-from-colours.mjs` | stable |
 | Backdrops and motifs | 79 backdrops, still or moving; motif shapes; favicon is the motif | `foundation/` | stable |
 | Fonts | Nine per group, heading and body sizes | `foundation/` | stable |
-| Tokens | Tailwind 4 theme, the one mapping onto shadcn's variables, an app's `tokens.css` | `foundation/src/styles/globals.css`, `scripts/tokens.mjs` | changed (Unreleased) |
+| Tokens | Tailwind 4 theme, the one mapping onto shadcn's variables, an app's `tokens.css` | `foundation/src/styles/globals.css`, `scripts/tokens.mjs` | changed (0.18.0) |
 
 ### Kit and shell
 
 | Feature | What it does | Where | Status |
 |-|-|-|-|
-| shadcn primitives | 29 shadcn/ui components with jimbo's edits, copied into apps | `foundation/src/components/ui/`, `scripts/shadcn-add.mjs` | new (Unreleased) |
-| UI kit | Composed from the primitives: fields, menus, toasts, tables, steps, lists, cards, stats, charts, Timeline, ScrollingLine | `reference/web/src/components/ui/` | changed (Unreleased) |
+| shadcn primitives | 29 shadcn/ui components with jimbo's edits, copied into apps | `foundation/src/components/ui/`, `scripts/shadcn-add.mjs` | new (0.18.0) |
+| UI kit | Composed from the primitives: fields, menus, toasts, tables, steps, lists, cards, stats, charts, Timeline, ScrollingLine | `reference/web/src/components/ui/` | changed (0.18.0) |
 | App shell | Phone-first, full-screen, floating tab dock, safe areas, top bar | `reference/web/src/routes/AppShell.tsx` | stable |
 | Heroes | `PageHeader` (compact hero), `HeroSection`, `HeroCarousel`; a hero on every page | `reference/web/src/components/ui/kit.tsx` | new (0.17.0) |
 | JumpMenu | Every data page one tap away | kit | new (0.17.0) |
 | Spotlight search | ⌘K app-wide search | kit | stable |
 | MapView | Maps in the theme | `reference/web/src/components/MapView.tsx` | stable |
 | jimbo-ui config section | `/jimbo-ui`: Theme (Looks, Colours, Type, Backdrop), Brand, Style guide, Updates/About | `reference/web/src/routes/JimboConfigPage.tsx`, `routes/config/` | stable |
-| Desktop grid columns | App-wide column count for tile grids on desktop, plus a per-grid picker | `foundation/src/lib/theme.ts` (`gridColumns`), kit `ColumnsPicker` | new (Unreleased) |
+| Desktop grid columns | App-wide column count for tile grids on desktop, plus a per-grid picker | `foundation/src/lib/theme.ts` (`gridColumns`), kit `ColumnsPicker` | new (0.18.0) |
 | URL state | The view lives in the URL | `reference/web/src/lib/useUrlState.ts` | stable |
 | Archetypes | Catalogue, Dashboard, Status monitor | `reference/web/src/archetypes/` | stable |
 
@@ -36,8 +36,8 @@ Theme engine, kit and shell, rules, registry, tooling and the plugin. 27 feature
 
 | Feature | What it does | Where | Status |
 |-|-|-|-|
-| Rulebook | 68 numbered rules (Brand, Colour, Shapes, Controls, Layout, Navigation, Motion, Parts, Binding, Accessibility) | `skills/jimbo-ui/rulebook.md` | changed (Unreleased: J binding group, S8, C8) |
-| PR route | Apps amend jimbo.ui only by PR; tracked pending versions | guide section 14, SKILL.md "Amend jimbo.ui" | new (Unreleased) |
+| Rulebook | 69 numbered rules (Brand, Colour, Shapes, Controls, Layout, Navigation, Motion, Parts, Binding, Accessibility) | `skills/jimbo-ui/rulebook.md` | changed (Unreleased: J binding group, S8, C8) |
+| PR route | Apps amend jimbo.ui only by PR; tracked pending versions | guide section 14, SKILL.md "Amend jimbo.ui" | new (0.18.0) |
 | Guide | Each rule explained, values and patterns | `skills/jimbo-ui/guide.md` | stable |
 
 ### Registry

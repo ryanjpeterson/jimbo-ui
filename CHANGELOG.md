@@ -34,6 +34,8 @@ the matching 0.x release.
 
 ## Unreleased
 
+## 0.18.0 — 2026-11-11
+
 jimbo.ui moves onto shadcn/ui, goes flat, and becomes binding: apps use its components and tokens only, and amend it by PR.
 
 **Update:** breaking

@@ -1822,7 +1822,7 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   `Menu` items take `current` and `{ heading }`, and long menus scroll.
   `LinkCard size="sm"` for a row of quick ways in. The shell sets
   `--page-max`, so a full-width hero's text lines up with the page column.
-- **Unreleased** — **jimbo.ui on shadcn/ui, and binding.** Components
+- **0.18.0 (2026-11-11)** — **jimbo.ui on shadcn/ui, and binding.** Components
   are shadcn/ui primitives in foundation (section 8, with jimbo's edits)
   and a kit composed from them; one token mapping onto shadcn's variable
   names in `globals.css` (section 3: the theme's accent is `primary`,
