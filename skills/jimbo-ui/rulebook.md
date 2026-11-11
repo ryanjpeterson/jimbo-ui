@@ -10,9 +10,10 @@ section with the detail and the components that do it for you.
 How to use it:
 - **Building UI:** keep the groups you're touching in mind; the kit already
   follows them, so a hand-built element is where breaks creep in.
-- **Auditing an app:** go group by group, list each break as
+- **Auditing an app:** start with J (it's binding) and P5, then go group by group, list each break as
   `rule · file:line · what · fix`, then fix them or hand the list to the
   update workflow.
+- **Missing a rule, token or component:** an app never invents one — it opens a PR to `ryanjpeterson/jimbo-ui` (J4, guide §14).
 - **Changing a rule:** edit it here, then the guide, the changelog
   (**Apps must** says what apps fix) and the guide's change log.
 
@@ -28,12 +29,12 @@ How to use it:
 
 ## C · Colour and contrast
 
-- **C1** Colours come from tokens only. No raw hex, no Tailwind palette colours (`bg-zinc-900`, `text-white`, `bg-black/55`) on anything branded. *§12*
-- **C2** Text on a brand fill uses its `on-*` colour. *§2*
+- **C1** Colours come from tokens only: shadcn's names (`bg-background`, `bg-card`, `bg-muted`, `text-foreground`, `text-muted-foreground`, `bg-primary`, `border-border`, `ring-ring`) and jimbo's brand families (`primary-*` shades, `highlight-*`, `support-*`, `text-subtle-foreground`). No raw hex, `rgb()`, arbitrary values (`bg-[#…]`), inline `style` colours or Tailwind palette colours (`bg-zinc-900`, `text-white`, `bg-black/55`). *§12*
+- **C2** Text on a brand fill uses its `-foreground` colour (`text-primary-foreground`, `text-highlight-foreground`, `text-support-foreground`). *§2*
 - **C3** Two to four source colours; none of them white or grey. A brand look uses only the colours on that brand's own site. *§2*
 - **C4** Colour comes from opaque shapes, not thin washes of another hue. *§2*
 - **C5** Status colours are the fixed tones (`Tone`), never theme colours. *§2*
-- **C6** Every template passes `node scripts/contrast.mjs --check` in each tone it comes in: body text ≥ 7:1, muted ≥ 5.5:1, labels ≥ 4.5:1 on fields (`surface-2`, the weakest surface text sits on); muted ≥ 4.5:1 on floating `.glass` over any photo; card border ≥ 1.75:1; card on page ≥ 1.19:1; **accent and highlight ≥ 3.5:1** on the page; support ≥ 4.5:1 on cards; text on the accent ≥ 4.5:1. *§3*
+- **C6** Every template passes `node scripts/contrast.mjs --check` in each tone it comes in: body text ≥ 7:1, muted ≥ 5.5:1, labels ≥ 4.5:1 on fields (`surface-2`, the weakest surface text sits on); card border ≥ 1.75:1; card on page ≥ 1.19:1; **accent and highlight ≥ 3.5:1** on the page; support ≥ 4.5:1 on cards; text on the accent ≥ 4.5:1. *§3*
 - **C7** **Colours stand apart.** Accent and highlight are at least 22 apart (ΔE), and no two of accent, highlight and support closer than 15 — closer than that, an eyebrow reads as a link and a badge as a button. A tone that can't do this is remade from the look's own colours or not offered. *§3*
 - **C8** **Hero text reads on any picture.** A hero's picture (`Hero`, `Banner`) or theme blur (`HeroSection`, `PageHeader`, `HeroCarousel`) sits under the page colour at the strength the theme works out (`hero-scrim-image`, `hero-scrim-blur`): title ≥ 7:1, eyebrow and lines ≥ 4.5:1 over the worst pixels. Never a fixed `bg-black/*` dim or `text-white`. *§3*
 
@@ -44,12 +45,13 @@ How to use it:
 - **S3** Circles sit side by side (4 px apart, 6 px from 16 px up), never overlapping, at the fixed sizes: 8, 10, 16, 40–48 px. *§2*
 - **S4** **A circle is never inside a box.** No square, rounded square, border, ring, tile or background behind a circle — an avatar placeholder, status dot or swatch is the bare circle. A picture keeps its own frame (square for places and covers, round for people); with no picture the placeholder is the circle alone. *§2*
 - **S5** Circles go only where §2 lists them: motif rows, stat and month dots, status dots, avatars, swatches, the favicon. Never decoration. *§2*
-- **S6** Anything straight on the backdrop (floating controls, unselected tabs, the pager) is `.glass`, never a bare outline or see-through. *§7*
+- **S6** Anything straight on the backdrop (floating controls, unselected tabs, the pager, the dock, the top bar) is a solid `bg-card` with a hairline `border` — never a bare outline, see-through or frosted. *§7*
 - **S7** A selected thing is a solid fill with `border-transparent` (plus a tick or `aria-pressed`), not an outline or a ring. *§7*
+- **S8** **Surfaces are flat.** One solid fill (`bg-background`, `bg-card`, `bg-muted`), a 1 px `border`, no shadow: no `shadow-*`, gradients, inner highlights, glows or `backdrop-blur-*` on any component. Depth comes from the surface steps and the backdrop. Overlays (menus, popovers, tooltips, toasts, sheets) are the one exception: a single `shadow-md`. *§7*
 
 ## K · Controls
 
-- **K1** **One control height.** Buttons, fields, selects, tabs and dropdowns are `h-control` (`h-control-sm` inside rows and cards). Never a height set by hand. *§6*
+- **K1** **One control height.** Buttons, fields, selects, tabs and dropdowns are `h-control` (`size="sm"` / `h-control-sm` inside rows and cards) — jimbo.ui's components set it. Never a height set by hand. *§6*
 - **K2** **Neighbours are one size.** Two controls side by side never differ in height, padding or type size — no `lg` primary beside a `sm` ghost, no full-size field beside a small button. Put them in a `.controls` row (or `.control-grid` for columns), which sizes them all alike. *§6*
 - **K3** **Nothing between a control row and its controls.** Actions passed to `PageHeader`, `Section`, `Hero`, `Banner` or `HeroSection` are a fragment, not a classed `div`/`span` wrapper; a component used there returns its control, not a box around it. *§6*
 - **K4** **A row of actions uses primary and secondary only** — one primary at most. Ghost buttons are for actions inside rows and cards, not beside a primary. *§8*
@@ -93,11 +95,20 @@ How to use it:
 
 ## P · Parts
 
-- **P1** One library: use the kit's component when one fits (catalogue first, §13). A second version of a kit component is a break — `ProgressBar` not a hand-made meter, `DataTable` not a hand-made table, `EntityRow`/`List` not hand-made rows. *§8, §13*
+- **P1** One library: jimbo.ui's. Use its component when one fits (catalogue first, §13). A second version of a kit component is a break — `ProgressBar` not a hand-made meter, `DataTable` not a hand-made table, `EntityRow`/`List` not hand-made rows. *§8, §13*
 - **P2** Every modal is a `Sheet`; every chart is the kit's (`TrendChart`, `BarChart`, `Sparkline`), at most three series, one y-axis. *§9*
 - **P3** Every map is `MapView`. *§9*
-- **P4** Icons are inline SVG (`stroke="currentColor"`, round caps), never glyphs or letters (`✕`, `‹ ›`, `★`, `i`). *§10*
-- **P5** Every app has exactly one jimbo-ui config section at `/jimbo-ui`, linked once from settings (`JimboConfigLink`), never a dock tab. *§1*
+- **P4** Icons are `lucide-react`, sized by the component (or `size-4` / `size-5`), never glyphs or letters (`✕`, `‹ ›`, `★`, `i`). *§10*
+- **P5** **Every app has a jimbo-ui config page** — exactly one, at `/jimbo-ui`, with every section the reference has (Theme, Style guide, Updates), gated by its `auth`, linked once from settings (`JimboConfigLink`), never a dock tab. *§1*
+
+## J · jimbo.ui is binding
+
+- **J1** **jimbo.ui is mandatory.** Every app with a `jimbo-ui.json` follows this rulebook. A break is a bug, fixed in the app — not a choice the app makes. *§14*
+- **J2** **Components come from jimbo.ui only.** shadcn primitives from `components/ui/` (foundation, never edited) and the kit from `reference/`. No `npx shadcn add`, no shadcn `components.json` in the app, no shadcn component jimbo.ui doesn't ship, no other UI library (MUI, Chakra, Mantine, Headless UI, daisyUI, Bootstrap…). *§14*
+- **J3** **No one-off restyles.** A jimbo.ui component is used through its own props and variants. `className` on it sets layout only (margin, width, flex and grid placement, `truncate`) — never colour, border, radius, shadow, padding, height or type size. *§14*
+- **J4** **Missing something? Amend jimbo.ui.** When an app needs a component, variant, token or rule jimbo.ui doesn't have, the only route is a PR to `ryanjpeterson/jimbo-ui` proposing it, generic (§14). Until it's released the app waits, or uses a temporary local version (J5). *§14*
+- **J5** **Temporary local versions are marked and tracked.** It lives in `src/components/jimbo-pending/`, opens with `// jimbo-ui pending: <PR url>`, is built only from jimbo.ui components and tokens, is listed in `jimbo-ui.json` `components.pending` with its PR, and is removed in the update that brings that PR's release. *§14*
+- **J6** **Every app has the jimbo-ui config page** (P5). An app without one isn't on jimbo.ui; the audit fails it first. *§1*
 
 ## A · Accessibility
 
