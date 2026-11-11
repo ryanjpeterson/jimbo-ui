@@ -4,7 +4,7 @@
 
 /* What an app's index.html puts on <body>; the published page has no body tag of its own. */
 @layer base {
-  body { @apply bg-bg font-body text-text-base antialiased; }
+  body { @apply bg-background font-body text-foreground antialiased; }
 }
 
 /* Stepping through looks on Home: the whole page fades slowly from one look to the next. */

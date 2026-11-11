@@ -4,124 +4,70 @@
  * and CommandPalette (⌘K: Spotlight for the app — search everything, go
  * anywhere, run an action).
  *
- * Each is portalled to <body> and placed against the thing that opened it,
- * below it where there's room and above it where there isn't, kept 8 px
- * inside the screen. Escape closes, and focus goes back where it came from.
- * For a choice or a short flow, use a Sheet instead.
+ * Built on jimbo.ui's shadcn primitives (components/ui: dropdown-menu,
+ * popover, tooltip, dialog): Radix places each one against the thing that
+ * opened it, keeps it on screen, closes it on Escape or a press outside and
+ * gives focus back. For a choice or a short flow, use a Sheet instead.
  *
- * jimbo-ui reference: copy into an app as is.
+ * jimbo-ui reference: copy into an app as is (rule J3: no restyling).
  */
 
 import {
-  cloneElement, forwardRef, isValidElement, useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState,
-  type CSSProperties, type KeyboardEvent as ReactKeyboardEvent, type ReactElement, type ReactNode, type RefObject,
+  forwardRef, useCallback, useEffect, useId, useMemo, useRef, useState,
+  type ButtonHTMLAttributes, type KeyboardEvent as ReactKeyboardEvent, type ReactElement, type ReactNode,
 } from "react";
-import { createPortal } from "react-dom";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { CheckIcon, ChevronDownIcon, EllipsisIcon, SearchIcon as LucideSearch, XIcon } from "lucide-react";
 import { BRAND } from "@/lib/brand.config";
 import { cn } from "@/lib/cn";
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Placing a floating panel against its anchor
-// ─────────────────────────────────────────────────────────────────────────────
-
-const EDGE = 8;
-const GAP = 6;
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Popover as PopoverRoot, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Tooltip as TooltipRoot, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 /**
- * Where a floating panel goes: under `anchor` (or over it when there isn't
- * room below), lined up with its start or end edge, or centred, and kept
- * inside the screen. Follows scrolling and resizing while `open`.
+ * What a trigger gets. Radix puts the ref, the click and the aria state on
+ * the element a `trigger` returns, so spread these on it (they may be empty)
+ * and make sure it forwards its ref — `Button`, `DropdownButton`,
+ * `MoreButton` and `TopBarButton` all do.
  */
-function useAnchored(anchor: RefObject<HTMLElement>, panel: RefObject<HTMLElement>, open: boolean, align: "start" | "end" | "center" = "start"): CSSProperties {
-  // Unplaced it's see-through but still focusable (a hidden one couldn't take focus as it opens).
-  const [style, setStyle] = useState<CSSProperties>({ position: "fixed", top: 0, left: 0, opacity: 0 });
-  const place = useCallback(() => {
-    const a = anchor.current?.getBoundingClientRect();
-    const p = panel.current;
-    if (!a || !p) return;
-    const w = p.offsetWidth, h = p.offsetHeight;
-    const vw = document.documentElement.clientWidth, vh = window.innerHeight;
-    const below = a.bottom + GAP + h <= vh - EDGE || a.top - GAP - h < EDGE;
-    const top = below ? a.bottom + GAP : a.top - GAP - h;
-    const raw = align === "end" ? a.right - w : align === "center" ? a.left + a.width / 2 - w / 2 : a.left;
-    const left = Math.min(Math.max(raw, EDGE), vw - EDGE - w);
-    setStyle({ position: "fixed", top: Math.max(top, EDGE), left, transformOrigin: below ? "top" : "bottom" });
-  }, [anchor, panel, align]);
-  useLayoutEffect(() => {
-    if (!open) return;
-    place();
-    addEventListener("scroll", place, { passive: true, capture: true });
-    addEventListener("resize", place);
-    return () => { removeEventListener("scroll", place, { capture: true }); removeEventListener("resize", place); };
-  }, [open, place]);
-  return style;
-}
+export type TriggerProps = ButtonHTMLAttributes<HTMLButtonElement>;
 
-/** Closes on a press outside both the anchor and the panel, and on Escape (focus goes back to the anchor). */
-function useDismiss(open: boolean, close: () => void, anchor: RefObject<HTMLElement>, panel: RefObject<HTMLElement>) {
-  useEffect(() => {
-    if (!open) return;
-    const onDown = (e: PointerEvent) => {
-      const t = e.target as Node;
-      if (!panel.current?.contains(t) && !anchor.current?.contains(t)) close();
-    };
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") { e.stopPropagation(); close(); anchor.current?.focus(); }
-    };
-    document.addEventListener("pointerdown", onDown, true);
-    document.addEventListener("keydown", onKey);
-    return () => { document.removeEventListener("pointerdown", onDown, true); document.removeEventListener("keydown", onKey); };
-  }, [open, close, anchor, panel]);
-}
-
-/** What a trigger needs: put these on the button that opens the overlay. */
-export type TriggerProps = {
-  ref: RefObject<HTMLButtonElement>;
-  onClick: () => void;
-  "aria-expanded": boolean;
-  "aria-controls": string;
-  "aria-haspopup": "menu" | "dialog";
-};
-
-const PANEL = "z-[45] rounded-xl border border-border bg-surface shadow-2xl shadow-black/40";
-
-/** The kit's round "more" button (⋯): a 44 px ghost circle. Spread a trigger's props on it. */
-export const MoreButton = forwardRef<HTMLButtonElement, Omit<TriggerProps, "ref"> & { label?: string }>(({ label = "More", ...props }, ref) => (
-  <button ref={ref} type="button" aria-label={label} {...props}
-    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-text-muted transition-colors hover:bg-surface-2 hover:text-text-base aria-expanded:bg-surface-2 aria-expanded:text-text-base">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.9" /><circle cx="12" cy="12" r="1.9" /><circle cx="19" cy="12" r="1.9" /></svg>
-  </button>
+/** The kit's "more" button (⋯): a 44 px ghost icon button. For a row's own actions. */
+export const MoreButton = forwardRef<HTMLButtonElement, TriggerProps & { label?: string }>(({ label = "More", ...props }, ref) => (
+  <Button ref={ref} type="button" variant="ghost" size="icon" aria-label={label} {...props}>
+    <EllipsisIcon className="size-5" />
+  </Button>
 ));
 MoreButton.displayName = "MoreButton";
 
 /**
  * The trigger for anything that opens a list of choices — a sort, a filter,
- * "more ways to do this…" — drawn as a dropdown, not a button: the field's
- * surface and border, its text, and a down arrow that turns while it's open.
- * One control high (`h-control`, or `h-control-sm` with `size="sm"`), so it
- * sits level in a `.controls` row. Spread a `Menu` or `Popover` trigger's
- * props on it. A ⋯ `MoreButton` stays only for a row's own actions.
+ * "more ways to do this…" — drawn as a dropdown, not a button (K5): the
+ * field's surface and border, its text, and a down arrow that turns while
+ * it's open. One control high (`h-control`, or `h-control-sm` with
+ * `size="sm"`), so it sits level in a `.controls` row. A ⋯ `MoreButton`
+ * stays only for a row's own actions.
  */
-export const DropdownButton = forwardRef<HTMLButtonElement, Omit<TriggerProps, "ref"> & {
+export const DropdownButton = forwardRef<HTMLButtonElement, TriggerProps & {
   children: ReactNode;
   /** Muted text before the value: "Sort" in "Sort: Newest". */
   label?: ReactNode;
   size?: "sm" | "md";
-  className?: string;
 }>(({ children, label, size = "md", className, ...props }, ref) => (
-  <button ref={ref} type="button" {...props}
+  <button ref={ref} type="button" data-slot="select-trigger" {...props}
     className={cn(
-      "field group inline-flex max-w-full shrink-0 items-center gap-2 pr-3 text-left font-semibold text-text-base transition-colors hover:border-text-subtle aria-expanded:border-accent",
-      size === "sm" ? "h-control-sm px-3 text-sm" : "h-control",
+      "group inline-flex max-w-full shrink-0 items-center gap-2 rounded-lg border border-input bg-muted text-left font-semibold text-foreground transition-colors outline-none hover:border-subtle-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-expanded:border-ring data-[state=open]:border-ring",
+      size === "sm" ? "h-control-sm px-3 text-sm" : "h-control pl-4 pr-3 text-15",
       className,
     )}>
-    {label && <span className="shrink-0 font-medium text-text-muted">{label}</span>}
+    {label && <span className="shrink-0 font-medium text-muted-foreground">{label}</span>}
     <span className="min-w-0 truncate">{children}</span>
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round"
-      aria-hidden="true" className="ml-auto shrink-0 text-text-subtle transition-transform group-aria-expanded:rotate-180">
-      <path d="M6 9l6 6 6-6" />
-    </svg>
+    <ChevronDownIcon aria-hidden="true" className="ml-auto size-4.5 shrink-0 text-subtle-foreground transition-transform group-data-[state=open]:rotate-180" />
   </button>
 ));
 DropdownButton.displayName = "DropdownButton";
@@ -132,7 +78,7 @@ DropdownButton.displayName = "DropdownButton";
 
 export type MenuItem =
   | { label: string; onSelect: () => void; hint?: ReactNode; icon?: ReactNode; danger?: boolean; disabled?: boolean;
-      /** The one you're on (a JumpMenu's current page): accent text and a tick. */
+      /** The one you're on (a JumpMenu's current page): primary text and a tick. */
       current?: boolean }
   | { heading: string }
   | "divider";
@@ -141,8 +87,9 @@ export type MenuItem =
  * A list of actions on one thing (a row's Edit / Duplicate / Delete), opened
  * from a button — the ⋯ `MoreButton` unless `trigger` draws another. Arrow
  * keys move, Home and End jump, a letter goes to the next item starting with
- * it, Enter picks. `danger` items are in the highlight colour and go last,
- * after a divider; confirm them with `ConfirmSheet`.
+ * it, Enter picks (shadcn `DropdownMenu`). `danger` items are in the
+ * highlight colour and go last, after a divider; confirm them with
+ * `ConfirmSheet`.
  */
 export function Menu({ items, label = "More", trigger, align = "end" }: {
   items: MenuItem[];
@@ -151,65 +98,30 @@ export function Menu({ items, label = "More", trigger, align = "end" }: {
   trigger?: (props: TriggerProps) => ReactNode;
   align?: "start" | "end";
 }) {
-  const [open, setOpen] = useState(false);
-  const id = useId();
-  const anchor = useRef<HTMLButtonElement>(null);
-  const panel = useRef<HTMLDivElement>(null);
-  const style = useAnchored(anchor, panel, open, align);
-  const close = useCallback(() => setOpen(false), []);
-  useDismiss(open, close, anchor, panel);
-
-  const buttons = () => [...(panel.current?.querySelectorAll<HTMLButtonElement>("[role=menuitem]:not(:disabled)") ?? [])];
-  useEffect(() => { if (open) buttons()[0]?.focus(); }, [open]);
-  const onKey = (e: ReactKeyboardEvent) => {
-    const all = buttons();
-    const at = all.indexOf(document.activeElement as HTMLButtonElement);
-    const go = (i: number) => { e.preventDefault(); all[(i + all.length) % all.length]?.focus(); };
-    if (e.key === "ArrowDown") go(at + 1);
-    else if (e.key === "ArrowUp") go(at - 1);
-    else if (e.key === "Home") go(0);
-    else if (e.key === "End") go(all.length - 1);
-    else if (e.key === "Tab") close();
-    else if (e.key.length === 1 && /\S/.test(e.key)) {
-      const k = e.key.toLowerCase();
-      const next = [...all.slice(at + 1), ...all.slice(0, at + 1)].find((b) => b.textContent?.trim().toLowerCase().startsWith(k));
-      if (next) { e.preventDefault(); next.focus(); }
-    }
-  };
-  const pick = (item: Exclude<MenuItem, "divider" | { heading: string }>) => { close(); anchor.current?.focus(); item.onSelect(); };
-  const props: TriggerProps = { ref: anchor, onClick: () => setOpen((o) => !o), "aria-expanded": open, "aria-controls": id, "aria-haspopup": "menu" };
-
   return (
-    <>
-      {trigger ? trigger(props) : <MoreButton label={label} {...props} />}
-      {open && createPortal(
-        <div ref={panel} id={id} role="menu" aria-label={label} onKeyDown={onKey} style={style}
-          className={cn(PANEL, "scroll-area max-h-[min(30rem,70dvh)] min-w-[12rem] max-w-[calc(100vw-16px)] overflow-y-auto py-1")}>
-          {items.map((item, i) => item === "divider"
-            ? <div key={i} role="separator" className="my-1 h-px bg-border" />
-            : "heading" in item
-            ? <p key={i} role="presentation" className="eyebrow px-3.5 pt-3 pb-1 text-support">{item.heading}</p>
-            : (
-              <button key={i} type="button" role="menuitem" disabled={item.disabled} onClick={() => pick(item)}
-                aria-current={item.current ? "page" : undefined}
-                className={cn(
-                  "flex min-h-11 w-full items-center gap-3 px-3.5 text-left text-15 font-semibold outline-hidden transition-colors focus-visible:bg-surface-2 hover:bg-surface-2 disabled:opacity-45",
-                  item.danger ? "text-highlight" : item.current ? "text-accent" : "text-text-base",
-                )}>
-                {item.icon && <span aria-hidden="true" className="flex w-5 shrink-0 justify-center text-text-subtle">{item.icon}</span>}
-                <span className="min-w-0 flex-1 truncate">{item.label}</span>
-                {item.hint && <span className="shrink-0 text-xs font-medium text-text-subtle">{item.hint}</span>}
-                {item.current && (
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="shrink-0">
-                    <path d="M5 12.5l4.5 4.5L19 7.5" />
-                  </svg>
-                )}
-              </button>
-            ))}
-        </div>,
-        document.body,
-      )}
-    </>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        {(trigger ? trigger({}) : <MoreButton label={label} />) as ReactElement}
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align={align} aria-label={label}
+        className="scroll-area max-h-[min(30rem,70dvh)] min-w-[12rem] max-w-[calc(100vw-16px)]">
+        {items.map((item, i) => item === "divider"
+          ? <DropdownMenuSeparator key={i} />
+          : "heading" in item
+          ? <DropdownMenuLabel key={i} className="eyebrow px-2.5 pt-3 pb-1 text-support">{item.heading}</DropdownMenuLabel>
+          : (
+            <DropdownMenuItem key={i} disabled={item.disabled} onSelect={item.onSelect}
+              variant={item.danger ? "destructive" : "default"}
+              aria-current={item.current ? "page" : undefined}
+              className={cn("min-h-11 gap-3 px-2.5 text-15 font-semibold", item.danger ? "text-highlight" : item.current && "text-primary")}>
+              {item.icon && <span aria-hidden="true" className="flex w-5 shrink-0 justify-center text-subtle-foreground">{item.icon}</span>}
+              <span className="min-w-0 flex-1 truncate">{item.label}</span>
+              {item.hint && <span className="shrink-0 text-xs font-medium text-subtle-foreground">{item.hint}</span>}
+              {item.current && <CheckIcon aria-hidden="true" className="shrink-0" />}
+            </DropdownMenuItem>
+          ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 
@@ -253,7 +165,7 @@ export function JumpMenu({ items, label, value, trigger, align = "start", size }
  * A small panel by its button — a few filters, a quick setting, a short
  * explanation — that stays open while you use it and closes on a press
  * outside or Escape. More than a few controls, or anything that saves, is a
- * Sheet. `trigger` draws the button with the props it's given.
+ * Sheet. `trigger` draws the button (spread the props it's given).
  */
 export function Popover({ label, trigger, children, align = "start", className }: {
   /** Names the panel for screen readers. */
@@ -262,30 +174,18 @@ export function Popover({ label, trigger, children, align = "start", className }
   /** The panel's content, or a function of `close` for content with a Done button. */
   children: ReactNode | ((close: () => void) => ReactNode);
   align?: "start" | "end" | "center";
+  /** Layout only (a width); J3. */
   className?: string;
 }) {
   const [open, setOpen] = useState(false);
-  const id = useId();
-  const anchor = useRef<HTMLButtonElement>(null);
-  const panel = useRef<HTMLDivElement>(null);
-  const style = useAnchored(anchor, panel, open, align);
   const close = useCallback(() => setOpen(false), []);
-  useDismiss(open, close, anchor, panel);
-  useEffect(() => {
-    if (open) panel.current?.querySelector<HTMLElement>("input, select, textarea, button, [href], [tabindex]:not([tabindex='-1'])")?.focus();
-  }, [open]);
-
   return (
-    <>
-      {trigger({ ref: anchor, onClick: () => setOpen((o) => !o), "aria-expanded": open, "aria-controls": id, "aria-haspopup": "dialog" })}
-      {open && createPortal(
-        <div ref={panel} id={id} role="dialog" aria-label={label} style={style}
-          className={cn(PANEL, "w-72 max-w-[calc(100vw-16px)] p-4", className)}>
-          {typeof children === "function" ? children(close) : children}
-        </div>,
-        document.body,
-      )}
-    </>
+    <PopoverRoot open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>{trigger({}) as ReactElement}</PopoverTrigger>
+      <PopoverContent align={align} aria-label={label} className={cn("max-w-[calc(100vw-16px)]", className)}>
+        {typeof children === "function" ? children(close) : children}
+      </PopoverContent>
+    </PopoverRoot>
   );
 }
 
@@ -295,45 +195,18 @@ export function Popover({ label, trigger, children, align = "start", className }
 
 /**
  * A short label for an icon-only control, shown after a moment's hover or on
- * keyboard focus. Never the only place something is said: the control has
- * its own `aria-label`, and touch screens don't show tooltips at all, so
- * nothing a person needs lives only here. Wraps one element.
+ * keyboard focus. Never the only place something is said (A3): the control
+ * has its own `aria-label`, and touch screens don't show tooltips at all.
+ * Wraps one element that forwards its ref.
  */
 export function Tooltip({ text, children }: { text: string; children: ReactElement }) {
-  const [open, setOpen] = useState(false);
-  const id = useId();
-  const anchor = useRef<HTMLSpanElement>(null);
-  const panel = useRef<HTMLDivElement>(null);
-  const timer = useRef<number>();
-  const style = useAnchored(anchor, panel, open, "center");
-  const show = (delay: number) => { clearTimeout(timer.current); timer.current = window.setTimeout(() => setOpen(true), delay); };
-  const hide = () => { clearTimeout(timer.current); setOpen(false); };
-  useEffect(() => () => clearTimeout(timer.current), []);
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") hide(); };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [open]);
-  const child = isValidElement<{ "aria-describedby"?: string }>(children)
-    ? cloneElement(children, { "aria-describedby": open ? id : undefined })
-    : children;
-
   return (
-    <span ref={anchor} className="inline-flex"
-      onPointerEnter={(e) => { if (e.pointerType === "mouse") show(450); }}
-      onPointerLeave={hide}
-      onFocus={(e) => { if (e.target.matches(":focus-visible")) show(0); }}
-      onBlur={hide}>
-      {child}
-      {open && createPortal(
-        <div ref={panel} id={id} role="tooltip" style={style}
-          className="pointer-events-none z-[45] max-w-60 rounded-lg bg-text-base px-2.5 py-1.5 text-xs font-semibold text-bg shadow-lg">
-          {text}
-        </div>,
-        document.body,
-      )}
-    </span>
+    <TooltipProvider delayDuration={450}>
+      <TooltipRoot>
+        <TooltipTrigger asChild>{children}</TooltipTrigger>
+        <TooltipContent className="max-w-60 text-xs font-semibold">{text}</TooltipContent>
+      </TooltipRoot>
+    </TooltipProvider>
   );
 }
 
@@ -488,18 +361,14 @@ const MOD = typeof navigator !== "undefined" && /Mac|iP(hone|ad|od)/.test(naviga
 
 /** The magnifier, 18 px: for a top-bar search button (`TopBarButton`) that opens the palette on phones. */
 export function SearchIcon({ size = 18 }: { size?: number }) {
-  return (
-    <svg className="shrink-0" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" aria-hidden="true">
-      <circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" />
-    </svg>
-  );
+  return <LucideSearch aria-hidden="true" className="shrink-0" style={{ width: size, height: size }} strokeWidth={2.25} />;
 }
 
 /** Looks like a search field and opens the palette: the search bar at the top of an explore or library page. */
 export function SearchTrigger({ onClick, label = "Search", className }: { onClick: () => void; label?: string; className?: string }) {
   return (
     <button type="button" onClick={onClick}
-      className={cn("glass flex h-control w-full items-center gap-3 rounded-xl px-4 text-left text-base text-text-subtle transition-colors hover:border-accent sm:h-11", className)}>
+      className={cn("flex h-control w-full items-center gap-3 rounded-lg border border-input bg-muted px-4 text-left text-15 text-subtle-foreground transition-colors outline-none hover:border-subtle-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50", className)}>
       <SearchIcon />
       <span className="min-w-0 flex-1 truncate">{label}</span>
       <kbd className="hidden shrink-0 rounded-md border border-border px-1.5 py-0.5 font-mono text-11 sm:block">{MOD}K</kbd>
@@ -509,9 +378,12 @@ export function SearchTrigger({ onClick, label = "Search", className }: { onClic
 
 function Thumb({ image, round }: { image: string | null; round?: boolean }) {
   return (
-    <span className={cn("flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden bg-surface-2", round ? "rounded-full" : "rounded-lg")}>
-      {image ? <img src={image} alt="" loading="lazy" className="h-full w-full object-cover" /> : <span className="motif-support h-4 w-4" />}
-    </span>
+    // With no picture, the motif alone — never a circle in a box (S4).
+    image ? (
+      <span className={cn("flex h-10 w-10 shrink-0 overflow-hidden", round ? "rounded-full" : "rounded-lg")}>
+        <img src={image} alt="" loading="lazy" className="h-full w-full object-cover" />
+      </span>
+    ) : <span className="flex h-10 w-10 shrink-0 items-center justify-center"><span className="motif-support h-4 w-4" /></span>
   );
 }
 
@@ -584,22 +456,17 @@ export function CommandPalette({
   const id = useId();
   const input = useRef<HTMLInputElement>(null);
   const list = useRef<HTMLDivElement>(null);
-  const back = useRef<HTMLElement | null>(null);
   const live = useRef({ providers, raw, setRaw });
   live.current = { providers, raw, setRaw };
 
   useEffect(() => {
     if (!open) return;
-    back.current = document.activeElement as HTMLElement | null;
     // A query from the URL comes back as chips, ready for more words.
     const { raw: r, setRaw: set } = live.current;
     if (query === undefined) set("");
     else if (r.trim() && !/\s$/.test(r)) set(`${r.trim()} `);
     setActiveKey(null);
     setRecents(storeKey ? readRecents(storeKey) : []);
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => { document.body.style.overflow = prev; back.current?.focus?.(); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
@@ -702,8 +569,6 @@ export function CommandPalette({
     list.current?.querySelector(`[data-index="${at}"]`)?.scrollIntoView({ block: "nearest" });
   }, [at]);
 
-  if (!open) return null;
-
   const pick = (r?: Row) => {
     if (!r) return;
     if (r.keep) { r.pick(); setActiveKey(null); input.current?.focus(); return; }
@@ -735,14 +600,16 @@ export function CommandPalette({
   const label = (key: string) => facets.find((f) => f.key === key)?.label ?? key;
   const shown = placeholder ?? (providers.length ? "Search" : "Search pages and actions");
 
-  return createPortal(
-    <div className="fixed inset-0 z-50 flex justify-center bg-black/60 px-3 pt-[calc(var(--safe-top)+12px)] backdrop-blur-xs sm:pt-[12vh]"
-      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div role="dialog" aria-modal="true" aria-label="Search"
-        className={cn("flex max-h-[min(34rem,calc(100dvh-var(--safe-top)-24px))] w-full max-w-lg flex-col self-start overflow-hidden rounded-2xl border border-border bg-bg shadow-2xl shadow-black/60",
+  // shadcn Dialog: focus trap, Escape, scroll lock and focus back on close.
+  return (
+    <Dialog open={open} onOpenChange={(o) => { if (!o) onClose(); }}>
+      <DialogContent showCloseButton={false} aria-describedby={undefined}
+        onEscapeKeyDown={(e) => e.preventDefault()}
+        className={cn("top-[calc(var(--safe-top)+12px)] flex max-h-[min(34rem,calc(100dvh-var(--safe-top)-24px))] w-[calc(100%-1.5rem)] max-w-lg translate-y-0 flex-col gap-0 overflow-hidden p-0 sm:top-[12vh] sm:max-w-lg",
           hasPreview && "md:h-[min(34rem,calc(100dvh-var(--safe-top)-24px))] md:max-w-3xl")}>
+        <DialogTitle className="sr-only">Search</DialogTitle>
         <div className="shrink-0 border-b border-border">
-          <label className="flex items-center gap-3 px-4 text-text-subtle">
+          <label className="flex items-center gap-3 px-4 text-subtle-foreground">
             <SearchIcon />
             <span className="sr-only">{shown}</span>
             <input ref={input} autoFocus value={text} onKeyDown={onKey}
@@ -750,19 +617,21 @@ export function CommandPalette({
               placeholder={chips.length ? "Add words or filters" : shown} role="combobox" aria-expanded="true" aria-controls={id}
               aria-autocomplete="list" aria-activedescendant={active ? `${id}-${at}` : undefined}
               enterKeyHint="go" autoCapitalize="off" autoCorrect="off" spellCheck={false}
-              className="h-14 min-w-0 flex-1 bg-transparent text-base text-text-base outline-hidden placeholder:text-text-subtle" />
-            {busy && <span className="h-2.5 w-2.5 shrink-0 animate-pulse rounded-full bg-accent" aria-hidden="true" />}
-            <kbd className="hidden shrink-0 rounded-md border border-border px-1.5 py-0.5 font-mono text-11 text-text-subtle sm:block">esc</kbd>
+              className="h-14 min-w-0 flex-1 bg-transparent text-base text-foreground outline-hidden placeholder:text-subtle-foreground" />
+            {busy && <span className="dot-primary h-2.5 w-2.5 shrink-0 animate-pulse" aria-hidden="true" />}
+            <kbd className="hidden shrink-0 rounded-md border border-border px-1.5 py-0.5 font-mono text-11 text-subtle-foreground sm:block">esc</kbd>
           </label>
           {chips.length > 0 && (
             <div className="-mt-1 flex flex-wrap gap-2 px-4 pb-3">
               {chips.map((c, i) => (
-                <button key={`${c.key}:${c.value}:${i}`} type="button" onClick={() => removeChip(i)} aria-label={`Remove filter ${label(c.key)} ${c.value}`}
-                  className="chip relative min-h-9 text-text-base transition-colors before:absolute before:inset-x-0 before:-inset-y-1 before:content-[''] hover:border-accent">
-                  <span className="text-text-subtle">{label(c.key)}</span>
-                  <span className="font-semibold">{c.value}</span>
-                  <svg className="-mr-1 text-text-subtle" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
-                </button>
+                <Badge key={`${c.key}:${c.value}:${i}`} variant="secondary" asChild>
+                  <button type="button" onClick={() => removeChip(i)} aria-label={`Remove filter ${label(c.key)} ${c.value}`}
+                    className="relative min-h-9 px-3 text-sm before:absolute before:inset-x-0 before:-inset-y-1 before:content-['']">
+                    <span className="text-subtle-foreground">{label(c.key)}</span>
+                    <span className="font-semibold text-foreground">{c.value}</span>
+                    <XIcon aria-hidden="true" className="-mr-1 size-3.5" />
+                  </button>
+                </Badge>
               ))}
             </div>
           )}
@@ -785,50 +654,49 @@ export function CommandPalette({
                     <div key={r.key} id={`${id}-${i}`} data-index={i} role="option" aria-selected={i === at}
                       onPointerMove={() => setActiveKey(r.key)} onClick={() => pick(r)}
                       className={cn("mx-1.5 flex cursor-pointer items-center gap-3 rounded-lg px-2.5", r.subtitle || r.image !== undefined ? "min-h-14 py-2" : "min-h-11",
-                        i === at ? "bg-surface-2" : "")}>
+                        i === at ? "bg-muted" : "")}>
                       {r.image !== undefined && <Thumb image={r.image} round={r.round} />}
                       <span className="min-w-0 flex-1">
-                        <span className={cn("block truncate text-15 font-semibold", i === at ? "text-text-base" : "text-text-muted")}>{r.title}</span>
-                        {r.subtitle && <span className="block truncate text-sm text-text-subtle">{r.subtitle}</span>}
+                        <span className={cn("block truncate text-15 font-semibold", i === at ? "text-foreground" : "text-muted-foreground")}>{r.title}</span>
+                        {r.subtitle && <span className="block truncate text-sm text-subtle-foreground">{r.subtitle}</span>}
                       </span>
-                      {r.meta && <span className="shrink-0 text-xs font-medium text-text-subtle">{r.meta}</span>}
+                      {r.meta && <span className="shrink-0 text-xs font-medium text-subtle-foreground">{r.meta}</span>}
                     </div>
                   );
                 })}
                 {g.loading && g.rows.length === 0 && (
                   <div aria-hidden="true" className="mx-1.5 flex min-h-14 items-center gap-3 px-2.5">
-                    <span className="h-10 w-10 shrink-0 animate-pulse rounded-lg bg-surface-2" />
-                    <span className="flex-1 space-y-2"><span className="block h-3 w-1/2 animate-pulse rounded-sm bg-surface-2" /><span className="block h-2.5 w-1/3 animate-pulse rounded-sm bg-surface-2" /></span>
+                    <span className="h-10 w-10 shrink-0 animate-pulse rounded-lg bg-muted" />
+                    <span className="flex-1 space-y-2"><span className="block h-3 w-1/2 animate-pulse rounded-sm bg-muted" /><span className="block h-2.5 w-1/3 animate-pulse rounded-sm bg-muted" /></span>
                   </div>
                 )}
-                {g.error && <p className="px-4 pb-2 text-sm text-text-muted">Couldn't search {g.label.toLowerCase()}. Try again in a moment.</p>}
+                {g.error && <p className="px-4 pb-2 text-sm text-muted-foreground">Couldn't search {g.label.toLowerCase()}. Try again in a moment.</p>}
               </div>
             ))}
             {!empty && rows.length === 0 && !busy && (
               <div className="flex flex-col items-center gap-3 px-4 py-10 text-center">
-                <span aria-hidden="true" className="inline-flex gap-1">{(["motif-accent", "motif-highlight", "motif-support"] as const).map((m) => <span key={m} className={cn(m, "h-2 w-2")} />)}</span>
-                <p className="text-sm text-text-muted">Nothing matches “{formatQuery(parsed)}”.{chips.length > 0 && " Try taking off a filter."}</p>
+                <span aria-hidden="true" className="inline-flex gap-1">{(["motif-primary", "motif-highlight", "motif-support"] as const).map((m) => <span key={m} className={cn(m, "h-2 w-2")} />)}</span>
+                <p className="text-sm text-muted-foreground">Nothing matches “{formatQuery(parsed)}”.{chips.length > 0 && " Try taking off a filter."}</p>
               </div>
             )}
-            {empty && rows.length === 0 && <p className="px-4 py-10 text-center text-sm text-text-muted">Type to search.</p>}
+            {empty && rows.length === 0 && <p className="px-4 py-10 text-center text-sm text-muted-foreground">Type to search.</p>}
           </div>
           {hasPreview && (
             <aside aria-label="Preview" className="hidden w-80 shrink-0 overflow-y-auto overscroll-contain border-l border-border md:block">
               {active?.preview ? active.preview() : (
-                <div className="flex h-full items-center justify-center p-6 text-center text-sm text-text-subtle">Highlight a result to see it here.</div>
+                <div className="flex h-full items-center justify-center p-6 text-center text-sm text-subtle-foreground">Highlight a result to see it here.</div>
               )}
             </aside>
           )}
         </div>
 
-        <div className="hidden shrink-0 items-center gap-4 border-t border-border px-4 py-2 text-11 text-text-subtle sm:flex">
+        <div className="hidden shrink-0 items-center gap-4 border-t border-border px-4 py-2 text-11 text-subtle-foreground sm:flex">
           {[["↑↓", "move"], ["↵", "open"], ["tab", "next group"], ["esc", "close"]].map(([k, v]) => (
             <span key={v} className="flex items-center gap-1.5"><kbd className="rounded-md border border-border px-1.5 py-0.5 font-mono">{k}</kbd>{v}</span>
           ))}
         </div>
         <p className="sr-only" aria-live="polite">{busy ? "Searching" : empty ? "" : `${rows.length} results`}</p>
-      </div>
-    </div>,
-    document.body,
+      </DialogContent>
+    </Dialog>
   );
 }

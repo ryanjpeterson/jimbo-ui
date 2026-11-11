@@ -14,10 +14,10 @@ const sizes = { sm: 22, md: 30, lg: 44 } as const;
 export function HeaderTitle({ size = "sm", className }: { size?: keyof typeof sizes; className?: string }) {
   const parts = BRAND.name.split(".");
   return (
-    <span className={cn("font-display leading-none tracking-[-0.02em] text-text-base", className)} style={{ fontSize: sizes[size] }}>
+    <span className={cn("font-display leading-none tracking-[-0.02em] text-foreground", className)} style={{ fontSize: sizes[size] }}>
       {parts.map((part, i) => (
         <Fragment key={i}>
-          {i > 0 && <span className="text-accent">.</span>}
+          {i > 0 && <span className="text-primary">.</span>}
           {part}
         </Fragment>
       ))}

@@ -14,6 +14,7 @@
 
 import { createContext, useContext, useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { HeaderTitle } from "@/components/HeaderTitle";
 import { ColorPicker } from "@/components/ColorPicker";
 import {
@@ -30,33 +31,32 @@ import { useUrlState } from "@/lib/useUrlState";
 
 const PLACES = ["Main hall", "Studio B", "Rooftop", "Riverside park", "Workshop room"];
 
-const TOKENS: { name: string; use: string }[] = [
-  { name: "bg", use: "Page" },
-  { name: "bg-deep", use: "Card gradient end" },
-  { name: "surface", use: "Cards, sheets" },
-  { name: "surface-2", use: "Fields, chips, hover" },
-  { name: "border", use: "Lines and outlines" },
-  { name: "text", use: "Body text" },
-  { name: "text-muted", use: "Secondary text" },
-  { name: "text-subtle", use: "Labels, hints" },
-  { name: "accent", use: "Primary actions, active state" },
-  { name: "accent-hover", use: "Accent on hover" },
-  { name: "accent-light", use: "Lighter shade (depth, glows)" },
-  { name: "accent-dark", use: "Darker shade (depth, shadows)" },
-  { name: "on-accent", use: "Text on accent fills" },
-  { name: "accent-950", use: "Accent wash (done chip)" },
-  { name: "accent-700", use: "Accent outline" },
-  { name: "highlight", use: "Dates, badges, alerts" },
-  { name: "on-highlight", use: "Text on highlight fills" },
-  { name: "highlight-dark", use: "Darker highlight" },
-  { name: "highlight-950", use: "Highlight wash (warnings)" },
-  { name: "support", use: "Page labels, avatars, third place" },
-  { name: "on-support", use: "Text on support fills" },
-  { name: "support-900", use: "Support wash (avatars)" },
+/** The token mapping (globals.css): each shadcn variable, the jimbo colour it comes from, and what it's for. */
+const TOKENS: { css: string; from: string; use: string }[] = [
+  { css: "background", from: "bg", use: "Page" },
+  { css: "card", from: "surface", use: "Cards, sheets, popovers" },
+  { css: "muted", from: "surface-2", use: "Fields, tags, tracks" },
+  { css: "accent", from: "surface-2", use: "Hover surface (shadcn's accent)" },
+  { css: "border", from: "border", use: "Hairlines and outlines" },
+  { css: "foreground", from: "text", use: "Body text" },
+  { css: "muted-foreground", from: "text-muted", use: "Secondary text" },
+  { css: "subtle-foreground", from: "text-subtle", use: "Labels, hints" },
+  { css: "primary", from: "accent", use: "Primary actions, active state, ring" },
+  { css: "primary-hover", from: "accent-hover", use: "Primary on hover" },
+  { css: "primary-light", from: "accent-light", use: "Lighter shade" },
+  { css: "primary-dark", from: "accent-dark", use: "Darker shade" },
+  { css: "primary-foreground", from: "on-accent", use: "Text on primary fills" },
+  { css: "primary-950", from: "accent-950", use: "Primary wash (done chip)" },
+  { css: "highlight", from: "highlight", use: "Dates, badges, alerts" },
+  { css: "highlight-foreground", from: "on-highlight", use: "Text on highlight fills" },
+  { css: "highlight-950", from: "highlight-950", use: "Highlight wash (warnings)" },
+  { css: "support", from: "support", use: "Page labels, avatars, third place" },
+  { css: "support-foreground", from: "on-support", use: "Text on support fills" },
+  { css: "support-900", from: "support-900", use: "Support wash (avatars)" },
 ];
 
-const DOT = { accent: "dot-accent", highlight: "dot-highlight", support: "dot-support" } as const;
-const LIT = { accent: "lit-accent", highlight: "lit-highlight", support: "lit-support" } as const;
+const DOT = { accent: "dot-primary", highlight: "dot-highlight", support: "dot-support" } as const;
+const LIT = { accent: "bg-primary text-primary-foreground", highlight: "bg-highlight text-highlight-foreground", support: "bg-support text-support-foreground" } as const;
 
 const TONE_EXAMPLES: { tone: Tone; label: string }[] = [
   { tone: "accent", label: "Done" },
@@ -127,7 +127,7 @@ export function StyleGuidePanel({ more = [] }: { more?: { value: string; label: 
       </div>
 
       <Block section="brand" title="Brand" note="The app's name as header text (a dot takes the accent) and its colours as flat circles — two to four; a faded one is inferred.">
-        <div className="card flex flex-wrap items-center gap-6 p-5">
+        <div className="rounded-xl border border-border bg-card flex flex-wrap items-center gap-6 p-5">
           <HeaderTitle size="lg" />
           <div className="flex flex-wrap gap-3">
             {THEME_KEYS.map((k) => (
@@ -135,7 +135,7 @@ export function StyleGuidePanel({ more = [] }: { more?: { value: string; label: 
                 <div className={`mx-auto h-12 w-12 rounded-full ${k === "background" ? "border border-border" : DOT[k]} ${own[k] ? "" : "opacity-55"}`}
                   style={k === "background" ? { background: theme[k] } : undefined} />
                 <p className="mt-1.5 text-xs font-semibold capitalize">{k}</p>
-                <p className="font-mono text-11 text-text-subtle">{own[k] ? theme[k] : "inferred"}</p>
+                <p className="font-mono text-11 text-subtle-foreground">{own[k] ? theme[k] : "inferred"}</p>
               </div>
             ))}
           </div>
@@ -143,57 +143,57 @@ export function StyleGuidePanel({ more = [] }: { more?: { value: string; label: 
       </Block>
 
       <Block section="brand" title="Shades and depth" note="Each brand colour comes lighter and darker, as a solid fill and as washes. Use them for depth, never as new colours.">
-        <div className="card space-y-4 p-5">
+        <div className="rounded-xl border border-border bg-card space-y-4 p-5">
           {(["accent", "highlight", "support"] as const).map((k) => (
             <div key={k} className="flex items-center gap-3">
               <p className="w-16 shrink-0 text-xs font-semibold capitalize">{k}</p>
               <div className="flex min-w-0 items-center gap-1">
                 {["lighter", "light", "", "dark", "darker"].map((v) => (
                   <span key={v} className="h-6 w-6 shrink-0 rounded-full"
-                    style={{ background: `rgb(var(--c-${k}${v ? `-${v}` : ""}))` }} title={`${k}${v ? `-${v}` : ""}`} />
+                    style={{ background: `var(--${k === "accent" ? "primary" : k}${v ? `-${v}` : ""})` }} title={`${k === "accent" ? "primary" : k}${v ? `-${v}` : ""}`} />
                 ))}
               </div>
-              <span className={`${LIT[k]} ml-auto shrink-0 whitespace-nowrap rounded-control px-2.5 py-1 text-xs font-bold`}>Fill</span>
+              <span className={`${LIT[k]} ml-auto shrink-0 whitespace-nowrap rounded-md px-2.5 py-1 text-xs font-bold`}>Fill</span>
             </div>
           ))}
         </div>
       </Block>
 
       <Block section="brand" title="Circles" note="Always one flat fill — no gradient, outline, ring, glow or shadow. Side by side, never overlapping. 8 px inline, 10 px status, 16 px swatches, 40–48 px editor swatches and avatars.">
-        <div className="card space-y-4 p-5">
+        <div className="rounded-xl border border-border bg-card space-y-4 p-5">
           <div className="flex flex-wrap items-center gap-6">
             <span className="flex items-center gap-2 text-sm"><ThemeDots /> ThemeDots (8 px)</span>
             <span className="flex items-center gap-2 text-sm"><span className="dot-support h-2 w-2" /> label dot</span>
             <span className="flex items-center gap-2 text-sm"><span className="h-2.5 w-2.5 rounded-full bg-yellow-400" /> status</span>
           </div>
           <div className="flex items-center gap-1">
-            {(["dot-accent", "dot-highlight", "dot-support"] as const).map((d) => <span key={d} className={`${d} h-4 w-4 shrink-0`} />)}
-            <span className="h-4 w-4 shrink-0 rounded-full border border-border bg-bg" />
-            <span className="ml-2 text-sm text-text-muted">swatches (16 px; the page colour gets a hairline border)</span>
+            {(["dot-primary", "dot-highlight", "dot-support"] as const).map((d) => <span key={d} className={`${d} h-4 w-4 shrink-0`} />)}
+            <span className="h-4 w-4 shrink-0 rounded-full border border-border bg-background" />
+            <span className="ml-2 text-sm text-muted-foreground">swatches (16 px; the page colour gets a hairline border)</span>
           </div>
-          <div className="glass flex items-center gap-3 rounded-2xl p-4">
-            <span className="dot-support flex h-10 w-10 items-center justify-center font-display text-on-support">A</span>
-            <p className="text-sm font-semibold">An avatar on .glass</p>
+          <div className="flex items-center gap-3 rounded-xl border border-border bg-card p-4">
+            <span className="dot-support flex h-10 w-10 items-center justify-center font-display text-support-foreground">A</span>
+            <p className="text-sm font-semibold">An avatar on a card</p>
           </div>
         </div>
       </Block>
 
       <Block section="brand" title="Motif" note={`ThemeDots in the theme's motif — ${MOTIFS.find((m) => m.key === theme.motif)?.label ?? "Circles"} here; pick another on the Brand tab. Flat shapes side by side at the same fixed sizes as circles; empty states and brand moments only. Status dots and avatars stay circles.`}>
-        <div className="card flex flex-wrap items-center gap-6 p-5">
+        <div className="rounded-xl border border-border bg-card flex flex-wrap items-center gap-6 p-5">
           {[8, 12, 16, 24].map((size) => (
             <span key={size} className="flex items-center gap-2 text-sm"><ThemeDots size={size} /> {size} px</span>
           ))}
         </div>
       </Block>
 
-      <Block section="brand" title="Colour tokens" note="Derived from the brand colours. Use these classes, never raw hex (bg-surface, text-text-muted, bg-accent/15 …).">
+      <Block section="brand" title="Colour tokens" note="shadcn's variable names, each mapped once from a jimbo colour in globals.css. Use these classes, never raw hex (bg-card, text-muted-foreground, bg-primary/15 …). shadcn's accent is the hover surface; the theme's accent colour is primary.">
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {TOKENS.map((t) => (
-            <div key={t.name} className="flex items-center gap-3 rounded-xl border border-border bg-surface p-2.5">
-              <span className="h-9 w-9 shrink-0 rounded-lg border border-border" style={{ background: `rgb(var(--c-${t.name}))` }} />
+            <div key={t.css} className="flex items-center gap-3 rounded-xl border border-border bg-card p-2.5">
+              <span className="h-9 w-9 shrink-0 rounded-lg border border-border" style={{ background: `var(--${t.css})` }} />
               <span className="min-w-0">
-                <span className="block truncate font-mono text-xs font-semibold">{t.name}</span>
-                <span className="block truncate text-11 text-text-subtle">{hex[t.name]} · {t.use}</span>
+                <span className="block truncate font-mono text-xs font-semibold">--{t.css}</span>
+                <span className="block truncate text-11 text-subtle-foreground">{hex[t.from]} · {t.from} · {t.use}</span>
               </span>
             </div>
           ))}
@@ -201,22 +201,22 @@ export function StyleGuidePanel({ more = [] }: { more?: { value: string; label: 
       </Block>
 
       <Block section="brand" title="Type" note={`Headings in ${FONTS[theme.fonts.headings!]!.label} (${theme.fonts.headingsWeight}), body in ${FONTS[theme.fonts.body!]!.label} (${theme.fonts.bodyWeight}) — the theme picks the fonts, weights and spacing. Tabular figures throughout.`}>
-        <div className="card space-y-3 p-5">
+        <div className="rounded-xl border border-border bg-card space-y-3 p-5">
           <p className="eyebrow">.eyebrow — label above a title</p>
           <p className="h-page">.h-page — Page title</p>
           <p className="h-section">.h-section — Section title</p>
           <p className="text-15">Body — 15px Inter. Plain sentences, sentence case.</p>
           <p className="meta">.meta — secondary line, 14px muted</p>
-          <p className="font-display text-5xl text-accent">128</p>
+          <p className="font-display text-5xl text-primary">128</p>
         </div>
       </Block>
 
-      <Block section="controls" title="Buttons" note="Pill-shaped. One primary action per view; secondary and ghost for the rest.">
-        <div className="card flex flex-wrap items-center gap-2 p-5">
+      <Block section="controls" title="Buttons" note="shadcn Button, softly rounded (never pills). One primary per row (K4); secondary and ghost for the rest; destructive only to confirm. One control high: default, sm, icon, icon-sm.">
+        <div className="rounded-xl border border-border bg-card flex flex-wrap items-center gap-2 p-5">
           <Button>Primary</Button>
           <Button variant="secondary">Secondary</Button>
           <Button variant="ghost">Ghost</Button>
-          <Button variant="danger">Danger</Button>
+          <Button variant="destructive">Destructive</Button>
           <Button size="sm">Small</Button>
           <Button disabled>Disabled</Button>
           <a className="link-action">.link-action</a>
@@ -224,21 +224,21 @@ export function StyleGuidePanel({ more = [] }: { more?: { value: string; label: 
       </Block>
 
       <Block section="controls" title="PageHeader and Back" note="On a page, PageHeader is a compact hero: the theme's colours blurred the full width, a big title, pulled up under the top bar (L11). Give each kind of page its own pattern (L12). Shown here plain, as it is inside a card. Every page below a dock tab's own page has Back to its parent — the path minus its last part (/library/import → /library) — above its eyebrow. Back lands on the parent as it was left (its tabs and filters), and the path says how far in you are. Actions are one .controls row.">
-        <div className="card p-5">
+        <div className="rounded-xl border border-border bg-card p-5">
           <PageHeader plain className="mb-0" back={{ to: "/jimbo-ui", label: "jimbo-ui config" }} eyebrow="Library" title="Import"
             actions={<><Button variant="secondary" size="sm">Cancel</Button><Button>Import</Button></>} />
         </div>
       </Block>
 
       <Block section="controls" title="Control rows" note="One control height (h-control: 44 px on phones, 40 px wider) for buttons, fields, selects and switches. In a .controls row — a PageHeader's actions, a Section's action, a field and its button — everything is that height, whatever size it was given; .control-grid lays options out in equal columns, each one control high.">
-        <div className="card space-y-4 p-5">
+        <div className="rounded-xl border border-border bg-card space-y-4 p-5">
           <div className="controls">
             <LayoutSwitch value={layout} onChange={setLayout} />
             <Button size="sm" variant="secondary">Small, made one height</Button>
             <Button>Primary</Button>
           </div>
           <div className="flex gap-2">
-            <input className="field h-control min-w-0 flex-1" placeholder="A field and its button" />
+            <Input className="min-w-0 flex-1" placeholder="A field and its button" />
             <Button>Go</Button>
           </div>
           <div className="control-grid">
@@ -253,20 +253,20 @@ export function StyleGuidePanel({ more = [] }: { more?: { value: string; label: 
       </Block>
 
       <Block section="controls" title="ShareSliders" note="Linked sliders that split one total: moving one moves the others the other way, in proportion, so they always add up to the total and none goes past it. Each shows its percentage and amount. rebalance and normaliseShares do the sums for your own controls.">
-        <div className="card p-5">
+        <div className="rounded-xl border border-border bg-card p-5">
           <ShareSliders total={60} unit="items" onChange={setShares}
             items={["First", "Second", "Third"].map((label, i) => ({ id: label, label, sub: "A share of 60", value: shares[i]! }))} />
         </div>
       </Block>
 
       <Block section="controls" title="Fields and filters">
-        <div className="card space-y-3 p-5">
+        <div className="rounded-xl border border-border bg-card space-y-3 p-5">
           <SearchField value={q} onChange={setQ} placeholder="SearchField" />
-          <input className="field h-control w-full" placeholder=".field text input" />
+          <Input placeholder="Input (shadcn)" />
           <SelectField label="SelectField" value={select} onChange={setSelect}
             options={[{ value: "newest", label: "Newest first" }, { value: "oldest", label: "Oldest first" }]} />
           <Tabs value={tab} onChange={setTab} options={[{ value: "one", label: "Tabs" }, { value: "two", label: "Segmented" }]} />
-          <PillTabs value={pill} onChange={setPill} options={[{ value: "a", label: "PillTabs" }, { value: "b", label: "Filter" }, { value: "c", label: "Chips" }]} />
+          <PillTabs value={pill} onChange={setPill} options={[{ value: "a", label: "PillTabs" }, { value: "b", label: "Filter" }, { value: "c", label: "Tags" }]} />
           <PillTabs scroll value={section} onChange={setSection}
             options={["Overview", "PillTabs scroll", "One row", "Its bar", "Always shows", "So you know", "There are more", "Past the edge"].map((l) => ({ value: l === "Overview" ? "overview" : l, label: l }))} />
           <ViewSwitch current="/jimbo-ui?tab=style" options={[{ to: "/jimbo-ui?tab=style", label: "List" }, { to: "/jimbo-ui?tab=style&view=map", label: "Map" }]} />
@@ -277,7 +277,7 @@ export function StyleGuidePanel({ more = [] }: { more?: { value: string; label: 
       </Block>
 
       <Block section="controls" title="Settings rows" note="KeyValue for read-only facts (inline, or stacked on detail pages); SwitchRow for on/off settings.">
-        <div className="card divide-etched overflow-hidden">
+        <div className="rounded-xl border border-border bg-card divide-etched overflow-hidden">
           <KeyValue label="KeyValue">Inline — label left, value right</KeyValue>
           <KeyValue label="Stacked" layout="stacked">A small label above the value</KeyValue>
           <SwitchRow label="SwitchRow" hint="The whole row is the switch" checked={on} onChange={setOn} />
@@ -285,13 +285,13 @@ export function StyleGuidePanel({ more = [] }: { more?: { value: string; label: 
       </Block>
 
       <Block section="controls" title="ColorPicker" note="Inline and touch-friendly — never the native colour input.">
-        <div className="card max-w-md p-5">
+        <div className="rounded-xl border border-border bg-card max-w-md p-5">
           <ColorPicker value={colour} onChange={setColour} swatches={["#A8FF3E", "#2EF2FF", "#F5FF2E", "#FF8A3D", "#B48CFF", "#3DFFC5", "#F2F2F2", "#FF3D6E"]} />
         </div>
       </Block>
 
       <Block section="numbers" title="Tones" note="Fixed colours for states that carry meaning; the done state uses the accent. Apps map their own statuses onto them.">
-        <div className="card flex flex-wrap gap-2 p-5">
+        <div className="rounded-xl border border-border bg-card flex flex-wrap gap-2 p-5">
           {TONE_EXAMPLES.map((t) => <Badge key={t.tone} tone={t.tone}>{t.label}</Badge>)}
           <Badge tone="accent" dot>With a dot</Badge>
           <Badge tone="yellow" dot live>Live — pulsing</Badge>
@@ -330,10 +330,10 @@ export function StyleGuidePanel({ more = [] }: { more?: { value: string; label: 
           <Section title="BarChart · vertical">
             <BarChart direction="vertical" tone="support" height={120}
               items={["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"].map((m, i) => ({ id: String(i), label: m, value: [3, 5, 2, 6, 8, 4, 9, 7, 5, 6, 3, 4][i]!, to: `/jimbo-ui?tab=style&month=${i + 1}` }))} />
-            <p className="mt-3 text-sm text-text-muted">Columns: this card has a line under its chart, and its neighbour stretches to match.</p>
+            <p className="mt-3 text-sm text-muted-foreground">Columns: this rounded-xl border border-border bg-card has a line under its chart, and its neighbour stretches to match.</p>
           </Section>
         </Columns>
-        <div className="card flex items-center gap-4 p-4">
+        <div className="rounded-xl border border-border bg-card flex items-center gap-4 p-4">
           <Sparkline values={[3, 4, 2, 5, 6, 5, 8]} className="w-28" />
           <p className="meta">Sparkline on its own — beside a row or in a card.</p>
         </div>
@@ -363,7 +363,7 @@ export function StyleGuidePanel({ more = [] }: { more?: { value: string; label: 
           </List>
         </Section>
         <MediaGrid>
-          <MediaCard to="/jimbo-ui?tab=style" name="MediaCard" sub="Image card" meta="3 items" />
+          <MediaCard to="/jimbo-ui?tab=style" name="MediaCard" sub="Image rounded-xl border border-border bg-card" meta="3 items" />
           <MediaCard to="/jimbo-ui?tab=style" name="Portrait" sub="For posters" aspect="portrait" />
         </MediaGrid>
         <MediaGrid size="sm">
@@ -371,10 +371,10 @@ export function StyleGuidePanel({ more = [] }: { more?: { value: string; label: 
             <MediaCard key={n} to="/jimbo-ui?tab=style" name={n} sub="Three across on phones" meta="12 items" aspect="square" />
           ))}
         </MediaGrid>
-        <LinkCard to="/jimbo-ui?tab=style" eyebrow="LinkCard" title="A card that goes somewhere" sub="Eyebrow, title, sub line" accent />
+        <LinkCard to="/jimbo-ui?tab=style" eyebrow="LinkCard" title="A rounded-xl border border-border bg-card that goes somewhere" sub="Eyebrow, title, sub line" accent />
         <LinkCard size="sm" to="/jimbo-ui?tab=style" eyebrow="size=sm" title="A quick way in" sub="Tighter, for a row of them" />
         <Section title="Section" count={3}>
-          <p className="p-4 text-sm text-text-muted">A titled card for a block of related content.</p>
+          <p className="p-4 text-sm text-muted-foreground">A titled rounded-xl border border-border bg-card for a block of related content.</p>
         </Section>
         <Section title="RankedList" flush>
           <RankedList items={[
@@ -383,7 +383,7 @@ export function StyleGuidePanel({ more = [] }: { more?: { value: string; label: 
             { id: "3", name: "Rooftop", count: 3, href: "/jimbo-ui?tab=style" },
           ]} />
         </Section>
-        <div className="card flex items-center gap-4 p-4">
+        <div className="rounded-xl border border-border bg-card flex items-center gap-4 p-4">
           <DateBlock date="2026-10-23" showYear />
           <p className="meta">DateBlock — the ticket-style date on every dated row.</p>
         </div>
@@ -397,7 +397,7 @@ export function StyleGuidePanel({ more = [] }: { more?: { value: string; label: 
           ] },
           { label: "2025", items: [
             { id: "a", when: "Jan 2025 · Started", title: "The first entry, and a title long enough to show the two-line trim at phone width before it gives up", tone: "support" },
-            { id: "z", when: "Jan 2025 · Note", title: "No link: a plain card", tone: "muted" },
+            { id: "z", when: "Jan 2025 · Note", title: "No link: a plain rounded-xl border border-border bg-card", tone: "muted" },
           ] },
         ]} />
       </Block>
@@ -414,7 +414,7 @@ export function StyleGuidePanel({ more = [] }: { more?: { value: string; label: 
             { to: "/jimbo-ui?tab=style", label: "Rooftop", sub: "3 events", tone: "support" },
           ]} />
         </Section>
-        <div className="card flex flex-wrap items-center gap-3 p-5">
+        <div className="rounded-xl border border-border bg-card flex flex-wrap items-center gap-3 p-5">
           <Button variant="secondary" onClick={() => setBar((b) => !b)}>{bar ? "Hide" : "Show"} a FloatingBar</Button>
           <p className="meta">Floats above the dock; the save bar uses it too.</p>
         </div>
@@ -426,11 +426,11 @@ export function StyleGuidePanel({ more = [] }: { more?: { value: string; label: 
         <div className="flex h-72 flex-col rounded-2xl border border-dashed border-border p-3" aria-label="A short page in a Page frame">
           <Page className="gap-3">
             <p className="meta">Page · a short page still fills the screen: its last Section fill stretches down</p>
-            <Section title="Section fill" fill><p className="text-sm text-text-muted">Little in it, and it reaches the bottom anyway.</p></Section>
+            <Section title="Section fill" fill><p className="text-sm text-muted-foreground">Little in it, and it reaches the bottom anyway.</p></Section>
           </Page>
         </div>
-        <div className="card overflow-hidden px-4"><Loading label="Loading — a skeleton shaped like the page" /></div>
-        <div className="card flex flex-wrap items-center gap-3 p-5">
+        <div className="rounded-xl border border-border bg-card overflow-hidden px-4"><Loading label="Loading — a skeleton shaped like the page" /></div>
+        <div className="rounded-xl border border-border bg-card flex flex-wrap items-center gap-3 p-5">
           <Button variant="secondary" onClick={() => setSheet(true)}>Open a Sheet</Button>
           <p className="meta">The one modal: a bottom sheet on phones, a dialog on desktop.</p>
         </div>
@@ -473,22 +473,22 @@ function FormBlocks() {
   return (
     <>
       <Block section="forms" title="Text fields" note="A label above, a hint or an error under. Errors are inline in the highlight colour, say what to do, and keep what was typed.">
-        <div className="card grid gap-4 p-5 sm:grid-cols-2">
+        <div className="rounded-xl border border-border bg-card grid gap-4 p-5 sm:grid-cols-2">
           <TextField label="TextField" value={name} onChange={setName} hint="A hint under the field" />
           <TextField label="With an error" type="email" value={email} onChange={setEmail} error={emailError} autoComplete="off" />
           <TextField label="Prefix and suffix" value={amount} onChange={setAmount} inputMode="decimal" prefix="$" optional
-            suffix={<span className="pr-3 text-sm text-text-subtle">per month</span>} />
+            suffix={<span className="pr-3 text-sm text-subtle-foreground">per month</span>} />
           <TextArea label="TextArea" value={notes} onChange={setNotes} maxLength={120} placeholder="Grows as you type; counts down near the limit" className="sm:row-span-2" />
         </div>
       </Block>
       <Block section="forms" title="Dates and times" note="DateField uses the platform's own picker, in the page's light or dark scheme.">
-        <div className="card grid gap-4 p-5 sm:grid-cols-2">
+        <div className="rounded-xl border border-border bg-card grid gap-4 p-5 sm:grid-cols-2">
           <DateField label="DateField" value={date} onChange={setDate} />
           <DateField label="Time" type="time" value={time} onChange={setTime} optional />
         </div>
       </Block>
       <Block section="forms" title="FileDrop" note="Tap to pick, or drop files on it. Wrong types and files over the limit are turned away with a reason.">
-        <div className="card p-5">
+        <div className="rounded-xl border border-border bg-card p-5">
           <FileDrop label="Attachments" files={files} onChange={setFiles} multiple accept="image/*,.pdf,.csv" maxSize={5 * 1024 * 1024} hint="Images, PDF or CSV, up to 5 MB each" />
         </div>
       </Block>
@@ -518,11 +518,11 @@ function OverlayBlocks() {
       </Block>
 
       <Block section="overlays" title="Menu" note="Actions on one thing, from the ⋯ button or any trigger. Arrow keys, Home / End and a letter move; destructive ones go last, in the highlight colour, and confirm.">
-        <div className="card divide-etched overflow-hidden">
+        <div className="rounded-xl border border-border bg-card divide-etched overflow-hidden">
           <div className="flex min-h-[64px] items-center gap-3 py-2 pl-4 pr-2">
             <div className="min-w-0 flex-1">
               <p className="text-15 font-semibold">A row with a Menu</p>
-              <p className="text-sm text-text-muted">The ⋯ MoreButton opens it</p>
+              <p className="text-sm text-muted-foreground">The ⋯ MoreButton opens it</p>
             </div>
             <Menu label="List actions" items={[
               { label: "Rename", icon: <Icon d="M4 20h4L19 9l-4-4L4 16v4z" />, onSelect: () => toast("Rename picked") },
@@ -540,11 +540,11 @@ function OverlayBlocks() {
         </div>
       </Block>
       <Block section="overlays" title="Popover and Tooltip" note="Popover: a few controls by their button, open while you use them. Tooltip: a label for an icon button on hover or keyboard focus — never the only place something's said.">
-        <div className="card flex flex-wrap items-center gap-3 p-5">
+        <div className="rounded-xl border border-border bg-card flex flex-wrap items-center gap-3 p-5">
           <Popover label="Sizes" trigger={(p) => <DropdownButton label="Sizes" {...p}>{sizes.length ? sizes.join(", ") : "Any"}</DropdownButton>}>
             {(close) => (
               <div className="space-y-3">
-                <p className="text-sm font-semibold text-text-muted">Show sizes</p>
+                <p className="text-sm font-semibold text-muted-foreground">Show sizes</p>
                 <ToggleGrid columns={4} options={["S", "M", "L", "XL"].map((v) => ({ value: v, label: v }))} selected={sizes}
                   onToggle={(v) => setSizes((xs) => (xs.includes(v) ? xs.filter((x) => x !== v) : [...xs, v]))} />
                 <Button size="sm" className="w-full" onClick={close}>Done</Button>
@@ -554,14 +554,14 @@ function OverlayBlocks() {
           {[["Share", "M4 12v7h16v-7M12 3v13M7.5 7.5 12 3l4.5 4.5"], ["Download", "M4 15v4h16v-4M12 3v12M7.5 10.5 12 15l4.5-4.5"], ["Pin", "M9 4h6l-1 6 4 4H6l4-4zM12 14v6"]].map(([label, d]) => (
             <Tooltip key={label} text={label!}>
               <button type="button" aria-label={label} onClick={() => toast(`${label} picked`)}
-                className="glass flex h-11 w-11 items-center justify-center rounded-full text-text-muted transition-colors hover:text-text-base"><Icon d={d!} /></button>
+                className="border border-border bg-card flex h-11 w-11 items-center justify-center rounded-full text-muted-foreground transition-colors hover:text-foreground"><Icon d={d!} /></button>
             </Tooltip>
           ))}
           <p className="meta">Hover or tab to the icons.</p>
         </div>
       </Block>
       <Block section="overlays" title="CommandPalette" note="Spotlight for the app, on ⌘K or Ctrl+K, a top-bar search button on phones, or a SearchTrigger on a page. Results come live from the app's providers, grouped, with thumbnails and a preview pane on wide screens. key:value filters become chips (in the showcase, try set:Holidays tone:light). Empty, it shows recent picks, suggestions and the filters; commands follow the results.">
-        <div className="card space-y-3 p-5">
+        <div className="rounded-xl border border-border bg-card space-y-3 p-5">
           <SearchTrigger label="Search" onClick={() => document.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true }))} />
           <p className="meta">The search and its filters stay in the URL (<code>?find=</code>), so a refresh or a shared link reopens it.</p>
         </div>
@@ -578,7 +578,7 @@ function FeedbackBlocks() {
   return (
     <>
       <Block section="feedback" title="Toasts" note="Every pop-up notice: top right, under the top bar. Each goes by itself — a few seconds, longer with an action, longest for an error — and hovering holds it. Three at most, newest on top.">
-        <div className="card flex flex-wrap gap-2 p-5">
+        <div className="rounded-xl border border-border bg-card flex flex-wrap gap-2 p-5">
           <Button variant="secondary" onClick={() => toast("Saved")}>Done</Button>
           <Button variant="secondary" onClick={() => toast({ title: "3 items moved", body: "To the archive.", action: { label: "Undo", onClick: () => toast("Moved back") } })}>With Undo</Button>
           <Button variant="secondary" onClick={() => toast({ title: "Syncing in the background", tone: "info" })}>Info</Button>
@@ -586,13 +586,13 @@ function FeedbackBlocks() {
         </div>
       </Block>
       <Block section="feedback" title="ConfirmSheet" note="Before something destructive or surprising: the question, what survives, and the action in its own words. useConfirm() makes it one await.">
-        <div className="card flex flex-wrap gap-2 p-5">
+        <div className="rounded-xl border border-border bg-card flex flex-wrap gap-2 p-5">
           <Button variant="secondary" onClick={async () => { if (await confirm({ title: "Remove 3 members?", body: "They lose access now. Their past entries stay.", confirmLabel: "Remove members", danger: true })) toast("Members removed"); }}>Destructive</Button>
           <Button variant="secondary" onClick={async () => { if (await confirm({ title: "Publish the schedule?", body: "Everyone in the group gets a notification.", confirmLabel: "Publish" })) toast("Published"); }}>Surprising</Button>
         </div>
       </Block>
       <Block section="feedback" title="ProgressBar" note="How far along a job of known length is; leave out the value while the length is unknown.">
-        <div className="card space-y-5 p-5">
+        <div className="rounded-xl border border-border bg-card space-y-5 p-5">
           <ProgressBar label="Uploading 12 photos" value={progress} />
           <ProgressBar label="size lg — the one a JobTile is about" value={progress} size="lg" />
           <ProgressBar label="Storage" value={3.2} max={5} tone="support" format={(v, m) => `${v} of ${m} GB`} />
@@ -614,13 +614,13 @@ function FeedbackBlocks() {
         </List>
       </Block>
       <Block section="feedback" title="Banners" note="Slim bars that stick under the top bar, first thing on the page: offline (fixed yellow, with changes waiting) or a new version ready.">
-        <div className="card space-y-3 overflow-hidden p-5 [&_[role=status]]:static [&_[role=status]]:m-0 [&_[role=status]]:rounded-xl">
+        <div className="rounded-xl border border-border bg-card space-y-3 overflow-hidden p-5 [&_[role=status]]:static [&_[role=status]]:m-0 [&_[role=status]]:rounded-xl">
           <OfflineBanner forceOffline pending={2} />
           <UpdateBanner onReload={() => toast("Reloading…")} onDismiss={() => toast("Asks again next launch")} />
         </div>
       </Block>
       <Block section="data" title="Stepper" note="Where you are in two to five steps. Done steps can be revisited; phones show the current step's name under the circles.">
-        <div className="card space-y-5 p-5">
+        <div className="rounded-xl border border-border bg-card space-y-5 p-5">
           <Stepper steps={["Account", "Details", "Invite", "Review"]} current={step} onStep={setStep} />
           <div className="flex gap-2">
             <Button size="sm" variant="secondary" disabled={step === 0} onClick={() => setStep((s) => s - 1)}>Back</Button>

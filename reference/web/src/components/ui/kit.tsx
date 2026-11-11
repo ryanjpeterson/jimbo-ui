@@ -6,14 +6,35 @@
  * Look: bold heading font, image heroes with a dark gradient, ticket-style
  * date blocks on dated rows, chevrons on anything that navigates.
  *
- * jimbo-ui reference: copy into an app and extend it with the app's own
- * domain pieces (statuses, rows, switches) built from the same tokens.
+ * Built on jimbo.ui's shadcn primitives (components/ui: Button, Card, Badge,
+ * Input, Select, Switch, Slider, Tabs, ToggleGroup, Drawer, Dialog,
+ * Skeleton, Empty): flat surfaces with hairline borders, no shadows or blur
+ * (S8). Colours are the shadcn token names (guide §3); a prop that names a
+ * theme colour still says "accent" (the theme's), drawn as `primary`.
+ *
+ * jimbo-ui reference: copy into an app. An app changes wiring only (its
+ * statuses, routes, copy), never looks (J3); anything new is a PR to
+ * jimbo-ui (J4).
  */
 
-import { Children, createContext, useContext, useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode, type RefObject } from "react";
-import { createPortal } from "react-dom";
+import { Children, createContext, useContext, useId, useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode, type RefObject } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, SearchIcon, XIcon } from "lucide-react";
 import { cn } from "@/lib/cn";
+import { Badge as UiBadge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
+import { Tabs as UiTabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerTitle } from "@/components/ui/drawer";
+import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 import { backdropCss, fullTheme, loadFonts, themeHex, themeVars, type BackdropPattern, type Theme } from "@/lib/theme";
 import { useBrand } from "@/lib/useBrand";
 import { BRAND } from "@/lib/brand.config";
@@ -51,11 +72,11 @@ export function initials(name: string): string {
 export type Tone = "accent" | "yellow" | "purple" | "red" | "muted";
 
 export const TONES: Record<Tone, { text: string; chip: string; border: string; tint: string; dot: string }> = {
-  accent: { text: "text-accent",      chip: "bg-accent-950 text-accent border-accent-700",      border: "border-accent-700", tint: "bg-accent-950", dot: "bg-accent" },
+  accent: { text: "text-primary",      chip: "bg-primary-950 text-primary border-primary-700",      border: "border-primary-700", tint: "bg-primary-950", dot: "bg-primary" },
   yellow: { text: "text-yellow-400",  chip: "bg-yellow-950 text-yellow-400 border-yellow-700", border: "border-yellow-600", tint: "bg-yellow-950", dot: "bg-yellow-400" },
   purple: { text: "text-purple-400",  chip: "bg-purple-950 text-purple-400 border-purple-800", border: "border-purple-700", tint: "bg-purple-950", dot: "bg-purple-400" },
   red:    { text: "text-red-400",     chip: "bg-red-950 text-red-400 border-red-800",          border: "border-red-700",    tint: "bg-red-950",    dot: "bg-red-400" },
-  muted:  { text: "text-text-subtle", chip: "bg-surface-2 text-text-subtle border-border",      border: "border-border",     tint: "bg-surface-2",  dot: "bg-text-subtle" },
+  muted:  { text: "text-subtle-foreground", chip: "bg-muted text-subtle-foreground border-border",      border: "border-border",     tint: "bg-muted",  dot: "bg-subtle-foreground" },
 };
 
 /** A status dot: a 10 px flat circle (add a tone's `dot`). */
@@ -64,13 +85,18 @@ export const STATUS_DOT = "h-2.5 w-2.5 shrink-0 rounded-full";
 /** A status dot that pulses while something is happening (running, syncing) — movement keeps it apart from a same-coloured still dot. */
 export const LIVE = "animate-pulse";
 
-/** A status as a labelled chip — for detail pages, headers and settings. `dot`: a status dot before the label (`live` pulses it). */
+/**
+ * A status as a labelled chip — for detail pages, headers and settings
+ * (shadcn `Badge` in a fixed status tone, C5). `dot`: a status dot before the
+ * label (`live` pulses it). The plain primitive (brand fills) is
+ * `components/ui/badge`.
+ */
 export function Badge({ tone, children, dot = false, live = false, className }: { tone: Tone; children: ReactNode; dot?: boolean; live?: boolean; className?: string }) {
   return (
-    <span className={cn("inline-flex min-w-0 max-w-full items-center gap-1.5 rounded-md border px-2 py-0.5 text-11 font-semibold", TONES[tone].chip, className)}>
+    <UiBadge variant="secondary" className={cn("min-w-0 max-w-full gap-1.5 text-11", TONES[tone].chip, className)}>
       {dot && <span aria-hidden="true" className={cn("h-2 w-2 shrink-0 rounded-full", TONES[tone].dot, live && LIVE)} />}
       <span className="min-w-0 truncate">{children}</span>
-    </span>
+    </UiBadge>
   );
 }
 
@@ -81,14 +107,10 @@ export type RowStatus = { tone: Tone; label: string; live?: boolean };
 // Icons
 // ─────────────────────────────────────────────────────────────────────────────
 
+/** A lucide chevron, 20 px: on anything that navigates. */
 export function Chevron({ dir = "right", className }: { dir?: "left" | "right" | "down"; className?: string }) {
-  const d = dir === "left" ? "M15 18l-6-6 6-6" : dir === "down" ? "M6 9l6 6 6-6" : "M9 18l6-6-6-6";
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25"
-      strokeLinecap="round" strokeLinejoin="round" className={cn("shrink-0", className)} aria-hidden="true">
-      <path d={d} />
-    </svg>
-  );
+  const Icon = dir === "left" ? ChevronLeftIcon : dir === "down" ? ChevronDownIcon : ChevronRightIcon;
+  return <Icon aria-hidden="true" className={cn("size-5 shrink-0", className)} strokeWidth={2.25} />;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -104,7 +126,7 @@ export function Chevron({ dir = "right", className }: { dir?: "left" | "right" |
 export function ThemeDots({ size = 8, className }: { size?: number; className?: string }) {
   return (
     <span aria-hidden="true" className={cn("inline-flex shrink-0 items-center", className)} style={{ gap: size >= 16 ? 6 : 4 }}>
-      {(["motif-accent", "motif-highlight", "motif-support"] as const).map((dot) => (
+      {(["motif-primary", "motif-highlight", "motif-support"] as const).map((dot) => (
         <span key={dot} className={dot} style={{ width: size, height: size }} />
       ))}
     </span>
@@ -117,10 +139,10 @@ export function ThemeDots({ size = 8, className }: { size?: number; className?: 
 
 const BLEED_TONES = {
   none: "",
-  surface: "border-y border-border bg-surface",
-  accent: "bg-accent text-on-accent shadow-[inset_0_1px_0_0_rgb(var(--c-accent-darker)/0.55),inset_0_-1px_0_0_rgb(var(--c-accent-darker)/0.55)]",
-  highlight: "bg-highlight text-on-highlight shadow-[inset_0_1px_0_0_rgb(var(--c-highlight-darker)/0.55),inset_0_-1px_0_0_rgb(var(--c-highlight-darker)/0.55)]",
-  support: "bg-support text-on-support shadow-[inset_0_1px_0_0_rgb(var(--c-support-darker)/0.55),inset_0_-1px_0_0_rgb(var(--c-support-darker)/0.55)]",
+  surface: "border-y border-border bg-card",
+  accent: "bg-primary text-primary-foreground",
+  highlight: "bg-highlight text-highlight-foreground",
+  support: "bg-support text-support-foreground",
 } as const;
 
 /**
@@ -246,8 +268,8 @@ function HeroText({ eyebrow, title, children, actions, align }: {
   return (
     <>
       {eyebrow && <p className="eyebrow text-support">{eyebrow}</p>}
-      <h1 className="line-clamp-3 break-words font-display text-40 leading-[1.02] text-text-base sm:text-6xl">{title}</h1>
-      {children && <div className={cn("max-w-xl text-17 text-text-muted", align === "center" && "mx-auto")}>{children}</div>}
+      <h1 className="line-clamp-3 break-words font-display text-40 leading-[1.02] text-foreground sm:text-6xl">{title}</h1>
+      {children && <div className={cn("max-w-xl text-17 text-muted-foreground", align === "center" && "mx-auto")}>{children}</div>}
       {actions && <div className="controls mt-2">{actions}</div>}
     </>
   );
@@ -318,11 +340,11 @@ export function HeroCarousel({ slides, index, onIndex, interval = 10_000, label 
   }, [stopped]);
 
   if (!n) return null;
-  const arrow = "glass relative inline-flex h-control w-control items-center justify-center overflow-hidden rounded-control text-text-base transition-colors hover:border-accent active:scale-95";
+  const arrow = "border border-border bg-card relative inline-flex h-control w-control items-center justify-center overflow-hidden rounded-control text-foreground transition-colors hover:border-primary active:scale-95";
   // The timer: the screen's full width, along the hero's bottom edge. Only the fill shows, no track (L7).
   const timer = n > 1 && interval > 0 && (
     <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-[3px]">
-      <span ref={bar} className={cn("block h-full origin-left bg-accent", stopped && "opacity-50")} style={{ transform: "scaleX(0)" }} />
+      <span ref={bar} className={cn("block h-full origin-left bg-primary", stopped && "opacity-50")} style={{ transform: "scaleX(0)" }} />
     </span>
   );
   return (
@@ -338,14 +360,14 @@ export function HeroCarousel({ slides, index, onIndex, interval = 10_000, label 
           <button type="button" className={arrow} onClick={() => go(i - 1)} aria-label="Previous"><Chevron dir="left" /></button>
           <button type="button" className={arrow} onClick={() => go(i + 1)} aria-label="Next"><Chevron /></button>
           {interval > 0 && (
-            <button type="button" className={cn(arrow, "text-text-muted")} onClick={() => setPaused((p) => !p)}
+            <button type="button" className={cn(arrow, "text-muted-foreground")} onClick={() => setPaused((p) => !p)}
               aria-label={paused ? "Play" : "Pause"} aria-pressed={paused}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 {paused ? <path d="M8 5.5v13l11-6.5z" /> : <><rect x="6.5" y="5" width="3.5" height="14" rx="1" /><rect x="14" y="5" width="3.5" height="14" rx="1" /></>}
               </svg>
             </button>
           )}
-          <p className="ml-2 text-sm tabular-nums text-text-muted">{i + 1} / {n}</p>
+          <p className="ml-2 text-sm tabular-nums text-muted-foreground">{i + 1} / {n}</p>
         </div>
       )}
       {/* Every slide in one cell: the tallest decides the height. Only the current one shows or takes focus. */}
@@ -395,10 +417,10 @@ export function PageHeader({ eyebrow, title, count, actions, back, pattern = "ri
 }) {
   const heading = (big: boolean) => (
     <div className="flex flex-wrap items-end justify-between gap-3">
-      <h1 className={cn("min-w-0 line-clamp-2 break-words", big ? "font-display text-4xl leading-[1.05] text-text-base sm:text-5xl" : "h-page")}>
+      <h1 className={cn("min-w-0 line-clamp-2 break-words", big ? "font-display text-4xl leading-[1.05] text-foreground sm:text-5xl" : "h-page")}>
         {title}
         {count != null && count > 0 && (
-          <span className={cn("ml-2 align-middle text-base font-body font-medium", big ? "text-text-muted" : "text-text-subtle")}>{count.toLocaleString()}</span>
+          <span className={cn("ml-2 align-middle text-base font-body font-medium", big ? "text-muted-foreground" : "text-subtle-foreground")}>{count.toLocaleString()}</span>
         )}
       </h1>
       {actions && <div className="controls max-w-full shrink-0 justify-end">{actions}</div>}
@@ -445,21 +467,19 @@ export function parentPath(pathname: string): string {
 
 /**
  * Back to the page above this one — on heroes and above a `PageHeader` (its
- * `back` prop). Always glass with body text, so it reads on a photo, a blur
+ * `back` prop). Always flat card with body text, so it reads on a photo, a blur
  * or the page alike (S6, C8); a long label is cut short. It goes to the
  * parent as it was left (`useRememberPages` in the shell), so filters and
  * tabs there survive. `overlay` is kept for older calls: it looks the same.
  */
 export function BackButton({ to, label }: { to: string; label: string; overlay?: boolean }) {
   return (
-    <Link
-      to={backHref(to)}
-      aria-label={`Back to ${label}`}
-      className="glass inline-flex h-control min-w-0 max-w-full items-center gap-1 rounded-control pl-2 pr-3.5 text-sm font-semibold text-text-base transition-colors hover:border-text-subtle"
-    >
-      <Chevron dir="left" className="shrink-0" />
-      <span className="truncate">{label}</span>
-    </Link>
+    <Button asChild variant="secondary" className="min-w-0 max-w-full gap-1 bg-card pl-2 pr-3.5 text-sm">
+      <Link to={backHref(to)} aria-label={`Back to ${label}`}>
+        <Chevron dir="left" className="shrink-0" />
+        <span className="truncate">{label}</span>
+      </Link>
+    </Button>
   );
 }
 
@@ -479,7 +499,7 @@ export function Banner({ backdrop, glow = "accent", back, badge, children, pullU
   pullUp?: boolean;
 }) {
   const glowCls = {
-    accent: "from-accent-900/70",
+    accent: "from-primary-900/70",
     highlight: "from-highlight-900/70",
     support: "from-support-900/70",
     yellow: "from-yellow-900/70",
@@ -515,30 +535,19 @@ export function Banner({ backdrop, glow = "accent", back, badge, children, pullU
   );
 }
 
-/** Full-size image over the page; tap anywhere or press Escape to close. */
+/** Full-size image over the page (shadcn `Dialog`); tap anywhere or press Escape to close. */
 export function ImageViewer({ src, alt, onClose }: { src: string; alt: string; onClose: () => void }) {
-  useEffect(() => {
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
-    document.addEventListener("keydown", onKey);
-    return () => { document.body.style.overflow = prev; document.removeEventListener("keydown", onKey); };
-  }, [onClose]);
-
-  // Portalled to <body> so it covers the app bar and tab bar (the banner it
-  // opens from is its own stacking context).
-  return createPortal(
-    <div role="dialog" aria-modal="true" aria-label={alt} onClick={onClose}
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-4 pt-[calc(1rem+var(--safe-top))] backdrop-blur-md">
-      <img src={src} alt={alt} className="max-h-full max-w-full rounded-lg object-contain shadow-2xl" />
-      <button onClick={onClose} aria-label="Close"
-        className="absolute right-4 top-[calc(1rem+var(--safe-top))] flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-md hover:bg-white/20">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" aria-hidden="true">
-          <path d="M6 6l12 12M18 6L6 18" />
-        </svg>
-      </button>
-    </div>,
-    document.body,
+  return (
+    <Dialog open onOpenChange={(o) => { if (!o) onClose(); }}>
+      <DialogContent showCloseButton={false} aria-describedby={undefined} onClick={onClose}
+        className="flex h-[100dvh] max-h-none w-screen max-w-none items-center justify-center rounded-none border-0 bg-transparent p-4 pt-[calc(1rem+var(--safe-top))] sm:max-w-none">
+        <DialogTitle className="sr-only">{alt}</DialogTitle>
+        <img src={src} alt={alt} className="max-h-full max-w-full rounded-lg object-contain" />
+        <DialogClose asChild>
+          <Button variant="secondary" size="icon" aria-label="Close" className="absolute right-4 top-[calc(1rem+var(--safe-top))]"><XIcon className="size-5" /></Button>
+        </DialogClose>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -563,7 +572,7 @@ export function Hero({ imageUrl, imageAlt, eyebrow, title, children, actions, ba
   pullUp?: boolean;
 }) {
   const glow = {
-    accent: "from-accent-900/70",
+    accent: "from-primary-900/70",
     highlight: "from-highlight-900/70",
     support: "from-support-900/70",
     yellow: "from-yellow-900/70",
@@ -573,7 +582,7 @@ export function Hero({ imageUrl, imageAlt, eyebrow, title, children, actions, ba
   // A picture that fails to load gives the initials thumbnail and the plain glow, not a broken image.
   const shown = useImageOrFallback(imageUrl);
   const thumbCls = cn(
-    "shrink-0 overflow-hidden rounded-xl border border-border bg-surface-2 shadow-2xl shadow-black/50",
+    "shrink-0 overflow-hidden rounded-xl border border-border bg-muted",
     square ? "h-24 w-24 sm:h-44 sm:w-44" : "h-32 w-24 sm:h-60 sm:w-44",
   );
 
@@ -587,22 +596,22 @@ export function Hero({ imageUrl, imageAlt, eyebrow, title, children, actions, ba
               className="group relative block h-full w-full cursor-zoom-in">
               <img src={shown.src} alt={imageAlt ?? title} onError={shown.onError} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
               {/* Small expand hint in the corner */}
-              <span className="glass absolute bottom-1.5 right-1.5 flex h-7 w-7 items-center justify-center rounded-full text-text-base">
+              <span className="border border-border bg-card absolute bottom-1.5 right-1.5 flex h-7 w-7 items-center justify-center rounded-full text-foreground">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
                 </svg>
               </span>
             </button>
           ) : (
-            <div className={cn("flex h-full w-full items-center justify-center bg-linear-to-br to-surface-2", glow)}>
-              <span className="font-display text-3xl text-text-subtle sm:text-5xl">{initials(title)}</span>
+            <div className={cn("flex h-full w-full items-center justify-center bg-linear-to-br to-muted", glow)}>
+              <span className="font-display text-3xl text-subtle-foreground sm:text-5xl">{initials(title)}</span>
             </div>
           )}
         </div>
         <div className="min-w-0 flex-1">
-          {eyebrow && <p className="eyebrow mb-1.5 text-text-muted">{eyebrow}</p>}
-          <h1 className="line-clamp-3 font-display text-28 leading-[1.05] text-text-base break-words sm:text-6xl">{title}</h1>
-          {children && <div className="mt-2 line-clamp-3 space-y-0.5 break-words text-15 text-text-muted sm:mt-3 sm:text-lg">{children}</div>}
+          {eyebrow && <p className="eyebrow mb-1.5 text-muted-foreground">{eyebrow}</p>}
+          <h1 className="line-clamp-3 font-display text-28 leading-[1.05] text-foreground break-words sm:text-6xl">{title}</h1>
+          {children && <div className="mt-2 line-clamp-3 space-y-0.5 break-words text-15 text-muted-foreground sm:mt-3 sm:text-lg">{children}</div>}
         </div>
       </div>
       {actions && <div className="controls pb-6 sm:pb-8">{actions}</div>}
@@ -639,13 +648,13 @@ export function Section({ title, count, action, children, flush = false, plain =
             // Shrinks (and trims) before the actions wrap: they only drop below once the title would be under 8 rem.
             <h2 className="h-section min-w-[8rem] flex-1 basis-0 truncate">
               {title}
-              {count != null && <span className="ml-2 text-sm font-body font-medium text-text-subtle">{count.toLocaleString()}</span>}
+              {count != null && <span className="ml-2 text-sm font-body font-medium text-subtle-foreground">{count.toLocaleString()}</span>}
             </h2>
           )}
           {action && <div className="controls ml-auto max-w-full shrink-0 justify-end">{action}</div>}
         </div>
       )}
-      {plain ? children : <div className={cn("card flex-1", flush ? "overflow-hidden" : "p-4 sm:p-5")}>{children}</div>}
+      {plain ? children : <Card className={cn("flex-1 gap-0 py-0", flush ? "overflow-hidden" : "p-4 sm:p-5")}>{children}</Card>}
     </section>
   );
 }
@@ -686,19 +695,19 @@ export function List({ children, layout = "rows", bare = false, maxHeight, class
   if (layout === "tiles") {
     return (
       <div className={cn("grid auto-rows-fr gap-3 sm:grid-cols-2 lg:grid-cols-3", className)}>
-        {Children.toArray(children).map((child, i) => <div key={i} className="card h-full overflow-hidden">{child}</div>)}
+        {Children.toArray(children).map((child, i) => <div key={i} className="rounded-xl border border-border bg-card h-full overflow-hidden">{child}</div>)}
       </div>
     );
   }
   if (maxHeight != null) {
     // The card clips its corners; the box inside scrolls, so the bar sits within the card's edge.
     return (
-      <div className={cn(!bare && "card overflow-hidden", className)}>
+      <div className={cn(!bare && "rounded-xl border border-border bg-card overflow-hidden", className)}>
         <div className="scroll-area divide-etched" style={{ maxHeight }}>{children}</div>
       </div>
     );
   }
-  return <div className={cn(!bare && "card overflow-hidden", "divide-etched", className)}>{children}</div>;
+  return <div className={cn(!bare && "rounded-xl border border-border bg-card overflow-hidden", "divide-etched", className)}>{children}</div>;
 }
 
 /** Rows or tiles, remembered per list (`key`) in this browser. */
@@ -737,15 +746,15 @@ export function ListGroupLabel({ children }: { children: ReactNode }) {
 export function DateBlock({ date, showYear = false, approximate = false }: { date: string; showYear?: boolean; approximate?: boolean }) {
   const p = dateParts(date);
   return (
-    <div className="flex w-[52px] shrink-0 flex-col items-center overflow-hidden rounded-xl border border-border bg-surface-2 leading-none shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06),0_6px_14px_-8px_rgba(0,0,0,0.6)] sm:w-14">
-      <span className="lit-highlight w-full py-[3px] text-center text-10 font-bold tracking-wider">{p.month}</span>
-      <span className="pt-1 font-display text-24 leading-[1.05] text-text-base sm:text-26">{approximate ? "~" : p.day}</span>
-      <span className="pb-1.5 text-10.5 font-medium text-text-subtle">{showYear ? p.year : p.weekday}</span>
+    <div className="flex w-[52px] shrink-0 flex-col items-center overflow-hidden rounded-xl border border-border bg-muted leading-none sm:w-14">
+      <span className="bg-highlight text-highlight-foreground w-full py-[3px] text-center text-10 font-bold tracking-wider">{p.month}</span>
+      <span className="pt-1 font-display text-24 leading-[1.05] text-foreground sm:text-26">{approximate ? "~" : p.day}</span>
+      <span className="pb-1.5 text-10.5 font-medium text-subtle-foreground">{showYear ? p.year : p.weekday}</span>
     </div>
   );
 }
 
-const rowBase = "group flex items-center gap-3 px-4 py-3.5 min-h-[76px] transition-colors hover:bg-surface-2/70 active:bg-surface-2 sm:gap-4";
+const rowBase = "group flex items-center gap-3 px-4 py-3.5 min-h-[76px] transition-colors hover:bg-accent active:bg-accent sm:gap-4";
 
 /** A dated item as a row: date block, optional thumb, title, sub lines, status dot, chevron. */
 export function EventRow({ to, onOpen, date, title, subtitle, meta, imageUrl, status, showYear = true, approximate, selected, onSelect }: {
@@ -768,10 +777,10 @@ export function EventRow({ to, onOpen, date, title, subtitle, meta, imageUrl, st
   if (onSelect) {
     return (
       <button type="button" onClick={onSelect} aria-pressed={!!selected}
-        className={cn(rowBase, "w-full text-left", selected && "bg-accent/10")}>
+        className={cn(rowBase, "w-full text-left", selected && "bg-primary/10")}>
         <span className={cn(
           "flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 transition-colors",
-          selected ? "lit-accent border-transparent" : "border-border",
+          selected ? "bg-primary text-primary-foreground border-transparent" : "border-border",
         )}>
           {selected && (
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7" /></svg>
@@ -779,9 +788,9 @@ export function EventRow({ to, onOpen, date, title, subtitle, meta, imageUrl, st
         </span>
         <DateBlock date={date} showYear={showYear} approximate={approximate} />
         <div className="min-w-0 flex-1">
-          <p className="line-clamp-2 text-15 font-semibold leading-snug text-text-base sm:text-base">{title}</p>
-          {subtitle && <p className="mt-0.5 truncate text-sm text-text-muted">{subtitle}</p>}
-          {meta && <p className="mt-0.5 truncate text-xs text-text-subtle">{meta}</p>}
+          <p className="line-clamp-2 text-15 font-semibold leading-snug text-foreground sm:text-base">{title}</p>
+          {subtitle && <p className="mt-0.5 truncate text-sm text-muted-foreground">{subtitle}</p>}
+          {meta && <p className="mt-0.5 truncate text-xs text-subtle-foreground">{meta}</p>}
         </div>
       </button>
     );
@@ -790,18 +799,18 @@ export function EventRow({ to, onOpen, date, title, subtitle, meta, imageUrl, st
     <>
       <DateBlock date={date} showYear={showYear} approximate={approximate} />
       {imageUrl !== undefined && (
-        <div className="hidden h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-surface-2 sm:block">
+        <div className="hidden h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-muted sm:block">
           {thumb.src && <img src={thumb.src} alt="" loading="lazy" onError={thumb.onError} className="h-full w-full object-cover" />}
         </div>
       )}
       <div className="min-w-0 flex-1">
-        <p className="line-clamp-2 text-15 font-semibold leading-snug text-text-base group-hover:text-accent sm:text-base">{title}</p>
-        {subtitle && <p className="mt-0.5 truncate text-sm text-text-muted">{subtitle}</p>}
-        {meta && <p className="mt-0.5 truncate text-xs text-text-subtle">{meta}</p>}
+        <p className="line-clamp-2 text-15 font-semibold leading-snug text-foreground group-hover:text-primary sm:text-base">{title}</p>
+        {subtitle && <p className="mt-0.5 truncate text-sm text-muted-foreground">{subtitle}</p>}
+        {meta && <p className="mt-0.5 truncate text-xs text-subtle-foreground">{meta}</p>}
       </div>
       {/* Status as a quiet dot — the label is in the tooltip and on the detail page */}
       {status && <span title={status.label} aria-label={status.label} className={cn(STATUS_DOT, TONES[status.tone].dot, status.live && LIVE)} />}
-      <Chevron className="text-text-subtle group-hover:text-accent" />
+      <Chevron className="text-subtle-foreground group-hover:text-primary" />
     </>
   );
   return onOpen || !to
@@ -816,32 +825,30 @@ export function EventRow({ to, onOpen, date, title, subtitle, meta, imageUrl, st
 export function KeyValue({ label, children, layout = "inline" }: { label: ReactNode; children: ReactNode; layout?: "inline" | "stacked" }) {
   return layout === "inline" ? (
     <div className="flex min-h-[56px] items-center justify-between gap-4 px-4 py-3">
-      <span className="min-w-0 truncate text-15 font-semibold text-text-base">{label}</span>
-      <span className="min-w-0 max-w-[65%] shrink-0 truncate whitespace-nowrap text-right text-sm text-text-muted">{children}</span>
+      <span className="min-w-0 truncate text-15 font-semibold text-foreground">{label}</span>
+      <span className="min-w-0 max-w-[65%] shrink-0 truncate whitespace-nowrap text-right text-sm text-muted-foreground">{children}</span>
     </div>
   ) : (
     <div className="px-4 py-3">
-      <p className="truncate text-xs font-semibold text-text-subtle">{label}</p>
-      <div className="mt-0.5 line-clamp-3 break-words text-15 text-text-base">{children}</div>
+      <p className="truncate text-xs font-semibold text-subtle-foreground">{label}</p>
+      <div className="mt-0.5 line-clamp-3 break-words text-15 text-foreground">{children}</div>
     </div>
   );
 }
 
-/** One setting turned on or off, as a whole-row switch (44 px+ tall) with a label and an optional hint. */
+/** One setting turned on or off, as a whole-row switch (44 px+ tall) with a label and an optional hint (shadcn `Switch`, A4). */
 export function SwitchRow({ label, hint, checked, onChange, disabled }: {
   label: ReactNode; hint?: ReactNode; checked: boolean; onChange: (on: boolean) => void; disabled?: boolean;
 }) {
+  const id = useId();
   return (
-    <button type="button" role="switch" aria-checked={checked} disabled={disabled} onClick={() => onChange(!checked)}
-      className="flex min-h-[60px] w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-surface-2/60 disabled:opacity-60">
+    <label htmlFor={id} className={cn("flex min-h-[60px] w-full cursor-pointer items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-accent", disabled && "cursor-default opacity-60")}>
       <span className="min-w-0 flex-1">
         <span className="block truncate text-15 font-semibold">{label}</span>
-        {hint && <span className="line-clamp-2 block text-sm text-text-muted">{hint}</span>}
+        {hint && <span className="line-clamp-2 block text-sm text-muted-foreground">{hint}</span>}
       </span>
-      <span className={cn("relative h-7 w-12 shrink-0 rounded-full border transition-colors", checked ? "lit-accent border-transparent" : "border-border bg-surface-2")}>
-        <span className={cn("absolute top-0.5 h-[22px] w-[22px] rounded-full shadow-xs transition-[left]", checked ? "left-[22px] bg-on-accent" : "left-0.5 bg-text-subtle")} />
-      </span>
-    </button>
+      <Switch id={id} checked={checked} onCheckedChange={onChange} disabled={disabled} className="shrink-0" />
+    </label>
   );
 }
 
@@ -862,6 +869,7 @@ export function Autocomplete({ label, value, onChange, options, onPick, onCreate
   onCreate?: (text: string) => void;
   placeholder?: string;
 }) {
+  const id = useId();
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
   const text = value.trim();
@@ -874,8 +882,8 @@ export function Autocomplete({ label, value, onChange, options, onPick, onCreate
   };
   return (
     <div className="relative">
-      {label && <label className="label">{label}</label>}
-      <input value={value} placeholder={placeholder} role="combobox" aria-expanded={open && count > 0} aria-autocomplete="list"
+      {label && <Label htmlFor={id} className="mb-1.5">{label}</Label>}
+      <Input id={id} value={value} placeholder={placeholder} role="combobox" aria-expanded={open && count > 0} aria-autocomplete="list"
         onChange={(e) => { onChange(e.target.value); setOpen(true); setActive(0); }}
         onFocus={() => setOpen(true)} onBlur={() => setTimeout(() => setOpen(false), 120)}
         onKeyDown={(e) => {
@@ -884,22 +892,22 @@ export function Autocomplete({ label, value, onChange, options, onPick, onCreate
           else if (e.key === "Enter" && open && count) { e.preventDefault(); choose(active); }
           else if (e.key === "Escape") setOpen(false);
         }}
-        className={cn("field h-control w-full", label && "mt-1.5")} />
+        />
       {open && count > 0 && text && (
-        <ul role="listbox" className="absolute inset-x-0 top-full z-30 mt-1 max-h-64 overflow-y-auto rounded-xl border border-border bg-surface py-1 shadow-2xl">
+        <ul role="listbox" className="scroll-area absolute inset-x-0 top-full z-30 mt-1 max-h-64 rounded-lg border border-border bg-popover py-1 text-popover-foreground shadow-md">
           {options.map((o, i) => (
             <li key={o.id} role="option" aria-selected={i === active}>
               <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => choose(i)}
-                className={cn("block min-h-[44px] w-full px-3 py-2 text-left", i === active && "bg-surface-2")}>
+                className={cn("block min-h-[44px] w-full px-3 py-2 text-left", i === active && "bg-accent")}>
                 <span className="block truncate text-15 font-semibold">{o.label}</span>
-                {o.sub && <span className="block truncate text-xs text-text-subtle">{o.sub}</span>}
+                {o.sub && <span className="block truncate text-xs text-subtle-foreground">{o.sub}</span>}
               </button>
             </li>
           ))}
           {canCreate && (
             <li role="option" aria-selected={active === options.length}>
               <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => choose(options.length)}
-                className={cn("block min-h-[44px] w-full px-3 py-2 text-left text-15 font-semibold text-accent", active === options.length && "bg-surface-2")}>
+                className={cn("block min-h-[44px] w-full px-3 py-2 text-left text-15 font-semibold text-primary", active === options.length && "bg-accent")}>
                 Add “{text}”
               </button>
             </li>
@@ -938,18 +946,18 @@ export function EntityRow({ to, name, imageUrl, sub, meta, round = false, avatar
       {/* A picture keeps its shape (square for places and covers, round for people);
           with none (or one that fails to load), the placeholder is a bare flat circle — never a circle in a box. */}
       {shown.src ? (
-        <div className={cn("h-12 w-12 shrink-0 overflow-hidden bg-surface-2", round ? "rounded-full" : "rounded-lg")}>
+        <div className={cn("h-12 w-12 shrink-0 overflow-hidden bg-muted", round ? "rounded-full" : "rounded-lg")}>
           <img src={shown.src} alt="" loading="lazy" onError={shown.onError} className="h-full w-full object-cover" />
         </div>
       ) : (
-        <div aria-hidden="true" className="dot-support flex h-12 w-12 shrink-0 items-center justify-center font-display text-base text-on-support">{avatarText ?? initials(name)}</div>
+        <div aria-hidden="true" className="dot-support flex h-12 w-12 shrink-0 items-center justify-center font-display text-base text-support-foreground">{avatarText ?? initials(name)}</div>
       )}
       <div className="min-w-0 flex-1">
-        <p className="truncate text-15 font-semibold text-text-base group-hover:text-accent sm:text-base">{name}</p>
-        {sub && <p className="mt-0.5 truncate text-sm text-text-muted">{sub}</p>}
+        <p className="truncate text-15 font-semibold text-foreground group-hover:text-primary sm:text-base">{name}</p>
+        {sub && <p className="mt-0.5 truncate text-sm text-muted-foreground">{sub}</p>}
       </div>
-      {meta && <span className="max-w-[40%] shrink-0 truncate text-sm font-medium text-text-subtle">{meta}</span>}
-      <Chevron className="text-text-subtle group-hover:text-accent" />
+      {meta && <span className="max-w-[40%] shrink-0 truncate text-sm font-medium text-subtle-foreground">{meta}</span>}
+      <Chevron className="text-subtle-foreground group-hover:text-primary" />
     </Link>
   );
 }
@@ -1027,8 +1035,8 @@ export function MediaCard({ to, name, imageUrl, sub, meta, aspect = "video", con
   // An image that fails to load (missing, moved, offline) falls back to the initials, not a broken image.
   const shown = useImageOrFallback(imageUrl);
   return (
-    <Link to={to} className="group card flex h-full flex-col overflow-hidden transition-colors hover:border-accent/60">
-      <div className={cn("relative overflow-hidden bg-surface-2", aspectCls)}>
+    <Link to={to} className="group rounded-xl border border-border bg-card flex h-full flex-col overflow-hidden transition-colors hover:border-primary/60">
+      <div className={cn("relative overflow-hidden bg-muted", aspectCls)}>
         {shown.src ? (
           contain ? (
             <>
@@ -1039,30 +1047,23 @@ export function MediaCard({ to, name, imageUrl, sub, meta, aspect = "video", con
             <img src={shown.src} alt={name} loading="lazy" onError={shown.onError} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
           )
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-linear-to-br from-surface-2 to-surface">
-            <span className={cn("font-display text-text-subtle/50", small ? "text-xl" : "text-3xl")}>{initials(name)}</span>
+          <div className="flex h-full w-full items-center justify-center bg-linear-to-br from-muted to-card">
+            <span className={cn("font-display text-subtle-foreground/50", small ? "text-xl" : "text-3xl")}>{initials(name)}</span>
           </div>
         )}
         {badge && <div className="absolute left-2 top-2">{badge}</div>}
       </div>
       <div className={cn("flex flex-1 flex-col gap-0.5", small ? "p-2 sm:p-2.5" : "p-3")}>
-        <ScrollingLine className={cn("font-semibold leading-snug text-text-base group-hover:text-accent", small ? "text-sm" : "text-15")}>{name}</ScrollingLine>
-        {sub && <ScrollingLine className={cn("text-text-muted", small ? "text-xs" : "text-sm")}>{sub}</ScrollingLine>}
-        {meta && <p className={cn("mt-auto truncate pt-1 font-medium text-text-subtle", small ? "text-11" : "text-xs")}>{meta}</p>}
+        <ScrollingLine className={cn("font-semibold leading-snug text-foreground group-hover:text-primary", small ? "text-sm" : "text-15")}>{name}</ScrollingLine>
+        {sub && <ScrollingLine className={cn("text-muted-foreground", small ? "text-xs" : "text-sm")}>{sub}</ScrollingLine>}
+        {meta && <p className={cn("mt-auto truncate pt-1 font-medium text-subtle-foreground", small ? "text-11" : "text-xs")}>{meta}</p>}
       </div>
     </Link>
   );
 }
 
 /** Tappable summary card: eyebrow, title, sub line, chevron. */
-const DOT = { accent: "dot-accent", highlight: "dot-highlight", support: "dot-support" } as const;
-/** A soft pool of the colour in a card's top-right corner, over the card's own gradient. */
-const GLOW = {
-  accent: "bg-[radial-gradient(circle_at_100%_0%,rgb(var(--c-accent)/0.2),transparent_55%),linear-gradient(rgb(var(--c-surface)/0.9),rgb(var(--c-bg-deep)/0.9))]",
-  highlight: "bg-[radial-gradient(circle_at_100%_0%,rgb(var(--c-highlight)/0.2),transparent_55%),linear-gradient(rgb(var(--c-surface)/0.9),rgb(var(--c-bg-deep)/0.9))]",
-  support: "bg-[radial-gradient(circle_at_100%_0%,rgb(var(--c-support)/0.2),transparent_55%),linear-gradient(rgb(var(--c-surface)/0.9),rgb(var(--c-bg-deep)/0.9))]",
-} as const;
-
+const DOT = { accent: "dot-primary", highlight: "dot-highlight", support: "dot-support" } as const;
 export function LinkCard({ to, eyebrow, title, sub, accent = false, size = "md" }: {
   to?: string;
   /** "sm": tighter padding and type, for a row of quick ways in. */
@@ -1070,23 +1071,23 @@ export function LinkCard({ to, eyebrow, title, sub, accent = false, size = "md" 
   eyebrow: ReactNode;
   title: ReactNode;
   sub?: ReactNode;
-  /** Accent border — for the one card on a page that should stand out. */
+  /** Primary border — for the one card on a page that should stand out. */
   accent?: boolean;
 }) {
   const body = (
     <>
       <div className="min-w-0 flex-1">
         <p className={cn("eyebrow", size === "md" && "mb-1")}>{eyebrow}</p>
-        <p className={cn("truncate font-semibold text-text-base group-hover:text-accent", size === "md" ? "text-base sm:text-lg" : "text-15")}>{title}</p>
-        {sub && <p className="mt-0.5 truncate text-sm text-text-muted">{sub}</p>}
+        <p className={cn("truncate font-semibold text-foreground group-hover:text-primary", size === "md" ? "text-base sm:text-lg" : "text-15")}>{title}</p>
+        {sub && <p className="mt-0.5 truncate text-sm text-muted-foreground">{sub}</p>}
       </div>
-      {to && <Chevron className="text-text-subtle group-hover:text-accent" />}
+      {to && <Chevron className="text-subtle-foreground group-hover:text-primary" />}
     </>
   );
-  const cls = cn("group card flex items-center gap-3", size === "md" ? "min-h-[84px] p-4 sm:p-5" : "min-h-[64px] px-4 py-3", accent && cn("border-accent/50", GLOW.accent));
+  const cls = cn("group flex-row items-center gap-3 py-0", size === "md" ? "min-h-[84px] p-4 sm:p-5" : "min-h-[64px] px-4 py-3", accent && "border-primary");
   return to
-    ? <Link to={to} className={cn(cls, "transition-colors hover:border-accent/60")}>{body}</Link>
-    : <div className={cls}>{body}</div>;
+    ? <Card asChild className={cn(cls, "transition-colors hover:border-primary")}><Link to={to}>{body}</Link></Card>
+    : <Card className={cls}>{body}</Card>;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1101,9 +1102,9 @@ export function StatTile({ label, value, sub, accent = "muted", trend }: {
   /** Recent values, oldest first: a sparkline under the number, its latest point in the tile's colour. */
   trend?: number[];
 }) {
-  const col = { accent: "text-accent", highlight: "text-highlight", support: "text-support", muted: "text-text-base" }[accent];
+  const col = { accent: "text-primary", highlight: "text-highlight", support: "text-support", muted: "text-foreground" }[accent];
   return (
-    <div className={cn("card relative overflow-hidden p-4 sm:p-5", accent !== "muted" && GLOW[accent])}>
+    <Card className="relative block gap-0 overflow-hidden p-4 sm:p-5">
       <p className="eyebrow mb-1 flex min-w-0 items-center gap-1.5">
         {accent !== "muted" && <span aria-hidden="true" className={cn(DOT[accent], "h-2 w-2 shrink-0")} />}
         <span className="min-w-0 truncate">{label}</span>
@@ -1112,8 +1113,8 @@ export function StatTile({ label, value, sub, accent = "muted", trend }: {
         {typeof value === "number" ? value.toLocaleString() : value}
       </p>
       {trend && trend.length > 1 && <Sparkline values={trend} tone={accent === "muted" ? "accent" : accent} className="mt-3" />}
-      {sub && <p className="mt-1.5 line-clamp-2 text-sm text-text-subtle">{sub}</p>}
-    </div>
+      {sub && <p className="mt-1.5 line-clamp-2 text-sm text-subtle-foreground">{sub}</p>}
+    </Card>
   );
 }
 
@@ -1142,10 +1143,10 @@ export function Page({ children, className }: { children: ReactNode; className?:
 
 export type ChartTone = "accent" | "support" | "highlight";
 const SERIES_TONES: ChartTone[] = ["accent", "support", "highlight"];
-const STROKE: Record<ChartTone, string> = { accent: "stroke-accent", support: "stroke-support", highlight: "stroke-highlight" };
-const FILL: Record<ChartTone, string> = { accent: "fill-accent", support: "fill-support", highlight: "fill-highlight" };
-const WASH: Record<ChartTone, string> = { accent: "fill-accent/10", support: "fill-support/10", highlight: "fill-highlight/10" };
-const KEY: Record<ChartTone, string> = { accent: "bg-accent", support: "bg-support", highlight: "bg-highlight" };
+const STROKE: Record<ChartTone, string> = { accent: "stroke-primary", support: "stroke-support", highlight: "stroke-highlight" };
+const FILL: Record<ChartTone, string> = { accent: "fill-primary", support: "fill-support", highlight: "fill-highlight" };
+const WASH: Record<ChartTone, string> = { accent: "fill-primary/10", support: "fill-support/10", highlight: "fill-highlight/10" };
+const KEY: Record<ChartTone, string> = { accent: "bg-primary", support: "bg-support", highlight: "bg-highlight" };
 
 /** 1,284 → "1,284"; 12,900 → "12.9K". */
 export function compactNumber(n: number): string {
@@ -1162,7 +1163,7 @@ function niceTicks(max: number, count = 3): number[] {
 }
 
 /** The element's width, kept up to date (charts draw in real pixels, so lines and dots never stretch). */
-function useWidth<T extends HTMLElement>(): [RefObject<T>, number] {
+function useWidth<T extends HTMLElement>(): [RefObject<T | null>, number] {
   const ref = useRef<T>(null);
   const [width, setWidth] = useState(0);
   useLayoutEffect(() => {
@@ -1207,8 +1208,8 @@ export function Sparkline({ values, tone = "accent", height = 28, className }: {
       role="img" aria-label={`Trend: ${values[0]?.toLocaleString()} to ${values[last]?.toLocaleString()}`}>
       {width > 0 && values.length > 1 && (
         <svg width={width} height={height} aria-hidden="true" className="overflow-visible">
-          <polyline points={values.map((v, i) => `${x(i)},${y(v)}`).join(" ")} fill="none" strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" className="stroke-text-subtle/70" />
-          <circle cx={x(last)} cy={y(values[last]!)} r={4} strokeWidth={2} className={cn(FILL[tone], "stroke-surface")} />
+          <polyline points={values.map((v, i) => `${x(i)},${y(v)}`).join(" ")} fill="none" strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" className="stroke-subtle-foreground/70" />
+          <circle cx={x(last)} cy={y(values[last]!)} r={4} strokeWidth={2} className={cn(FILL[tone], "stroke-card")} />
         </svg>
       )}
     </div>
@@ -1262,28 +1263,28 @@ export function TrendChart({ labels, series, format = compactNumber, height = 18
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap items-baseline gap-x-5 gap-y-1" aria-live="polite">
-        <span className="text-xs font-semibold text-text-subtle">{labels[at]}</span>
+        <span className="text-xs font-semibold text-subtle-foreground">{labels[at]}</span>
         {lines.map((l) => (
           <span key={l.label} className="flex items-baseline gap-2">
             {lines.length > 1 && <span aria-hidden="true" className={cn("h-0.5 w-3 self-center rounded-full", KEY[l.tone])} />}
-            <span className="text-lg font-semibold tabular-nums text-text-base">{l.values[at] != null ? format(l.values[at]!) : "—"}</span>
-            {lines.length > 1 && <span className="text-sm text-text-muted">{l.label}</span>}
+            <span className="text-lg font-semibold tabular-nums text-foreground">{l.values[at] != null ? format(l.values[at]!) : "—"}</span>
+            {lines.length > 1 && <span className="text-sm text-muted-foreground">{l.label}</span>}
           </span>
         ))}
       </div>
       <div ref={ref} tabIndex={0} onKeyDown={onKey} onBlur={() => setActive(null)}
         aria-label={`${title ?? lines.map((l) => l.label).join(", ")}: use the arrow keys to read each point`}
-        className="rounded-lg outline-hidden focus-visible:ring-2 focus-visible:ring-accent" style={{ height }} data-no-swipe>
+        className="rounded-lg outline-hidden focus-visible:ring-2 focus-visible:ring-primary" style={{ height }} data-no-swipe>
         {width > 0 && (
           <svg width={width} height={height} aria-hidden="true" className="touch-pan-y select-none overflow-visible">
             {ticks.map((t) => (
               <g key={t}>
                 <line x1={pad.left} x2={width - pad.right} y1={y(t)} y2={y(t)} strokeWidth={1} className="stroke-border/70" />
-                <text x={pad.left - 8} y={y(t)} dy="0.32em" textAnchor="end" className="fill-text-subtle text-11 tabular-nums">{format(t)}</text>
+                <text x={pad.left - 8} y={y(t)} dy="0.32em" textAnchor="end" className="fill-subtle-foreground text-11 tabular-nums">{format(t)}</text>
               </g>
             ))}
             {xLabels.map((i) => (
-              <text key={i} x={x(i)} y={height - 6} textAnchor={i === 0 ? "start" : i === last ? "end" : "middle"} className="fill-text-subtle text-11">{labels[i]}</text>
+              <text key={i} x={x(i)} y={height - 6} textAnchor={i === 0 ? "start" : i === last ? "end" : "middle"} className="fill-subtle-foreground text-11">{labels[i]}</text>
             ))}
             {lines.length === 1 && lines[0]!.values.length > 1 && (
               <path className={WASH[lines[0]!.tone]}
@@ -1293,9 +1294,9 @@ export function TrendChart({ labels, series, format = compactNumber, height = 18
               <polyline key={l.label} points={l.values.map((v, i) => `${x(i)},${y(v)}`).join(" ")} fill="none"
                 strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" className={STROKE[l.tone]} />
             ))}
-            <line x1={x(at)} x2={x(at)} y1={pad.top} y2={pad.top + plotH} strokeWidth={1} className="stroke-text-subtle/60" />
+            <line x1={x(at)} x2={x(at)} y1={pad.top} y2={pad.top + plotH} strokeWidth={1} className="stroke-subtle-foreground/60" />
             {lines.map((l) => l.values[at] != null && (
-              <circle key={l.label} cx={x(at)} cy={y(l.values[at]!)} r={4.5} strokeWidth={2} className={cn(FILL[l.tone], "stroke-surface")} />
+              <circle key={l.label} cx={x(at)} cy={y(l.values[at]!)} r={4.5} strokeWidth={2} className={cn(FILL[l.tone], "stroke-card")} />
             ))}
             {/* The hit area: the whole plot, so the pointer only has to be near a point. */}
             <rect x={pad.left} y={0} width={plotW} height={height} fill="transparent"
@@ -1344,7 +1345,7 @@ export function BarChart({ items, direction = "horizontal", tone = "accent", for
         {items.map((it) => {
           const body = (
             <>
-              <span className="w-[32%] shrink-0 truncate text-sm font-semibold text-text-muted group-hover:text-text-base">{it.label}</span>
+              <span className="w-[32%] shrink-0 truncate text-sm font-semibold text-muted-foreground group-hover:text-foreground">{it.label}</span>
               <span className="flex h-3 flex-1 items-center">
                 {/* Square at the baseline, a 4 px round on the data end. */}
                 <span className={cn("block h-full min-w-[2px] rounded-r-[4px]", KEY[tone])} style={{ width: `${(it.value / max) * 100}%` }} />
@@ -1354,7 +1355,7 @@ export function BarChart({ items, direction = "horizontal", tone = "accent", for
           );
           const cls = "group flex h-11 items-center gap-3 rounded-lg px-1";
           return it.to
-            ? <Link key={it.id} to={it.to} className={cn(cls, "transition-colors hover:bg-surface-2/70")}>{body}</Link>
+            ? <Link key={it.id} to={it.to} className={cn(cls, "transition-colors hover:bg-accent")}>{body}</Link>
             : <div key={it.id} className={cls}>{body}</div>;
         })}
         {table}
@@ -1368,9 +1369,9 @@ export function BarChart({ items, direction = "horizontal", tone = "accent", for
     <div className="space-y-3">
       <p className="flex min-h-7 items-baseline gap-2" aria-live="polite">
         <span className="text-lg font-semibold tabular-nums">{items[shown] ? format(items[shown]!.value) : "—"}</span>
-        <span className="min-w-0 truncate text-sm text-text-muted">{items[shown]?.label}{active == null && items.length > 1 ? " · highest" : ""}</span>
+        <span className="min-w-0 truncate text-sm text-muted-foreground">{items[shown]?.label}{active == null && items.length > 1 ? " · highest" : ""}</span>
         {items[shown]?.to && (
-          <Link to={items[shown]!.to!} className="-my-2 ml-auto inline-flex min-h-11 items-center gap-1 rounded-lg px-2 text-sm font-semibold text-accent hover:bg-surface-2/70">
+          <Link to={items[shown]!.to!} className="-my-2 ml-auto inline-flex min-h-11 items-center gap-1 rounded-lg px-2 text-sm font-semibold text-primary hover:bg-accent">
             Open <Chevron className="h-3.5 w-3.5" />
           </Link>
         )}
@@ -1389,14 +1390,14 @@ export function BarChart({ items, direction = "horizontal", tone = "accent", for
             }}
             className={cn("group flex h-full min-w-0 flex-1 items-end justify-center px-[1px] outline-hidden", it.to && "cursor-pointer")}>
             <span className={cn("block w-full max-w-6 rounded-t-[4px] transition-opacity", KEY[tone],
-              shown === i ? "opacity-100" : "opacity-70 group-hover:opacity-100", "group-focus-visible:ring-2 group-focus-visible:ring-text-base")}
+              shown === i ? "opacity-100" : "opacity-70 group-hover:opacity-100", "group-focus-visible:ring-2 group-focus-visible:ring-foreground")}
               style={{ height: `${Math.max((it.value / max) * 100, it.value > 0 ? 2 : 0)}%` }} />
           </button>
         ))}
       </div>
       <div className="flex">
         {items.map((it, i) => (
-          <span key={it.id} className="min-w-0 flex-1 truncate text-center text-11 text-text-subtle">{i % every === 0 ? it.label : ""}</span>
+          <span key={it.id} className="min-w-0 flex-1 truncate text-center text-11 text-subtle-foreground">{i % every === 0 ? it.label : ""}</span>
         ))}
       </div>
       {table}
@@ -1414,9 +1415,9 @@ export type RankedItem = {
 
 /** Leaderboard rows: rank, name, sub line, count. Two columns from sm up. */
 export function RankedList({ items, unit = "item" }: { items: RankedItem[]; unit?: string }) {
-  if (items.length === 0) return <p className="p-4 text-sm text-text-subtle">Nothing here yet.</p>;
+  if (items.length === 0) return <p className="p-4 text-sm text-subtle-foreground">Nothing here yet.</p>;
   const rankColor = (rank: number) =>
-    rank === 1 ? "text-accent" : rank === 2 ? "text-highlight" : rank === 3 ? "text-support" : "text-text-subtle";
+    rank === 1 ? "text-primary" : rank === 2 ? "text-highlight" : rank === 3 ? "text-support" : "text-subtle-foreground";
   return (
     <div className="grid sm:grid-cols-2 sm:divide-x sm:divide-border">
       {[items.slice(0, Math.ceil(items.length / 2)), items.slice(Math.ceil(items.length / 2))].map((col, ci) => (
@@ -1427,12 +1428,12 @@ export function RankedList({ items, unit = "item" }: { items: RankedItem[]; unit
               <Link key={item.id} to={item.href} className={rowBase}>
                 <span className={cn("w-7 shrink-0 text-right font-display text-xl", rankColor(rank))}>{rank}</span>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-15 font-semibold text-text-base group-hover:text-accent">{item.name}</p>
-                  {item.sub && <p className="truncate text-sm text-text-subtle">{item.sub}</p>}
+                  <p className="truncate text-15 font-semibold text-foreground group-hover:text-primary">{item.name}</p>
+                  {item.sub && <p className="truncate text-sm text-subtle-foreground">{item.sub}</p>}
                 </div>
-                <span className="shrink-0 text-sm font-semibold text-text-muted">
+                <span className="shrink-0 text-sm font-semibold text-muted-foreground">
                   {item.count}
-                  <span className="ml-1 font-normal text-text-subtle">{item.count === 1 ? unit : `${unit}s`}</span>
+                  <span className="ml-1 font-normal text-subtle-foreground">{item.count === 1 ? unit : `${unit}s`}</span>
                 </span>
               </Link>
             );
@@ -1471,10 +1472,10 @@ export interface TimelineGroup {
 }
 
 const TIMELINE_DOT: Record<TimelineTone, string> = {
-  accent: "dot-accent",
+  accent: "dot-primary",
   highlight: "dot-highlight",
   support: "dot-support",
-  muted: "rounded-full bg-text-subtle",
+  muted: "rounded-full bg-subtle-foreground",
 };
 
 function TimelineMilestone({ item }: { item: TimelineItem }) {
@@ -1484,9 +1485,9 @@ function TimelineMilestone({ item }: { item: TimelineItem }) {
         <p className="eyebrow min-w-0 flex-1 truncate">{item.when}</p>
         {item.badge && <span className="shrink-0">{item.badge}</span>}
       </div>
-      <p className="mt-1 line-clamp-2 break-words font-semibold leading-snug text-text-base group-hover:text-accent">{item.title}</p>
-      {item.body && <p className="mt-1 line-clamp-3 break-words text-sm text-text-muted">{item.body}</p>}
-      {item.meta && <p className="mt-1.5 truncate text-xs font-medium text-text-subtle">{item.meta}</p>}
+      <p className="mt-1 line-clamp-2 break-words font-semibold leading-snug text-foreground group-hover:text-primary">{item.title}</p>
+      {item.body && <p className="mt-1 line-clamp-3 break-words text-sm text-muted-foreground">{item.body}</p>}
+      {item.meta && <p className="mt-1.5 truncate text-xs font-medium text-subtle-foreground">{item.meta}</p>}
     </>
   );
   return (
@@ -1494,9 +1495,9 @@ function TimelineMilestone({ item }: { item: TimelineItem }) {
       {/* The 10 px status dot sits on the line, on the page — never inside the card. */}
       <span aria-hidden="true" className={cn("absolute left-0 top-5 h-2.5 w-2.5", TIMELINE_DOT[item.tone ?? "accent"])} />
       {item.to ? (
-        <Link to={item.to} className="group card block min-h-11 px-4 py-3 transition-colors hover:border-accent/60">{inner}</Link>
+        <Link to={item.to} className="group rounded-xl border border-border bg-card block min-h-11 px-4 py-3 transition-colors hover:border-primary/60">{inner}</Link>
       ) : (
-        <div className="card px-4 py-3">{inner}</div>
+        <div className="rounded-xl border border-border bg-card px-4 py-3">{inner}</div>
       )}
     </li>
   );
@@ -1533,24 +1534,15 @@ export function SearchField({ value, onChange, placeholder }: { value: string; o
   return (
     <label className="relative block flex-1">
       <span className="sr-only">{placeholder}</span>
-      <svg className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-text-subtle" width="18" height="18"
-        viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" aria-hidden="true">
-        <circle cx="11" cy="11" r="7" /><path d="M20 20l-3.5-3.5" />
-      </svg>
-      <input
-        type="search"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        className="field h-control w-full pl-10"
-      />
+      <SearchIcon aria-hidden="true" className="pointer-events-none absolute left-3.5 top-1/2 size-4.5 -translate-y-1/2 text-subtle-foreground" strokeWidth={2.25} />
+      <Input type="search" value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className="pl-10" />
     </label>
   );
 }
 
 /**
  * A labelled slider (weight, spacing, vibrancy…): the label and current value
- * above, a full-width track in the accent below, 44 px tall for thumbs.
+ * above, a full-width track in the primary below, 44 px tall for thumbs.
  */
 export function RangeField({ label, value, onChange, min, max, step, format = String, className }: {
   label: string;
@@ -1564,14 +1556,14 @@ export function RangeField({ label, value, onChange, min, max, step, format = St
   className?: string;
 }) {
   return (
-    <label className={cn("block", className)}>
+    <div className={cn("block", className)}>
       <span className="flex items-baseline justify-between gap-3">
-        <span className="min-w-0 truncate text-sm font-semibold text-text-muted">{label}</span>
-        <span className="font-mono text-xs text-text-subtle">{format(value)}</span>
+        <span className="min-w-0 truncate text-sm font-semibold text-muted-foreground">{label}</span>
+        <span className="font-mono text-xs text-subtle-foreground">{format(value)}</span>
       </span>
-      <input type="range" min={min} max={max} step={step} value={value} onChange={(e) => onChange(Number(e.target.value))}
-        className="h-control w-full cursor-pointer accent-[rgb(var(--c-accent))]" />
-    </label>
+      {/* shadcn Slider, in a control-high box so its thumb is easy to catch. */}
+      <Slider aria-label={label} min={min} max={max} step={step} value={[value]} onValueChange={([v]) => onChange(v ?? value)} className="h-control" />
+    </div>
   );
 }
 
@@ -1644,89 +1636,72 @@ export function ShareSliders({ items, total, step = 1, unit, onChange, className
               {it.sub && <p className="meta truncate">{it.sub}</p>}
             </div>
             <div className="flex shrink-0 items-center gap-2">
-              <span className="whitespace-nowrap font-mono text-xs text-text-subtle">
+              <span className="whitespace-nowrap font-mono text-xs text-subtle-foreground">
                 {Math.round((100 * it.value) / sum)}%{unit ? ` · ${it.value} ${unit}` : ""}
               </span>
               {it.action}
             </div>
           </div>
-          <input type="range" min={0} max={total} step={step} value={it.value} disabled={items.length < 2}
+          <Slider min={0} max={total} step={step} value={[it.value]} disabled={items.length < 2}
             aria-label={`Share for ${typeof it.label === "string" ? it.label : it.id}`}
-            onChange={(e) => onChange(rebalance(values, i, Number(e.target.value), total, step))}
-            className="h-control w-full cursor-pointer accent-[rgb(var(--c-accent))] disabled:cursor-default disabled:opacity-60" />
+            onValueChange={([v]) => onChange(rebalance(values, i, v ?? it.value, total, step))}
+            className="h-control" />
         </div>
       ))}
     </div>
   );
 }
 
-/** Native select styled as a field — the phone-friendly filter control. */
-export function SelectField<T extends string>({ value, onChange, options, label, className }: {
+/** One pick from many (a filter, a sort on phones): shadcn `Select`, one control high (K1, K8). */
+export function SelectField<T extends string>({ value, onChange, options, label, size = "md", className }: {
   value: T;
   onChange: (v: T) => void;
   options: { value: T; label: string }[];
   label: string;
+  size?: "md" | "sm";
+  /** Layout only (J3). */
   className?: string;
 }) {
   return (
-    <label className={cn("relative block", className)}>
-      <span className="sr-only">{label}</span>
-      <select value={value} onChange={(e) => onChange(e.target.value as T)}
-        className="field h-control w-full appearance-none pr-10 font-semibold">
-        {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-      </select>
-      <Chevron dir="down" className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-text-subtle" />
-    </label>
+    <Select value={value} onValueChange={(v) => onChange(v as T)}>
+      <SelectTrigger aria-label={label} size={size === "sm" ? "sm" : "default"} className={cn("w-full font-semibold", className)}>
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        {options.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
+      </SelectContent>
+    </Select>
   );
 }
 
-/** Two to four tabs for views of one thing (Upcoming / Past). Full width on phones; `size="sm"` is a compact inline switch for a section's action slot. */
+/**
+ * Two to four tabs for views of one thing (Upcoming / Past): shadcn `Tabs`,
+ * the chosen one a solid primary fill (S7). Full width on phones;
+ * `size="sm"` is a compact inline switch for a section's action slot.
+ */
 export function Tabs<T extends string>({ value, onChange, options, size = "md" }: {
   value: T;
   onChange: (v: T) => void;
   options: { value: T; label: string }[];
   size?: "md" | "sm";
 }) {
-  if (size === "sm") {
-    return (
-      <div role="tablist" className="glass inline-grid h-control shrink-0 rounded-control p-0.5" style={{ gridTemplateColumns: `repeat(${options.length}, auto)` }}>
-        {options.map((o) => {
-          const active = o.value === value;
-          return (
-            // Fills the switch, which is one control high: it lines up with the buttons beside it.
-            <button key={o.value} role="tab" aria-selected={active} onClick={() => onChange(o.value)}
-              className={cn("h-full rounded-lg px-3 text-sm font-semibold transition-colors", active ? "lit-accent" : "text-text-muted hover:text-text-base")}>
-              {o.label}
-            </button>
-          );
-        })}
-      </div>
-    );
-  }
+  const many = options.length > 3;
   return (
-    <div role="tablist" className="glass grid h-control rounded-xl p-0.5 sm:inline-grid sm:min-w-[320px]"
-      // Four or more tabs size to their labels (equal widths would clip the longest).
-      style={{ gridTemplateColumns: options.length > 3 ? `repeat(${options.length}, auto)` : `repeat(${options.length}, minmax(0, 1fr))` }}>
-      {options.map((o) => {
-        const active = o.value === value;
-        return (
-          <button key={o.value} role="tab" aria-selected={active} onClick={() => onChange(o.value)}
-            className={cn(
-              "h-full truncate rounded-lg font-semibold transition-colors sm:px-4 sm:text-sm",
-              // Four or more tabs: tighter on phones so every label fits.
-              options.length > 3 ? "px-2.5 text-sm" : "px-4 text-15",
-              active ? "lit-accent" : "text-text-muted hover:text-text-base",
-            )}>
+    <UiTabs value={value} onValueChange={(v) => onChange(v as T)} className={size === "sm" ? "shrink-0" : "w-full sm:w-auto"}>
+      <TabsList className={cn(size === "sm" ? "" : "w-full sm:min-w-[320px]")}>
+        {options.map((o) => (
+          <TabsTrigger key={o.value} value={o.value}
+            className={cn("min-w-0 truncate font-semibold", size === "sm" ? "px-3" : many ? "px-2.5 sm:px-4" : "px-4 text-15 sm:text-sm")}>
             {o.label}
-          </button>
-        );
-      })}
-    </div>
+          </TabsTrigger>
+        ))}
+      </TabsList>
+    </UiTabs>
   );
 }
 
 /**
- * Pill tabs for desktop filters; wraps rather than scrolling. `scroll` keeps
+ * Tab buttons for desktop filters (softly rounded `Button`s, not pills); wraps rather than scrolling. `scroll` keeps
  * them on one row that scrolls sideways (to the screen's edges on phones) —
  * for a page's own sections when there are more than fit, so they don't stack
  * into rows that look like the filters under them. Its scrollbar always shows
@@ -1755,13 +1730,11 @@ export function PillTabs<T extends string>({ value, onChange, options, scroll = 
       {options.map((o) => {
         const active = o.value === value;
         return (
-          <button key={o.value} type="button" aria-pressed={active} onClick={() => onChange(o.value)}
-            className={cn(
-              "h-control shrink-0 rounded-control border px-4 text-sm font-semibold transition-colors",
-              active ? cn("border-transparent", o.activeClass ?? "lit-accent") : "glass text-text-muted hover:border-text-subtle hover:text-text-base",
-            )}>
+          <Button key={o.value} type="button" aria-pressed={active} onClick={() => onChange(o.value)}
+            variant={active ? "default" : "secondary"}
+            className={cn("shrink-0 px-4 text-sm", active ? o.activeClass : "bg-card text-muted-foreground hover:text-foreground")}>
             {o.label}
-          </button>
+          </Button>
         );
       })}
     </div>
@@ -1778,19 +1751,18 @@ export function Pager({ page, totalPages, total, pageSize, onPage }: {
   if (totalPages <= 1) return null;
   const from = (page - 1) * pageSize + 1;
   const to = Math.min(page * pageSize, total);
-  const btn = "glass inline-flex h-12 flex-1 items-center justify-center gap-1 rounded-xl text-15 font-semibold transition-colors hover:border-accent disabled:opacity-30 disabled:hover:border-white/10 sm:h-11 sm:flex-none sm:px-5";
   return (
     <nav className="mt-6 flex items-center gap-3" aria-label="Pagination">
-      <button className={btn} disabled={page <= 1} onClick={() => onPage(page - 1)}>
+      <Button variant="secondary" className="flex-1 bg-card sm:flex-none" disabled={page <= 1} onClick={() => onPage(page - 1)}>
         <Chevron dir="left" /> Prev
-      </button>
-      <p className="shrink-0 text-center text-sm text-text-subtle sm:flex-1">
+      </Button>
+      <p className="shrink-0 text-center text-sm text-subtle-foreground sm:flex-1">
         <span className="hidden sm:inline">{from.toLocaleString()}–{to.toLocaleString()} of {total.toLocaleString()} · </span>
         Page {page} of {totalPages}
       </p>
-      <button className={btn} disabled={page >= totalPages} onClick={() => onPage(page + 1)}>
+      <Button variant="secondary" className="flex-1 bg-card sm:flex-none" disabled={page >= totalPages} onClick={() => onPage(page + 1)}>
         Next <Chevron />
-      </button>
+      </Button>
     </nav>
   );
 }
@@ -1824,22 +1796,25 @@ export function ToggleGrid<T extends string | number>({ options, selected, onTog
   className?: string;
 }) {
   return (
-    <div className={cn("grid gap-2 [grid-template-columns:repeat(var(--tg),minmax(0,1fr))] sm:[grid-template-columns:repeat(var(--tg-sm),minmax(0,1fr))]", className)}
+    // shadcn ToggleGroup (type multiple): each item aria-pressed, picked ones a flat primary fill (S7).
+    <ToggleGroup type="multiple" spacing={2} value={selected.map(String)}
+      onValueChange={(next) => {
+        const changed = options.find((o) => next.includes(String(o.value)) !== selected.includes(o.value));
+        if (changed) onToggle(changed.value);
+      }}
+      className={cn("grid w-full gap-2 [grid-template-columns:repeat(var(--tg),minmax(0,1fr))] sm:[grid-template-columns:repeat(var(--tg-sm),minmax(0,1fr))]", className)}
       style={{ ["--tg" as string]: columns, ["--tg-sm" as string]: smColumns ?? columns }}>
       {options.map((o) => {
         const on = selected.includes(o.value);
         return (
-          <button key={String(o.value)} type="button" aria-pressed={on} aria-label={o.ariaLabel} onClick={() => onToggle(o.value)}
-            className={cn(
-              "flex min-h-11 flex-col items-center justify-center rounded-control border px-1 py-1.5 text-15 font-semibold leading-tight transition-[color,background-color,border-color,transform] active:scale-95",
-              on ? "lit-accent border-transparent" : "border-border bg-surface-2 text-text-muted hover:border-text-subtle hover:text-text-base",
-            )}>
+          <ToggleGroupItem key={String(o.value)} value={String(o.value)} aria-label={o.ariaLabel}
+            className="h-auto min-h-11 flex-col border border-border bg-muted px-1 py-1.5 text-15 font-semibold leading-tight text-muted-foreground active:scale-95">
             <span>{o.label}</span>
-            {o.sub && <span className={cn("text-11 font-medium", on ? "text-on-accent/80" : "text-text-subtle")}>{o.sub}</span>}
-          </button>
+            {o.sub && <span className={cn("text-11 font-medium", on ? "text-primary-foreground/80" : "text-subtle-foreground")}>{o.sub}</span>}
+          </ToggleGroupItem>
         );
       })}
-    </div>
+    </ToggleGroup>
   );
 }
 
@@ -1851,7 +1826,7 @@ export interface LinkChip {
   tone?: "accent" | "highlight" | "support";
 }
 
-const CHIP_DOTS = { accent: "dot-accent", highlight: "dot-highlight", support: "dot-support" } as const;
+const CHIP_DOTS = { accent: "dot-primary", highlight: "dot-highlight", support: "dot-support" } as const;
 
 /**
  * Related things as a wrapping row of linked chips (44 px tall), each with an
@@ -1862,12 +1837,13 @@ export function LinkChips({ items, className }: { items: LinkChip[]; className?:
   return (
     <div className={cn("flex flex-wrap gap-2", className)}>
       {items.map((c, i) => (
-        <Link key={`${c.to}-${i}`} to={c.to}
-          className="chip inline-flex min-h-11 min-w-0 max-w-full items-center gap-2 px-3 text-text-base transition-colors hover:border-accent hover:text-accent active:scale-95">
-          {c.tone && <span aria-hidden="true" className={cn(CHIP_DOTS[c.tone], "h-2 w-2 shrink-0")} />}
-          <span className="min-w-0 truncate font-semibold">{c.label}</span>
-          {c.sub && <span className="shrink-0 text-sm text-text-subtle">{c.sub}</span>}
-        </Link>
+        <UiBadge key={`${c.to}-${i}`} variant="secondary" asChild>
+          <Link to={c.to} className="min-h-11 min-w-0 max-w-full gap-2 rounded-lg px-3 text-sm text-foreground hover:border-primary hover:text-primary active:scale-95">
+            {c.tone && <span aria-hidden="true" className={cn(CHIP_DOTS[c.tone], "h-2 w-2 shrink-0")} />}
+            <span className="min-w-0 truncate font-semibold">{c.label}</span>
+            {c.sub && <span className="shrink-0 font-normal text-subtle-foreground">{c.sub}</span>}
+          </Link>
+        </UiBadge>
       ))}
     </div>
   );
@@ -1882,8 +1858,8 @@ export function LinkChips({ items, className }: { items: LinkChip[]; className?:
 export function FloatingBar({ children, actions, live }: { children: ReactNode; actions: ReactNode; live?: boolean }) {
   return (
     <div className="fixed inset-x-0 z-40 flex justify-center px-3 bottom-[var(--above-dock)]">
-      <div className="flex w-full max-w-md items-center gap-2 rounded-2xl border border-border bg-surface/95 p-2 pl-4 shadow-2xl shadow-black/50 backdrop-blur-xl">
-        {live != null && <span aria-hidden="true" className={cn(STATUS_DOT, live ? cn("dot-accent", LIVE) : "bg-text-subtle")} />}
+      <div className="flex w-full max-w-md items-center gap-2 rounded-2xl border border-border bg-card p-2 pl-4">
+        {live != null && <span aria-hidden="true" className={cn(STATUS_DOT, live ? cn("dot-primary", LIVE) : "bg-subtle-foreground")} />}
         <p className="min-w-0 flex-1 truncate text-sm font-semibold" aria-live="polite">{children}</p>
         {actions}
       </div>
@@ -1892,9 +1868,28 @@ export function FloatingBar({ children, actions, live }: { children: ReactNode; 
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Sheet — the one modal: slides up from the bottom on phones, centered dialog on desktop
+// Sheet — the one modal: a drawer up from the bottom on phones, a dialog from sm
 // ─────────────────────────────────────────────────────────────────────────────
 
+/** Whether a media query matches, kept up to date. */
+export function useMediaQuery(query: string): boolean {
+  const [on, setOn] = useState(() => typeof window !== "undefined" && window.matchMedia(query).matches);
+  useEffect(() => {
+    const m = window.matchMedia(query);
+    const update = () => setOn(m.matches);
+    update();
+    m.addEventListener("change", update);
+    return () => m.removeEventListener("change", update);
+  }, [query]);
+  return on;
+}
+
+/**
+ * The one modal (P2): shadcn `Drawer` on phones (drag down to close, a grab
+ * handle, up to 92 dvh) and `Dialog` from `sm` (centred, `max-w-lg`, or
+ * `max-w-xl` when `wide`). Open while it's rendered; `onClose` when it's
+ * dismissed. Focus is trapped, Escape closes, the page behind doesn't scroll.
+ */
 export function Sheet({ title, subtitle, onClose, children, wide = false }: {
   title: ReactNode;
   subtitle?: ReactNode;
@@ -1902,45 +1897,36 @@ export function Sheet({ title, subtitle, onClose, children, wide = false }: {
   children: ReactNode;
   wide?: boolean;
 }) {
-  // Keep the page behind from scrolling while the sheet is open.
-  useEffect(() => {
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => { document.body.style.overflow = prev; };
-  }, []);
-
-  // Portalled to <body>, so a parent's spacing (space-y margins) or transform can't shift the backdrop.
-  return createPortal(
-    <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-xs sm:items-center sm:p-6"
-      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
-    >
-      <div
-        role="dialog"
-        aria-modal="true"
-        className={cn(
-          "flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-t-3xl border border-border bg-bg shadow-2xl shadow-black/60",
-          "sm:max-h-[88dvh] sm:rounded-3xl",
-          wide ? "sm:max-w-xl" : "sm:max-w-lg",
-        )}
-      >
-        <div className="mx-auto mt-2.5 h-1.5 w-10 shrink-0 rounded-full bg-border sm:hidden" aria-hidden="true" />
-        <header className="flex shrink-0 items-start justify-between gap-3 border-b border-border px-5 pb-4 pt-3 sm:pt-5">
-          <div className="min-w-0">
-            <h2 className="h-section line-clamp-2 break-words">{title}</h2>
-            {subtitle && <p className="meta mt-1 line-clamp-2">{subtitle}</p>}
-          </div>
-          <button onClick={onClose} aria-label="Close"
-            className="-mr-2 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-text-muted transition-colors hover:bg-surface-2 hover:text-text-base">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" aria-hidden="true">
-              <path d="M6 6l12 12M18 6L6 18" />
-            </svg>
-          </button>
-        </header>
-        <div className="scroll-area flex-1 pb-[var(--safe-bottom)]">{children}</div>
+  const desktop = useMediaQuery("(min-width: 640px)");
+  const close = (open: boolean) => { if (!open) onClose(); };
+  const header = (Title: typeof DialogTitle, Desc: typeof DialogDescription, Close: typeof DialogClose) => (
+    <header className="flex shrink-0 items-start justify-between gap-3 border-b border-border px-5 pb-4 pt-3 sm:pt-5">
+      <div className="min-w-0">
+        <Title className="h-section line-clamp-2 break-words">{title}</Title>
+        {subtitle ? <Desc className="meta mt-1 line-clamp-2">{subtitle}</Desc> : <Desc className="sr-only">{typeof title === "string" ? title : "Sheet"}</Desc>}
       </div>
-    </div>,
-    document.body,
+      <Close asChild>
+        <Button variant="ghost" size="icon" aria-label="Close" className="-mr-2 shrink-0"><XIcon className="size-5" /></Button>
+      </Close>
+    </header>
+  );
+  if (desktop) {
+    return (
+      <Dialog open onOpenChange={close}>
+        <DialogContent showCloseButton={false} className={cn("flex max-h-[88dvh] flex-col gap-0 overflow-hidden p-0", wide ? "sm:max-w-xl" : "sm:max-w-lg")}>
+          {header(DialogTitle, DialogDescription, DialogClose)}
+          <div className="scroll-area flex-1">{children}</div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+  return (
+    <Drawer open onOpenChange={close}>
+      <DrawerContent>
+        {header(DrawerTitle as typeof DialogTitle, DrawerDescription as typeof DialogDescription, DrawerClose as typeof DialogClose)}
+        <div className="scroll-area flex-1 pb-[var(--safe-bottom)]">{children}</div>
+      </DrawerContent>
+    </Drawer>
   );
 }
 
@@ -1948,30 +1934,30 @@ export function Sheet({ title, subtitle, onClose, children, wide = false }: {
 // States
 // ─────────────────────────────────────────────────────────────────────────────
 
-/** Placeholder shaped like a page — a title and a list of rows — while it loads. */
+/** Placeholder shaped like a page — a title and a list of rows — while it loads (shadcn `Skeleton`). */
 export function Loading({ label = "Loading…" }: { label?: string }) {
   return (
-    <div role="status" aria-label={label} className="animate-pulse space-y-5 py-2">
+    <div role="status" aria-label={label} className="space-y-5 py-2">
       <span className="sr-only">{label}</span>
       <div className="space-y-2.5">
-        <div className="h-3 w-24 rounded-full bg-surface-2" />
-        <div className="h-8 w-56 max-w-[70%] rounded-lg bg-surface-2" />
+        <Skeleton className="h-3 w-24" />
+        <Skeleton className="h-8 w-56 max-w-[70%]" />
       </div>
       <div className="grid grid-cols-2 gap-3">
-        <div className="h-24 rounded-2xl bg-surface" />
-        <div className="h-24 rounded-2xl bg-surface" />
+        <Skeleton className="h-24 rounded-xl" />
+        <Skeleton className="h-24 rounded-xl" />
       </div>
-      <div className="card divide-etched overflow-hidden">
+      <Card className="divide-etched gap-0 overflow-hidden py-0">
         {[0, 1, 2, 3, 4].map((i) => (
           <div key={i} className="flex items-center gap-3 px-4 py-3">
-            <div className="h-12 w-12 shrink-0 rounded-xl bg-surface-2" />
+            <Skeleton className="h-12 w-12 shrink-0 rounded-lg" />
             <div className="min-w-0 flex-1 space-y-2">
-              <div className="h-3.5 rounded-full bg-surface-2" style={{ width: `${70 - i * 8}%` }} />
-              <div className="h-3 w-1/3 rounded-full bg-surface-2/70" />
+              <Skeleton className="h-3.5" style={{ width: `${70 - i * 8}%` }} />
+              <Skeleton className="h-3 w-1/3" />
             </div>
           </div>
         ))}
-      </div>
+      </Card>
     </div>
   );
 }
@@ -1989,7 +1975,7 @@ export function useSettled<T>(value: T, settled: boolean): T {
 
 /**
  * Content being replaced because a control changed (a sort, a filter, a
- * page): the old result stays, dimmed, under a glass bar saying what's
+ * page): the old result stays, dimmed, under a flat card bar saying what's
  * happening. The bar shows after 150 ms, so fast answers don't flicker, and
  * offers Cancel after a second. Cancel should abort the request and put the
  * control back (`useSettled`). Never leave a control looking like it did
@@ -2014,13 +2000,13 @@ export function Pending({ pending, label = "Loading…", onCancel, children, cla
     <div aria-busy={pending} className={cn("relative", className)}>
       {shown && (
         <div className="pointer-events-none sticky top-3 z-10 -mb-14 flex h-14 justify-center">
-          <div role="status" className="glass pointer-events-auto flex h-11 items-center gap-3 rounded-control pl-4 pr-1.5 text-sm font-semibold shadow-lg">
+          <div role="status" className="border border-border bg-card pointer-events-auto flex h-11 items-center gap-3 rounded-control pl-4 pr-1.5 text-sm font-semibold">
             <span className="flex gap-1" aria-hidden="true">
-              {[0, 1, 2].map((i) => <span key={i} className="h-2 w-2 animate-pulse rounded-full bg-accent" style={{ animationDelay: `${i * 150}ms` }} />)}
+              {[0, 1, 2].map((i) => <span key={i} className="dot-primary h-2 w-2 animate-pulse" style={{ animationDelay: `${i * 150}ms` }} />)}
             </span>
             <span>{label}</span>
             {onCancel && stage === 2
-              ? <button type="button" onClick={onCancel} className="h-8 rounded-lg px-3 text-text-muted hover:bg-surface-2 hover:text-text-base">Cancel</button>
+              ? <Button variant="ghost" size="sm" onClick={onCancel}>Cancel</Button>
               : <span className="w-1.5" />}
           </div>
         </div>
@@ -2030,6 +2016,7 @@ export function Pending({ pending, label = "Loading…", onCancel, children, cla
   );
 }
 
+/** Nothing here yet, or something went wrong: shadcn `Empty` on a card, the motif above the title. */
 export function EmptyState({ title, body, action, tone = "muted", fill = false }: {
   title: string;
   body?: ReactNode;
@@ -2039,12 +2026,14 @@ export function EmptyState({ title, body, action, tone = "muted", fill = false }
   fill?: boolean;
 }) {
   return (
-    <div className={cn("card px-6 py-14 text-center", fill && "flex flex-1 flex-col items-center justify-center")}>
-      <ThemeDots size={12} className="mb-4" />
-      <p className={cn("text-lg font-semibold", tone === "error" ? "text-highlight" : "text-text-base")}>{title}</p>
-      {body && <p className="mx-auto mt-1 max-w-sm text-sm text-text-muted">{body}</p>}
-      {action && <div className="mt-5 flex justify-center">{action}</div>}
-    </div>
+    <Empty className={cn("rounded-xl border border-solid border-border bg-card px-6 py-14", fill && "flex-1")}>
+      <EmptyHeader>
+        <EmptyMedia><ThemeDots size={12} /></EmptyMedia>
+        <EmptyTitle className={cn("text-lg font-semibold", tone === "error" ? "text-highlight" : "text-foreground")}>{title}</EmptyTitle>
+        {body && <EmptyDescription className="max-w-sm">{body}</EmptyDescription>}
+      </EmptyHeader>
+      {action && <EmptyContent className="flex-row justify-center">{action}</EmptyContent>}
+    </Empty>
   );
 }
 
@@ -2056,19 +2045,19 @@ export function ViewSwitch({ options, current, floating = false }: {
   options: { to: string; label: string }[];
   /** The `to` of the view showing now. */
   current: string;
-  /** Frosted, for sitting over a map or image. */
+  /** Solid, for sitting over a map or image. */
   floating?: boolean;
 }) {
   return (
     <div className={cn(
       "flex h-control rounded-xl p-0.5",
-      floating ? "border border-border bg-bg/90 shadow-xl backdrop-blur-md" : "glass",
+      floating ? "border border-border bg-background" : "border border-border bg-card",
     )}>
       {options.map((o) => (
         <Link key={o.to} to={o.to} replace aria-current={o.to === current ? "page" : undefined}
           className={cn(
             "flex h-full items-center rounded-lg px-4 text-sm font-semibold transition-colors",
-            o.to === current ? "lit-accent" : "text-text-muted hover:text-text-base",
+            o.to === current ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground",
           )}>
           {o.label}
         </Link>

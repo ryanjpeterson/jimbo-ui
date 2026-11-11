@@ -5,6 +5,8 @@ import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import { AppShell, TopBarButton, type ShellTab } from "@/routes/AppShell";
 import { Sheet } from "@/components/ui/kit";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { CommandPalette, SearchIcon, useSpotlight, type Command } from "@/components/ui/overlays";
 import { toast } from "@/components/ui/feedback";
 import { useApplyBrand } from "@/lib/useBrand";
@@ -56,8 +58,8 @@ export function Shell() {
       {sheet === "add" && (
         <Sheet title="Add an entry" subtitle="The + button opens the app's main add flow in a sheet." onClose={() => setSheet(null)}>
           <div className="space-y-3 p-5">
-            <label className="label" htmlFor="add-title">Title</label>
-            <input id="add-title" className="field h-control w-full" placeholder="What's happening?" />
+            <Label htmlFor="add-title">Title</Label>
+            <Input id="add-title" placeholder="What's happening?" />
             <Button className="w-full" onClick={() => setSheet(null)}>Add entry</Button>
           </div>
         </Sheet>

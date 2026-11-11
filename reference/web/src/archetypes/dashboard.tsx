@@ -61,7 +61,7 @@ export function DashboardPage() {
   return (
     <div className="space-y-6">
       <PageHeader eyebrow="Dashboard" title="All jobs" />
-      <p className={cn("-mt-3 text-15 font-semibold", trouble ? "text-highlight" : "text-accent")}>
+      <p className={cn("-mt-3 text-15 font-semibold", trouble ? "text-highlight" : "text-primary")}>
         {trouble ? `${trouble === 1 ? "One job needs" : `${trouble} jobs need`} a look.` : "Everything's fine."}
       </p>
 
@@ -91,8 +91,8 @@ export function DashboardPage() {
                 className={cn(STATUS_DOT, "mt-1.5", TONES[STATUS[j.status].tone].dot, j.status === "running" && LIVE)} />
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-15 font-semibold">{j.name}</span>
-                <span className="block text-sm text-text-muted">{j.from}</span>
-                <span className={cn("mt-0.5 block text-sm", j.error ? "text-highlight" : "text-text-subtle")}>{j.error ? `Can't run: ${j.error}` : j.last}</span>
+                <span className="block text-sm text-muted-foreground">{j.from}</span>
+                <span className={cn("mt-0.5 block text-sm", j.error ? "text-highlight" : "text-subtle-foreground")}>{j.error ? `Can't run: ${j.error}` : j.last}</span>
               </span>
               <Button size="sm" variant="secondary" disabled={j.status === "running" || !!j.error}>Run</Button>
             </div>
@@ -104,7 +104,7 @@ export function DashboardPage() {
         <Section title="Runs this week">
           <BarChart direction="vertical" tone="support" title="Runs per day this week"
             items={DAYS.map((d, i) => ({ id: d, label: d, value: RUNS_PER_DAY[i]! }))} />
-          <p className="mt-3 text-sm text-text-muted">Busiest: Thursday (5), Tuesday (4).</p>
+          <p className="mt-3 text-sm text-muted-foreground">Busiest: Thursday (5), Tuesday (4).</p>
         </Section>
         <Section title="Minutes per run">
           <TrendChart labels={DATES} title="Minutes per run, last two weeks" format={(n) => `${n}m`}
@@ -132,7 +132,7 @@ export function DashboardPage() {
       {log && (
         <Sheet wide title={log.title} subtitle={log.sub} onClose={() => setParams({}, { replace: true })}>
           <div className="p-4 sm:p-5">
-            <pre className="whitespace-pre-wrap break-words rounded-xl border border-border bg-bg-deep/80 p-3 font-mono text-12 leading-relaxed text-text-muted">
+            <pre className="whitespace-pre-wrap break-words rounded-xl border border-border bg-background-deep/80 p-3 font-mono text-12 leading-relaxed text-muted-foreground">
               {"10:42:01  Starting\n10:42:03  Comparing both sides\n10:42:05  Syncing 1,204 files\n…"}
             </pre>
           </div>

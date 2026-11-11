@@ -11,11 +11,20 @@
  * SearchField, SelectField, Autocomplete, RangeField and ColorPicker are in
  * the kit. All of them are 48 px tall on phones, 44 from `sm:` up.
  *
+ * Built on jimbo.ui's shadcn primitives: Field (label, description, error),
+ * Input and Textarea.
+ *
  * jimbo-ui reference: copy into an app as is.
  */
 
 import { useId, useLayoutEffect, useRef, useState, type InputHTMLAttributes, type ReactNode } from "react";
+import { CalendarIcon, CircleAlertIcon, ClockIcon, UploadIcon } from "lucide-react";
 import { cn } from "@/lib/cn";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Field, FieldDescription, FieldError, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 /** The label, hint and error around a field, wired up with ids for screen readers. */
 function FieldFrame({ id, label, hint, error, optional, counter, className, children }: {
@@ -29,23 +38,23 @@ function FieldFrame({ id, label, hint, error, optional, counter, className, chil
   children: ReactNode;
 }) {
   return (
-    <div className={cn("block", className)}>
-      <label htmlFor={id} className="label flex items-baseline justify-between gap-3">
-        <span>{label}{optional && <span className="ml-1.5 font-normal text-text-subtle">optional</span>}</span>
+    <Field data-invalid={error ? true : undefined} className={cn("gap-1.5", className)}>
+      <FieldLabel htmlFor={id} className="flex items-baseline justify-between gap-3 text-sm font-semibold text-muted-foreground">
+        <span>{label}{optional && <span className="ml-1.5 font-normal text-subtle-foreground">optional</span>}</span>
         {counter}
-      </label>
+      </FieldLabel>
       {children}
       {error
-        ? <p id={`${id}-msg`} className="mt-1.5 flex items-start gap-1.5 text-sm font-semibold text-highlight">
-            <svg className="mt-0.5 shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 7.5v5.5M12 16.5v.01" /></svg>
+        ? <FieldError id={`${id}-msg`} className="flex items-start gap-1.5 font-semibold text-highlight">
+            <CircleAlertIcon aria-hidden="true" className="mt-0.5 size-3.5 shrink-0" strokeWidth={2.5} />
             {error}
-          </p>
-        : hint && <p id={`${id}-msg`} className="mt-1.5 text-sm text-text-subtle">{hint}</p>}
-    </div>
+          </FieldError>
+        : hint && <FieldDescription id={`${id}-msg`} className="text-subtle-foreground">{hint}</FieldDescription>}
+    </Field>
   );
 }
 
-const fieldCls = (error: ReactNode) => cn("field w-full", error ? "border-highlight focus:border-highlight focus:ring-highlight/25" : "");
+const fieldCls = (error: ReactNode) => (error ? "border-highlight focus-visible:border-highlight focus-visible:ring-highlight/25" : "");
 
 type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, "value" | "onChange" | "size" | "prefix">;
 
@@ -70,10 +79,10 @@ export function TextField({ label, value, onChange, hint, error, optional, prefi
   return (
     <FieldFrame id={id} label={label} hint={hint} error={error} optional={optional} className={className}>
       <div className="relative">
-        {prefix && <span className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-15 text-text-subtle">{prefix}</span>}
-        <input id={id} value={value} onChange={(e) => onChange(e.target.value)} aria-invalid={error ? true : undefined}
+        {prefix && <span className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-15 text-subtle-foreground">{prefix}</span>}
+        <Input id={id} value={value} onChange={(e) => onChange(e.target.value)} aria-invalid={error ? true : undefined}
           aria-describedby={error || hint ? `${id}-msg` : undefined} {...rest}
-          className={cn(fieldCls(error), "h-control", prefix && "pl-9", suffix && "pr-12")} />
+          className={cn(fieldCls(error), prefix && "pl-9", suffix && "pr-12")} />
         {suffix && <span className="absolute inset-y-0 right-1 flex items-center">{suffix}</span>}
       </div>
     </FieldFrame>
@@ -116,19 +125,14 @@ export function TextArea({ label, value, onChange, hint, error, optional, rows =
   return (
     <FieldFrame id={id} label={label} hint={hint} error={error} optional={optional} className={className}
       counter={left != null && left <= Math.max(20, maxLength! * 0.1) && (
-        <span className={cn("text-xs font-medium tabular-nums", left < 0 ? "text-highlight" : "text-text-subtle")} aria-live="polite">{left} left</span>
+        <span className={cn("text-xs font-medium tabular-nums", left < 0 ? "text-highlight" : "text-subtle-foreground")} aria-live="polite">{left} left</span>
       )}>
-      <textarea ref={ref} id={id} value={value} onChange={(e) => onChange(e.target.value)} rows={rows} maxLength={maxLength} placeholder={placeholder}
+      <Textarea ref={ref} id={id} value={value} onChange={(e) => onChange(e.target.value)} rows={rows} maxLength={maxLength} placeholder={placeholder}
         aria-invalid={error ? true : undefined} aria-describedby={error || hint ? `${id}-msg` : undefined}
-        className={cn(fieldCls(error), "block resize-none py-3 leading-relaxed")} />
+        className={cn(fieldCls(error), "block resize-none py-3 leading-relaxed [field-sizing:fixed]")} />
     </FieldFrame>
   );
 }
-
-const DATE_ICON = {
-  date: <><rect x="3.5" y="5" width="17" height="15.5" rx="2.5" /><path d="M3.5 10h17M8 3v4M16 3v4" /></>,
-  time: <><circle cx="12" cy="12" r="8.5" /><path d="M12 7.5V12l3 2" /></>,
-};
 
 /**
  * A date, a time, or both, as `YYYY-MM-DD` / `HH:MM` / `YYYY-MM-DDTHH:MM`
@@ -152,16 +156,13 @@ export function DateField({ label, value, onChange, type = "date", min, max, hin
   return (
     <FieldFrame id={id} label={label} hint={hint} error={error} optional={optional} className={className}>
       <div className="relative">
-        <svg className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-text-subtle" width="18" height="18" viewBox="0 0 24 24"
-          fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-          {DATE_ICON[type === "time" ? "time" : "date"]}
-        </svg>
+        {(() => { const Icon = type === "time" ? ClockIcon : CalendarIcon; return <Icon aria-hidden="true" className="pointer-events-none absolute left-3.5 top-1/2 size-4.5 -translate-y-1/2 text-subtle-foreground" />; })()}
         {/* The picker button is the whole field: the platform's own icon is hidden (ours sits left). */}
-        <input id={id} type={type} value={value} min={min} max={max} onChange={(e) => onChange(e.target.value)}
+        <Input id={id} type={type} value={value} min={min} max={max} onChange={(e) => onChange(e.target.value)}
           aria-invalid={error ? true : undefined} aria-describedby={error || hint ? `${id}-msg` : undefined}
-          className={cn(fieldCls(error), "h-control appearance-none pl-10 tabular-nums",
+          className={cn(fieldCls(error), "appearance-none pl-10 tabular-nums",
             "[&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:h-auto [&::-webkit-calendar-picker-indicator]:w-auto [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0",
-            "[&::-webkit-date-and-time-value]:text-left", !value && "text-text-subtle")} />
+            "[&::-webkit-date-and-time-value]:text-left", !value && "text-subtle-foreground")} />
       </div>
     </FieldFrame>
   );
@@ -217,20 +218,18 @@ export function FileDrop({ label, files, onChange, accept, multiple = false, max
   };
   return (
     <div className={cn("space-y-2", className)}>
-      <p className="label mb-0" id={`${id}-label`}>{label}</p>
+      <p className="text-sm font-semibold text-muted-foreground" id={`${id}-label`}>{label}</p>
       <label htmlFor={id}
         onDragOver={(e) => { e.preventDefault(); setOver(true); }} onDragLeave={() => setOver(false)}
         onDrop={(e) => { e.preventDefault(); setOver(false); add(e.dataTransfer.files); }}
         className={cn(
-          "flex min-h-32 cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed px-4 py-6 text-center transition-colors",
-          "has-[:focus-visible]:border-accent has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-accent/25",
-          over ? "border-accent bg-accent/10" : "border-border bg-surface-2/50 hover:border-text-subtle",
+          "flex min-h-32 cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed px-4 py-6 text-center transition-colors",
+          "has-[:focus-visible]:border-ring has-[:focus-visible]:ring-[3px] has-[:focus-visible]:ring-ring/50",
+          over ? "border-primary bg-primary-950" : "border-border bg-muted hover:border-subtle-foreground",
         )}>
-        <svg className={over ? "text-accent" : "text-text-subtle"} width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-          <path d="M12 15V4M7.5 8.5 12 4l4.5 4.5M4 15v3.5A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V15" />
-        </svg>
-        <span className="text-15 font-semibold"><span className="text-accent">Choose {multiple ? "files" : "a file"}</span><span className="hidden sm:inline"> or drop {multiple ? "them" : "it"} here</span></span>
-        {hint && <span className="text-sm text-text-subtle">{hint}</span>}
+        <UploadIcon aria-hidden="true" className={cn("size-6.5", over ? "text-primary" : "text-subtle-foreground")} />
+        <span className="text-15 font-semibold"><span className="text-primary">Choose {multiple ? "files" : "a file"}</span><span className="hidden sm:inline"> or drop {multiple ? "them" : "it"} here</span></span>
+        {hint && <span className="text-sm text-subtle-foreground">{hint}</span>}
         <input id={id} type="file" accept={accept} multiple={multiple} aria-labelledby={`${id}-label`} className="sr-only"
           onChange={(e) => { add(e.target.files); e.target.value = ""; }} />
       </label>
@@ -240,20 +239,20 @@ export function FileDrop({ label, files, onChange, accept, multiple = false, max
         </ul>
       )}
       {files.length > 0 && (
-        <ul className="card divide-etched overflow-hidden">
+        <Card asChild className="divide-etched gap-0 overflow-hidden py-0"><ul>
           {files.map((f, i) => (
             <li key={`${f.name}-${i}`} className="flex min-h-14 items-center gap-3 py-1.5 pl-4 pr-1.5">
-              <span aria-hidden="true" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-surface-2 font-mono text-10 font-bold uppercase text-text-subtle">
+              <span aria-hidden="true" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted font-mono text-10 font-bold uppercase text-subtle-foreground">
                 {f.name.split(".").pop()?.slice(0, 4)}
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-15 font-semibold">{f.name}</span>
-                <span className="block text-xs text-text-subtle">{fileSize(f.size)}</span>
+                <span className="block text-xs text-subtle-foreground">{fileSize(f.size)}</span>
               </span>
-              <button type="button" onClick={() => onChange(files.filter((_, j) => j !== i))} className="link-action h-11 shrink-0 px-3">Remove</button>
+              <Button variant="ghost" onClick={() => onChange(files.filter((_, j) => j !== i))} className="shrink-0">Remove</Button>
             </li>
           ))}
-        </ul>
+        </ul></Card>
       )}
     </div>
   );

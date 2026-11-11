@@ -12,17 +12,24 @@
  * - `OfflineBanner` / `UpdateBanner` — slim bars under the top bar: offline
  *   (with changes waiting), or a new version ready.
  *
+ * Built on jimbo.ui's shadcn primitives: sonner, alert-dialog, progress.
  * jimbo-ui reference: copy into an app as is. `Toaster` goes in the app shell once.
  */
 
-import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
-import { createPortal } from "react-dom";
+import { useState, useSyncExternalStore, type ReactNode } from "react";
+import { toast as sonner } from "sonner";
+import { CheckIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge, Sheet, type Tone } from "@/components/ui/kit";
+import { Progress } from "@/components/ui/progress";
+import { Toaster as SonnerToaster } from "@/components/ui/sonner";
+import {
+  AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Badge, type Tone } from "@/components/ui/kit";
 import { cn } from "@/lib/cn";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Toasts
+// Toasts (shadcn Sonner)
 // ─────────────────────────────────────────────────────────────────────────────
 
 export type ToastTone = "done" | "info" | "error";
@@ -30,7 +37,7 @@ export type ToastTone = "done" | "info" | "error";
 export type ToastInput = {
   title: string;
   body?: ReactNode;
-  /** done (accent dot, the default), info (support) or error (highlight; stays longest). */
+  /** done (primary dot, the default), info (support) or error (highlight; stays longest). */
   tone?: ToastTone;
   /** One action — usually Undo. */
   action?: { label: string; onClick: () => void };
@@ -38,92 +45,41 @@ export type ToastInput = {
   duration?: number;
 };
 
-type ToastItem = ToastInput & { id: number };
-
-let toasts: ToastItem[] = [];
-let nextId = 1;
-const listeners = new Set<() => void>();
-const emit = () => listeners.forEach((l) => l());
-
-/** Shows a toast; returns a function that closes it. Works from anywhere — no hook needed. */
-export function toast(input: ToastInput | string): () => void {
-  const t: ToastItem = { ...(typeof input === "string" ? { title: input } : input), id: nextId++ };
-  // Three at most: the oldest gives way.
-  toasts = [...toasts, t].slice(-3);
-  emit();
-  return () => dismissToast(t.id);
-}
-
-export function dismissToast(id: number) {
-  toasts = toasts.filter((t) => t.id !== id);
-  emit();
-}
-
-const subscribe = (l: () => void) => { listeners.add(l); return () => { listeners.delete(l); }; };
-
-const TOAST_DOT: Record<ToastTone, string> = { done: "dot-accent", info: "dot-support", error: "dot-highlight" };
+const TOAST_DOT: Record<ToastTone, string> = { done: "dot-primary", info: "dot-support", error: "dot-highlight" };
 
 const toastDuration = (t: ToastInput) =>
   t.duration ?? (t.tone === "error" ? 8000 : t.action ? 6000 : 4000);
 
 /**
- * One toast. Every toast is timed — errors too, just longer — and a thin line
- * along the bottom shows the time left. Hovering or focusing it holds the
- * timer (and the line) until the pointer or focus leaves.
+ * Shows a toast; returns a function that closes it. Works from anywhere — no
+ * hook needed. Every toast is timed (errors too, just longer), and hovering
+ * holds it. Three at most.
  */
-function ToastCard({ t }: { t: ToastItem }) {
+export function toast(input: ToastInput | string): () => void {
+  const t = typeof input === "string" ? { title: input } : input;
   const tone = t.tone ?? "done";
-  const duration = toastDuration(t);
-  const [paused, setPaused] = useState(false);
-  const left = useRef(duration);
-  useEffect(() => {
-    if (paused) return;
-    const started = Date.now();
-    const timer = setTimeout(() => dismissToast(t.id), left.current);
-    return () => { clearTimeout(timer); left.current -= Date.now() - started; };
-  }, [t.id, paused]);
-  return (
-    <div role={tone === "error" ? "alert" : "status"} onPointerEnter={() => setPaused(true)} onPointerLeave={() => setPaused(false)}
-      onFocus={() => setPaused(true)} onBlur={() => setPaused(false)}
-      className="pointer-events-auto relative flex w-full items-start gap-3 overflow-hidden rounded-2xl border border-border bg-surface/95 py-2 pl-4 pr-2 shadow-2xl shadow-black/50 backdrop-blur-xl motion-safe:animate-toast-in">
-      <span aria-hidden="true" style={{ animationDuration: `${duration}ms`, animationPlayState: paused ? "paused" : "running" }}
-        className={cn("absolute inset-x-0 bottom-0 h-0.5 origin-left animate-toast-timer opacity-60",
-          tone === "error" ? "bg-highlight" : tone === "info" ? "bg-support" : "bg-accent")} />
-      <span aria-hidden="true" className={cn(TOAST_DOT[tone], "mt-[15px] h-2.5 w-2.5 shrink-0")} />
-      <div className="min-w-0 flex-1 py-2">
-        <p className="text-15 font-semibold leading-snug">{t.title}</p>
-        {t.body && <p className="mt-0.5 text-sm text-text-muted">{t.body}</p>}
-      </div>
-      {t.action && (
-        <button type="button" onClick={() => { dismissToast(t.id); t.action!.onClick(); }}
-          className="h-11 shrink-0 rounded-control px-3 text-sm font-semibold text-accent transition-colors hover:bg-surface-2">
-          {t.action.label}
-        </button>
-      )}
-      <button type="button" onClick={() => dismissToast(t.id)} aria-label="Close"
-        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-text-subtle transition-colors hover:bg-surface-2 hover:text-text-base">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
-      </button>
-    </div>
-  );
+  const id = sonner(t.title, {
+    description: t.body,
+    duration: toastDuration(t),
+    icon: <span aria-hidden="true" className={cn(TOAST_DOT[tone], "h-2.5 w-2.5")} />,
+    action: t.action ? { label: t.action.label, onClick: t.action.onClick } : undefined,
+    closeButton: true,
+  });
+  return () => dismissToast(id);
+}
+
+export function dismissToast(id: string | number) {
+  sonner.dismiss(id);
 }
 
 /**
- * Where toasts appear: the top right corner, just under the top bar
+ * Where toasts appear (M4): the top right corner, just under the top bar
  * (`--top-bar`), so they never cover the dock, a pinned save bar or the
- * thing just tapped. Full width on phones, a narrow column from 640 px.
- * Newest on top. Put it in the app shell once. Over sheets too (z 60), so a
- * toast from inside one is seen.
+ * thing just tapped. Newest on top. Put it in the app shell once.
  */
 export function Toaster() {
-  const list = useSyncExternalStore(subscribe, () => toasts, () => toasts);
-  return createPortal(
-    <div aria-live="polite"
-      className="pointer-events-none fixed left-[calc(0.75rem+var(--safe-left))] right-[calc(0.75rem+var(--safe-right))] top-[calc(var(--top-bar)+0.5rem)] z-[60] flex flex-col gap-2 sm:left-auto sm:right-[calc(1rem+var(--safe-right))] sm:w-96">
-      {[...list].reverse().map((t) => <ToastCard key={t.id} t={t} />)}
-    </div>,
-    document.body,
-  );
+  return <SonnerToaster visibleToasts={3} offset={{ top: "calc(var(--top-bar) + 0.5rem)", right: "calc(1rem + var(--safe-right))" }}
+    mobileOffset={{ top: "calc(var(--top-bar) + 0.5rem)", left: "calc(0.75rem + var(--safe-left))", right: "calc(0.75rem + var(--safe-right))" }} />;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -142,28 +98,29 @@ export type ConfirmOptions = {
 };
 
 /**
- * Asks before a destructive or surprising action, as a small Sheet: the
- * question, a line on what happens and what survives, then Cancel and the
- * action named in its own words. `busy` while the action runs.
+ * Asks before a destructive or surprising action (M5), as a shadcn
+ * AlertDialog: the question, a line on what happens and what survives, then
+ * Cancel and the action named in its own words. Cancel has the focus when
+ * it's `danger`. `busy` while the action runs.
  */
 export function ConfirmSheet({ title, body, confirmLabel, cancelLabel = "Cancel", danger = false, busy = false, onConfirm, onClose }: ConfirmOptions & {
   busy?: boolean;
   onConfirm: () => void;
   onClose: () => void;
 }) {
-  const cancel = useRef<HTMLButtonElement>(null);
-  const confirm = useRef<HTMLButtonElement>(null);
-  useEffect(() => { (danger ? cancel : confirm).current?.focus(); }, [danger]);
   return (
-    <Sheet title={title} onClose={onClose}>
-      <div className="space-y-5 p-5">
-        {body && <p className="text-15 text-text-muted">{body}</p>}
-        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-          <Button ref={cancel} variant="secondary" onClick={onClose} disabled={busy}>{cancelLabel}</Button>
-          <Button ref={confirm} onClick={onConfirm} loading={busy} className={cn(danger && "lit-highlight hover:bg-highlight-hover")}>{confirmLabel}</Button>
-        </div>
-      </div>
-    </Sheet>
+    <AlertDialog open onOpenChange={(o) => { if (!o && !busy) onClose(); }}>
+      <AlertDialogContent onOpenAutoFocus={danger ? undefined : (e) => { e.preventDefault(); (e.currentTarget as HTMLElement).querySelector<HTMLButtonElement>("[data-confirm]")?.focus(); }}>
+        <AlertDialogHeader>
+          <AlertDialogTitle className="font-display text-xl">{title}</AlertDialogTitle>
+          {body ? <AlertDialogDescription className="text-15">{body}</AlertDialogDescription> : <AlertDialogDescription className="sr-only">{title}</AlertDialogDescription>}
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={busy}>{cancelLabel}</AlertDialogCancel>
+          <Button data-confirm variant={danger ? "destructive" : "default"} onClick={onConfirm} loading={busy}>{confirmLabel}</Button>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }
 
@@ -183,26 +140,28 @@ export function useConfirm(): [(options: ConfirmOptions) => Promise<boolean>, Re
 // Progress
 // ─────────────────────────────────────────────────────────────────────────────
 
-const BAR_FILL = { accent: "bg-accent", support: "bg-support", highlight: "bg-highlight" } as const;
+const BAR_TONE = { accent: "primary", primary: "primary", support: "support", highlight: "highlight" } as const;
 
 /**
  * How far along a job of known length is (an upload, an import, a quota):
- * a flat bar in the tone over a surface track, the label and value above.
- * No `value` is "working, length unknown" — a slow sweep. For background
- * work that shouldn't take a whole row, use the corner ring (guide section 9).
+ * a flat bar (shadcn `Progress`) in the tone over a muted track, the label
+ * and value above. No `value` is "working, length unknown" — a slow sweep.
+ * For background work that shouldn't take a whole row, use the corner ring
+ * (guide section 9).
  */
-export function ProgressBar({ label, value, max = 100, tone = "accent", format, hideLabel = false, size = "md", className }: {
+export function ProgressBar({ label, value, max = 100, tone = "primary", format, hideLabel = false, size = "md", className }: {
   label: string;
   /** Leave out while the length is unknown. */
   value?: number;
   max?: number;
-  tone?: keyof typeof BAR_FILL;
+  tone?: keyof typeof BAR_TONE;
   /** How the value reads: "42%" by default. */
   format?: (value: number, max: number) => string;
   /** Keep the label for screen readers only. */
   hideLabel?: boolean;
   /** `lg`: a thicker bar, for the one job a tile is about (`JobTile`). */
   size?: "md" | "lg";
+  /** Layout only (J3). */
   className?: string;
 }) {
   const known = value != null;
@@ -211,15 +170,10 @@ export function ProgressBar({ label, value, max = 100, tone = "accent", format, 
   return (
     <div className={cn("space-y-1.5", className)}>
       <div className={cn("flex items-baseline justify-between gap-3 text-sm", hideLabel && "sr-only")}>
-        <span className="min-w-0 truncate font-semibold text-text-muted">{label}</span>
-        <span className="shrink-0 tabular-nums text-text-subtle">{text}</span>
+        <span className="min-w-0 truncate font-semibold text-muted-foreground">{label}</span>
+        <span className="shrink-0 tabular-nums text-subtle-foreground">{text}</span>
       </div>
-      <div role="progressbar" aria-label={label} aria-valuemin={0} aria-valuemax={max} aria-valuenow={known ? value : undefined} aria-valuetext={text}
-        className={cn("relative overflow-hidden rounded-full bg-surface-2", size === "lg" ? "h-3" : "h-2")}>
-        {known
-          ? <div className={cn("h-full rounded-full transition-[width] duration-300", BAR_FILL[tone])} style={{ width: `${pct}%` }} />
-          : <div className={cn("absolute inset-y-0 w-1/3 rounded-full motion-safe:animate-[jimbo-sweep_1.4s_ease-in-out_infinite]", BAR_FILL[tone])} />}
-      </div>
+      <Progress aria-label={label} aria-valuetext={text} value={known ? pct : null} tone={BAR_TONE[tone]} size={size} />
     </div>
   );
 }
@@ -274,7 +228,7 @@ export function JobTile({ title, state = "running", value, max = 100, count, cur
   const name = typeof title === "string" ? title : "Progress";
   const header = (
     <div className="flex items-start gap-3">
-      <p className="min-w-0 flex-1 break-words text-15 font-semibold leading-snug text-text-base">{title}</p>
+      <p className="min-w-0 flex-1 break-words text-15 font-semibold leading-snug text-foreground">{title}</p>
       <Badge tone={s.tone} dot live={s.live} className="mt-0.5 shrink-0">{stateLabel ?? s.label}</Badge>
       {action}
     </div>
@@ -283,8 +237,8 @@ export function JobTile({ title, state = "running", value, max = 100, count, cur
     <dl className="mt-auto flex flex-wrap gap-x-5 gap-y-2 border-t border-border pt-3">
       {facts.map((f) => (
         <div key={f.label} className="min-w-0">
-          <dt className="text-11 font-semibold uppercase tracking-wider text-text-subtle">{f.label}</dt>
-          <dd className="break-words text-sm font-semibold text-text-base">{f.value}</dd>
+          <dt className="text-11 font-semibold uppercase tracking-wider text-subtle-foreground">{f.label}</dt>
+          <dd className="break-words text-sm font-semibold text-foreground">{f.value}</dd>
         </div>
       ))}
     </dl>
@@ -295,7 +249,7 @@ export function JobTile({ title, state = "running", value, max = 100, count, cur
       <div className={cn("flex h-full flex-col gap-2 p-4 sm:p-5", className)}>
         {header}
         {/* Muted, not highlight: highlight text on a card can drop under 3:1 in some looks; the badge says it failed. */}
-        {note && <p className="break-words text-sm text-text-muted">{note}</p>}
+        {note && <p className="break-words text-sm text-muted-foreground">{note}</p>}
         {factBlock}
       </div>
     );
@@ -311,23 +265,23 @@ export function JobTile({ title, state = "running", value, max = 100, count, cur
       <div>
         <p className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
           {known
-            ? <span className="font-display text-40 leading-none text-text-base">{shown}%</span>
-            : <span className="font-display text-28 leading-none text-text-muted">Working…</span>}
-          {countText && <span className="text-sm font-medium text-text-muted">{countText}</span>}
+            ? <span className="font-display text-40 leading-none text-foreground">{shown}%</span>
+            : <span className="font-display text-28 leading-none text-muted-foreground">Working…</span>}
+          {countText && <span className="text-sm font-medium text-muted-foreground">{countText}</span>}
         </p>
         <ProgressBar label={name} hideLabel size="lg" value={value} max={max} className="mt-3" />
       </div>
       {current && (
-        // The item it's on: readable type on an accent wash (text on accent-950 is ≥ 6.5:1 in every look).
-        <div className="rounded-xl bg-accent-950 px-3 py-2.5">
-          <p className="flex items-center gap-1.5 text-11 font-semibold uppercase tracking-wider text-text-base">
-            <span aria-hidden="true" className={cn("dot-accent h-2 w-2 shrink-0", state === "running" && "animate-pulse")} />
+        // The item it's on: readable type on a primary wash (text on primary-950 is ≥ 6.5:1 in every look).
+        <div className="rounded-xl bg-primary-950 px-3 py-2.5">
+          <p className="flex items-center gap-1.5 text-11 font-semibold uppercase tracking-wider text-foreground">
+            <span aria-hidden="true" className={cn("dot-primary h-2 w-2 shrink-0", state === "running" && "animate-pulse")} />
             {currentLabel}
           </p>
-          <p className="mt-1 break-words text-15 font-semibold leading-snug text-text-base">{current}</p>
+          <p className="mt-1 break-words text-15 font-semibold leading-snug text-foreground">{current}</p>
         </div>
       )}
-      {note && <p className="break-words text-sm text-text-muted">{note}</p>}
+      {note && <p className="break-words text-sm text-muted-foreground">{note}</p>}
       {factBlock}
     </div>
   );
@@ -349,27 +303,25 @@ export function Stepper({ steps, current, onStep }: { steps: string[]; current: 
           const circle = (
             <span className={cn(
               "flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold tabular-nums transition-colors",
-              state === "done" && "bg-accent-950 text-accent",
-              state === "current" && "lit-accent",
-              state === "next" && "border border-border bg-surface-2 text-text-subtle",
+              state === "done" && "bg-primary-950 text-primary",
+              state === "current" && "bg-primary text-primary-foreground",
+              state === "next" && "border border-border bg-muted text-subtle-foreground",
             )}>
-              {state === "done"
-                ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7" /></svg>
-                : i + 1}
+              {state === "done" ? <CheckIcon aria-hidden="true" className="size-3.5" strokeWidth={3.5} /> : i + 1}
             </span>
           );
-          const label = <span className={cn("hidden text-sm font-semibold sm:inline", state === "next" ? "text-text-subtle" : "text-text-base")}>{s}</span>;
+          const label = <span className={cn("hidden text-sm font-semibold sm:inline", state === "next" ? "text-subtle-foreground" : "text-foreground")}>{s}</span>;
           return (
             <li key={s} aria-current={state === "current" ? "step" : undefined} className={cn("flex items-center", i < steps.length - 1 && "flex-1")}>
               {onStep && state === "done"
-                ? <button type="button" onClick={() => onStep(i)} className="-m-1.5 flex items-center gap-2 rounded-full p-1.5 transition-colors hover:bg-surface-2 sm:pr-3">{circle}{label}<span className="sr-only">(done, go back)</span></button>
+                ? <button type="button" onClick={() => onStep(i)} className="-m-1.5 flex items-center gap-2 rounded-full p-1.5 transition-colors hover:bg-muted sm:pr-3">{circle}{label}<span className="sr-only">(done, go back)</span></button>
                 : <span className="flex items-center gap-2">{circle}{label}{state === "done" && <span className="sr-only">(done)</span>}</span>}
-              {i < steps.length - 1 && <span aria-hidden="true" className={cn("mx-2 h-0.5 min-w-4 flex-1 rounded-full sm:mx-3", i < current ? "bg-accent" : "bg-border")} />}
+              {i < steps.length - 1 && <span aria-hidden="true" className={cn("mx-2 h-0.5 min-w-4 flex-1 rounded-full sm:mx-3", i < current ? "bg-primary" : "bg-border")} />}
             </li>
           );
         })}
       </ol>
-      <p className="text-sm text-text-muted sm:hidden">Step {current + 1} of {steps.length} · <span className="font-semibold text-text-base">{steps[current]}</span></p>
+      <p className="text-sm text-muted-foreground sm:hidden">Step {current + 1} of {steps.length} · <span className="font-semibold text-foreground">{steps[current]}</span></p>
     </nav>
   );
 }
@@ -390,7 +342,7 @@ export function useOnline(): boolean {
 /** A slim bar that sticks under the top bar (z 30): one line and an optional action. */
 function TopBanner({ className, dot, children, action }: { className: string; dot: string; children: ReactNode; action?: ReactNode }) {
   return (
-    <div role="status" className={cn("sticky top-[var(--top-bar)] z-30 -mx-4 -mt-6 mb-6 flex min-h-11 items-center gap-3 px-4 py-1.5 text-sm font-semibold backdrop-blur-md sm:-mx-6 sm:-mt-8 sm:mb-8 sm:px-6", className)}>
+    <div role="status" className={cn("sticky top-[var(--top-bar)] z-30 -mx-4 -mt-6 mb-6 flex min-h-11 items-center gap-3 px-4 py-1.5 text-sm font-semibold sm:-mx-6 sm:-mt-8 sm:mb-8 sm:px-6", className)}>
       <span aria-hidden="true" className={cn("h-2 w-2 shrink-0 rounded-full", dot)} />
       <p className="min-w-0 flex-1">{children}</p>
       {action}
@@ -414,7 +366,7 @@ export function OfflineBanner({ pending = 0, forceOffline }: {
   if (online && pending === 0) return null;
   const waiting = pending > 0 ? `${pending} ${pending === 1 ? "change" : "changes"} ${online ? "sending…" : "waiting to send"}` : null;
   return (
-    <TopBanner className="bg-yellow-950/95 text-yellow-200" dot={online ? "bg-yellow-400 animate-pulse" : "bg-yellow-400"}>
+    <TopBanner className="bg-yellow-950 text-yellow-200" dot={online ? "bg-yellow-400 animate-pulse" : "bg-yellow-400"}>
       {online ? waiting : <>You're offline{waiting ? ` · ${waiting}` : " · changes will send when you're back"}</>}
     </TopBanner>
   );
@@ -427,10 +379,10 @@ export function OfflineBanner({ pending = 0, forceOffline }: {
  */
 export function UpdateBanner({ onReload, onDismiss }: { onReload: () => void; onDismiss?: () => void }) {
   return (
-    <TopBanner className="border-b border-border bg-surface/90" dot="dot-support"
+    <TopBanner className="border-b border-border bg-card" dot="dot-support"
       action={<span className="flex shrink-0 items-center gap-1">
-        {onDismiss && <button type="button" onClick={onDismiss} className="h-9 rounded-control px-3 text-sm font-semibold text-text-muted transition-colors hover:bg-surface-2 hover:text-text-base">Later</button>}
-        <button type="button" onClick={onReload} className="lit-accent h-9 rounded-control px-3 text-sm font-semibold transition-colors hover:bg-accent-hover">Reload</button>
+        {onDismiss && <Button variant="ghost" size="sm" onClick={onDismiss}>Later</Button>}
+        <Button size="sm" onClick={onReload}>Reload</Button>
       </span>}>
       A new version is ready
     </TopBanner>
