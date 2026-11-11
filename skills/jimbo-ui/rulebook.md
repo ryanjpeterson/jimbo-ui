@@ -33,8 +33,9 @@ How to use it:
 - **C3** Two to four source colours; none of them white or grey. A brand look uses only the colours on that brand's own site. *§2*
 - **C4** Colour comes from opaque shapes, not thin washes of another hue. *§2*
 - **C5** Status colours are the fixed tones (`Tone`), never theme colours. *§2*
-- **C6** Every template passes `node scripts/contrast.mjs --check` in each tone it comes in: body text ≥ 7:1, muted ≥ 4.5:1, labels ≥ 3.5:1 on cards; card border ≥ 1.75:1; card on page ≥ 1.19:1; **accent and highlight ≥ 3.5:1** on the page; support ≥ 4.5:1 on cards; text on the accent ≥ 4.5:1. *§3*
+- **C6** Every template passes `node scripts/contrast.mjs --check` in each tone it comes in: body text ≥ 7:1, muted ≥ 5.5:1, labels ≥ 4.5:1 on fields (`surface-2`, the weakest surface text sits on); muted ≥ 4.5:1 on floating `.glass` over any photo; card border ≥ 1.75:1; card on page ≥ 1.19:1; **accent and highlight ≥ 3.5:1** on the page; support ≥ 4.5:1 on cards; text on the accent ≥ 4.5:1. *§3*
 - **C7** **Colours stand apart.** Accent and highlight are at least 22 apart (ΔE), and no two of accent, highlight and support closer than 15 — closer than that, an eyebrow reads as a link and a badge as a button. A tone that can't do this is remade from the look's own colours or not offered. *§3*
+- **C8** **Hero text reads on any picture.** A hero's picture (`Hero`, `Banner`) or theme blur (`HeroSection`, `PageHeader`, `HeroCarousel`) sits under the page colour at the strength the theme works out (`hero-scrim-image`, `hero-scrim-blur`): title ≥ 7:1, eyebrow and lines ≥ 4.5:1 over the worst pixels. Never a fixed `bg-black/*` dim or `text-white`. *§3*
 
 ## S · Shapes and circles
 

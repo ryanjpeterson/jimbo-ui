@@ -34,6 +34,27 @@ the matching 0.x release.
 
 ## Unreleased
 
+Hero text and muted text read on every surface and picture.
+
+**Update:** fix
+
+### Changed
+
+- Muted and label text step to read on fields (`surface-2`), not just
+  cards: targets 5.5:1 and 4.5:1 (C6). New template scores: muted on
+  floating glass over any photo, and hero text over its scrim.
+- `BackButton` is always `.glass` with body text (`overlay` is ignored);
+  `Hero` and `Banner` use tokens instead of white and black.
+
+### Added
+
+- Hero scrims (rule C8): `heroScrims()` in `theme.ts`, the
+  `--hero-scrim-image` / `--hero-scrim-blur` variables and the
+  `hero-scrim-image` / `hero-scrim-blur` utilities.
+
+**Apps must:** copy the foundation files. When wanted, replace a hand-made
+`bg-black/*` dim over a hero picture with `hero-scrim-image`.
+
 ## 0.17.0 — 2026-11-08
 
 **Update:** breaking

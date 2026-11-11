@@ -310,6 +310,17 @@
     shadow-[0_12px_30px_-18px_rgba(0,0,0,0.6)];
 }
 
+/* Hero scrims (C8): the page colour over a hero's picture (Hero, Banner) or
+   its theme blur (HeroSection, PageHeader, HeroCarousel), at the strength
+   theme.ts heroScrims works out for this theme — the least that keeps the
+   title ≥ 7:1 and its eyebrow and lines ≥ 4.5:1 over any picture. */
+@utility hero-scrim-image {
+  background-color: rgb(var(--c-bg) / var(--hero-scrim-image, 0.85));
+}
+@utility hero-scrim-blur {
+  background-color: rgb(var(--c-bg) / var(--hero-scrim-blur, 0.75));
+}
+
 @layer components {
   /* The one card surface every section, list and tile sits on. */
   /* Nearly opaque (the page's orbs only just show through), and lit by the

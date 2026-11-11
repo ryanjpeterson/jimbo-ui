@@ -562,8 +562,11 @@ inferred ones, which are built to pass):
 - Support ≥ 4.5:1 on cards (it's used for small text).
 - Text on an accent button ≥ 4.5:1.
 
-Every template must also pass `node scripts/contrast.mjs --check`, measured
-on cards: body text ≥ 7:1, muted ≥ 4.5:1, labels ≥ 3.5:1, card border
+Every template must also pass `node scripts/contrast.mjs --check`, with text
+measured on fields (`surface-2`, the weakest surface it sits on, so it holds
+on cards and the page too): body text ≥ 7:1, muted ≥ 5.5:1, labels ≥ 4.5:1;
+muted ≥ 4.5:1 on floating `.glass` over any photo; hero text over its scrim
+(below); card border
 ≥ 1.75:1, card against page ≥ 1.19:1 — and the three above, plus
 **colours apart**: accent and highlight at least 22 apart (CIE76 ΔE) and no
 two of accent, highlight and support closer than 15 — closer than that, two
@@ -572,7 +575,16 @@ button). A tonal theme passes when its shades are spread that far (the
 engine spreads them); identical colours don't. A tone written into
 `themes.ts` that misses any target isn't offered as written: it's remade
 from the look's own colours (`atTone`), or that tone isn't offered and the
-look shows at its nearest tone. Mid-grey backgrounds limit body text
+look shows at its nearest tone.
+
+**Hero scrims (C8).** A hero's picture or theme blur sits under the page
+colour, as much of it as this theme needs (`heroScrims` in `theme.ts`, set as
+`--hero-scrim-image` and `--hero-scrim-blur`): the least that keeps the title
+≥ 7:1 and its eyebrow and lines ≥ 4.5:1 over pure white and black (a
+picture) or a strong wash of a brand colour (the blur). Use the
+`hero-scrim-image` / `hero-scrim-blur` utilities, never a fixed black dim.
+
+Mid-grey backgrounds limit body text
 most: keep them dark enough (luminance under about 0.07) for 7:1.
 
 ---
@@ -1651,3 +1663,8 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   `Menu` items take `current` and `{ heading }`, and long menus scroll.
   `LinkCard size="sm"` for a row of quick ways in. The shell sets
   `--page-max`, so a full-width hero's text lines up with the page column.
+- **Unreleased** — Stricter text contrast, measured on fields: muted
+  5.5:1, labels 4.5:1 (C6); muted on floating glass over photos. Hero
+  scrims (C8): the page colour over a hero's picture or blur, sized per
+  theme. `BackButton` is always glass with body text; `Hero` uses tokens,
+  not white and black.

@@ -226,6 +226,8 @@ function HeroFrame({ pattern, tone = "accent", size, align, pullUp, under, child
           <div className="absolute -inset-16 blur-3xl saturate-150"
             style={{ backgroundImage: `${wash}, ${look.image}`, backgroundSize: `100% 100%, ${look.size}`,
               backgroundPosition: `0 0, ${look.position}`, backgroundRepeat: `no-repeat, ${look.repeat}` }} />
+          {/* The page colour over the blur, as much as this theme needs for its text to read on it (C8). */}
+          <div className="hero-scrim-blur absolute inset-0" />
         </div>
       )}
       <div {...rest} className={cn("flex flex-col justify-end",
@@ -343,7 +345,7 @@ export function HeroCarousel({ slides, index, onIndex, interval = 10_000, label 
               </svg>
             </button>
           )}
-          <p className="ml-2 text-sm tabular-nums text-text-subtle">{i + 1} / {n}</p>
+          <p className="ml-2 text-sm tabular-nums text-text-muted">{i + 1} / {n}</p>
         </div>
       )}
       {/* Every slide in one cell: the tallest decides the height. Only the current one shows or takes focus. */}
@@ -396,7 +398,7 @@ export function PageHeader({ eyebrow, title, count, actions, back, pattern = "ri
       <h1 className={cn("min-w-0 line-clamp-2 break-words", big ? "font-display text-4xl leading-[1.05] text-text-base sm:text-5xl" : "h-page")}>
         {title}
         {count != null && count > 0 && (
-          <span className="ml-2 align-middle text-base font-body font-medium text-text-subtle">{count.toLocaleString()}</span>
+          <span className={cn("ml-2 align-middle text-base font-body font-medium", big ? "text-text-muted" : "text-text-subtle")}>{count.toLocaleString()}</span>
         )}
       </h1>
       {actions && <div className="controls max-w-full shrink-0 justify-end">{actions}</div>}
@@ -442,24 +444,21 @@ export function parentPath(pathname: string): string {
 }
 
 /**
- * Back to the page above this one — on heroes (`overlay`) and above a
- * `PageHeader` (its `back` prop). It goes to the parent as it was left
- * (`useRememberPages` in the shell), so filters and tabs there survive.
+ * Back to the page above this one — on heroes and above a `PageHeader` (its
+ * `back` prop). Always glass with body text, so it reads on a photo, a blur
+ * or the page alike (S6, C8); a long label is cut short. It goes to the
+ * parent as it was left (`useRememberPages` in the shell), so filters and
+ * tabs there survive. `overlay` is kept for older calls: it looks the same.
  */
-export function BackButton({ to, label, overlay = false }: { to: string; label: string; overlay?: boolean }) {
+export function BackButton({ to, label }: { to: string; label: string; overlay?: boolean }) {
   return (
     <Link
       to={backHref(to)}
       aria-label={`Back to ${label}`}
-      className={cn(
-        "inline-flex h-control items-center gap-1 rounded-full pl-2 pr-3.5 text-sm font-semibold transition-colors",
-        overlay
-          ? "bg-black/45 text-white backdrop-blur-md hover:bg-black/60"
-          : "-ml-2 text-text-muted hover:text-text-base",
-      )}
+      className="glass inline-flex h-control min-w-0 max-w-full items-center gap-1 rounded-control pl-2 pr-3.5 text-sm font-semibold text-text-base transition-colors hover:border-text-subtle"
     >
-      <Chevron dir="left" />
-      {label}
+      <Chevron dir="left" className="shrink-0" />
+      <span className="truncate">{label}</span>
     </Link>
   );
 }
@@ -492,7 +491,7 @@ export function Banner({ backdrop, glow = "accent", back, badge, children, pullU
     <section className={cn("relative isolate mb-6 ml-[calc(50%-50vw)] w-screen overflow-hidden sm:mb-8", pullUp && "-mt-6 sm:-mt-8")}>
       {/* Backdrop: the image itself, blurred and scaled up so it fills the whole
           banner edge to edge (scaling hides the soft edges blur leaves behind),
-          under a light dim. The whole layer fades out at the bottom (.fade-out), so
+          under the page colour — as much as the theme needs for text to read on any picture (C8). The whole layer fades out at the bottom (.fade-out), so
           the page's own backdrop shows through — never a hard edge or a band of page colour. */}
       <div aria-hidden="true" className={cn("fade-out absolute inset-0 -z-10 overflow-hidden", !pullUp && "fade-both")}>
         {backdrop ? (
@@ -500,7 +499,7 @@ export function Banner({ backdrop, glow = "accent", back, badge, children, pullU
         ) : (
           <div className={cn("absolute inset-0 bg-linear-to-br via-support-950/60 to-transparent", glowCls)} />
         )}
-        <div className="absolute inset-0 bg-black/35" />
+        <div className={cn("absolute inset-0", backdrop ? "hero-scrim-image" : "hero-scrim-blur")} />
       </div>
 
       <div className="mx-auto max-w-5xl px-4 sm:px-6">
@@ -574,7 +573,7 @@ export function Hero({ imageUrl, imageAlt, eyebrow, title, children, actions, ba
   // A picture that fails to load gives the initials thumbnail and the plain glow, not a broken image.
   const shown = useImageOrFallback(imageUrl);
   const thumbCls = cn(
-    "shrink-0 overflow-hidden rounded-xl border border-white/10 bg-surface-2 shadow-2xl shadow-black/50",
+    "shrink-0 overflow-hidden rounded-xl border border-border bg-surface-2 shadow-2xl shadow-black/50",
     square ? "h-24 w-24 sm:h-44 sm:w-44" : "h-32 w-24 sm:h-60 sm:w-44",
   );
 
@@ -588,7 +587,7 @@ export function Hero({ imageUrl, imageAlt, eyebrow, title, children, actions, ba
               className="group relative block h-full w-full cursor-zoom-in">
               <img src={shown.src} alt={imageAlt ?? title} onError={shown.onError} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
               {/* Small expand hint in the corner */}
-              <span className="absolute bottom-1.5 right-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-black/55 text-white/90 backdrop-blur-xs">
+              <span className="glass absolute bottom-1.5 right-1.5 flex h-7 w-7 items-center justify-center rounded-full text-text-base">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
                 </svg>
@@ -596,13 +595,13 @@ export function Hero({ imageUrl, imageAlt, eyebrow, title, children, actions, ba
             </button>
           ) : (
             <div className={cn("flex h-full w-full items-center justify-center bg-linear-to-br to-surface-2", glow)}>
-              <span className="font-display text-3xl text-white/40 sm:text-5xl">{initials(title)}</span>
+              <span className="font-display text-3xl text-text-subtle sm:text-5xl">{initials(title)}</span>
             </div>
           )}
         </div>
         <div className="min-w-0 flex-1">
           {eyebrow && <p className="eyebrow mb-1.5 text-text-muted">{eyebrow}</p>}
-          <h1 className="line-clamp-3 font-display text-28 leading-[1.05] text-white break-words sm:text-6xl">{title}</h1>
+          <h1 className="line-clamp-3 font-display text-28 leading-[1.05] text-text-base break-words sm:text-6xl">{title}</h1>
           {children && <div className="mt-2 line-clamp-3 space-y-0.5 break-words text-15 text-text-muted sm:mt-3 sm:text-lg">{children}</div>}
         </div>
       </div>
