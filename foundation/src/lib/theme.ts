@@ -20,9 +20,10 @@
  * `-size` (an em multiple every text size follows: headings and body each ±);
  * and tune colour vibrancy and layer contrast with two sliders.
  *
- * Tokens are CSS variables holding "R G B" channels, so Tailwind classes keep
- * their opacity modifiers (`bg-accent/15`). The defaults live in
- * globals.css too, so the app looks right before any script runs; index.html
+ * Tokens are CSS variables holding "R G B" channels (--c-bg, --c-accent…).
+ * globals.css maps them once onto shadcn's variable names (--background,
+ * --primary…), which every class uses (`bg-primary/15`). The defaults live
+ * in tokens.css, so the app looks right before any script runs; index.html
  * applies the last-used theme from localStorage before first paint.
  *
  * Part of jimbo-ui (foundation — don't edit here; change jimbo-ui and update).
@@ -702,12 +703,6 @@ export function heroScore(theme: Theme): number {
     for (const p of backs) for (const [ink, t] of inks) worst = Math.min(worst, contrast(ink, p) / t);
   }
   return worst;
-}
-
-/** Floating controls (.glass: surface at 90%) over anything — a photo, a blur: the muted text's worst contrast on it. */
-export function glassScore(theme: Theme): number {
-  const c = deriveColors(theme);
-  return Math.min(...[WHITE, BLACK].map((p) => contrast(c["text-muted"]!, mix(p, c.surface!, 0.9))));
 }
 
 /** A Google Maps style rule (the shape of google.maps.MapTypeStyle, without needing its types). */
@@ -1948,14 +1943,14 @@ export function toneOf(theme: Theme): PageTone {
 }
 
 /** The readability targets every template meets (scripts/contrast.mjs): the names of any it misses. */
-export const TEMPLATE_TARGETS = { text: 7, muted: 5.5, subtle: 4.5, glass: 4.5, hero: 1, border: 1.75, card: 1.19, accent: 3.5, highlight: 3.5, support: 4.5, button: 4.5, apart: 15 } as const;
+export const TEMPLATE_TARGETS = { text: 7, muted: 5.5, subtle: 4.5, hero: 1, border: 1.75, card: 1.19, accent: 3.5, highlight: 3.5, support: 4.5, button: 4.5, apart: 15 } as const;
 export function templateScores(theme: Theme): Record<keyof typeof TEMPLATE_TARGETS, number> {
   const c = themeHex(theme);
   return {
     // Text on the weakest surface it sits on: fields, chips and secondary buttons (surface-2).
     text: contrast(c.text!, c["surface-2"]!), muted: contrast(c["text-muted"]!, c["surface-2"]!), subtle: contrast(c["text-subtle"]!, c["surface-2"]!),
-    // Muted text on floating glass over any photo; hero text over its scrim (share of HERO_TARGETS).
-    glass: glassScore(theme), hero: heroScore(theme),
+    // Hero text over its scrim (share of HERO_TARGETS). Floating controls are solid cards (S6), so the text targets cover them.
+    hero: heroScore(theme),
     border: contrast(c.border!, c.surface!), card: contrast(c.surface!, c.bg!),
     accent: contrast(c.accent!, c.bg!), highlight: contrast(c.highlight!, c.bg!), support: contrast(c.support!, c.surface!),
     button: contrast(c["on-accent"]!, c.accent!),

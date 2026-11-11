@@ -8,6 +8,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { hexToRgb, isHex, rgbToHex } from "@/lib/theme";
+import { cn } from "@/lib/cn";
+import { Input } from "@/components/ui/input";
 
 type HSV = { h: number; s: number; v: number };
 
@@ -89,7 +91,7 @@ export function ColorPicker({ value, onChange, swatches }: {
         style={{ background: `linear-gradient(to top, #000, transparent), linear-gradient(to right, #fff, ${pure})` }}
       >
         <span
-          className="pointer-events-none absolute h-7 w-7 -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px] border-white shadow-[0_0_0_1px_rgba(0,0,0,0.4),0_4px_12px_rgba(0,0,0,0.5)]"
+          className="pointer-events-none absolute h-7 w-7 -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px] border-background ring-1 ring-foreground"
           style={{ left: `${hsv.s * 100}%`, top: `${(1 - hsv.v) * 100}%`, background: value }}
         />
       </div>
@@ -106,7 +108,7 @@ export function ColorPicker({ value, onChange, swatches }: {
         style={{ background: "linear-gradient(to right, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00)" }}
       >
         <span
-          className="pointer-events-none absolute top-1/2 h-9 w-9 -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px] border-white shadow-[0_0_0_1px_rgba(0,0,0,0.4),0_4px_12px_rgba(0,0,0,0.5)]"
+          className="pointer-events-none absolute top-1/2 h-9 w-9 -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px] border-background ring-1 ring-foreground"
           style={{ left: `${(hsv.h / 360) * 100}%`, background: pure }}
         />
       </div>
@@ -115,16 +117,16 @@ export function ColorPicker({ value, onChange, swatches }: {
       <div className="grid grid-cols-8 gap-1.5 sm:gap-2">
         {swatches.map((c) => (
           <button key={c} type="button" onClick={() => { setText(c); onChange(c); }} aria-label={`Use ${c}`}
-            className={`aspect-square w-full max-w-10 justify-self-center rounded-full border-2 transition-transform active:scale-90 ${c.toUpperCase() === value.toUpperCase() ? "border-text-base" : "border-black/30"}`}
+            className={`aspect-square w-full max-w-10 justify-self-center rounded-full border-2 transition-transform active:scale-90 ${c.toUpperCase() === value.toUpperCase() ? "border-foreground" : "border-black/30"}`}
             style={{ background: c }} />
         ))}
       </div>
 
       {/* Hex */}
       <label className="flex items-center gap-3">
-        <span className="h-10 w-10 shrink-0 rounded-xl border border-border" style={{ background: value }} />
-        <span className="text-sm text-text-muted">Hex</span>
-        <input
+        <span className="h-10 w-10 shrink-0 rounded-full" style={{ background: value }} />
+        <span className="text-sm text-muted-foreground">Hex</span>
+        <Input
           value={text}
           onChange={(e) => {
             const raw = e.target.value.trim();
@@ -135,7 +137,7 @@ export function ColorPicker({ value, onChange, swatches }: {
           maxLength={7}
           spellCheck={false}
           aria-label="Hex colour"
-          className={`field ml-auto h-10 w-32 font-mono text-sm uppercase ${isHex(text.startsWith("#") ? text : `#${text}`) ? "" : "border-highlight"}`}
+          className={cn("ml-auto h-control-sm w-32 font-mono text-sm uppercase", isHex(text.startsWith("#") ? text : `#${text}`) ? "" : "border-highlight")}
         />
       </label>
     </div>

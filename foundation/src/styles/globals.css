@@ -2,73 +2,184 @@
 @import "tailwindcss";
 @import "./tokens.css";
 
+@import "tw-animate-css";
+
 /* ─────────────────────────────────────────────────────────────────────────
-   Tailwind theme (Tailwind 4: the config lives here, not in a JS file).
-   Every colour is a theme token: a CSS variable of "R G B" channels, set by
-   src/lib/theme.ts from the brand colours (defaults: tokens.css), so opacity
-   modifiers like bg-accent/15 keep working. `inline` puts each value into
-   the utility itself, so it follows the variables where it's used — a
-   ThemeScope's colours, a heading's --fs — not where it was defined.
+   The token mapping — the one place jimbo's theme meets shadcn/ui.
+   src/lib/theme.ts turns a theme (two to four source colours, fonts,
+   backdrop) into "R G B" channels (--c-bg, --c-accent…; defaults in
+   tokens.css). This block names them the way shadcn's components expect, so
+   every shadcn component picks up any jimbo theme with no colour code of its
+   own. It's set on :root and on every .theme-scope (ThemeScope), so a part of
+   the page in another theme repaints too. Don't add a second mapping, and
+   don't set these anywhere else.
+
+     jimbo           shadcn
+     bg              --background          (bg-deep: --background-deep)
+     text            --foreground, --card-foreground, --popover-foreground…
+     surface         --card, --popover, --sidebar
+     surface-2       --secondary, --muted, --accent (shadcn's hover surface)
+     text-muted      --muted-foreground   (text-subtle: --subtle-foreground)
+     accent          --primary (+ --primary-foreground, shades), --ring, --chart-1
+     highlight       --highlight (+ foreground, shades), --chart-2
+     support         --support (+ foreground, shades), --chart-3
+     border          --border, --input
+   Note the one trap: shadcn's --accent is the quiet hover surface, not the
+   brand colour. jimbo's accent colour is --primary (bg-primary).
    ───────────────────────────────────────────────────────────────────────── */
+@layer base {
+  :root, .theme-scope {
+    --background: rgb(var(--c-bg));
+    --background-deep: rgb(var(--c-bg-deep));
+    --foreground: rgb(var(--c-text));
+    --card: rgb(var(--c-surface));
+    --card-foreground: rgb(var(--c-text));
+    --popover: rgb(var(--c-surface));
+    --popover-foreground: rgb(var(--c-text));
+    --secondary: rgb(var(--c-surface-2));
+    --secondary-foreground: rgb(var(--c-text));
+    --muted: rgb(var(--c-surface-2));
+    --muted-foreground: rgb(var(--c-text-muted));
+    --subtle-foreground: rgb(var(--c-text-subtle));
+    --accent: rgb(var(--c-surface-2));
+    --accent-foreground: rgb(var(--c-text));
+    --destructive: #C62828;
+    --destructive-foreground: #FFFFFF;
+    --border: rgb(var(--c-border));
+    --input: rgb(var(--c-border));
+    --ring: rgb(var(--c-accent));
+    --primary: rgb(var(--c-accent));
+    --primary-foreground: rgb(var(--c-on-accent));
+    --primary-hover: rgb(var(--c-accent-hover));
+    --primary-lighter: rgb(var(--c-accent-lighter));
+    --primary-light: rgb(var(--c-accent-light));
+    --primary-dark: rgb(var(--c-accent-dark));
+    --primary-darker: rgb(var(--c-accent-darker));
+    --primary-950: rgb(var(--c-accent-950));
+    --primary-900: rgb(var(--c-accent-900));
+    --primary-800: rgb(var(--c-accent-800));
+    --primary-700: rgb(var(--c-accent-700));
+    --highlight: rgb(var(--c-highlight));
+    --highlight-foreground: rgb(var(--c-on-highlight));
+    --highlight-hover: rgb(var(--c-highlight-hover));
+    --highlight-lighter: rgb(var(--c-highlight-lighter));
+    --highlight-light: rgb(var(--c-highlight-light));
+    --highlight-dark: rgb(var(--c-highlight-dark));
+    --highlight-darker: rgb(var(--c-highlight-darker));
+    --highlight-950: rgb(var(--c-highlight-950));
+    --highlight-900: rgb(var(--c-highlight-900));
+    --highlight-800: rgb(var(--c-highlight-800));
+    --highlight-700: rgb(var(--c-highlight-700));
+    --support: rgb(var(--c-support));
+    --support-foreground: rgb(var(--c-on-support));
+    --support-hover: rgb(var(--c-support-hover));
+    --support-lighter: rgb(var(--c-support-lighter));
+    --support-light: rgb(var(--c-support-light));
+    --support-dark: rgb(var(--c-support-dark));
+    --support-darker: rgb(var(--c-support-darker));
+    --support-950: rgb(var(--c-support-950));
+    --support-900: rgb(var(--c-support-900));
+    --support-800: rgb(var(--c-support-800));
+    --support-700: rgb(var(--c-support-700));
+    --chart-1: rgb(var(--c-accent));
+    --chart-2: rgb(var(--c-highlight));
+    --chart-3: rgb(var(--c-support));
+    --chart-4: rgb(var(--c-accent-light));
+    --chart-5: rgb(var(--c-support-dark));
+    --sidebar: rgb(var(--c-surface));
+    --sidebar-foreground: rgb(var(--c-text));
+    --sidebar-primary: rgb(var(--c-accent));
+    --sidebar-primary-foreground: rgb(var(--c-on-accent));
+    --sidebar-accent: rgb(var(--c-surface-2));
+    --sidebar-accent-foreground: rgb(var(--c-text));
+    --sidebar-border: rgb(var(--c-border));
+    --sidebar-ring: rgb(var(--c-accent));
+    /* Softly rounded, not pills: shadcn's scale from one radius (10 px). */
+    --radius: 0.625rem;
+  }
+}
+
+/* Tailwind theme (Tailwind 4: the config lives here, not in a JS file).
+   `inline` puts each var() into the utility itself, so it follows the
+   variables where it's used (a ThemeScope's colours, a heading's --fs).
+   Opacity modifiers work on all of them (bg-primary/15). */
 @theme inline {
   /* One control height (h-control): buttons, fields, selects and switches
      side by side line up. 44 px on phones (the touch target), 40 px from
      sm. h-control-sm is the compact size for inside rows and cards. */
   --spacing-control: var(--control-h);
   --spacing-control-sm: var(--control-h-sm);
-  --color-bg: rgb(var(--c-bg));
-  --color-bg-deep: rgb(var(--c-bg-deep));
-  --color-surface: rgb(var(--c-surface));
-  --color-surface-2: rgb(var(--c-surface-2));
-  --color-border: rgb(var(--c-border));
-  --color-text-base: rgb(var(--c-text));
-  --color-text-muted: rgb(var(--c-text-muted));
-  --color-text-subtle: rgb(var(--c-text-subtle));
-
-  /* accent / highlight / support: the theme's brand colours, each with hover,
-     shades (lighter … darker), a lit two-stop fill (top → bottom, for
-     bg-linear-to-b) and washes mixed into the page (950 … 700):
-     bg-accent, text-highlight-light, from-support-top, bg-accent-950… */
-  --color-accent: rgb(var(--c-accent));
-  --color-accent-hover: rgb(var(--c-accent-hover));
-  --color-accent-lighter: rgb(var(--c-accent-lighter));
-  --color-accent-light: rgb(var(--c-accent-light));
-  --color-accent-dark: rgb(var(--c-accent-dark));
-  --color-accent-darker: rgb(var(--c-accent-darker));
-  --color-accent-top: rgb(var(--c-accent-top));
-  --color-accent-bottom: rgb(var(--c-accent-bottom));
-  --color-accent-950: rgb(var(--c-accent-950));
-  --color-accent-900: rgb(var(--c-accent-900));
-  --color-accent-800: rgb(var(--c-accent-800));
-  --color-accent-700: rgb(var(--c-accent-700));
-  --color-highlight: rgb(var(--c-highlight));
-  --color-highlight-hover: rgb(var(--c-highlight-hover));
-  --color-highlight-lighter: rgb(var(--c-highlight-lighter));
-  --color-highlight-light: rgb(var(--c-highlight-light));
-  --color-highlight-dark: rgb(var(--c-highlight-dark));
-  --color-highlight-darker: rgb(var(--c-highlight-darker));
-  --color-highlight-top: rgb(var(--c-highlight-top));
-  --color-highlight-bottom: rgb(var(--c-highlight-bottom));
-  --color-highlight-950: rgb(var(--c-highlight-950));
-  --color-highlight-900: rgb(var(--c-highlight-900));
-  --color-highlight-800: rgb(var(--c-highlight-800));
-  --color-highlight-700: rgb(var(--c-highlight-700));
-  --color-support: rgb(var(--c-support));
-  --color-support-hover: rgb(var(--c-support-hover));
-  --color-support-lighter: rgb(var(--c-support-lighter));
-  --color-support-light: rgb(var(--c-support-light));
-  --color-support-dark: rgb(var(--c-support-dark));
-  --color-support-darker: rgb(var(--c-support-darker));
-  --color-support-top: rgb(var(--c-support-top));
-  --color-support-bottom: rgb(var(--c-support-bottom));
-  --color-support-950: rgb(var(--c-support-950));
-  --color-support-900: rgb(var(--c-support-900));
-  --color-support-800: rgb(var(--c-support-800));
-  --color-support-700: rgb(var(--c-support-700));
-  /* Text on an accent / highlight / support fill: dark or light, whichever reads. */
-  --color-on-accent: rgb(var(--c-on-accent));
-  --color-on-highlight: rgb(var(--c-on-highlight));
-  --color-on-support: rgb(var(--c-on-support));
+  --color-background: var(--background);
+  --color-background-deep: var(--background-deep);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-subtle-foreground: var(--subtle-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-lighter: var(--primary-lighter);
+  --color-primary-light: var(--primary-light);
+  --color-primary-dark: var(--primary-dark);
+  --color-primary-darker: var(--primary-darker);
+  --color-primary-950: var(--primary-950);
+  --color-primary-900: var(--primary-900);
+  --color-primary-800: var(--primary-800);
+  --color-primary-700: var(--primary-700);
+  --color-highlight: var(--highlight);
+  --color-highlight-foreground: var(--highlight-foreground);
+  --color-highlight-hover: var(--highlight-hover);
+  --color-highlight-lighter: var(--highlight-lighter);
+  --color-highlight-light: var(--highlight-light);
+  --color-highlight-dark: var(--highlight-dark);
+  --color-highlight-darker: var(--highlight-darker);
+  --color-highlight-950: var(--highlight-950);
+  --color-highlight-900: var(--highlight-900);
+  --color-highlight-800: var(--highlight-800);
+  --color-highlight-700: var(--highlight-700);
+  --color-support: var(--support);
+  --color-support-foreground: var(--support-foreground);
+  --color-support-hover: var(--support-hover);
+  --color-support-lighter: var(--support-lighter);
+  --color-support-light: var(--support-light);
+  --color-support-dark: var(--support-dark);
+  --color-support-darker: var(--support-darker);
+  --color-support-950: var(--support-950);
+  --color-support-900: var(--support-900);
+  --color-support-800: var(--support-800);
+  --color-support-700: var(--support-700);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-control: var(--radius);
 
   /* Headings and body follow the theme's type styles (sans, mono or serif),
      set by src/lib/theme.ts as --font-display / --font-body (defaults below).
@@ -113,30 +224,15 @@
 }
 
 @theme {
-  /* Fixed: the error colour behind danger states. */
-  --color-danger: #FF5252;
   --font-script: 'Caveat Brush', cursive;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
-  /* Softly rounded, not pills: cards 14, fields 11, controls 10, chips 8.
-     Circles (avatars, dots, orbs) stay rounded-full — they're the motif. */
-  --radius-3xl: 18px;
-  --radius-2xl: 14px;
-  --radius-xl: 11px;
-  --radius-control: 10px;
-  --radius-lg: 8px;
-  --radius-md: 6px;
-  --radius-sm: 4px;
-  /* Toasts slide down into place in the top right (Toaster); the line
-     along a toast's bottom shrinks as its time runs out. */
-  --animate-toast-in: jimbo-toast-in 180ms ease-out;
-  --animate-toast-timer: jimbo-toast-timer 4s linear forwards;
 }
 
 @layer base {
   /* Tailwind 4 draws a bare `border` in currentColor; here it's the theme's
      line colour, so a border never shows up in the text colour. */
   *, ::after, ::before, ::backdrop, ::file-selector-button {
-    border-color: rgb(var(--c-border));
+    border-color: var(--border);
   }
   /* Buttons show a pointer, as they did before Tailwind 4. */
   button:not(:disabled), [role="button"]:not(:disabled) { cursor: pointer; }
@@ -280,7 +376,7 @@
      lockAppZoom sets data-installed). Elements that pinch in JS (maps,
      image viewers) set touch-action: none on themselves. */
   html[data-installed] { touch-action: pan-x pan-y; }
-  ::selection { background: rgb(var(--c-accent)); color: rgb(var(--c-on-accent)); }
+  ::selection { background: var(--primary); color: var(--primary-foreground); }
 }
 
 /* Headings: Archivo at a heavy weight with slightly tight tracking, on top of
@@ -302,14 +398,6 @@
      .eyebrow     label above a title   11px caps  subtle
    Numbers use tabular figures so columns of counts and dates line up.
    ───────────────────────────────────────────────────────────────────────── */
-/* Lightly frosted: mostly solid surface with a soft blur and a crisp edge —
-   depth without the see-through look. A utility (not a component class) so
-   other classes can @apply it and it takes variants (sm:glass). */
-@utility glass {
-  @apply border border-border bg-surface/90 backdrop-blur-md
-    shadow-[0_12px_30px_-18px_rgba(0,0,0,0.6)];
-}
-
 /* Hero scrims (C8): the page colour over a hero's picture (Hero, Banner) or
    its theme blur (HeroSection, PageHeader, HeroCarousel), at the strength
    theme.ts heroScrims works out for this theme — the least that keeps the
@@ -322,32 +410,21 @@
 }
 
 @layer components {
-  /* The one card surface every section, list and tile sits on. */
-  /* Nearly opaque (the page's orbs only just show through), and lit by the
-     brand colours: a breath of accent from the top left
-     and of support from the bottom right, so no card is a flat slab of one hue. */
-  .card {
-    @apply rounded-2xl border border-border
-      shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06),0_12px_32px_-16px_rgba(0,0,0,0.7)];
-    background-image:
-      radial-gradient(circle at 0% 0%, rgb(var(--c-accent) / 0.09), transparent 55%),
-      radial-gradient(circle at 100% 100%, rgb(var(--c-support) / 0.09), transparent 55%),
-      linear-gradient(rgb(var(--c-surface) / 0.97), rgb(var(--c-bg-deep) / 0.97));
-  }
-  /* A card in glass: same shape as .card, frosted instead of solid. */
-  .card-glass {
-    @apply glass rounded-2xl;
-  }
+  /* Cards, fields, buttons, badges and tags are shadcn components now
+     (components/ui: Card, Input, Button, Badge) — the old .card, .glass,
+     .field, .btn-*, .chip and .lit-* classes are gone (S6, S8). What's left
+     here is type, the motif and a few layout helpers. */
+
   /* Dots: a brand colour as a flat circle — one solid fill, no gradient,
      outline, ring or shadow. The circle motif; size them with utilities
-     (guide: Circles). The old .orb-* names are the same thing. */
-  .dot-accent, .orb-accent       { @apply rounded-full bg-accent; }
-  .dot-highlight, .orb-highlight { @apply rounded-full bg-highlight; }
-  .dot-support, .orb-support     { @apply rounded-full bg-support; }
+     (guide: Circles). */
+  .dot-primary   { @apply rounded-full bg-primary; }
+  .dot-highlight { @apply rounded-full bg-highlight; }
+  .dot-support   { @apply rounded-full bg-support; }
   /* The motif (ThemeDots): a brand colour in the theme's motif shape —
      circles by default, or a flat shape from theme.ts MOTIFS drawn as a
      mask (--motif-mask). Brand moments only; status and avatars keep .dot-*. */
-  .motif-accent, .motif-highlight, .motif-support {
+  .motif-primary, .motif-highlight, .motif-support {
     display: inline-block;
     border-radius: var(--motif-radius, 9999px);
     -webkit-mask-image: var(--motif-mask, none);
@@ -359,80 +436,32 @@
     -webkit-mask-repeat: no-repeat;
     mask-repeat: no-repeat;
   }
-  .motif-accent    { @apply bg-accent; }
+  .motif-primary   { @apply bg-primary; }
   .motif-highlight { @apply bg-highlight; }
   .motif-support   { @apply bg-support; }
   .eyebrow {
-    @apply text-11 font-semibold uppercase tracking-[0.12em] text-text-subtle;
+    @apply text-11 font-semibold uppercase tracking-[0.12em] text-subtle-foreground;
   }
   .h-page {
-    @apply font-display text-30 leading-[1.05] text-text-base sm:text-4xl;
+    @apply font-display text-30 leading-[1.05] text-foreground sm:text-4xl;
   }
   .h-section {
-    @apply font-display text-xl leading-tight text-text-base sm:text-22;
+    @apply font-display text-xl leading-tight text-foreground sm:text-22;
   }
   .meta {
-    @apply text-sm text-text-muted;
+    @apply text-sm text-muted-foreground;
   }
-  /* Form label above a field. */
-  .label {
-    @apply mb-1.5 block text-sm font-semibold text-text-muted;
-  }
-  /* Text input / select / textarea surface. */
-  .field {
-    @apply rounded-xl border border-border bg-surface-2 px-4 text-15 text-text-base placeholder:text-text-subtle
-      transition-colors focus:border-accent focus:outline-hidden focus:ring-2 focus:ring-accent/20
-      disabled:opacity-50;
-  }
-  /* Buttons: pill-shaped, one height per size, three tones. */
-  .btn {
-    @apply inline-flex h-control shrink-0 select-none items-center justify-center gap-2 whitespace-nowrap rounded-control px-5
-      text-15 font-semibold transition-colors
-      focus:outline-hidden focus-visible:ring-2 focus-visible:ring-accent/50
-      disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm;
-  }
-  .btn-sm {
-    @apply h-control-sm px-3.5 text-sm;
-  }
-  /* Flat accent fill with a slight outline in the accent's darker shade. */
-  .btn-primary {
-    @apply bg-accent text-on-accent hover:bg-accent-hover;
-  }
-  .btn-secondary {
-    @apply border border-border bg-surface-2 text-text-base hover:border-text-subtle;
-  }
-  .btn-ghost {
-    @apply text-text-muted hover:bg-surface-2 hover:text-text-base;
-  }
-  .btn-danger {
-    @apply text-text-muted hover:bg-red-950/40 hover:text-highlight;
-  }
-  /* Small rounded tag: names, filters, counts. */
-  .chip {
-    @apply inline-flex items-center gap-1.5 rounded-lg border border-border bg-surface-2 px-3 py-1.5 text-sm font-medium
-      text-text-muted;
-  }
-  /* Etched dividers between stacked items (rows in a list): a full-strength
-     border with a faint light line under it, so each row reads as its own
-     strip in dark and light themes alike. Use on the parent, like divide-y;
-     it also reaches one level down into groups — a wrapper that starts with
-     a ListGroupLabel (a month's label and its rows) — but not into an
-     ordinary row, so a <div> row's own children get no lines. */
+  /* Hairline dividers between stacked items (rows in a list), on the parent
+     like divide-y. It also reaches one level down into groups — a wrapper
+     that starts with a ListGroupLabel (a month's label and its rows) — but
+     not into an ordinary row, so a <div> row's own children get no lines. */
   .divide-etched > :not(:first-child),
   .divide-etched > :has(> .list-group-label:first-child) > :not(:first-child) {
-    border-top: 1px solid rgb(var(--c-border));
-    box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.05);
+    border-top: 1px solid var(--border);
   }
-  /* A solid brand fill for small shapes (active tabs and pills, count badges,
-     date bands): one flat colour, no outline, and its on- colour for text.
-     Pair with border-transparent where the shape has a border. (Named "lit"
-     before they went flat; kept.) */
-  .lit-accent    { @apply bg-accent text-on-accent; }
-  .lit-highlight { @apply bg-highlight text-on-highlight; }
-  .lit-support   { @apply bg-support text-on-support; }
   /* Inline text action ("Edit", "Remove", "+ Add"). */
   .link-action {
-    @apply text-sm font-semibold text-text-muted transition-colors hover:text-accent;
+    @apply text-sm font-semibold text-muted-foreground transition-colors hover:text-primary;
   }
 }
 
@@ -447,19 +476,19 @@
    ones off in Chrome, so only browsers without them get them). */
 @layer base {
   body *::-webkit-scrollbar { width: 10px; height: 10px; }
-  body *::-webkit-scrollbar-track { background: rgb(var(--c-surface-2)); border-radius: 9999px; }
+  body *::-webkit-scrollbar-track { background: var(--muted); border-radius: 9999px; }
   body *::-webkit-scrollbar-thumb {
-    background: rgb(var(--c-text-subtle));
+    background: var(--subtle-foreground);
     border: 2px solid transparent;
     background-clip: padding-box;
     border-radius: 9999px;
     min-height: 32px;
   }
-  body *::-webkit-scrollbar-thumb:hover { background-color: rgb(var(--c-text-muted)); }
-  body *::-webkit-scrollbar-thumb:active { background-color: rgb(var(--c-accent)); }
+  body *::-webkit-scrollbar-thumb:hover { background-color: var(--muted-foreground); }
+  body *::-webkit-scrollbar-thumb:active { background-color: var(--primary); }
   body *::-webkit-scrollbar-corner { background: transparent; }
   @supports not selector(::-webkit-scrollbar) {
-    body * { scrollbar-color: rgb(var(--c-text-subtle)) rgb(var(--c-surface-2)); scrollbar-width: thin; }
+    body * { scrollbar-color: var(--subtle-foreground) var(--muted); scrollbar-width: thin; }
   }
 }
 
@@ -474,7 +503,7 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem;
-  & > .btn, & > .field, & > [role="tablist"], & > label > .field, & > label > select, & > a.btn {
+  & > [data-slot="button"], & > [data-slot="input"], & > [data-slot="select-trigger"], & > [role="tablist"], & > [data-slot="toggle-group"] > *, & > label > [data-slot="input"] {
     height: var(--control-h);
   }
   /* A bare wrapper (a component returning <span>…</span>) doesn't break the row:
@@ -482,10 +511,10 @@
   & > span:not([class]), & > div:not([class]) {
     display: contents;
   }
-  & > :is(span, div):not([class]) > :is(.btn, .field, [role="tablist"]) {
+  & > :is(span, div):not([class]) > :is([data-slot="button"], [data-slot="input"], [data-slot="select-trigger"], [role="tablist"]) {
     height: var(--control-h);
   }
-  & > .btn:not(:has(> svg:only-child)), & > :is(span, div):not([class]) > .btn:not(:has(> svg:only-child)) {
+  & > [data-slot="button"]:not([data-size^="icon"]), & > :is(span, div):not([class]) > [data-slot="button"]:not([data-size^="icon"]) {
     padding-inline: 1.25rem;
     font-size: 0.9375rem;
   }
@@ -496,7 +525,7 @@
   display: grid;
   gap: 0.75rem;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
-  & > .btn, & > .field, & > [role="tablist"], & > label > .field, & > label > select {
+  & > [data-slot="button"], & > [data-slot="input"], & > [data-slot="select-trigger"], & > [role="tablist"], & > label > [data-slot="input"] {
     height: var(--control-h);
     width: 100%;
   }
@@ -542,16 +571,6 @@
   to   { transform: scale(1.18) rotate(2.5deg); }
 }
 
-/* A toast dropping into place in the top right (Toaster). */
-@keyframes jimbo-toast-in {
-  from { opacity: 0; transform: translateY(-12px) scale(0.98); }
-  to   { opacity: 1; transform: none; }
-}
-/* A toast's time left, shrinking to nothing (its duration is set inline). */
-@keyframes jimbo-toast-timer {
-  from { transform: scaleX(1); }
-  to   { transform: scaleX(0); }
-}
 /* An indeterminate ProgressBar: a third of the track sweeping across. */
 @keyframes jimbo-sweep {
   from { left: -33%; }
