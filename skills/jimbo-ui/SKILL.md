@@ -110,6 +110,9 @@ The short form of the rulebook; the numbered rules are in
 - Tile grids follow the app-wide desktop column count (config → Brand →
   Desktop grids); a grid whose content wants another count gets a
   `ColumnsPicker` in its section's action slot (L13).
+- Openers and bands keep their content in the page column, packed to the
+  start or spread to both edges — never centred over wider sections (L14).
+  A card of rows has no padding above its first row (S9).
 - Full-width openers (banners, heroes, photo or gradient headers) **fade
   into the page**: mask their background layer out with `.fade-out`
   (`.fade-both` when something sits above) — never a hard bottom edge, a

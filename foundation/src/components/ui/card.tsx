@@ -5,14 +5,17 @@ import { cn } from "@/lib/cn"
 import { Slot } from "radix-ui"
 
 // jimbo.ui: flat (no shadow, S8), phone-first padding, and `asChild` so a
-// whole card can be a link (LinkCard, MediaCard).
+// whole card can be a link (LinkCard, MediaCard). The padding is one class,
+// `py-(--card-py)`, with the size per breakpoint in the variable, so a
+// `py-0` replaces it at every width: a card of rows has no padding above
+// its first row or below its last (S9).
 function Card({ className, asChild = false, ...props }: React.ComponentProps<"div"> & { asChild?: boolean }) {
   const Comp = asChild ? Slot.Root : "div"
   return (
     <Comp
       data-slot="card"
       className={cn(
-        "flex flex-col gap-4 rounded-xl border bg-card py-4 text-card-foreground sm:py-5",
+        "flex flex-col gap-4 rounded-xl border bg-card py-(--card-py) text-card-foreground [--card-py:--spacing(4)] sm:[--card-py:--spacing(5)]",
         className
       )}
       {...props}

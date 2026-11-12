@@ -48,6 +48,7 @@ How to use it:
 - **S6** Anything straight on the backdrop (floating controls, unselected tabs, the pager, the dock, the top bar) is a solid `bg-card` with a hairline `border` — never a bare outline, see-through or frosted. *§7*
 - **S7** A selected thing is a solid fill with `border-transparent` (plus a tick or `aria-pressed`), not an outline or a ring. *§7*
 - **S8** **Surfaces are flat.** One solid fill (`bg-background`, `bg-card`, `bg-muted`), a 1 px `border`, no shadow: no `shadow-*`, gradients, inner highlights, glows or `backdrop-blur-*` on any component. Depth comes from the surface steps and the backdrop. Overlays (menus, popovers, tooltips, toasts, sheets) are the one exception: a single `shadow-md`. *§7*
+- **S9** **A card of rows has no padding of its own.** A card that holds rows — a `List`, `Accordion`, `DataTable`, a flush `Section`, a file list — starts its first row at its top edge and ends its last at its bottom edge, at every width: `py-0` on the `Card` (one class replaces the card's padding at every breakpoint). Each row brings its own padding. *§7*
 
 ## K · Controls
 
@@ -76,6 +77,7 @@ How to use it:
 - **L8** Rows are at least 76 px tall, divided by an etched line (`.divide-etched`). *§6*
 - **L9** Font sizes come from the type scale; no `text-[10px]`-style sizes. *§5*
 - **L13** **Desktop columns depend on the content.** Tile grids (`MediaGrid`, `List layout="tiles"`) take their desktop column count (from `lg`) from the app-wide setting (jimbo-ui config → Brand → Desktop grids, `Theme.gridColumns`, 3–8), else their own default. A grid whose content wants a different count (covers want more, text cards fewer) offers `ColumnsPicker` in its `Section`'s action slot, kept in the URL by `useGridColumns`. Phones and tablets keep the grid's own counts. *§6*
+- **L14** **Content lines up with the page column.** A hero's, banner's or full-width band's content takes the page's own width (column, wide or full: `--page-max`) and starts where the sections below start. A row in it is packed to the start (`justify-start`) or spread to both edges (`justify-between`), never floating in the middle over wider content (`justify-around`, `justify-evenly`, or a narrower `mx-auto` box). `HeroSection align="center"` is the one centred opener. *§6*
 
 ## N · Navigation and the URL
 

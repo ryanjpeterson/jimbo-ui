@@ -35,7 +35,13 @@ the matching 0.x release.
 ## Unreleased
 
 ### Added
+- **S9** — a card of rows (`List`, `Accordion`, `DataTable`, a flush `Section`) has no padding of its own: the first row starts at the card's top edge.
+- **L14** — a hero's or band's content lines up with the page column (column, wide or full) and packs to the start or spreads to both edges, never centred over wider sections.
 - `ConditionGroup` (`forms.tsx`): a rule's conditions as rows of chips — "All of" (each narrows, accent dot), "Any of" (an or group, support dot), "Except" (left out, highlight dot). A chip's text edits it, its × removes it; empty rows aren't drawn. Data-agnostic, built from `Badge` and `Button`. In the Style guide under Forms.
+
+### Fixed
+- `Card` padded `py-4 sm:py-5`, so a `py-0` (Accordion, DataTable, List, a flush Section, FileDrop's files) only cleared it on phones: from `sm` those cards had 20 px above the first row and below the last. The padding is now one class (`py-(--card-py)`), which `py-0` replaces at every width (S9).
+- `Banner` (and `Hero`) kept its content in a centred 64rem box whatever the page width, so on a wide or full page the picture and title floated in the middle above wider sections. It takes the page column's width (`--page-max`), as `FullBleed` and `PageHeader` do (L14).
 
 **Update:** feature. **Apps must:** Nothing.
 

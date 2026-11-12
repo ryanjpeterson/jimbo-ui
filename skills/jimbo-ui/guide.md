@@ -973,6 +973,16 @@ and body fonts.
   `<ColumnsPicker value={cols} onChange={setCols} />` in its `Section`'s
   action slot (it shows from `lg` only; the choice is in the URL as
   `?covers-cols=6`). Phones and tablets keep the grid's own counts.
+- **Content lines up with the page column (L14).** Full-width openers and
+  bands (`Hero`, `Banner`, `PageHeader`, `HeroSection`, `FullBleed`) run
+  their background edge to edge, but their content sits in the page's own
+  column (`--page-max`: 64rem, 80rem or none for `AppShell width` column,
+  wide or full), so the back button, picture and title start exactly where
+  the sections below do. Rows inside pack to the start or spread to both
+  edges (`justify-between`: a back button left, a badge right) — never
+  `justify-around` / `justify-evenly`, and never a narrower centred box
+  over wider sections, which leaves the hero floating in the middle of a
+  wide page. `HeroSection align="center"` is the one centred opener.
   Picking a look keeps the setting: it isn't part of a look.
   Sections side by side go in `Columns` (`count` 2 or 3, from `lg:` or
   `sm:`), never a bare `grid lg:grid-cols-2`: each `Section`'s card stretches
@@ -1070,7 +1080,8 @@ and body fonts.
 | --- | --- |
 | Surfaces (S8) | **Flat.** One solid fill — `bg-background` (page), `bg-card` (cards, sheets, menus, the dock, the top bar, floating controls), `bg-muted` (fields, tags, tracks) — and a 1 px `border-border` hairline. No shadows, gradients, inner highlights, glows or blur on any component, and nothing see-through (`bg-card/90`). Depth comes from the surface steps (card on page ≥ 1.19:1) and the backdrop |
 | Overlays | Menus, popovers, tooltips, toasts and sheets are the one exception: a single `shadow-md` to lift them off what's under them. The dimmer under a dialog or sheet is `bg-background/80` |
-| `Card` (`components/ui/card`) | `rounded-xl` (14 px), `border`, `bg-card`, padding 16 px (20 from `sm`). `asChild` makes a whole card a link (`LinkCard`, `MediaCard`) |
+| `Card` (`components/ui/card`) | `rounded-xl` (14 px), `border`, `bg-card`, padding 16 px (20 from `sm`), as one class (`py-(--card-py)`) so `py-0` clears it at every width. `asChild` makes a whole card a link (`LinkCard`, `MediaCard`) |
+| A card of rows (S9) | **No padding of its own.** A card holding rows (`List`, `Accordion`, `DataTable`, a flush `Section`, `FileDrop`'s files) is `py-0`: the first row starts at the card's top edge, the last ends at its bottom, and each row brings its own padding. Never a gap above the first row |
 | Floating on the backdrop (S6) | Unselected tabs, the pager, back buttons, the dock and top bar: solid `bg-card` with a hairline border — never a bare outline, see-through or frosted |
 | `.dot-primary/highlight/support` | A brand colour as a **flat circle**: one solid fill, nothing else (see Circles in section 2). Size it with utilities |
 | `.motif-primary/highlight/support` | A brand colour in the theme's motif shape (circle unless `Theme.motif` says otherwise), for `ThemeDots` only |
@@ -1844,3 +1855,7 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   one grid. The config section fills the page column, like the header.
 - **Unreleased** — `ConditionGroup` (`forms.tsx`): a rule's conditions as
   rows of chips, All of / Any of / Except, each chip editable and removable.
+- **Unreleased (2)** — S9: a card of rows has no padding of its own (`Card`
+  pads with one class, so `py-0` clears it at every width; from `sm` it
+  didn't). L14: content lines up with the page column (`Banner` and `Hero`
+  use `--page-max`, not a fixed 64rem, and pack to the start).

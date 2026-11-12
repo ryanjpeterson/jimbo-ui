@@ -36,7 +36,7 @@ Theme engine, kit and shell, rules, registry, tooling and the plugin. 27 feature
 
 | Feature | What it does | Where | Status |
 |-|-|-|-|
-| Rulebook | 69 numbered rules (Brand, Colour, Shapes, Controls, Layout, Navigation, Motion, Parts, Binding, Accessibility) | `skills/jimbo-ui/rulebook.md` | changed (Unreleased: J binding group, S8, C8) |
+| Rulebook | 71 numbered rules (Brand, Colour, Shapes, Controls, Layout, Navigation, Motion, Parts, Binding, Accessibility) | `skills/jimbo-ui/rulebook.md` | changed (Unreleased: S9 cards of rows, L14 page column) |
 | PR route | Apps amend jimbo.ui only by PR; tracked pending versions | guide section 14, SKILL.md "Amend jimbo.ui" | new (0.18.0) |
 | Guide | Each rule explained, values and patterns | `skills/jimbo-ui/guide.md` | stable |
 

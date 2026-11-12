@@ -523,7 +523,8 @@ export function Banner({ backdrop, glow = "accent", back, badge, children, pullU
         <div className={cn("absolute inset-0", backdrop ? "hero-scrim-image" : "hero-scrim-blur")} />
       </div>
 
-      <div className="mx-auto max-w-5xl px-4 sm:px-6">
+      {/* The page column's width (column, wide or full), so the content starts where the sections below do (L14). */}
+      <div className="mx-auto max-w-[var(--page-max,64rem)] px-4 sm:px-6">
         {(back || badge) && (
           <div className="flex min-h-[56px] items-center justify-between gap-3 pt-3 sm:pt-4">
             {back ? <BackButton to={back.to} label={back.label} overlay /> : <span />}
