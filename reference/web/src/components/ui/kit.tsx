@@ -290,14 +290,14 @@ export interface HeroSlide {
  * same cell, so the hero is always as tall as its fullest slide and nothing
  * under it moves when it changes. Slides are facts, never buttons (L11). The
  * prev / next arrows, the pause button and "3 / 29" sit at the hero's top
- * left; it moves on by itself every `interval` (10 s), the time left drawn as
- * a thin bar the screen's full width along the hero's bottom edge, and stops
+ * left (or right, `controlsAt`); it moves on by itself every `interval` (10 s), the time left drawn as
+ * a thin bar the screen's full width along the hero's bottom edge (or its top, `timerAt`), and stops
  * while it's hovered or has focus, or for good with the pause button
  * (rulebook M2's one exception). Reduced
  * motion: slides swap without the fade. `index` / `onIndex` to control it
  * (a URL parameter); without them it keeps its own.
  */
-export function HeroCarousel({ slides, index, onIndex, interval = 10_000, label = "Highlights", pattern = "ripples", tone, size = "md", align = "left", pullUp = true }: {
+export function HeroCarousel({ slides, index, onIndex, interval = 10_000, label = "Highlights", pattern = "ripples", tone, size = "md", align = "left", pullUp = true, timerAt = "bottom", controlsAt = "left" }: {
   slides: HeroSlide[];
   index?: number;
   onIndex?: (i: number) => void;
@@ -310,6 +310,10 @@ export function HeroCarousel({ slides, index, onIndex, interval = 10_000, label 
   size?: "md" | "lg";
   align?: "left" | "center";
   pullUp?: boolean;
+  /** Where the timer bar runs: along the hero's bottom edge (the default) or its top, right under the top bar. */
+  timerAt?: "top" | "bottom";
+  /** Which side the arrows, pause and "3 / 29" sit on (ignored with align="center"). */
+  controlsAt?: "left" | "right";
 }) {
   const [own, setOwn] = useState(0);
   const n = slides.length;
@@ -342,9 +346,9 @@ export function HeroCarousel({ slides, index, onIndex, interval = 10_000, label 
 
   if (!n) return null;
   const arrow = "border border-border bg-card relative inline-flex h-control w-control items-center justify-center overflow-hidden rounded-control text-foreground transition-colors hover:border-primary active:scale-95";
-  // The timer: the screen's full width, along the hero's bottom edge. Only the fill shows, no track (L7).
+  // The timer: the screen's full width, along the hero's bottom (or top) edge. Only the fill shows, no track (L7).
   const timer = n > 1 && interval > 0 && (
-    <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-[3px]">
+    <span aria-hidden="true" className={cn("pointer-events-none absolute inset-x-0 h-[3px]", timerAt === "top" ? "top-0" : "bottom-0")}>
       <span ref={bar} className={cn("block h-full origin-left bg-primary", stopped && "opacity-50")} style={{ transform: "scaleX(0)" }} />
     </span>
   );
@@ -355,9 +359,10 @@ export function HeroCarousel({ slides, index, onIndex, interval = 10_000, label 
       onPointerLeave={() => setHeld((h) => ({ ...h, hover: false }))}
       onFocus={() => setHeld((h) => ({ ...h, focus: true }))}
       onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setHeld((h) => ({ ...h, focus: false })); }}>
-      {/* The controls, top left (centred with align="center"). */}
+      {/* The controls, top left or right (centred with align="center"); the count sits on the outer side. */}
       {n > 1 && (
-        <div className={cn("flex items-center gap-2", align === "center" && "justify-center")}>
+        <div className={cn("flex items-center gap-2", align === "center" ? "justify-center" : controlsAt === "right" && "justify-end")}>
+          {controlsAt === "right" && align !== "center" && <p className="mr-2 text-sm tabular-nums text-muted-foreground">{i + 1} / {n}</p>}
           <button type="button" className={arrow} onClick={() => go(i - 1)} aria-label="Previous"><Chevron dir="left" /></button>
           <button type="button" className={arrow} onClick={() => go(i + 1)} aria-label="Next"><Chevron /></button>
           {interval > 0 && (
@@ -368,7 +373,7 @@ export function HeroCarousel({ slides, index, onIndex, interval = 10_000, label 
               </svg>
             </button>
           )}
-          <p className="ml-2 text-sm tabular-nums text-muted-foreground">{i + 1} / {n}</p>
+          {(controlsAt === "left" || align === "center") && <p className="ml-2 text-sm tabular-nums text-muted-foreground">{i + 1} / {n}</p>}
         </div>
       )}
       {/* Every slide in one cell: the tallest decides the height. Only the current one shows or takes focus. */}
@@ -395,10 +400,11 @@ export function HeroCarousel({ slides, index, onIndex, interval = 10_000, label 
  * the theme's colours, a big title, the eyebrow, a count and the page's
  * controls — pulled up under the top bar. `pattern` picks the blur's layout
  * and `tone` the colour that leads it: give each kind of page its own pair,
- * so pages of different data look different (L12). `plain` is the old in-column header, for demos and headers inside a
- * card; never at the top of a page.
+ * so pages of different data look different (L12). `lede` is a line or two under the title saying what
+ * the page is for, and `updated` a freshness line ("Updated 12 min ago") for data worked out ahead of
+ * time. `plain` is the old in-column header, for demos and headers inside a card; never at the top of a page.
  */
-export function PageHeader({ eyebrow, title, count, actions, back, pattern = "ripples", tone, pullUp = true, plain = false, className }: {
+export function PageHeader({ eyebrow, title, count, actions, back, lede, updated, pattern = "ripples", tone, pullUp = true, plain = false, className }: {
   eyebrow?: ReactNode;
   title: ReactNode;
   count?: number;
@@ -406,6 +412,10 @@ export function PageHeader({ eyebrow, title, count, actions, back, pattern = "ri
   actions?: ReactNode;
   /** The page this one sits under (its path minus the last part). Every page below a dock tab's own page has one. */
   back?: { to: string; label: string };
+  /** What the page is for, in a sentence or two: a reading-width line under the title. */
+  lede?: ReactNode;
+  /** When the data shown was last worked out (a Date, or ms since the epoch), with an optional note after it. */
+  updated?: { at: Date | number; note?: ReactNode };
   /** The backdrop the hero's blur is made from. */
   pattern?: BackdropPattern;
   /** The brand colour that leads the blur. `pattern` and `tone` together tell kinds of page apart (L12). */
@@ -433,6 +443,8 @@ export function PageHeader({ eyebrow, title, count, actions, back, pattern = "ri
         {back && <div className="mb-2"><BackButton to={back.to} label={back.label} /></div>}
         {eyebrow && <p className="eyebrow mb-1 text-support">{eyebrow}</p>}
         {heading(false)}
+        {lede && <Lede className="mt-2">{lede}</Lede>}
+        {updated && <UpdatedLine at={updated.at} note={updated.note} className="mt-1" />}
       </header>
     );
   }
@@ -441,7 +453,41 @@ export function PageHeader({ eyebrow, title, count, actions, back, pattern = "ri
       {back && <div className="mb-auto"><BackButton to={back.to} label={back.label} /></div>}
       {eyebrow && <p className="eyebrow text-support">{eyebrow}</p>}
       {heading(true)}
+      {lede && <Lede>{lede}</Lede>}
+      {updated && <UpdatedLine at={updated.at} note={updated.note} />}
     </HeroFrame>
+  );
+}
+
+/**
+ * What a page or part is for, in a sentence or two: one reading width, muted.
+ * `PageHeader lede` and `Part lede` use it; on its own it goes straight
+ * under a header that has none. `className` is layout only (J3).
+ */
+export function Lede({ children, className }: { children: ReactNode; className?: string }) {
+  return <p className={cn("max-w-3xl px-0.5 text-15 leading-relaxed text-muted-foreground", className)}>{children}</p>;
+}
+
+/** "just now", "12 min ago", "3 h ago", "2 days ago", then the date. */
+export function timeAgo(at: Date | number, now = Date.now()): string {
+  const d = typeof at === "number" ? new Date(at) : at;
+  const min = Math.max(0, Math.round((now - d.getTime()) / 60_000));
+  if (min < 1) return "just now";
+  if (min < 60) return `${min} min ago`;
+  const h = Math.round(min / 60);
+  if (h < 24) return `${h} h ago`;
+  const days = Math.round(h / 24);
+  if (days < 30) return `${days} day${days === 1 ? "" : "s"} ago`;
+  return d.toLocaleDateString([], { day: "numeric", month: "short", year: "numeric" });
+}
+
+/** A freshness line for data worked out ahead of time: "Updated 12 min ago · note", the exact time on hover. */
+export function UpdatedLine({ at, note, className }: { at: Date | number; note?: ReactNode; className?: string }) {
+  const d = typeof at === "number" ? new Date(at) : at;
+  return (
+    <p className={cn("meta", className)} title={d.toLocaleString()}>
+      Updated {timeAgo(d)}{note && <> · {note}</>}
+    </p>
   );
 }
 
@@ -656,6 +702,47 @@ export function Section({ title, count, action, children, flush = false, plain =
         </div>
       )}
       {plain ? children : <Card className={cn("flex-1 gap-0 py-0", flush ? "overflow-hidden" : "p-4 sm:p-5")}>{children}</Card>}
+    </section>
+  );
+}
+
+/**
+ * A part of a long page, bigger than a `Section`: a rule above (none on the
+ * page's first), an eyebrow with an 8 px dot in its tone, a big heading, at
+ * most one action on the right, an optional `lede`, then the sections in
+ * it. For pages that read as a few parts with sections inside them, rather
+ * than one long run of sections.
+ */
+export function Part({ id, eyebrow, title, lede, tone = "support", action, first = false, children }: {
+  /** For aria-labelledby; one is made up when left out. */
+  id?: string;
+  eyebrow: ReactNode;
+  title: ReactNode;
+  lede?: ReactNode;
+  tone?: "accent" | "highlight" | "support";
+  /** One action at most (a Button, a `Menu`). */
+  action?: ReactNode;
+  /** The page's first part: no rule above it. */
+  first?: boolean;
+  children: ReactNode;
+}) {
+  const auto = useId();
+  const hid = id ?? `part-${auto}`;
+  const text = { accent: "text-primary", highlight: "text-highlight", support: "text-support" }[tone];
+  return (
+    <section aria-labelledby={hid} className={cn("min-w-0 space-y-6", !first && "border-t border-border pt-6")}>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div className="min-w-0">
+          <p className={cn("eyebrow flex min-w-0 items-center gap-2", text)}>
+            <span aria-hidden="true" className={cn(DOT[tone], "h-2 w-2 shrink-0")} />
+            <span className="min-w-0 truncate">{eyebrow}</span>
+          </p>
+          <h2 id={hid} className="line-clamp-2 break-words font-display text-3xl leading-tight text-foreground sm:text-4xl">{title}</h2>
+        </div>
+        {action && <div className="controls ml-auto max-w-full shrink-0 justify-end">{action}</div>}
+      </div>
+      {lede && <Lede className="-mt-3">{lede}</Lede>}
+      {children}
     </section>
   );
 }
@@ -1147,17 +1234,20 @@ export function LinkCard({ to, eyebrow, title, sub, accent = false, size = "md" 
 // Numbers
 // ─────────────────────────────────────────────────────────────────────────────
 
-export function StatTile({ label, value, sub, accent = "muted", trend }: {
+export function StatTile({ label, value, sub, accent = "muted", trend, to }: {
   label: string;
   value: string | number;
   sub?: ReactNode;
   accent?: "accent" | "highlight" | "support" | "muted";
   /** Recent values, oldest first: a sparkline under the number, its latest point in the tile's colour. */
   trend?: number[];
+  /** Where the stat goes: the whole tile is the one link, no arrow text (N4). */
+  to?: string;
 }) {
   const col = { accent: "text-primary", highlight: "text-highlight", support: "text-support", muted: "text-foreground" }[accent];
-  return (
-    <Card className="relative block gap-0 overflow-hidden p-4 sm:p-5">
+  const cls = "relative block gap-0 overflow-hidden p-4 sm:p-5";
+  const body = (
+    <>
       <p className="eyebrow mb-1 flex min-w-0 items-center gap-1.5">
         {accent !== "muted" && <span aria-hidden="true" className={cn(DOT[accent], "h-2 w-2 shrink-0")} />}
         <span className="min-w-0 truncate">{label}</span>
@@ -1167,8 +1257,11 @@ export function StatTile({ label, value, sub, accent = "muted", trend }: {
       </p>
       {trend && trend.length > 1 && <Sparkline values={trend} tone={accent === "muted" ? "accent" : accent} className="mt-3" />}
       {sub && <p className="mt-1.5 line-clamp-2 text-sm text-subtle-foreground">{sub}</p>}
-    </Card>
+    </>
   );
+  return to
+    ? <Card asChild className={cn(cls, "h-full transition-[border-color,transform] hover:border-primary/60 active:scale-[0.98]")}><Link to={to}>{body}</Link></Card>
+    : <Card className={cls}>{body}</Card>;
 }
 
 export function StatGrid({ children }: { children: ReactNode }) {
@@ -1516,6 +1609,8 @@ export interface TimelineItem {
   tone?: TimelineTone;
   /** At the end of the `when` line, e.g. a "Now" or "New" `Badge`. */
   badge?: ReactNode;
+  /** One small button under the card, outside its link (a card with `to` stays one tap target). */
+  action?: ReactNode;
 }
 
 export interface TimelineGroup {
@@ -1552,6 +1647,7 @@ function TimelineMilestone({ item }: { item: TimelineItem }) {
       ) : (
         <div className="rounded-xl border border-border bg-card px-4 py-3">{inner}</div>
       )}
+      {item.action && <div className="controls mt-2">{item.action}</div>}
     </li>
   );
 }
@@ -1578,6 +1674,157 @@ export function Timeline({ groups, className }: { groups: TimelineGroup[]; class
     </div>
   );
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Heatmap — how much happened each day
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface HeatDay { date: string; value: number }
+
+const HEAT_SHADES = ["bg-muted", "bg-primary-900", "bg-primary-800", "bg-primary-700", "bg-primary"];
+const HEAT_DAYS = ["Mon", "", "Wed", "", "Fri", "", ""];
+const HEAT_MIN_CELL = 11;
+const heatWeekday = (iso: string) => (new Date(`${iso}T12:00`).getDay() + 6) % 7;
+
+/** Steps at the 50th, 75th and 90th percentile of the days with something, so one huge day doesn't flatten the rest. */
+function heatSteps(values: number[]): number[] {
+  const v = values.filter((x) => x > 0).sort((a, b) => a - b);
+  if (!v.length) return [1, 1, 1];
+  const q = (p: number) => v[Math.min(v.length - 1, Math.floor(p * v.length))]!;
+  return [q(0.5), q(0.75), q(0.9)];
+}
+const heatShade = (x: number, s: number[]) => (!x ? 0 : x <= s[0]! ? 1 : x <= s[1]! ? 2 : x <= s[2]! ? 3 : 4);
+
+/**
+ * A calendar heatmap: a square per day, a column per week (Monday at the
+ * top), in five solid steps of the accent's shades. Days in order, oldest
+ * first, one per day. Each day with something in it opens `to(date)`. Fills
+ * its width and never scrolls sideways (L3): with `trim` a narrow screen
+ * leaves off the earliest weeks; without it, weeks that don't fit wrap onto
+ * more blocks of one width. A caption gives the totals and the key.
+ */
+export function Heatmap({ days: all, to, unit = "events", title, trim = true }: {
+  days: HeatDay[];
+  /** Where a day with something in it goes; left out, days aren't links. */
+  to?: (date: string) => string;
+  /** What a day's value counts, for labels and the caption ("visits"). */
+  unit?: string;
+  /** Names the figure for screen readers. */
+  title?: string;
+  /** On a narrow screen, show the latest weeks that fit (off: every week, wrapping). */
+  trim?: boolean;
+}) {
+  const box = useRef<HTMLElement>(null);
+  const [fit, setFit] = useState(60);
+  useEffect(() => {
+    const el = box.current;
+    if (!el) return;
+    const ro = new ResizeObserver(([e]) => setFit(Math.max(8, Math.floor(((e?.contentRect.width ?? 600) - 28) / HEAT_MIN_CELL))));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  const last = all[all.length - 1];
+  const keep = last ? heatWeekday(last.date) + 1 + (fit - 1) * 7 : 0;
+  const days = trim && all.length > keep ? all.slice(all.length - keep) : all;
+  if (!days.length) return null;
+  const s = heatSteps(all.map((d) => d.value));
+  const cells: (HeatDay | null)[] = [...Array(heatWeekday(days[0]!.date)).fill(null), ...days];
+  const weeks = Math.ceil(cells.length / 7);
+  const months: { col: number; label: string }[] = [];
+  cells.forEach((c, i) => {
+    if (c && c.date.endsWith("-01")) months.push({ col: Math.floor(i / 7), label: new Date(`${c.date}T12:00`).toLocaleDateString([], { month: "short" }) });
+  });
+  const total = days.reduce((a, d) => a + d.value, 0);
+  const active = days.filter((d) => d.value).length;
+  const count = Math.max(1, Math.ceil(weeks / Math.max(fit, 1)));
+  const per = Math.ceil(weeks / count);
+  return (
+    <figure ref={box} className="space-y-2" aria-label={title ?? `${active} days with ${unit}`}>
+      <div className="space-y-3">
+        {Array.from({ length: count }, (_, b) => b * per).map((from) => {
+          const n = Math.min(per, weeks - from);
+          return (
+            <div key={from} className="grid gap-0.5 text-10 text-subtle-foreground" style={{ gridTemplateColumns: `1.75rem repeat(${per}, minmax(0, 1fr))` }}>
+              <span />
+              {Array.from({ length: per }, (_, k) => (
+                <span key={k} className="h-3 overflow-visible whitespace-nowrap leading-3">{k < n ? months.find((x) => x.col === from + k)?.label ?? "" : ""}</span>
+              ))}
+              {Array.from({ length: 7 }, (_, row) => (
+                <HeatRow key={row} row={row} from={from} weeks={n} cols={per} cells={cells} s={s} to={to} unit={unit} />
+              ))}
+            </div>
+          );
+        })}
+      </div>
+      <figcaption className="flex flex-wrap items-center justify-between gap-2 text-sm text-subtle-foreground">
+        <span>{active.toLocaleString()} days with {unit} · {total.toLocaleString()} {unit}</span>
+        <span className="inline-flex items-center gap-1" aria-hidden="true">
+          Less {HEAT_SHADES.map((c) => <span key={c} className={cn("h-2.5 w-2.5 rounded-sm", c)} />)} More
+        </span>
+      </figcaption>
+    </figure>
+  );
+}
+
+function HeatRow({ row, from, weeks, cols, cells, s, to, unit }: {
+  row: number; from: number; weeks: number; cols: number; cells: (HeatDay | null)[]; s: number[]; to?: (date: string) => string; unit: string;
+}) {
+  return (
+    <>
+      <span className="leading-none">{HEAT_DAYS[row]}</span>
+      {Array.from({ length: cols }, (_, k) => {
+        const w = from + k;
+        const c = k < weeks ? cells[w * 7 + row] : null;
+        if (!c) return <span key={w} />;
+        const label = `${new Date(`${c.date}T12:00`).toLocaleDateString([], { weekday: "short", day: "numeric", month: "short", year: "numeric" })}: ${c.value.toLocaleString()} ${unit}`;
+        const cls = cn("block aspect-square w-full rounded-sm", HEAT_SHADES[heatShade(c.value, s)]);
+        return c.value && to
+          ? <Link key={w} to={to(c.date)} title={label} aria-label={label} className={cn(cls, "transition-opacity hover:opacity-70 active:opacity-70")} />
+          : <span key={w} title={label} className={cls} />;
+      })}
+    </>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CodeBlock — text to read or copy as it is
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Raw text (a command, a config line, a log excerpt) in monospace, wrapped,
+ * on the field surface, with a Copy button beside it that says "Copied" for
+ * two seconds. `prominent` makes Copy the primary button, for the one thing
+ * on the page to do. `onCopy(ok)` lets the page say more (a toast), or say
+ * it couldn't (the clipboard can refuse).
+ */
+export function CodeBlock({ code, label = "Copy", prominent = false, onCopy, className }: {
+  code: string;
+  /** Names the Copy button for screen readers ("Copy the command"). */
+  label?: string;
+  prominent?: boolean;
+  onCopy?: (ok: boolean) => void;
+  /** Layout only (J3). */
+  className?: string;
+}) {
+  const [copied, setCopied] = useState(false);
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+      onCopy?.(true);
+    } catch {
+      onCopy?.(false);
+    }
+  };
+  return (
+    <div className={cn("flex min-w-0 items-stretch gap-2", className)}>
+      <code className="min-w-0 flex-1 select-all whitespace-pre-wrap break-all rounded-lg border border-border bg-muted px-3 py-2 font-mono text-13 text-foreground">{code}</code>
+      <Button size="sm" variant={prominent ? "default" : "secondary"} onClick={() => void copy()} aria-label={label}>{copied ? "Copied" : "Copy"}</Button>
+    </div>
+  );
+}
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Controls

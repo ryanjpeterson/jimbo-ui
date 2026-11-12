@@ -34,6 +34,19 @@ the matching 0.x release.
 
 ## Unreleased
 
+### Added
+- `Part`: a part of a long page, bigger than a `Section` — a rule above, an eyebrow with a dot, a big heading, one action, a lede, then its sections.
+- `Lede`, `UpdatedLine` and `timeAgo`; `PageHeader` takes `lede` (what the page is for) and `updated` (`{ at, note? }`, "Updated 12 min ago").
+- `StatTile to`: the whole tile is one link (N4 named it; the kit lacked it).
+- `HeroCarousel` `timerAt` ("top" | "bottom") and `controlsAt` ("left" | "right"); L11 and M2 allow both sides.
+- `Timeline` items take `action`: one small button under the card, outside its link.
+- `Heatmap` (a calendar heatmap) and `CodeBlock` (text to copy, with a Copy button) move from candidates into the kit.
+
+### Fixed
+- The Style guide's Timeline demo said "a plain rounded-xl border border-border bg-card"; it says "a plain card" again.
+
+**Update:** feature. **Apps must:** Nothing.
+
 ## 0.18.0 — 2026-11-11
 
 jimbo.ui moves onto shadcn/ui, goes flat, and becomes binding: apps use its components and tokens only, and amend it by PR.

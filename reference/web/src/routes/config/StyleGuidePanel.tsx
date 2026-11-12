@@ -18,7 +18,7 @@ import { Input } from "@/components/ui/input";
 import { HeaderTitle } from "@/components/HeaderTitle";
 import { ColorPicker } from "@/components/ColorPicker";
 import {
-  Autocomplete, Chevron, Columns, ColumnsPicker, FloatingBar, LinkChips, ToggleGrid, Badge, BarChart, DateBlock, KeyValue, LayoutSwitch, SwitchRow, EmptyState, EntityRow, EventRow, LinkCard, List, ListGroupLabel, Loading, MediaCard, MediaGrid, Page, PageHeader, Pager,
+  Autocomplete, Chevron, Columns, CodeBlock, ColumnsPicker, FloatingBar, Heatmap, Lede, Part, LinkChips, ToggleGrid, Badge, BarChart, DateBlock, KeyValue, LayoutSwitch, SwitchRow, EmptyState, EntityRow, EventRow, LinkCard, List, ListGroupLabel, Loading, MediaCard, MediaGrid, Page, PageHeader, Pager,
   PillTabs, RankedList, SearchField, Section, SelectField, ShareSliders, Sheet, Sparkline, StatGrid, StatTile, Tabs, ThemeDots, Timeline, TrendChart, useGridColumns, useListLayout, ViewSwitch, type Tone,
 } from "@/components/ui/kit";
 import { DateField, FileDrop, TextArea, TextField } from "@/components/ui/forms";
@@ -224,9 +224,11 @@ export function StyleGuidePanel({ more = [] }: { more?: { value: string; label: 
         </div>
       </Block>
 
-      <Block section="controls" title="PageHeader and Back" note="On a page, PageHeader is a compact hero: the theme's colours blurred the full width, a big title, pulled up under the top bar (L11). Give each kind of page its own pattern (L12). Shown here plain, as it is inside a card. Every page below a dock tab's own page has Back to its parent — the path minus its last part (/library/import → /library) — above its eyebrow. Back lands on the parent as it was left (its tabs and filters), and the path says how far in you are. Actions are one .controls row.">
+      <Block section="controls" title="PageHeader and Back" note="On a page, PageHeader is a compact hero: the theme's colours blurred the full width, a big title, pulled up under the top bar (L11). Give each kind of page its own pattern (L12). Shown here plain, as it is inside a card. Every page below a dock tab's own page has Back to its parent — the path minus its last part (/library/import → /library) — above its eyebrow. Back lands on the parent as it was left (its tabs and filters), and the path says how far in you are. Actions are one .controls row. lede says what the page is for; updated is a freshness line for data worked out ahead of time.">
         <div className="rounded-xl border border-border bg-card p-5">
           <PageHeader plain className="mb-0" back={{ to: "/jimbo-ui", label: "jimbo-ui config" }} eyebrow="Library" title="Import"
+            lede="Bring in entries from a file. Nothing is saved until you check them."
+            updated={{ at: Date.now() - 12 * 60_000, note: "worked out every hour" }}
             actions={<><Button variant="secondary" size="sm">Cancel</Button><Button>Import</Button></>} />
         </div>
       </Block>
@@ -299,12 +301,12 @@ export function StyleGuidePanel({ more = [] }: { more?: { value: string; label: 
         </div>
       </Block>
 
-      <Block section="numbers" title="Numbers">
+      <Block section="numbers" title="Numbers" note="A StatTile with to is one link, the whole tile (N4).">
         <StatGrid>
           <StatTile label="StatTile · accent" value={128} accent="accent" />
           <StatTile label="StatTile · highlight" value={42} accent="highlight" />
           <StatTile label="StatTile · support" value={17} accent="support" />
-          <StatTile label="StatTile · muted" value={6} sub="with a sub line" />
+          <StatTile label="StatTile · muted" value={6} sub="with a sub line" to="/jimbo-ui?tab=style" />
         </StatGrid>
       </Block>
 
@@ -392,17 +394,36 @@ export function StyleGuidePanel({ more = [] }: { more?: { value: string; label: 
         </div>
       </Block>
 
-      <Block section="lists" title="Timeline" note="Milestones in order along a line, in groups. The 10 px dot sits on the line, outside the card; its colour is the kind of milestone, and the when line names it too. A milestone with a link is one tap target.">
+      <Block section="lists" title="Timeline" note="Milestones in order along a line, in groups. The 10 px dot sits on the line, outside the card; its colour is the kind of milestone, and the when line names it too. A milestone with a link is one tap target; its action sits under the card, outside the link.">
         <Timeline groups={[
           { label: "2026", items: [
             { id: "c", when: "Oct 2026 · Release", title: "Version two goes out", body: "The rebuild ships to everyone, with the old data carried over.", tone: "highlight", badge: <Badge tone="accent">Now</Badge>, to: "/jimbo-ui?tab=style" },
-            { id: "b", when: "Mar 2026 · Milestone", title: "A thousand entries", meta: "Took 14 months", to: "/jimbo-ui?tab=style" },
+            { id: "b", when: "Mar 2026 · Milestone", title: "A thousand entries", meta: "Took 14 months", to: "/jimbo-ui?tab=style",
+              action: <Button size="sm" variant="secondary">Save as a list</Button> },
           ] },
           { label: "2025", items: [
             { id: "a", when: "Jan 2025 · Started", title: "The first entry, and a title long enough to show the two-line trim at phone width before it gives up", tone: "support" },
-            { id: "z", when: "Jan 2025 · Note", title: "No link: a plain rounded-xl border border-border bg-card", tone: "muted" },
+            { id: "z", when: "Jan 2025 · Note", title: "No link: a plain card", tone: "muted" },
           ] },
         ]} />
+      </Block>
+
+      <Block section="lists" title="Part and Lede" note="A part of a long page, bigger than a Section: a rule above (none on the first), an eyebrow with a dot in its tone, a big heading, one action, a lede, then its sections. Lede on its own goes under a header that has none.">
+        <Part first eyebrow="This year" title="Activity" tone="highlight" lede="What happened, and when." action={<Button variant="secondary">Export</Button>}>
+          <StatGrid><StatTile label="Entries" value={312} accent="highlight" /><StatTile label="Days" value={88} /></StatGrid>
+        </Part>
+        <Part eyebrow="All time" title="Totals">
+          <Lede>A part with no lede of its own, and a Lede under it.</Lede>
+        </Part>
+      </Block>
+
+      <Block section="numbers" title="Heatmap" note="A square per day, a column per week, five solid steps of the accent's shades. Days with something in them link to their page. On phones the earliest weeks are left off, or wrap onto more blocks with trim off.">
+        <Heatmap unit="entries" to={() => "/jimbo-ui?tab=style"}
+          days={Array.from({ length: 182 }, (_, k) => { const d = new Date(Date.UTC(2026, 4, 1) + k * 86_400_000); return { date: d.toISOString().slice(0, 10), value: (k * 7919) % 11 < 4 ? 0 : (k * 31) % 9 }; })} />
+      </Block>
+
+      <Block section="data" title="CodeBlock" note="Text to copy as it is (a command, a config line), in monospace and wrapped, with Copy beside it. prominent when copying it is the thing to do here.">
+        <CodeBlock code="npx example-cli init --dir ./data" label="Copy the command" prominent onCopy={(ok) => toast(ok ? "Copied" : { title: "The clipboard said no", tone: "error" })} />
       </Block>
 
       <Block section="controls" title="Picks, related links and the floating bar" note="ToggleGrid for several picks from a small set; LinkChips for related things to go to; FloatingBar for a status and its actions above the dock.">
