@@ -7,19 +7,22 @@
  * - `DateField` — a date, time or both, with the platform's own picker
  *   (the phone wheel on iOS, the calendar on Android and desktop).
  * - `FileDrop` — pick or drop files; checks type and size and lists them.
+ * - `ConditionGroup` — a rule's conditions as rows of chips: "All of",
+ *   "Any of", "Except"; a chip's text edits it, its × removes it.
  *
  * SearchField, SelectField, Autocomplete, RangeField and ColorPicker are in
  * the kit. All of them are 48 px tall on phones, 44 from `sm:` up.
  *
  * Built on jimbo.ui's shadcn primitives: Field (label, description, error),
- * Input and Textarea.
+ * Input and Textarea; ConditionGroup on Badge and Button.
  *
  * jimbo-ui reference: copy into an app as is.
  */
 
 import { useId, useLayoutEffect, useRef, useState, type InputHTMLAttributes, type ReactNode } from "react";
-import { CalendarIcon, CircleAlertIcon, ClockIcon, UploadIcon } from "lucide-react";
+import { CalendarIcon, CircleAlertIcon, ClockIcon, UploadIcon, XIcon } from "lucide-react";
 import { cn } from "@/lib/cn";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Field, FieldDescription, FieldError, FieldLabel } from "@/components/ui/field";
@@ -254,6 +257,75 @@ export function FileDrop({ label, files, onChange, accept, multiple = false, max
           ))}
         </ul></Card>
       )}
+    </div>
+  );
+}
+
+/**
+ * How a condition joins its rule. `all`: every one must hold, each narrows
+ * (accent dot). `any`: at least one must hold, an "or" group (support dot).
+ * `not`: anything that matches is left out (highlight dot).
+ */
+export type ConditionKind = "all" | "any" | "not";
+
+const CONDITION_DOT: Record<ConditionKind, string> = { all: "dot-primary", any: "dot-support", not: "dot-highlight" };
+const CONDITION_TITLE: Record<ConditionKind, string> = { all: "All of", any: "Any of", not: "Except" };
+
+export interface ConditionChip {
+  id: string;
+  /** What the condition says ("Size: large", "Made after 2020"). */
+  label: ReactNode;
+  /** Makes the chip's text a button that opens the condition to change it. */
+  onEdit?: () => void;
+  onRemove: () => void;
+  /** The × button's name for screen readers ("Remove Size: large"). */
+  removeLabel: string;
+}
+
+export interface ConditionRow {
+  kind: ConditionKind;
+  /** The row's label; "All of", "Any of" or "Except" by default. */
+  title?: string;
+  chips: ConditionChip[];
+}
+
+/**
+ * A rule's conditions (a filter, a saved search, an automation) as rows of
+ * chips, one row per way they join: "All of", "Any of", "Except". Each row's
+ * label has a dot in its colour, so the row reads by its words as well as
+ * its colour. A chip's text edits it (`onEdit`), its × removes it. Rows with
+ * no chips aren't drawn, and nothing is when every row is empty — show your
+ * own empty line or the control that adds the first condition.
+ *
+ * Data-agnostic: the page says what each chip is and does, and keeps the
+ * rule (in the URL where it's a view, N1). Adding a condition is the
+ * page's own control (a `Menu`, a `Popover` or a `Sheet` of fields).
+ */
+export function ConditionGroup({ rows, className }: { rows: ConditionRow[]; className?: string }) {
+  const shown = rows.filter((r) => r.chips.length);
+  if (!shown.length) return null;
+  return (
+    <div className={cn("space-y-2", className)}>
+      {shown.map((r, i) => {
+        const title = r.title ?? CONDITION_TITLE[r.kind];
+        return (
+          <div key={`${r.kind}-${i}`} role="group" aria-label={title} className="flex min-w-0 flex-wrap items-center gap-2">
+            <p aria-hidden="true" className="eyebrow flex w-full items-center gap-1.5 sm:w-20 sm:shrink-0">
+              <span className={cn(CONDITION_DOT[r.kind], "size-2 shrink-0")} />{title}
+            </p>
+            {r.chips.map((c) => (
+              <Badge key={c.id} variant="secondary" className="max-w-full gap-0 py-0 pr-0 pl-1">
+                {c.onEdit
+                  ? <Button size="sm" variant="ghost" className="min-w-0 max-w-full px-2" onClick={c.onEdit}>
+                      <span className="min-w-0 truncate">{c.label}</span>
+                    </Button>
+                  : <span className="min-w-0 truncate px-2">{c.label}</span>}
+                <Button size="icon" variant="ghost" aria-label={c.removeLabel} onClick={c.onRemove}><XIcon /></Button>
+              </Badge>
+            ))}
+          </div>
+        );
+      })}
     </div>
   );
 }

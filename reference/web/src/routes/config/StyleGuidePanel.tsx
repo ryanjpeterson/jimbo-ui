@@ -21,7 +21,7 @@ import {
   Autocomplete, Chevron, Columns, ColumnsPicker, FloatingBar, LinkChips, ToggleGrid, Badge, BarChart, DateBlock, KeyValue, LayoutSwitch, SwitchRow, EmptyState, EntityRow, EventRow, LinkCard, List, ListGroupLabel, Loading, MediaCard, MediaGrid, Page, PageHeader, Pager,
   PillTabs, RankedList, SearchField, Section, SelectField, ShareSliders, Sheet, Sparkline, StatGrid, StatTile, Tabs, ThemeDots, Timeline, TrendChart, useGridColumns, useListLayout, ViewSwitch, type Tone,
 } from "@/components/ui/kit";
-import { DateField, FileDrop, TextArea, TextField } from "@/components/ui/forms";
+import { ConditionGroup, DateField, FileDrop, TextArea, TextField, type ConditionKind } from "@/components/ui/forms";
 import { DropdownButton, JumpMenu, Menu, Popover, SearchTrigger, Tooltip } from "@/components/ui/overlays";
 import { JobTile, OfflineBanner, ProgressBar, Stepper, toast, UpdateBanner, useConfirm } from "@/components/ui/feedback";
 import { Accordion, DataTable, type Column, type TableSort } from "@/components/ui/data";
@@ -464,6 +464,14 @@ export function StyleGuidePanel({ more = [] }: { more?: { value: string; label: 
 // Forms, overlays, feedback and data (components/ui/forms, overlays, feedback, data)
 // ─────────────────────────────────────────────────────────────────────────────
 
+const CONDITIONS: { id: string; kind: ConditionKind; label: string }[] = [
+  { id: "size", kind: "all", label: "Size: large" },
+  { id: "stock", kind: "all", label: "In stock" },
+  { id: "blue", kind: "any", label: "Colour: blue" },
+  { id: "green", kind: "any", label: "Colour: green" },
+  { id: "sale", kind: "not", label: "On sale" },
+];
+
 function FormBlocks() {
   const [name, setName] = useState("Studio B");
   const [email, setEmail] = useState("someone@");
@@ -472,6 +480,7 @@ function FormBlocks() {
   const [date, setDate] = useState("2026-11-14");
   const [time, setTime] = useState("");
   const [files, setFiles] = useState<File[]>([]);
+  const [conditions, setConditions] = useState(CONDITIONS);
   const emailError = email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) ? "Add the part after the @, like example.com" : undefined;
   return (
     <>
@@ -493,6 +502,23 @@ function FormBlocks() {
       <Block section="forms" title="FileDrop" note="Tap to pick, or drop files on it. Wrong types and files over the limit are turned away with a reason.">
         <div className="rounded-xl border border-border bg-card p-5">
           <FileDrop label="Attachments" files={files} onChange={setFiles} multiple accept="image/*,.pdf,.csv" maxSize={5 * 1024 * 1024} hint="Images, PDF or CSV, up to 5 MB each" />
+        </div>
+      </Block>
+      <Block section="forms" title="ConditionGroup" note="A rule's conditions as rows of chips: All of narrows, Any of is an or group, Except leaves things out. Tap a chip's text to change it, its × to remove it. Empty rows aren't drawn.">
+        <div className="rounded-xl border border-border bg-card space-y-3 p-5">
+          <ConditionGroup rows={(["all", "any", "not"] as ConditionKind[]).map((kind) => ({
+            kind,
+            chips: conditions.filter((c) => c.kind === kind).map((c) => ({
+              id: c.id,
+              label: c.label,
+              onEdit: () => toast(`Change “${c.label}”`),
+              onRemove: () => setConditions((all) => all.filter((x) => x.id !== c.id)),
+              removeLabel: `Remove ${c.label}`,
+            })),
+          }))} />
+          {conditions.length < CONDITIONS.length && (
+            <Button size="sm" variant="secondary" onClick={() => setConditions(CONDITIONS)}>Put them back</Button>
+          )}
         </div>
       </Block>
     </>

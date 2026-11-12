@@ -1140,6 +1140,7 @@ them as they are (J2, J3).
 | `Popover`, `Tooltip` | `popover`, `tooltip` |
 | `CommandPalette` | `dialog`, `badge` (its own listbox and query parsing) |
 | `TextField`, `TextArea`, `DateField`, `FileDrop` | `field`, `input`, `textarea`, `card` |
+| `ConditionGroup` | `badge`, `button` |
 | `SelectField`, `Tabs`, `ToggleGrid`, `SwitchRow`, `RangeField`, `ShareSliders` | `select`, `tabs`, `toggle-group`, `switch`, `slider` |
 | `DataTable`, `Accordion` | `table`, `accordion`, `card` |
 | `ProgressBar`, `JobTile` | `progress`, `card`, `badge` |
@@ -1208,6 +1209,7 @@ them as they are (J2, J3).
 | `TextArea` (`ui/forms.tsx`) | Several lines; grows with its text up to `maxRows`; with `maxLength` it counts what's left once close |
 | `DateField` (`ui/forms.tsx`) | A date, time or both (`type`) with the platform's own picker, in the page's light or dark scheme; `min` / `max` |
 | `FileDrop` (`ui/forms.tsx`) | Pick or drop files: a dashed area that is the button, then the files with sizes and Remove; turns away wrong types and files over `maxSize`, saying why |
+| `ConditionGroup` (`ui/forms.tsx`) | A rule's conditions (a filter, a saved search, an automation) as rows of chips, one row per way they join: `all` ("All of", each narrows, accent dot), `any` ("Any of", an or group, support dot), `not` ("Except", left out, highlight dot). The row's label names it, so colour is never the only cue. A chip's text edits it (`onEdit`), its × removes it (`removeLabel` names it). Empty rows aren't drawn, nor is anything when every row is empty. Data-agnostic: the page owns the rule (in the URL, N1) and the control that adds a condition |
 | `Menu` + `MoreButton` (`ui/overlays.tsx`) | Actions on one thing from the ⋯ button, or a list of choices from a `DropdownButton` trigger: arrow keys, Home / End, a letter; `danger` items last after a `"divider"`, in the highlight colour, confirmed |
 | `DropdownButton` (`ui/overlays.tsx`) | **The trigger for anything that opens choices** (a `Menu` of options, a sort, a filter `Popover`): looks like a select — field surface, the value (`label` adds a muted prefix: "Sort Newest"), a down arrow that turns while open. `h-control`, or `size="sm"`; spread the trigger props on it |
 | `Popover` (`ui/overlays.tsx`) | A few controls by their button (filters, a quick setting), open while you use them; anything that saves is a `Sheet` |
@@ -1256,6 +1258,7 @@ one here fits.
 | **Switching views** | `Tabs` (2–4, segmented) · `PillTabs` (wrapping filters) · `ViewSwitch` (list ⇄ map) · `SelectField` (many options on phones) |
 | **Finding things** | `SearchField` (one list) · `CommandPalette` with providers (app-wide, Spotlight) · `SearchTrigger` (a page's search bar that opens it) · `PillTabs` filters · `SelectField` sort · `Autocomplete` (pick or add a record) |
 | **Picking several** | `ToggleGrid` (a small fixed set) · `Autocomplete` with chips (many records) · `SwitchRow`s (named on/off settings) |
+| **Building a rule** | `ConditionGroup` (its conditions: all of, any of, except) · `Menu`, `Popover` or `Sheet` of `SelectField`s to add one |
 | **Related things** | `LinkChips` (a wrapping row) · `LinkCard` stack (a few, with a line each) · `List` + `EntityRow` |
 | **Empty or loading** | `EmptyState` (with `ThemeDots`) · `Loading` skeleton |
 | **Status** | `Badge` (detail pages) · status dot on rows · `DateBlock` ticket |
@@ -1839,3 +1842,5 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   Desktop grid columns (L13): an app-wide setting in the config's Brand
   tab (`Theme.gridColumns`) and `ColumnsPicker` + `useGridColumns` for
   one grid. The config section fills the page column, like the header.
+- **Unreleased** — `ConditionGroup` (`forms.tsx`): a rule's conditions as
+  rows of chips, All of / Any of / Except, each chip editable and removable.
