@@ -1853,9 +1853,9 @@ Versions and what apps must do for each are in the repo's `CHANGELOG.md`.
   Desktop grid columns (L13): an app-wide setting in the config's Brand
   tab (`Theme.gridColumns`) and `ColumnsPicker` + `useGridColumns` for
   one grid. The config section fills the page column, like the header.
-- **Unreleased** — `ConditionGroup` (`forms.tsx`): a rule's conditions as
-  rows of chips, All of / Any of / Except, each chip editable and removable.
-- **Unreleased (2)** — S9: a card of rows has no padding of its own (`Card`
-  pads with one class, so `py-0` clears it at every width; from `sm` it
+- **0.18.1 (2026-11-11)** — `ConditionGroup` (`forms.tsx`): a rule's
+  conditions as rows of chips, All of / Any of / Except, each chip editable
+  and removable. S9: a card of rows has no padding of its own (`Card` pads
+  with one class, so `py-0` clears it at every width; from `sm` it
   didn't). L14: content lines up with the page column (`Banner` and `Hero`
   use `--page-max`, not a fixed 64rem, and pack to the start).

@@ -15,7 +15,7 @@ Four outside systems, none needed at runtime by the repo itself.
 
 ## jimbo standards
 
-It is one: jimbo-ui 0.18.0. Seven apps are registered; jimbo-notify builds on it; jimbo-explain 0.1.0 documents it.
+It is one: jimbo-ui 0.18.1. Seven apps are registered; jimbo-notify builds on it; jimbo-explain 0.1.0 documents it.
 
 ## Secrets and config
 

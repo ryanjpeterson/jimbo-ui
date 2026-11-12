@@ -34,6 +34,12 @@ the matching 0.x release.
 
 ## Unreleased
 
+## 0.18.1 — 2026-11-11
+
+ConditionGroup for rules; cards of rows lose their top padding on desktop (S9); hero content lines up with the page column (L14).
+
+**Update:** feature
+
 ### Added
 - **S9** — a card of rows (`List`, `Accordion`, `DataTable`, a flush `Section`) has no padding of its own: the first row starts at the card's top edge.
 - **L14** — a hero's or band's content lines up with the page column (column, wide or full) and packs to the start or spreads to both edges, never centred over wider sections.
@@ -43,7 +49,9 @@ the matching 0.x release.
 - `Card` padded `py-4 sm:py-5`, so a `py-0` (Accordion, DataTable, List, a flush Section, FileDrop's files) only cleared it on phones: from `sm` those cards had 20 px above the first row and below the last. The padding is now one class (`py-(--card-py)`), which `py-0` replaces at every width (S9).
 - `Banner` (and `Hero`) kept its content in a centred 64rem box whatever the page width, so on a wide or full page the picture and title floated in the middle above wider sections. It takes the page column's width (`--page-max`), as `FullBleed` and `PageHeader` do (L14).
 
-**Update:** feature. **Apps must:** Nothing.
+### Apps must
+
+- Nothing — copy the foundation files (`card.tsx` brings S9). Apps whose item pages use `Hero` / `Banner` take `Banner` from `reference/web/src/components/ui/kit.tsx` (L14); apps building rules can adopt `ConditionGroup` from `forms.tsx` and drop a pending one.
 
 ## 0.18.0 — 2026-11-11
 

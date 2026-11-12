@@ -12,6 +12,7 @@
 | 2026-11-03 | 0.14.0 (Tailwind 4, many kit pieces), 0.14.1, 0.14.2 |
 | 2026-11-04 to 2026-11-06 | 0.14.3–0.14.7 (space, Halloween, Spotlight search, card grids, symmetry, one control height), 0.15.0 (toasts) |
 | 2026-11-08 | 0.16.0 (the numbered rulebook), 0.17.0 (a hero on every page, HeroCarousel, JumpMenu, Timeline) |
+| 2026-11-11 | 0.18.1 (feature): `ConditionGroup`; cards of rows lose their desktop padding (S9); hero content lines up with the page column (L14) |
 | 2026-11-11 | 0.18.0 (breaking): hero scrims (C8); the component layer rebuilt on shadcn/ui with one token mapping, a flat look (S8), React 19, and the rules made binding (J1–J6, the PR route); desktop grid columns (L13) |
 
 ## Milestones

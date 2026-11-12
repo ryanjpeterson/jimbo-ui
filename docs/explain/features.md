@@ -21,7 +21,7 @@ Theme engine, kit and shell, rules, registry, tooling and the plugin. 27 feature
 | Feature | What it does | Where | Status |
 |-|-|-|-|
 | shadcn primitives | 29 shadcn/ui components with jimbo's edits, copied into apps | `foundation/src/components/ui/`, `scripts/shadcn-add.mjs` | new (0.18.0) |
-| UI kit | Composed from the primitives: fields, condition chips, menus, toasts, tables, steps, lists, cards, stats, charts, Timeline, ScrollingLine | `reference/web/src/components/ui/` | changed (0.18.0) |
+| UI kit | Composed from the primitives: fields, condition chips, menus, toasts, tables, steps, lists, cards, stats, charts, Timeline, ScrollingLine | `reference/web/src/components/ui/` | changed (0.18.1) |
 | App shell | Phone-first, full-screen, floating tab dock, safe areas, top bar | `reference/web/src/routes/AppShell.tsx` | stable |
 | Heroes | `PageHeader` (compact hero), `HeroSection`, `HeroCarousel`; a hero on every page | `reference/web/src/components/ui/kit.tsx` | new (0.17.0) |
 | JumpMenu | Every data page one tap away | kit | new (0.17.0) |
@@ -36,7 +36,7 @@ Theme engine, kit and shell, rules, registry, tooling and the plugin. 27 feature
 
 | Feature | What it does | Where | Status |
 |-|-|-|-|
-| Rulebook | 71 numbered rules (Brand, Colour, Shapes, Controls, Layout, Navigation, Motion, Parts, Binding, Accessibility) | `skills/jimbo-ui/rulebook.md` | changed (Unreleased: S9 cards of rows, L14 page column) |
+| Rulebook | 71 numbered rules (Brand, Colour, Shapes, Controls, Layout, Navigation, Motion, Parts, Binding, Accessibility) | `skills/jimbo-ui/rulebook.md` | changed (0.18.1: S9 cards of rows, L14 page column) |
 | PR route | Apps amend jimbo.ui only by PR; tracked pending versions | guide section 14, SKILL.md "Amend jimbo.ui" | new (0.18.0) |
 | Guide | Each rule explained, values and patterns | `skills/jimbo-ui/guide.md` | stable |
 
