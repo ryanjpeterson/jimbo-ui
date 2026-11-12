@@ -554,7 +554,9 @@
         "interval": "ms (10 s; 0 never moves on)",
         "size": "md | lg",
         "align": "start | center",
-        "pattern": "a backdrop (always blurred)"
+        "pattern": "a backdrop (always blurred)",
+        "timerAt": "bottom | top",
+        "controlsAt": "left | right"
       },
       "source": "reference/web/src/components/ui/kit.tsx#HeroCarousel"
     },
@@ -581,7 +583,10 @@
         "PageTitle",
         "Header"
       ],
-      "variants": {},
+      "variants": {
+        "lede": "a reading-width line under the title",
+        "updated": "a freshness line ({ at, note? })"
+      },
       "source": "reference/web/src/components/ui/kit.tsx#PageHeader"
     },
     {
@@ -822,7 +827,8 @@
       "variants": {
         "accent": "accent | highlight | support",
         "size": "proposed: sm — a compact cell for admin summaries (dl stat grids)",
-        "trend": "number[] — a Sparkline under the number"
+        "trend": "number[] — a Sparkline under the number",
+        "to": "the whole tile is one link"
       },
       "source": "reference/web/src/components/ui/kit.tsx#StatTile",
       "shadcn": "card"
@@ -1293,13 +1299,17 @@
     {
       "id": "heatmap",
       "name": "Heatmap",
-      "purpose": "Shows how often something happens across a grid of days or weeks.",
-      "tier": "candidate",
+      "purpose": "Shows how much happened each day, a square per day and a column per week.",
+      "tier": "kit",
       "aliases": [
         "Calendar heatmap",
         "ActivityGrid"
       ],
-      "variants": {}
+      "variants": {
+        "trim": "latest weeks that fit (default) | every week, wrapping",
+        "to": "days with something link to their page"
+      },
+      "source": "reference/web/src/components/ui/kit.tsx#Heatmap"
     },
     {
       "id": "timeline",
@@ -1311,9 +1321,39 @@
         "History"
       ],
       "variants": {
-        "tone": "accent | highlight | support | muted (per milestone)"
+        "tone": "accent | highlight | support | muted (per milestone)",
+        "action": "one small button under a milestone's card"
       },
       "source": "reference/web/src/components/ui/kit.tsx#Timeline"
+    },
+    {
+      "id": "part",
+      "name": "Part",
+      "purpose": "Splits a long page into a few big parts, each holding sections: a rule, an eyebrow with a dot, a big heading, one action.",
+      "tier": "kit",
+      "aliases": [
+        "PageSection",
+        "Chapter",
+        "Group"
+      ],
+      "variants": {
+        "tone": "accent | highlight | support",
+        "first": "no rule above"
+      },
+      "source": "reference/web/src/components/ui/kit.tsx#Part"
+    },
+    {
+      "id": "lede",
+      "name": "Lede",
+      "purpose": "Says what a page or part is for, in a sentence or two, at one reading width.",
+      "tier": "kit",
+      "aliases": [
+        "Intro",
+        "Help line",
+        "Subtitle"
+      ],
+      "variants": {},
+      "source": "reference/web/src/components/ui/kit.tsx#Lede"
     },
     {
       "id": "share-button",
@@ -1329,16 +1369,18 @@
     {
       "id": "code-block",
       "name": "CodeBlock",
-      "purpose": "Shows raw text (a log, a config) in monospace, wrapped.",
-      "tier": "candidate",
+      "purpose": "Shows text to copy as it is (a command, a config line) in monospace, wrapped, with a Copy button.",
+      "tier": "kit",
       "aliases": [
         "LogView",
         "pre",
         "Console"
       ],
       "variants": {
-        "follow": "stays scrolled to the end while it grows"
-      }
+        "prominent": "Copy as the primary button"
+      },
+      "source": "reference/web/src/components/ui/kit.tsx#CodeBlock",
+      "shadcn": "button"
     },
     {
       "id": "verdict",
