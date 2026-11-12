@@ -43,6 +43,7 @@ the matching 0.x release.
 - `Heatmap` (a calendar heatmap) and `CodeBlock` (text to copy, with a Copy button) move from candidates into the kit.
 
 ### Fixed
+- `HeroCarousel` passed `inert=""` to hidden slides, which React 19 reads as false (a console error, and hidden slides stayed focusable); it passes `inert` as a boolean.
 - The Style guide's Timeline demo said "a plain rounded-xl border border-border bg-card"; it says "a plain card" again.
 
 **Update:** feature. **Apps must:** Nothing.

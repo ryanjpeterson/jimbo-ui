@@ -380,7 +380,7 @@ export function HeroCarousel({ slides, index, onIndex, interval = 10_000, label 
       <div className="mt-auto grid pt-6" aria-live={stopped ? "polite" : "off"}>
         {slides.map((s, k) => (
           <div key={s.id} role="group" aria-roledescription="slide" aria-label={`${k + 1} of ${n}`}
-            aria-hidden={k !== i} {...(k !== i ? { inert: "" } as object : {})}
+            aria-hidden={k !== i} inert={k !== i}
             className={cn("col-start-1 row-start-1 flex flex-col justify-end gap-3 motion-safe:transition-opacity motion-safe:duration-500",
               align === "center" && "items-center text-center", k === i ? "opacity-100" : "invisible opacity-0")}>
             <HeroText eyebrow={s.eyebrow} title={s.title} align={align}>{s.children}</HeroText>
