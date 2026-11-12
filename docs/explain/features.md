@@ -21,7 +21,7 @@ Theme engine, kit and shell, rules, registry, tooling and the plugin. 27 feature
 | Feature | What it does | Where | Status |
 |-|-|-|-|
 | shadcn primitives | 29 shadcn/ui components with jimbo's edits, copied into apps | `foundation/src/components/ui/`, `scripts/shadcn-add.mjs` | new (0.18.0) |
-| UI kit | Composed from the primitives: fields, menus, toasts, tables, steps, lists, cards, stats, charts, Timeline, ScrollingLine | `reference/web/src/components/ui/` | changed (0.18.0) |
+| UI kit | Composed from the primitives: fields, condition chips, menus, toasts, tables, steps, lists, cards, stats, charts, Timeline, ScrollingLine | `reference/web/src/components/ui/` | changed (0.18.0) |
 | App shell | Phone-first, full-screen, floating tab dock, safe areas, top bar | `reference/web/src/routes/AppShell.tsx` | stable |
 | Heroes | `PageHeader` (compact hero), `HeroSection`, `HeroCarousel`; a hero on every page | `reference/web/src/components/ui/kit.tsx` | new (0.17.0) |
 | JumpMenu | Every data page one tap away | kit | new (0.17.0) |

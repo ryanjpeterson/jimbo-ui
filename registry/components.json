@@ -1488,6 +1488,26 @@
       "shadcn": "field, card"
     },
     {
+      "id": "condition-group",
+      "name": "ConditionGroup",
+      "purpose": "Shows a rule's conditions as rows of chips (all of, any of, except) to change or remove.",
+      "tier": "kit",
+      "aliases": [
+        "RuleBuilder",
+        "FilterBuilder",
+        "QueryBuilder",
+        "ConditionChips",
+        "FilterChips",
+        "RuleGroup"
+      ],
+      "variants": {
+        "kind": "all (accent dot) | any (support dot) | not (highlight dot)",
+        "chip": "onEdit (the text is a button) | text only"
+      },
+      "source": "reference/web/src/components/ui/forms.tsx#ConditionGroup",
+      "shadcn": "badge, button"
+    },
+    {
       "id": "menu",
       "name": "Menu",
       "purpose": "Offers a short list of actions on one thing from a button.",

@@ -34,6 +34,11 @@ the matching 0.x release.
 
 ## Unreleased
 
+### Added
+- `ConditionGroup` (`forms.tsx`): a rule's conditions as rows of chips — "All of" (each narrows, accent dot), "Any of" (an or group, support dot), "Except" (left out, highlight dot). A chip's text edits it, its × removes it; empty rows aren't drawn. Data-agnostic, built from `Badge` and `Button`. In the Style guide under Forms.
+
+**Update:** feature. **Apps must:** Nothing.
+
 ## 0.18.0 — 2026-11-11
 
 jimbo.ui moves onto shadcn/ui, goes flat, and becomes binding: apps use its components and tokens only, and amend it by PR.
