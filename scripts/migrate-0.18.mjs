@@ -23,9 +23,20 @@
  *   .chip → <Badge> / LinkChips, .label → <Label> / <Field>,
  *   raw rgb(var(--c-…)) colours, classes built from a tone name
  *   (`bg-${tone}`: "accent" now means shadcn's hover surface).
+ *
+ * What it leaves alone:
+ *   - foundation files (they say so on line 1);
+ *   - exact copies of a jimbo-ui file (the kit, AppShell, the config panels…),
+ *     matched by content against this checkout's foundation/ and reference/ —
+ *     they already use the new names, and "accent" in them is the hover
+ *     surface, so rewriting it would turn every hover into the solid accent;
+ *   - any other file that already uses the new names (`*-foreground`,
+ *     `bg-card`…): it's listed to check by hand instead of rewritten;
+ *   - the words "card" and "glass" outside class strings (comments, copy).
  */
 import { readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
-import { join, extname, relative } from "node:path";
+import { join, extname, relative, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 
 const args = process.argv.slice(2);
 const dry = args.includes("--dry");
@@ -62,13 +73,16 @@ export const RULES = [
   // Solid fills.
   [/\blit-accent\b/g, "bg-primary text-primary-foreground"],
   [/\blit-(highlight|support)\b/g, "bg-$1 text-$1-foreground"],
-  // Glass and the lit card → a flat card (S6, S8).
-  [/(["'`\s])card-glass(?=["'`\s])/g, "$1rounded-xl border border-border bg-card"],
-  [/(["'`\s])glass(?=["'`\s])/g, "$1border border-border bg-card"],
-  [/(["'`\s])card(?=["'`\s])/g, "$1rounded-xl border border-border bg-card"],
   // No blur or shadows on components (S8).
   [new RegExp(`[ \\t]?${V}backdrop-blur(?:-[a-z0-9]+)?(?=["'\`\\s])`, "g"), ""],
   [new RegExp(`[ \\t]?${V}shadow(?:-[a-z0-9/\\[\\]_.,()#-]+)?(?=["'\`\\s])`, "g"), ""],
+];
+
+/** Bare class names, rewritten only inside class strings (never in comments or copy): glass and the lit card → a flat card (S6, S8). */
+export const CLASS_RULES = [
+  [/(^|\s)card-glass(?=\s|$)/g, "$1rounded-xl border border-border bg-card"],
+  [/(^|\s)glass(?=\s|$)/g, "$1border border-border bg-card"],
+  [/(^|\s)card(?=\s|$)/g, "$1rounded-xl border border-border bg-card"],
 ];
 
 /** [pattern, what to do, any line (not just class strings)] — reported, not rewritten. */
@@ -101,10 +115,32 @@ function* walk(dir) {
   }
 }
 
-/** Rewrite one file's text; foundation files (they say so on line 1) are left alone. */
+/** The class strings in a file — className="…", class="…", @apply …, and the strings inside cn(…) — rewritten with `fn`. */
+function mapClassStrings(text, fn) {
+  return text
+    .replace(/(class(?:Name)?=\{?\s*)(["'`])([^"'`]*)\2/g, (_, pre, q, body) => `${pre}${q}${fn(body)}${q}`)
+    .replace(/(@apply )([^;]*)/g, (_, pre, body) => `${pre}${fn(body)}`)
+    .replace(/\bcn\(([^)]*)\)/g, (all, args) => all.replace(args, args.replace(/(["'`])([^"'`]*)\1/g, (_, q, body) => `${q}${fn(body)}${q}`)));
+}
+
+/** Rewrite one file's text (old names → shadcn names). */
 export function migrate(text) {
   let out = text;
   for (const [re, to] of RULES) out = out.replace(re, to);
+  return mapClassStrings(out, (cls) => CLASS_RULES.reduce((c, [re, to]) => c.replace(re, to), cls));
+}
+
+/** Names only 0.18 has: a file using them has been migrated (or copied from 0.18) already. */
+const NEW_NAMES = /\b(?:primary|highlight|support|muted|accent|card|popover|secondary|destructive)-foreground\b|\bsubtle-foreground\b|\bbg-card\b/;
+export const alreadyMigrated = (text) => NEW_NAMES.test(text);
+
+/** Every file in this jimbo-ui checkout's foundation/ and reference/, by content: an app's exact copies are skipped. */
+function jimboFiles() {
+  const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+  const out = new Set();
+  for (const dir of ["foundation", "reference"]) {
+    try { for (const f of walk(join(root, dir))) out.add(readFileSync(f, "utf8")); } catch { /* not in a jimbo-ui checkout */ }
+  }
   return out;
 }
 
@@ -112,10 +148,16 @@ const main = process.argv[1] && import.meta.url.endsWith(process.argv[1].split("
 if (main) {
   let changed = 0;
   const reports = [];
+  const skipped = [];
+  const copies = jimboFiles();
   for (const root of roots) {
     for (const file of walk(root)) {
       const text = readFileSync(file, "utf8");
-      if (/^\/[/*] Part of jimbo-ui \(foundation/.test(text)) continue;
+      if (/^\/[/*] Part of jimbo-ui \(foundation/.test(text) || copies.has(text)) continue;
+      if (alreadyMigrated(text)) {
+        if (migrate(text) !== text) skipped.push(relative(process.cwd(), file));
+        continue;
+      }
       const out = migrate(text);
       if (out !== text) { changed++; if (!dry) writeFileSync(file, out); }
       out.split("\n").forEach((line, i) => {
@@ -129,6 +171,10 @@ if (main) {
     }
   }
   console.log(`${dry ? "Would change" : "Changed"} ${changed} file(s).`);
+  if (skipped.length) {
+    console.log(`\n${skipped.length} file(s) already use the new names, so they were left alone. Check these by hand for old names (in them "accent" may be the hover surface, which is right):`);
+    for (const f of skipped) console.log(`  ${f}`);
+  }
   if (reports.length) {
     console.log(`\n${reports.length} to fix by hand:`);
     for (const r of reports) console.log(`  ${r}`);
