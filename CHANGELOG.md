@@ -34,6 +34,14 @@ the matching 0.x release.
 
 ## Unreleased
 
+**Update:** fix
+
+### Fixed
+- `scripts/migrate-0.18.mjs` rewrote files that were already on the 0.18 names. An app that copied the 0.18 kit (or `AppShell`, the config panels, `data.tsx`, `feedback.tsx`…) before running it had every `hover:bg-accent` — shadcn's hover surface — turned into `hover:bg-primary`, the solid accent fill, so hovered rows showed accent text on an accent fill. Its "card" and "glass" rules also rewrote those words in comments and copy ("An image card"). It now skips exact copies of jimbo-ui's foundation and reference files (matched by content), lists any other file that already uses the new names to check by hand instead of rewriting it, and rewrites "card" and "glass" only inside class strings.
+
+### Apps must
+- Nothing for apps that haven't run the codemod. An app that ran it after copying 0.18 files: copy the kit and the other exact-copy reference files again from the release (its `jimbo-ui.json` `reference` map names them), and search the app for `hover:bg-primary` / `active:bg-primary` on rows that should use the hover surface (`bg-accent`).
+
 ## 0.18.1 — 2026-11-11
 
 ConditionGroup for rules; cards of rows lose their top padding on desktop (S9); hero content lines up with the page column (L14).
